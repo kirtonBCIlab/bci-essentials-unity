@@ -97,7 +97,7 @@ public class SSVEP_Controller : MonoBehaviour
     private bool locked_keys = false;
 
     // SSVEP vars
-    public int refreshRate = 60;
+    public int refreshRate = 100;
     //public int stim_freq = 10;
     
     //public int markersPerSelection = 5;
@@ -116,23 +116,26 @@ public class SSVEP_Controller : MonoBehaviour
     public LSLResponseStream response;
     public bool trainingComplete = false;
     public bool responseExists = false;
+    private double responseTimeout = 0.008;
+    private double responseDelay = 0.2;             // Time in seconds to wait between checking for a python response
+    private double responseDelayFrames;
+    private int responseDelayFrameCount = 0;
     //private Unity_SSVEP unitySSVEP;
 
     //Other Scripts to Connect
-    //[SerializeField] Setup_SSVEP setup;
+    //[SerializeField] SSVEP_Setup setup;
     //[SerializeField] LSLMarkerStream marker;
 
-    public Setup_SSVEP setup;
+    public SSVEP_Setup setup;
     //public LSLMarkerStream marker;
 
 
     private void Awake()
     {
-        setup = GetComponent<Setup_SSVEP>();
+        setup = GetComponent<SSVEP_Setup>();
         marker = GetComponent<LSLMarkerStream>();
         //response = GetComponent<LSLResponseStream>();
         Application.targetFrameRate = refreshRate;
-
 
         print(marker);
     }
@@ -272,25 +275,16 @@ public class SSVEP_Controller : MonoBehaviour
         //}
         if (responseExists == true)
         {
-            string[] responseStrings = response.PullResponse();
-            for (int i = 0; i < responseStrings.Count(); i++)
+            // Pull a response
+            //Debug.Log("pulling python response");
+            // Check if enough frames have elapsed to pull another python response
+            responseDelayFrames = responseDelay * (double)refreshRate;
+            if (responseDelayFrameCount > (int)responseDelayFrames)
             {
-                string responseString = responseStrings[i];
-                print("WE GOT A RESPONSE");
-                print(responseString);
-
-                int n;
-                bool isNumeric = int.TryParse(responseString, out n);
-                if (isNumeric == true)
-                {
-                    //Run on selection
-                    onSelection(n, objectList[n]);
-                }
-
-
+                StartCoroutine(pullPythonResponse());
+                responseDelayFrameCount = 0;
             }
-
-
+            responseDelayFrameCount++;
         }
 
         if (Input.GetKeyDown(KeyCode.S))
@@ -450,9 +444,60 @@ public class SSVEP_Controller : MonoBehaviour
 
     }
 
+    public IEnumerator pullPythonResponse()
+    {
+        // Initialize the default response string
+        string[] defaultResponseStrings = { "" };
+        string[] responseStrings = defaultResponseStrings;
+
+        // Pull the python response and add it to the responseStrings array
+        responseStrings = response.PullResponse(defaultResponseStrings, responseTimeout);
+
+        //bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
+
+        if (responseStrings.Length > defaultResponseStrings.Length)
+        {
+            print(responseStrings);
+            for (int i = 0; i < responseStrings.Length; i++)
+            {
+                string responseString = responseStrings[i];
+                print("WE GOT A RESPONSE");
+                print(responseString);
+
+                int n;
+                bool isNumeric = int.TryParse(responseString, out n);
+                if (isNumeric == true)
+                {
+                    //Run on selection
+                    StartCoroutine(onSelection(n, objectList[n]));
+                }
+
+            }
+        }
+        //if (responseStrings.Count() > 0)
+        //{
+        //    for (int i = 1; i < responseStrings.Count(); i++)
+        //    {
+        //        string responseString = responseStrings[i];
+        //        print("WE GOT A RESPONSE");
+        //        print(responseString);
+
+        //        int n;
+        //        bool isNumeric = int.TryParse(responseString, out n);
+        //        if (isNumeric == true)
+        //        {
+        //            //Run on selection
+        //            StartCoroutine(onSelection(n, objectList[n]));
+        //        }
+
+        //    }
+        //}
+        yield return new WaitForSeconds(0.001f);
+    }
+
     public IEnumerator onSelection(int selectedInd, GameObject selectedObject)
     {
-        // This is free form, 
+        // This is free form, do whatever you want on selection
 
         print("Obejct " + selectedInd.ToString() + " selected");
 
@@ -464,10 +509,6 @@ public class SSVEP_Controller : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.3F);
 
         }
-        
-        
-
-
     }
 
     /* Checks to see if given values are valid */
@@ -483,6 +524,7 @@ public class SSVEP_Controller : MonoBehaviour
         }
     }
 
+    // Reset all of the SSVEP objects to their default colour
     private void ResetCubeColour()
     {
         for (int i = 0; i < objectList.Count; i++)

@@ -4,7 +4,7 @@ using UnityEngine;
 //TODO: ADD REQUIREMENT FOR OTHER COMPONENTS ON HERE
 
 //This class contains the functions needed to set-up the P300 matrices for flashing.
-public class Setup_SSVEP : MonoBehaviour
+public class SSVEP_Setup: MonoBehaviour
 {
     public int refreshRate;
     
@@ -23,7 +23,7 @@ public class Setup_SSVEP : MonoBehaviour
     }
     private void Start()
     {
-        //Get all of the information from the sSVEP_Controller that is needed here.
+        //Get all of the information from the SSVEP_Controller that is needed here.
 
     }
 
