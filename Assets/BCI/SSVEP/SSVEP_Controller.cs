@@ -11,8 +11,6 @@ using LSL4Unity;
 SSVEP Controller Script
 Author: Brian Irvine
 Adapted from: Eli Kinney-Lang & Shaheed Murji "P300_Flashes.cs"
-    
-    This is a refactoring of the original P300_Flashes.cs code to update the P300 Dynamic Cubes tool.
 
     Parameters here have been updated, and the master script has been broken out to better support modulatrity.
 
@@ -455,9 +453,28 @@ public class SSVEP_Controller : MonoBehaviour
 
         //bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
 
+        for (int i = 0; i < responseStrings.Length; i++)
+        {
+            string responseString = responseStrings[i];
+            print("WE GOT A RESPONSE");
+            print(responseString);
+
+            int n;
+            bool isNumeric = int.TryParse(responseString, out n);
+            if (isNumeric == true)
+            {
+                //Run on selection
+                StartCoroutine(onSelection(n, objectList[n]));
+            }
+
+        }
+
         if (responseStrings.Length > defaultResponseStrings.Length)
         {
-            print(responseStrings);
+            //print(responseStrings);
+
+            //print(responseStrings.Length);
+
             for (int i = 0; i < responseStrings.Length; i++)
             {
                 string responseString = responseStrings[i];
