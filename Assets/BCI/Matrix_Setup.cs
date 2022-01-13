@@ -8,7 +8,7 @@ using UnityEngine;
 // All objects are given the tag "BCI" so that they can be collected by the controller script
 
 //This class contains the functions needed to set-up the P300 matrices for flashing.
-public class SSVEP_Setup : MonoBehaviour
+public class Matrix_Setup : MonoBehaviour
 {
     public int numColumns;
     public int numRows;
@@ -97,7 +97,7 @@ public class SSVEP_Setup : MonoBehaviour
         {
             Destroy(objectList[i]);
         }
-        
+
     }
 
     // I DONT THINK THIS BELONGS HERE

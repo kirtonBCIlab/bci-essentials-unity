@@ -46,6 +46,7 @@ Adapted from: Shaheed Murji "P300_Flashes.cs"
 public class P300_Controller : MonoBehaviour
 {
     /* Public Variables */
+    public bool setupRequired;          //Determines if setupSSVEP needs to be run or if there are already objects with BCI tag
     public int refreshRate;     //Refresh rate of the Screen
     public float freqHz;        //Frequency in Hz
     public float dutyCycle;     //Previously 'flashLength'. Determines how long an object will remain "on" during a flash. 
@@ -61,7 +62,6 @@ public class P300_Controller : MonoBehaviour
     public int numColumns;      //Initial number of columns to use
     public Color onColour;      //Color during the 'flash' of the object.
     public Color offColour;     //Color when not flashing of the object.
-    public bool SendLiveInfo;   //This determines whether or not to send live information about the set-up to LSL.
     public int TargetObjectID;  //This can be used to select a 'target' object for individuals to focus on, using the given int ID.
     public int trainingLength;  //Number of training selections to complete
     public float trainBreak;    //Time in seconds between training trials
@@ -85,14 +85,14 @@ public class P300_Controller : MonoBehaviour
     private int s_trials;
     private Dictionary<KeyCode, bool> keyLocks = new Dictionary<KeyCode, bool>();
 
-    //Variables used for checking redraw
-    private double current_startx;
-    private double current_starty;
-    private float current_startz;
-    private double current_dx;
-    private double current_dy;
-    private int current_numrow;
-    private int current_numcol;
+    ////Variables used for checking redraw
+    //private double current_startx;
+    //private double current_starty;
+    //private float current_startz;
+    //private double current_dx;
+    //private double current_dy;
+    //private int current_numrow;
+    //private int current_numcol;
     private GameObject current_object;
     private bool locked_keys = false;
 
@@ -110,15 +110,21 @@ public class P300_Controller : MonoBehaviour
         setup = GetComponent<P300_Setup>();
         singleFlash = GetComponent<P300_SingleFlash>();
         //runPython = GetComponent<RunPython>();
+
+        marker = GetComponent<LSLMarkerStream>();
+        Application.targetFrameRate = refreshRate;
+
+        print(marker);
     }
 
     private void Start()
     {
         //Get the screen refresh rate, so that the colours can be set appropriately
         resol = Screen.resolutions;
+        
         refreshRate = resol[3].refreshRate;
         //Set up LSL Marker Streams (Outlet & Inlet)
-        marker = FindObjectOfType<LSLMarkerStream>();
+        //marker = FindObjectOfType<LSLMarkerStream>();
         //inletP300 = FindObjectOfType<Inlet_P300>();
 
         //Setting up Keys, to lock other keys when one simulation is being run
@@ -126,9 +132,6 @@ public class P300_Controller : MonoBehaviour
         keyLocks.Add(KeyCode.D, false);
         keyLocks.Add(KeyCode.T, false);
         locked_keys = false;
-
-        //Starting with sending the live information as false.
-        SendLiveInfo = false;
 
         //Check to see if inputs are valid, if not, then don't draw matrix and prompt user to redraw with the
         //correct inputs
@@ -139,12 +142,18 @@ public class P300_Controller : MonoBehaviour
             return;
         }
         //Initialize Matrix
-        SetupP300();
+        
+        // Add statement to check if 
+        if (setupRequired == true)
+        {
+            SetupP300();
+        }
+
         //SetUpMatrix();
         //SetUpSingle();
         //SetUpRC();
 
-        SaveCurrentInfo();
+        //SaveCurrentInfo();
         //Set the colour of the box to the given offColour
         //TurnOff();
         //System.Threading.Thread.Sleep(2000);
@@ -265,17 +274,17 @@ public class P300_Controller : MonoBehaviour
     }
 
     /* Save current states into variables for OnValidate to check */
-    public void SaveCurrentInfo()
-    {
-        current_object  = myObject;
-        current_startx  = startX;
-        current_starty  = startY;
-        current_startz  = startZ;
-        current_dx      = distanceX;
-        current_dy      = distanceY;
-        current_numrow  = numRows;
-        current_numcol  = numColumns;
-    }
+    //public void SaveCurrentInfo()
+    //{
+    //    current_object  = myObject;
+    //    current_startx  = startX;
+    //    current_starty  = startY;
+    //    current_startz  = startZ;
+    //    current_dx      = distanceX;
+    //    current_dy      = distanceY;
+    //    current_numrow  = numRows;
+    //    current_numcol  = numColumns;
+    //}
 
     //Write any marker you want!
     public void WriteMarker(string markerString)

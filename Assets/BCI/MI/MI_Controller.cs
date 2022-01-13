@@ -47,15 +47,6 @@ public class MI_Controller : MonoBehaviour
 {
     /* Public Variables */
     public bool setupRequired;          //Determines if MI_Setup needs to be run or if there are already objects with BCI tag
-    public double startX;               //Initial position of X for drawing in the objects
-    public double startY;               //Initial position of Y for drawing in the objects
-    public float startZ;                //Initial position of Z for drawing in the objects
-    public double distanceX;            //Distance between objects in X-plane
-    public double distanceY;            //Distance between objects in Y-Plane
-    public GameObject myObject;         //Previously 'myCube'. Object type that will be flashing. Default is a cube.
-    public Resolution[] resol;          //Resolution of the screen
-    public int numRows;                 //Initial number of rows to use
-    public int numColumns;              //Initial number of columns to use
     public Color onColour;              //Color during the 'flash' of the object.
     public Color offColour;             //Color when not flashing of the object.
     public bool SendLiveInfo;           //This determines whether or not to send live information about the set-up to LSL.
@@ -74,8 +65,11 @@ public class MI_Controller : MonoBehaviour
     private string markerString;        //The marker string to be sent out
 
     /* Variables shared with LSL Inlet (to be accessed to flash correct cube) */
-    public List<GameObject> objectList = new List<GameObject>();  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
+    public GameObject[] objectList;  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
     public bool listExists = false;
+
+    //TRAINING
+    public GameObject targetCube;
 
     /* Private Variables */
     private GameObject[,] object_matrix;
@@ -83,13 +77,13 @@ public class MI_Controller : MonoBehaviour
     private Dictionary<KeyCode, bool> keyLocks = new Dictionary<KeyCode, bool>();
 
     //Variables used for checking redraw
-    private double current_startx;
-    private double current_starty;
-    private float current_startz;
-    private double current_dx;
-    private double current_dy;
-    private int current_numrow;
-    private int current_numcol;
+    //private double current_startx;
+    //private double current_starty;
+    //private float current_startz;
+    //private double current_dx;
+    //private double current_dy;
+    //private int current_numrow;
+    //private int current_numcol;
     private GameObject current_object;
     private bool locked_keys = false;
 
@@ -121,7 +115,8 @@ public class MI_Controller : MonoBehaviour
     //[SerializeField] SSVEP_Setup setup;
     //[SerializeField] LSLMarkerStream marker;
 
-    public MI_Setup setup;
+    //public MI_Setup setup;
+    private Matrix_Setup setup;
     //public LSLMarkerStream marker;
 
     // MI Specific
@@ -131,7 +126,7 @@ public class MI_Controller : MonoBehaviour
 
     private void Awake()
     {
-        setup = GetComponent<MI_Setup>();
+        setup = GetComponent<Matrix_Setup>();
         marker = GetComponent<LSLMarkerStream>();
         //response = GetComponent<LSLResponseStream>();
         Application.targetFrameRate = refreshRate;
@@ -142,7 +137,7 @@ public class MI_Controller : MonoBehaviour
     private void Start()
     {
         //Get the screen refresh rate, so that the colours can be set appropriately
-        resol = Screen.resolutions;
+        //resol = Screen.resolutions;
 
         //Setting up Keys, to lock other keys when one simulation is being run
         keyLocks.Add(KeyCode.S, false);
@@ -156,12 +151,12 @@ public class MI_Controller : MonoBehaviour
 
         //Check to see if inputs are valid, if not, then don't draw matrix and prompt user to redraw with the
         //correct inputs
-        if (CheckEmpty())
-        {
-            print("Values must be non-zero and non-negative, please re-enter values and press 'D' to redraw...");
-            locked_keys = true;
-            return;
-        }
+        //if (CheckEmpty())
+        //{
+        //    print("Values must be non-zero and non-negative, please re-enter values and press 'D' to redraw...");
+        //    locked_keys = true;
+        //    return;
+        //}
 
         //Initialize Matrix
         if (setupRequired == true)
@@ -239,7 +234,7 @@ public class MI_Controller : MonoBehaviour
                 StartCoroutine(trainMI());
             }
 
-            // Make a selection, there must be a better way
+            // Make a selection
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
                 StartCoroutine(onSelection(0, objectList[0]));
@@ -264,8 +259,8 @@ public class MI_Controller : MonoBehaviour
     //Setting up the scene:
     private void SetupMI()
     {
-        object_matrix = setup.SetUpMatrix(objectList);
-        setup.Recolour(objectList, offColour);
+        setup.SetUpMatrix();
+        //setup.Recolour(objectList, offColour);
     }
 
     //Populating the SSVEP object list
@@ -387,7 +382,7 @@ public class MI_Controller : MonoBehaviour
 
             trainingCube = objectList[trainingIndex];
 
-            GameObject trainTarget = Instantiate(myObject);
+            GameObject trainTarget = Instantiate(targetCube);
             trainTarget.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
             trainTarget.transform.position = new Vector3(0, 0, 2) + trainingCube.transform.position;
 
@@ -564,22 +559,22 @@ public class MI_Controller : MonoBehaviour
 
     /* Checks to see if given values are valid */
     // Do I need this????
-    public bool CheckEmpty()
-    {
-        if (myObject == null || distanceX <= 0 || distanceY <= 0 || numRows <= 0 || numColumns <= 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    //public bool CheckEmpty()
+    //{
+    //    if (myObject == null || distanceX <= 0 || distanceY <= 0 || numRows <= 0 || numColumns <= 0)
+    //    {
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
 
     // Reset all of the SSVEP objects to their default colour
     private void ResetCubeColour()
     {
-        for (int i = 0; i < objectList.Count; i++)
+        for (int i = 0; i < objectList.Count(); i++)
         {
             objectList[i].GetComponent<Renderer>().material.color = Color.grey;
         }

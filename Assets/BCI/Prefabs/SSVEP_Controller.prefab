@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4065407625621757540}
   - component: {fileID: 4065407625621757541}
-  - component: {fileID: 4065407625621757467}
+  - component: {fileID: 7509760245157474170}
   - component: {fileID: 4065407625621757466}
+  - component: {fileID: 1591129461602711486}
   m_Layer: 0
   m_Name: SSVEP_Controller
   m_TagString: Untagged
@@ -46,33 +47,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setupRequired: 1
-  startX: 0
-  startY: 0
-  startZ: 0
-  distanceX: 2
-  distanceY: 2
-  myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-  numRows: 1
-  numColumns: 3
   onColour: {r: 0.9245283, g: 0.056692798, b: 0.056692798, a: 0}
   offColour: {r: 0.8984342, g: 0.9622642, b: 0.05900679, a: 0}
-  SendLiveInfo: 0
+  myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
+  objectList: []
+  listExists: 0
   TargetObjectID: 0
   numTrainingSelections: 3
   numTrainingWindows: 3
-  windowLength: 1
+  windowLength: 1.4
   trainBreak: 3
   setFreqFlash:
   - 10
   - 12
   - 15
   realFreqFlash: []
-  objectList: []
   refreshRate: 60
-  cube: {fileID: 6396776630637071763, guid: 487094b6b930d7c4485c398415cf4d0c, type: 3}
+  targetCube: {fileID: 6396776630637071763, guid: 487094b6b930d7c4485c398415cf4d0c, type: 3}
   marker: {fileID: 0}
-  setup: {fileID: 4065407625621757467}
---- !u!114 &4065407625621757467
+  response: {fileID: 0}
+  trainingComplete: 0
+  responseExists: 0
+  setup: {fileID: 0}
+--- !u!114 &7509760245157474170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -81,11 +78,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4065407625621757542}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1d4a8cc3b28be34d849f69cd29dae47, type: 3}
+  m_Script: {fileID: 11500000, guid: c403024fefd71b0438394dc65d340d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  refreshRate: 60
-  sSVEP_Controller: {fileID: 4065407625621757541}
+  numColumns: 3
+  numRows: 1
+  myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
+  startX: 0
+  startY: 0
+  startZ: 0
+  distanceX: 2
+  distanceY: 2
 --- !u!114 &4065407625621757466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,3 +103,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lslStreamName: Unity_<Paradigma_Name_here>
   lslStreamType: LSL_Marker_Strings
+--- !u!114 &1591129461602711486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4065407625621757542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d64fb522813bc7247975d1e5d73d93ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  responsePredicate: name='PythonResponse'
+  value: PythonResponse
+  pyRespIndex: 0
