@@ -398,8 +398,6 @@ public class MI_Controller : MonoBehaviour
             // Replace cursor to center
             cursor.transform.position = new Vector3(2, 0, 0);
 
-
-
             //RunSingleFlash();
             yield return new WaitForSecondsRealtime(trainBreak);
 

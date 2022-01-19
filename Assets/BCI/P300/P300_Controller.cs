@@ -46,26 +46,30 @@ Adapted from: Shaheed Murji "P300_Flashes.cs"
 public class P300_Controller : MonoBehaviour
 {
     /* Public Variables */
-    public bool setupRequired;          //Determines if setupSSVEP needs to be run or if there are already objects with BCI tag
+    public bool setupRequired;  //Determines if setupSSVEP needs to be run or if there are already objects with BCI tag
+    public bool setupOccured;   //Boolean shows if the setup has occured
     public int refreshRate;     //Refresh rate of the Screen
     public float freqHz;        //Frequency in Hz
     public float dutyCycle;     //Previously 'flashLength'. Determines how long an object will remain "on" during a flash. 
     public int numFlashes;      //Previously 'numSamples'. Determines number of times a single object will flash in the series.
-    public double startX;       //Initial position of X for drawing in the objects
-    public double startY;       //Initial position of Y for drawing in the objects
-    public float startZ;        //Initial position of Z for drawing in the objects
-    public double distanceX;    //Distance between objects in X-plane
-    public double distanceY;    //Distance between objects in Y-Plane
+    //public double startX;       //Initial position of X for drawing in the objects
+    //public double startY;       //Initial position of Y for drawing in the objects
+    //public float startZ;        //Initial position of Z for drawing in the objects
+    //public double distanceX;    //Distance between objects in X-plane
+    //public double distanceY;    //Distance between objects in Y-Plane
     public GameObject myObject; //Previously 'myCube'. Object type that will be flashing. Default is a cube.
     public Resolution[] resol;  //Resolution of the screen
-    public int numRows;         //Initial number of rows to use
-    public int numColumns;      //Initial number of columns to use
+    //public int numRows;         //Initial number of rows to use
+    //public int numColumns;      //Initial number of columns to use
     public Color onColour;      //Color during the 'flash' of the object.
     public Color offColour;     //Color when not flashing of the object.
     public int TargetObjectID;  //This can be used to select a 'target' object for individuals to focus on, using the given int ID.
     public int trainingLength;  //Number of training selections to complete
     public float trainBreak;    //Time in seconds between training trials
 
+
+    public bool listExists = false; //whether the list of objects exists or is tbd
+    public bool trialOn = false;    //is a trial occuring
     //Variables for the Boxes
     /* Grid is mapped out as follows:
 
@@ -78,21 +82,15 @@ public class P300_Controller : MonoBehaviour
      */
 
     /* Variables shared with LSL Inlet (to be accessed to flash correct cube) */
-    public List<GameObject> object_list = new List<GameObject>();  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
+    //public List<GameObject> object_list = new List<GameObject>();  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
 
     /* Private Variables */
     private GameObject[,] object_matrix;
+    public GameObject[] objectList;
     private int s_trials;
     private Dictionary<KeyCode, bool> keyLocks = new Dictionary<KeyCode, bool>();
 
-    ////Variables used for checking redraw
-    //private double current_startx;
-    //private double current_starty;
-    //private float current_startz;
-    //private double current_dx;
-    //private double current_dy;
-    //private int current_numrow;
-    //private int current_numcol;
+
     private GameObject current_object;
     private bool locked_keys = false;
 
@@ -101,13 +99,13 @@ public class P300_Controller : MonoBehaviour
     //private Inlet_P300 inletP300;
 
     //Other Scripts to Connect
-    [SerializeField] P300_Setup setup;
+    [SerializeField] Matrix_Setup setup;
     [SerializeField] P300_SingleFlash singleFlash;
     //[SerializeField] RunPython runPython;
 
     private void Awake()
     {
-        setup = GetComponent<P300_Setup>();
+        setup = GetComponent<Matrix_Setup>();
         singleFlash = GetComponent<P300_SingleFlash>();
         //runPython = GetComponent<RunPython>();
 
@@ -132,16 +130,6 @@ public class P300_Controller : MonoBehaviour
         keyLocks.Add(KeyCode.D, false);
         keyLocks.Add(KeyCode.T, false);
         locked_keys = false;
-
-        //Check to see if inputs are valid, if not, then don't draw matrix and prompt user to redraw with the
-        //correct inputs
-        if (CheckEmpty())
-        {
-            print("Values must be non-zero and non-negative, please re-enter values and press 'D' to redraw...");
-            locked_keys = true;
-            return;
-        }
-        //Initialize Matrix
         
         // Add statement to check if 
         if (setupRequired == true)
@@ -149,31 +137,13 @@ public class P300_Controller : MonoBehaviour
             SetupP300();
         }
 
-        //SetUpMatrix();
-        //SetUpSingle();
-        //SetUpRC();
-
-        //SaveCurrentInfo();
-        //Set the colour of the box to the given offColour
-        //TurnOff();
-        //System.Threading.Thread.Sleep(2000);
-        SendInfo();
-
         //Run Python
         //runPython.RunP300Python();
     }
 
 
     private void Update()
-    {
-        //Don't think we need this anymore.
-
-        //if(Input.GetKeyDown(KeyCode.I))
-        //{
-        //    SetupP300();
-        //    Debug.Log("Initialization worked!");
-        //}
-
+    { 
         if(Input.GetKeyDown(KeyCode.S))
         {
             RunSingleFlash();
@@ -185,30 +155,6 @@ public class P300_Controller : MonoBehaviour
         {
             StartCoroutine(DoTraining());
         }
-
-        ////Resolve new streams - This is just if you need to refresh the streams.
-        //if (Input.GetKeyDown(KeyCode.F4))
-        //{
-        //    inletP300.ResolveOnRequest();
-        //}
-
-
-        ////TODO: Redraw Matrix
-        ////Select this after changing parameters
-        //if (Input.GetKeyDown(KeyCode.D) && keyLocks[KeyCode.S] == false)
-        //{
-        //    //Check if values are empty
-        //    if (CheckEmpty())
-        //    {
-        //        print("Values must be non-zero and non-negative, please re-enter values and try again...");
-        //        locked_keys = true;
-        //        return;
-        //    }
-        //    keyLocks[KeyCode.D] = true;
-        //    //Run our Redraw function.
-        //    
-        //    RedrawSingleFlash();
-        //}
 
         //Quit Program 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -223,13 +169,11 @@ public class P300_Controller : MonoBehaviour
     //Setting up the scene:
     private void SetupP300()
     {
-        object_matrix = setup.SetUpMatrix(object_list);
-        setup.Recolour(object_list,offColour);
+        setup.SetUpMatrix();
     }
 
     public void RunSingleFlash()
     {
-        //print("running singleflash training on target " + targetCube.ToString());
         singleFlash.SetUpSingle();
         singleFlash.SingleFlashes();
     }
@@ -238,53 +182,7 @@ public class P300_Controller : MonoBehaviour
     {
         setup.DestroyMatrix();
         SetupP300();
-        //singleFlash.Redraw();
     }
-
-    /* Checks to see if given values are valid */
-    public bool CheckEmpty()
-    {
-        if (myObject == null || distanceX <= 0 || distanceY <= 0 || numRows <= 0 || numColumns <= 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /* Write information to LSL for initializations */
-    //TODO: Make this more intuitive and flexible for send/receive. JSONify.
-    public void SendInfo()
-    {
-        marker.Write(numRows.ToString());
-        marker.Write(numColumns.ToString());
-        marker.Write(numFlashes.ToString());
-        marker.Write(s_trials.ToString());
-    }
-
-    //Send Current information about the current P300 setup
-    public void SendCurrentInfo()
-    {
-        marker.Write("Current rows : "  + numRows.ToString());
-        marker.Write("Current cols: "   + numColumns.ToString());
-        marker.Write("Num flashes: "    + numFlashes.ToString());
-        marker.Write("Target Object: "  + TargetObjectID.ToString());
-    }
-
-    /* Save current states into variables for OnValidate to check */
-    //public void SaveCurrentInfo()
-    //{
-    //    current_object  = myObject;
-    //    current_startx  = startX;
-    //    current_starty  = startY;
-    //    current_startz  = startZ;
-    //    current_dx      = distanceX;
-    //    current_dy      = distanceY;
-    //    current_numrow  = numRows;
-    //    current_numcol  = numColumns;
-    //}
 
     //Write any marker you want!
     public void WriteMarker(string markerString)
@@ -299,29 +197,39 @@ public class P300_Controller : MonoBehaviour
         locked_keys = !locked_keys;
     }
 
+    // Turn ON
+    public void turnON(GameObject objectToTurnOn)
+    {
+        objectToTurnOn.GetComponent<Renderer>().material.color = onColour;
+    }
+    
+    // Turn OFF
+    public void turnOFF(GameObject objectToTurnOff)
+    {
+        objectToTurnOff.GetComponent<Renderer>().material.color = offColour;
+    }
+
+    // TODO: On Selection
+
     // Do Training
-    public IEnumerator  DoTraining()
+    public IEnumerator DoTraining()
     {
         System.Random trainRandom = new System.Random();
-        GameObject[,] objectList = setup.SetUpMatrix(object_list);
+
+        //populate the list
+        PopulateList("tag");
+
         GameObject trainingCube;
 
-        // Get singleflash ready
-        //RunSingleFlash();
-
-        
+        // Run this once for each training target
         for (int i = 0; i < trainingLength; i++)
         {
             // Select random cube to train on
-            int trainingIndex = trainRandom.Next((numRows * numColumns));
+            int trainingIndex = trainRandom.Next(((int)objectList.Length - 1));
 
             print("Running training session " + i.ToString() + " on cube " + trainingIndex.ToString());
-            // Training goes here
 
-            // Put a slightly larger cube just behind the training cube as a target
-            int x = trainingIndex % numColumns;
-            int y = (trainingIndex - x) / numColumns;
-            trainingCube = objectList[x,y];
+            trainingCube = objectList[trainingIndex];
 
             GameObject trainTarget = Instantiate(myObject);
             trainTarget.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
@@ -335,14 +243,9 @@ public class P300_Controller : MonoBehaviour
             print("starting singleflash");
             RunSingleFlash();
             yield return new WaitForSecondsRealtime(trainBreak);
-            RunSingleFlash();
-            //singleFlash.startFlashes = true;
-            //singleFlash.SingleFlashes();
-
-            // RunSingleFlash(trainingIndex);
 
             // Wait for response saying that singleflash is complete
-            float timeToTrain = numRows *  numColumns * numFlashes * (1f / freqHz);// + trainBreak???
+            float timeToTrain = objectList.Length * numFlashes * (1f / freqHz);// + trainBreak???
 
             yield return new WaitForSecondsRealtime(timeToTrain);
             
@@ -359,6 +262,60 @@ public class P300_Controller : MonoBehaviour
         print("Training complete");
         WriteMarker("Training Complete");
     }
-    
+
+    public void PopulateList(string pMethod)
+    {
+        //Collect objects with the BCI tag
+        if (pMethod == "tag")
+        {
+            try
+            {
+                //Add game objects to list by tag "BCI"
+                //GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
+                objectList = GameObject.FindGameObjectsWithTag("BCI");
+
+                //The object list exists
+                listExists = true;
+            }
+            catch
+            {
+                //the list does not exist
+                print("Unable to create a list based on 'BCI' object tag");
+                listExists = false;
+            }
+
+        }
+        else if (pMethod == "predefined")
+        {
+            if (listExists == true)
+            {
+                print("The predefined list exists");
+            }
+            if (listExists == false)
+            {
+                print("The predefined list doesn't exist, try a different pMethod");
+            }
+        }
+
+        if (listExists == true)
+        {
+            // Set cubes to default colour 
+            ResetCubeColour();
+        }
+        else
+        {
+            print("No object list exists");
+        }
+
+    }
+
+    private void ResetCubeColour()
+    {
+        for (int i = 0; i < objectList.Length; i++)
+        {
+            turnOFF(objectList[i]);
+            //objectList[i].GetComponent<Renderer>().material.color = Color.grey;
+        }
+    }
 
 }
