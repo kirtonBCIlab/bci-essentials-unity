@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SSVEPStandardTrainingScene.unity
+    guid: 1efaefe7c26bfb54cab84321f432ce72
   m_configObjects: {}

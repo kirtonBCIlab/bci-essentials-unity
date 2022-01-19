@@ -31,7 +31,7 @@ Adapted from: Eli Kinney-Lang & Shaheed Murji "P300_Flashes.cs"
     o   Target_SFX (.mp4/.wav): sound to be played when target object flashes.
     o   NonTarget_SFX (.mp4/.wav): sound to be played when non-target objects flash.
     o	On Colour (Colour): Colour of cube object when flashed //TODO - Do we want to have this parameter still?
-    o	Off Colour (Colour): Colour of cube object when not flashing //TODO - Do we want this parameter still?
+    o	Off Colour (Colour): Colour of cube object when not trialOn //TODO - Do we want this parameter still?
     
     Inputs:
     o   'S' key: Single Flash Start/Stop
@@ -43,64 +43,88 @@ Adapted from: Eli Kinney-Lang & Shaheed Murji "P300_Flashes.cs"
     
  */
 
-public class SSVEP_Controller : MonoBehaviour
+public class MI_Controller : MonoBehaviour
 {
-    // SETUP
-    public bool setupRequired;          //Determines if setupSSVEP needs to be run or if there are already objects with BCI tag
-    public Matrix_Setup setup;
+    //SETUP
+    public bool setupRequired;          //Determines if MI_Setup needs to be run or if there are already objects with BCI tag
     public Color onColour;              //Color during the 'flash' of the object.
     public Color offColour;             //Color when not flashing of the object.
 
-    //OBJECTS
-    public GameObject myObject;         //Previously 'myCube'. Object type that will be flashing. Default is a cube.
-    //public List<GameObject> objectList = new List<GameObject>();  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
-    public GameObject[] objectList;
-    
-    public bool listExists = false;     //Does a list of objects exist
 
-    //SSVEP
-    public int refreshRate = 100;
-    public float[] setFreqFlash;        //frequency of flashes (in Hz) set by the user
-    public float[] realFreqFlash;       //frequency of flashes (in Hz) based on the closest approximation possible with given display settings
-    private string realFreqFlashString; //Nearest possible frequencies as determined by the screen refresh rate
-    public float windowLength;          //Length of training windows
-    private bool flashing;              //Flashing On/Off
-    private float period;               //The period of the refresh rate
-    private int ISI_count = 0;          //Count of Inter-Screen Intervals 
-    private int[] frames_on = new int[99];          // tells if the flash is on or not
-    private int[] frame_count = new int[99];        // number of frames ellapsed
-    private int[] frame_on_count = new int[99];     // how many frames does the flash stay on for
-    private int[] frame_off_count = new int[99];    // how many frames does the flash stay off for
-
-    //TRAINING
+    public bool SendLiveInfo;           //This determines whether or not to send live information about the set-up to LSL.
     public int TargetObjectID;          //This can be used to select a 'target' object for individuals to focus on, using the given int ID.
-    public GameObject targetCube;       //The training target object
-    private int trainLabel;             //The label of the current training target
     public int numTrainingSelections;   //Number of training selections to complete
     public int numTrainingWindows;      //Number of markers to send per selection
-
+    public float windowLength;          //Length of training windows
     //public float windowOverlapRatio;  //Ratio of overlap in the signal, 0 is non overlapping, 1 is 
     public float trainBreak;            //Time in seconds between training trials
-    private bool training = false;      //Training is ongoing
-    public bool trainingComplete = false;//Training is complete
-    public bool shamFeedback = false;   //Sham feedback on or off
-    public float shamAccuracy = 0.9f;   //Sham feedback accuracy, do you want sham feedback to make any mistakes
 
-    //MARKERS
-    private LSLMarkerStream marker;     //Connection to the LSLMarkerStream script
+    // Sham feedback during training
+    public bool shamFeedback = false;
+    public float shamAccuracy = 0.9f;
+
+    private bool training = false;      //Has training occured
     private string markerString;        //The marker string to be sent out
 
-    //RESPONSE
-    private LSLResponseStream response; //Connection to the LSLResponseStream script
-    public bool responseExists = false; //If the response exists
-    private double responseTimeout = 0.008;//Timeout before giving up on receiving a new sample
-    private double responseDelay = 0.2; //Time in seconds to wait between checking for a python response
-    private double responseDelayFrames; //Number of frames before checking for a new response
-    private int responseDelayFrameCount = 0;//Count of frames since last response 
+    /* Variables shared with LSL Inlet (to be accessed to flash correct cube) */
+    public GameObject[] objectList;  //Previously 'cube_list'. List of objects that will be flashing, shared with the LSL inlet.
+    public bool listExists = false;
 
-    //USER INPUTS
+    //TRAINING
+    public GameObject targetCube;
+
+    /* Private Variables */
+    private GameObject[,] object_matrix;
+    private int s_trials;
     private Dictionary<KeyCode, bool> keyLocks = new Dictionary<KeyCode, bool>();
+
+    //Variables used for checking redraw
+    //private double current_startx;
+    //private double current_starty;
+    //private float current_startz;
+    //private double current_dx;
+    //private double current_dy;
+    //private int current_numrow;
+    //private int current_numcol;
+    private GameObject current_object;
     private bool locked_keys = false;
+
+    // 
+    public int refreshRate = 100;
+    private int ISI_count = 0;
+    //public int stim_freq = 10;
+
+    //public int markersPerSelection = 5;
+    //public int trainLength;
+    private int trainLabel;
+    public GameObject cube;
+
+    /* LSL Variables */
+    public LSLMarkerStream marker;
+    public LSLResponseStream response;
+    public bool trainingComplete = false;
+    public bool responseExists = false;
+    private double responseTimeout = 0.008;
+    private double responseDelay = 0.2;             // Time in seconds to wait between checking for a python response
+    private double responseDelayFrames;
+    private int responseDelayFrameCount = 0;
+    //private Unity_SSVEP unitySSVEP;
+
+    // Tells if the trial is running
+    public bool trialOn = false;
+
+    //Other Scripts to Connect
+    //[SerializeField] SSVEP_Setup setup;
+    //[SerializeField] LSLMarkerStream marker;
+
+    //public MI_Setup setup;
+    private Matrix_Setup setup;
+    //public LSLMarkerStream marker;
+
+    // MI Specific
+    public GameObject cursor;
+
+
 
     private void Awake()
     {
@@ -124,6 +148,8 @@ public class SSVEP_Controller : MonoBehaviour
         keyLocks.Add(KeyCode.P, false);
         locked_keys = false;
 
+        //Starting with sending the live information as false.
+        SendLiveInfo = false;
 
         //Check to see if inputs are valid, if not, then don't draw matrix and prompt user to redraw with the
         //correct inputs
@@ -137,11 +163,10 @@ public class SSVEP_Controller : MonoBehaviour
         //Initialize Matrix
         if (setupRequired == true)
         {
-            SetupSSVEP();
+            SetupMI();
         }
 
         //Populate the list (REMOVE THIS LATER)
-        
         PopulateList("tag");
 
     }
@@ -153,49 +178,19 @@ public class SSVEP_Controller : MonoBehaviour
         if (listExists == true)
         {
             ISI_count++;
-            // Add duty cycle
-            // Generate the flashing
-            for (int i = 0; i < objectList.Count(); i++)
-            {
-                if (flashing == true)
-                {
-                    frame_count[i]++;
-                    if (frames_on[i] == 1)
-                    {
-                        if (frame_count[i] >= frame_on_count[i])
-                        {
-                            // turn the cube off
-                            turnOFF(objectList[i]);
-                            frames_on[i] = 0;
-                            frame_count[i] = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (frame_count[i] >= frame_off_count[i])
-                        {
-                            // turn the cube on
-                            turnON(objectList[i]);
-                            frames_on[i] = 1;
-                            frame_count[i] = 0;
-                        }
-                    }
-                }
-            }
-
             // so jank, but this sends the markers 
-            // make this into a coroutine??
+            // put into a coroutine
             if (ISI_count >= refreshRate * windowLength)
             {
-                if (flashing == true)
+                if (trialOn == true)
                 {
                     if (training == true)
                     {
-                        markerString = windowLength.ToString() + "," + trainLabel.ToString() + "," + realFreqFlashString;
+                        markerString = windowLength.ToString() + "," + trainLabel.ToString();
                     }
                     else
                     {
-                        markerString = windowLength.ToString() + "," + realFreqFlashString;
+                        markerString = windowLength.ToString();
                     }
                     print(markerString);
                     marker.Write(markerString);
@@ -203,15 +198,6 @@ public class SSVEP_Controller : MonoBehaviour
                 ISI_count = 0;
             }
 
-            // Check for a response
-            //print(responseExists.ToString());
-            //if (responseExists == false && trainingComplete == true)
-            //{
-            //    print("Looking for a response stream");
-            //    response = GetComponent<LSLResponseStream>();
-            //    response.ResolveResponse();
-            //    responseExists = true;
-            //}
             if (responseExists == true)
             {
                 // Pull a response
@@ -226,43 +212,31 @@ public class SSVEP_Controller : MonoBehaviour
                 responseDelayFrameCount++;
             }
 
-            // Do a trial
             if (Input.GetKeyDown(KeyCode.S))
             {
-                if (responseExists == false)
-                {
-                    //Get response stream from Python
-                    print("Looking for a response stream");
-                    response = GetComponent<LSLResponseStream>();
-                    int diditwork = response.ResolveResponse();
-                    print(diditwork.ToString());
-                    responseExists = true;
-                }
                 //RunSingleFlash();
                 // Debug.Log("Single Flash worked!");
                 //StartSSVEP(freqFlash);
-                if (flashing == false)
+                if (trialOn == false)
                 {
-                    print("Trial Starting");
                     marker.Write("Trial Started");
                 }
                 else
                 {
-                    print("Trial Ends");
                     marker.Write("Trial Ends");
                     ResetCubeColour();
                 }
 
-                flashing = !flashing;
+                trialOn = !trialOn;
             }
 
             // Do Training
             if (Input.GetKeyDown(KeyCode.T))
             {
-                StartCoroutine(trainSSVEP());
+                StartCoroutine(trainMI());
             }
 
-            // Make a selection, there must be a better way
+            // Make a selection
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
                 StartCoroutine(onSelection(0, objectList[0]));
@@ -271,38 +245,7 @@ public class SSVEP_Controller : MonoBehaviour
             {
                 StartCoroutine(onSelection(1, objectList[1]));
             }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                StartCoroutine(onSelection(2, objectList[2]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                StartCoroutine(onSelection(3, objectList[3]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                StartCoroutine(onSelection(4, objectList[4]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                StartCoroutine(onSelection(5, objectList[5]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha6))
-            {
-                StartCoroutine(onSelection(6, objectList[6]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha7))
-            {
-                StartCoroutine(onSelection(7, objectList[7]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha8))
-            {
-                StartCoroutine(onSelection(8, objectList[8]));
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha9))
-            {
-                StartCoroutine(onSelection(9, objectList[9]));
-            }
+
         }
 
         //Quit Program 
@@ -316,9 +259,8 @@ public class SSVEP_Controller : MonoBehaviour
     }
 
     //Setting up the scene:
-    private void SetupSSVEP()
+    private void SetupMI()
     {
-        //setup.SetUpMatrix(objectList);
         setup.SetUpMatrix();
         //setup.Recolour(objectList, offColour);
     }
@@ -326,15 +268,13 @@ public class SSVEP_Controller : MonoBehaviour
     //Populating the SSVEP object list
     public void PopulateList(string pMethod)
     {
-        print("populating the list using method " + pMethod);
         //Collect objects with the BCI tag
         if (pMethod == "tag")
         {
             try
             {
                 //Add game objects to list by tag "BCI"
-                //GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
-                objectList = GameObject.FindGameObjectsWithTag("BCI");
+                GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
 
                 //The object list exists
                 listExists = true;
@@ -349,9 +289,9 @@ public class SSVEP_Controller : MonoBehaviour
         }
         else if (pMethod == "predefined")
         {
-            if(listExists == true)
+            if (listExists == true)
             {
-                print("The predefined list exists");   
+                print("The predefined list exists");
             }
             if (listExists == false)
             {
@@ -361,31 +301,31 @@ public class SSVEP_Controller : MonoBehaviour
 
         if (listExists == true)
         {
-            //Initialize the real flash frequency list
-            //realFreqFlash = new float[objectList.Length];
-            realFreqFlash = new float[objectList.Count()];
+            ////Initialize the real flash frequency list
+            ////realFreqFlash = new float[objectList.Length];
+            //realFreqFlash = new float[objectList.Count];
 
-            //Set all frames to be off, get ready for SSVEP flashing
+            //Set all frames to be off, get ready for SSVEP trialOn
             //for (int i = 0; i < objectList.Length; i++)
-            for (int i = 0; i < objectList.Count(); i++)
-            {
-                frames_on[i] = 0;
-                frame_count[i] = 0;
-                period = (float)refreshRate / (float)setFreqFlash[i];
-                // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
-                frame_off_count[i] = (int)Math.Ceiling(period / 2);
-                frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (refreshRate / (float)(frame_off_count[i] + frame_on_count[i]));
-                print("frequency " + (i + 1).ToString() + " : " + realFreqFlash[i].ToString());
-            }
+            //for (int i = 0; i < objectList.Count; i++)
+            //{
+            //    //frames_on[i] = 0;
+            //    //frame_count[i] = 0;
+            //    //period = (float)refreshRate / (float)setFreqFlash[i];
+            //    // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
+            //    frame_off_count[i] = (int)Math.Ceiling(period / 2);
+            //    frame_on_count[i] = (int)Math.Floor(period / 2);
+            //    realFreqFlash[i] = (refreshRate / (frame_off_count[i] + frame_on_count[i]));
+            //    print("frequency " + (i + 1).ToString() + " : " + realFreqFlash[i].ToString());
+            //}
 
             // cut the end off of setFlashFreqs
 
             // get a string of the flash_freqs
-            realFreqFlashString = string.Join(",", realFreqFlash);
+            //realFreqFlashString = string.Join(",", realFreqFlash);
 
-            // Turn flashing off for now
-            flashing = false;
+            // Turn trialOn off for now
+            trialOn = false;
 
             // Set cubes to default colour 
             ResetCubeColour();
@@ -398,7 +338,7 @@ public class SSVEP_Controller : MonoBehaviour
     }
 
     //Training
-    public IEnumerator trainSSVEP()
+    public IEnumerator trainMI()
     {
         if (responseExists == false)
         {
@@ -412,8 +352,7 @@ public class SSVEP_Controller : MonoBehaviour
 
         //Set up the random generator
         System.Random trainRandom = new System.Random();
-        //GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
-        objectList = GameObject.FindGameObjectsWithTag("BCI");
+        GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
         GameObject trainingCube;
 
         // set training to true
@@ -455,11 +394,17 @@ public class SSVEP_Controller : MonoBehaviour
 
             // Run SingleFlash
             print("starting ");
+
+            // Replace cursor to center
+            cursor.transform.position = new Vector3(2, 0, 0);
+
+
+
             //RunSingleFlash();
             yield return new WaitForSecondsRealtime(trainBreak);
 
             trainLabel = trainingIndex;
-            flashing = true;
+            trialOn = true;
 
             // Wait for response saying that singleflash is complete
             float timeToTrain = (float)numTrainingWindows * windowLength;// + trainBreak???
@@ -468,12 +413,27 @@ public class SSVEP_Controller : MonoBehaviour
             yield return new WaitForSecondsRealtime(timeToTrain);
             marker.Write("Trial Ends");
 
-            // Turn off flashing
-            flashing = false;
+
+
+            //Deliver sham feedback
+            if (shamFeedback == true)
+            {
+                StartCoroutine(onSelection(trainLabel, objectList[trainLabel]));
+            }
+
+            //Destroy the training target
+            Destroy(trainTarget);
+
+            // Pause before next trial
+            yield return new WaitForSecondsRealtime(trainBreak);
+
+
+            // Turn off trialOn
+            trialOn = false;
             ResetCubeColour();
 
             // Destroy the train target
-            Destroy(trainTarget);
+            
 
 
             print("Training session " + i.ToString() + " complete");
@@ -559,41 +519,44 @@ public class SSVEP_Controller : MonoBehaviour
         yield return new WaitForSeconds(0.001f);
     }
 
-    //Program the ON effect
-    public void turnON(GameObject turnMeOn)
-    {
-        turnMeOn.GetComponent<Renderer>().material.color = onColour;
-    }
-
-    //Program the OFF effect
-    public void turnOFF(GameObject turnMeOff)
-    {
-        turnMeOff.GetComponent<Renderer>().material.color = offColour;
-    }
-
     public IEnumerator onSelection(int selectedInd, GameObject selectedObject)
     {
-        //Turn off the flashing and reset
-        flashing = false;
+        //Turn off the trialOn and reset
+        trialOn = false;
         ResetCubeColour();
 
+        print("Object " + selectedInd.ToString() + " selected");
 
-        // This is free form, do whatever you want on selection
+        //LERP the cursor
 
-        print("Obejct " + selectedInd.ToString() + " selected");
+        // LERP over 0.5 seconds
+        int interpFrameCount = (int)(refreshRate / 2);
 
-        for (int i = 0; i < 3; i++)
+
+        float lerpTime = 0f;
+        float lerpDuration = 1f;
+        Vector3 startPosition = cursor.transform.position;
+        Vector3 targetPosition = selectedObject.transform.position;
+
+        while (lerpTime < lerpDuration)
         {
-            selectedObject.GetComponent<Renderer>().material.color = Color.red;
-            yield return new WaitForSecondsRealtime(0.3F);
-            selectedObject.GetComponent<Renderer>().material.color = Color.grey;
-            yield return new WaitForSecondsRealtime(0.3F);
-
+            cursor.transform.position = Vector3.Lerp(startPosition, targetPosition, lerpTime / lerpDuration);
+            lerpTime += Time.deltaTime;
+            yield return null;
         }
+        cursor.transform.position = targetPosition;
 
-        //Turn off the flashing and reset
 
-        flashing = false;
+
+        // Flash the target
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    selectedObject.GetComponent<Renderer>().material.color = Color.red;
+        //    yield return new WaitForSecondsRealtime(0.3F);
+        //    selectedObject.GetComponent<Renderer>().material.color = Color.grey;
+        //    yield return new WaitForSecondsRealtime(0.3F);
+
+        //}
     }
 
     /* Checks to see if given values are valid */
@@ -625,7 +588,7 @@ public class SSVEP_Controller : MonoBehaviour
     {
         marker.Write(markerString);
     }
-    
+
     //Toggle key locks on/off
     public void LockKeysToggle(KeyCode key)
     {

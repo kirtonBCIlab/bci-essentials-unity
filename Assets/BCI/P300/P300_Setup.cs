@@ -4,27 +4,24 @@ using UnityEngine;
 //TODO: ADD REQUIREMENT FOR OTHER COMPONENTS ON HERE
 
 //This class contains the functions needed to set-up the P300 matrices for flashing.
-public class Setup_SSVEP : MonoBehaviour
+public class P300_Setup : MonoBehaviour
 {
-    public int refreshRate;
-    
     //This is the most important game object which needs to be returned
     private GameObject[,] object_matrix;
-    private List<GameObject> object_list = new List<GameObject>();
+    private List<GameObject> object_list = new List<GameObject>(); 
 
-    [SerializeField] SSVEP_Controller sSVEP_Controller;
+    [SerializeField] P300_Controller p300_Controller;
     private GameObject objects; //This name is a left-over from previous iterations. However it works fine for here.
     private int matrixCounter = 0;
 
     private void Awake()
     {
-        Application.targetFrameRate = refreshRate;
-        sSVEP_Controller = GetComponent<SSVEP_Controller>();
+        p300_Controller = GetComponent<P300_Controller>(); 
     }
     private void Start()
     {
-        //Get all of the information from the sSVEP_Controller that is needed here.
-
+        //Get all of the information from the P300_Controller that is needed here.
+        
     }
 
     /* Configure matrix and display this on the screen */
@@ -46,19 +43,19 @@ public class Setup_SSVEP : MonoBehaviour
 
         */
         //Get variables from the p300 Controller for each of the variables
-        int numColumns = sSVEP_Controller.numColumns;
-        int numRows = sSVEP_Controller.numRows;
-        GameObject myObject = sSVEP_Controller.myObject;
-        double startX = sSVEP_Controller.startX;       //Initial position of X for drawing in the objects
-        double startY = sSVEP_Controller.startY;       //Initial position of Y for drawing in the objects
-        float startZ = sSVEP_Controller.startZ;        //Initial position of Z for drawing in the objects
-        double distanceX = sSVEP_Controller.distanceX;    //Distance between objects in X-plane
-        double distanceY = sSVEP_Controller.distanceY;
+        int numColumns      = p300_Controller.numColumns;
+        int numRows         = p300_Controller.numRows;
+        GameObject myObject = p300_Controller.myObject;
+        double startX       = p300_Controller.startX;       //Initial position of X for drawing in the objects
+        double startY       = p300_Controller.startY;       //Initial position of Y for drawing in the objects
+        float startZ        = p300_Controller.startZ;        //Initial position of Z for drawing in the objects
+        double distanceX    = p300_Controller.distanceX;    //Distance between objects in X-plane
+        double distanceY    = p300_Controller.distanceY;
 
 
-        //Initial set up
-        object_matrix = new GameObject[numColumns, numRows];
-        objects = new GameObject { name = "Objects" };
+    //Initial set up
+    object_matrix = new GameObject[numColumns, numRows];
+        objects = new GameObject { name = "Objects"};
 
         /* Dynamic Matrix Setup */
         int object_counter = 0;
@@ -71,7 +68,6 @@ public class Setup_SSVEP : MonoBehaviour
 
                 //Renaming objects
                 new_obj.name = "Object" + object_counter.ToString();
-                new_obj.tag = "BCI";
                 //new_obj.GetComponent<ActionController>().id = object_counter;
 
                 //Adding to list
@@ -90,7 +86,7 @@ public class Setup_SSVEP : MonoBehaviour
         }
 
         //Now update the object list in the primary controller
-        sSVEP_Controller.objectList = objectList;
+        p300_Controller.object_list = objectList;
 
         //Position Camera to the centre of the objects
         float cameraX = (float)((((objectList[numColumns - 1].transform.position.x) - (objectList[0].transform.position.x)) / 2) + (startX * 2));
@@ -119,7 +115,7 @@ public class Setup_SSVEP : MonoBehaviour
                 matrixCounter++;
             }
         }
-
+        
         return object_matrix;
     }
 

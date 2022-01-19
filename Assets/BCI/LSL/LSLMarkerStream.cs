@@ -41,9 +41,9 @@ namespace LSL4Unity
             print("LSL initialized");
         }
 
-        public void Write(string marker)
+        public void Write(string markerString)
         {
-            sample[0] = marker;
+            sample[0] = markerString;
             lslOutlet.push_sample(sample);
         }
         /*
