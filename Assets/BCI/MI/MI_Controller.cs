@@ -123,6 +123,10 @@ public class MI_Controller : MonoBehaviour
 
     // MI Specific
     public GameObject cursor;
+    public GameObject Arrow_left;
+    public GameObject Arrow_right;
+    public GameObject goalPoint_left;
+    public GameObject goalPoint_right;
 
 
 
@@ -239,11 +243,11 @@ public class MI_Controller : MonoBehaviour
             // Make a selection
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                StartCoroutine(onSelection(0, objectList[0]));
+                StartCoroutine(onSelection(numTrainingWindows-1, 0, objectList[0]));
             }
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                StartCoroutine(onSelection(1, objectList[1]));
+                StartCoroutine(onSelection(numTrainingWindows-1, 1, objectList[1]));
             }
 
         }
@@ -355,6 +359,7 @@ public class MI_Controller : MonoBehaviour
         GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
         GameObject trainingCube;
 
+        print("Recognized BCI Objects: " + objectList.Length.ToString());
         // set training to true
         training = true;
         int trainingIndex;
@@ -372,57 +377,68 @@ public class MI_Controller : MonoBehaviour
                 unshuffledTrainArray[k] = k;
             }
         }
-
+        
+        // Shuffle the training array
         System.Random randomShuffle = new System.Random();
         int[] shuffledTrainArray = unshuffledTrainArray.OrderBy(x => randomShuffle.Next()).ToArray();
 
+        // Set up default scale for arrows
+        Vector3 defaultArrowSize = new Vector3(1.0f, 1.0f, 1.0f);
+        
+        // Iterate though each training trial in For each training trial/target: 
         for (int i = 0; i < numTrainingSelections; i++)
         {
+            
             trainingIndex = shuffledTrainArray[i];
 
-            print("Running training session " + i.ToString() + " on cube " + trainingIndex.ToString());
+            print("Running training trial " + i.ToString() + " out of " + numTrainingSelections + " on cube " + trainingIndex.ToString());
 
             trainingCube = objectList[trainingIndex];
 
-            GameObject trainTarget = Instantiate(targetCube);
+/*             GameObject trainTarget = Instantiate(targetCube); // Makes a target - can we get rid of this? used in SSVEP to highlight the box to look at. 
             trainTarget.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-            trainTarget.transform.position = new Vector3(0, 0, 2) + trainingCube.transform.position;
+            trainTarget.transform.position = new Vector3(0, 0, 2) + trainingCube.transform.position; */
 
-            //
+            // The ID (0 or 1) for the current trial target
             TargetObjectID = trainingIndex;
 
-
-            // Run SingleFlash
-            print("starting ");
+            print("Trial Starting ");
 
             // Replace cursor to center
-            cursor.transform.position = new Vector3(2, 0, 0);
+            //cursor.transform.position = new Vector3(2, 0, 0);
 
-
+            // Make sure arrows are back to the original size 
+            Arrow_left.transform.localScale = defaultArrowSize;
+            Arrow_right.transform.localScale = defaultArrowSize;
 
             //RunSingleFlash();
-            yield return new WaitForSecondsRealtime(trainBreak);
+            yield return new WaitForSecondsRealtime(trainBreak); // Pause for "trainBreak" seconds
 
             trainLabel = trainingIndex;
             trialOn = true;
 
-            // Wait for response saying that singleflash is complete
-            float timeToTrain = (float)numTrainingWindows * windowLength;// + trainBreak???
+            float timeToTrain = (float) windowLength;
 
             marker.Write("Trial Started");
-            yield return new WaitForSecondsRealtime(timeToTrain);
+
+            // Iterate through each window, after each window, run 'onSelection' to scale the arrow
+            for (int j=0; j < numTrainingWindows; j++){
+                yield return new WaitForSecondsRealtime(timeToTrain);
+                if (shamFeedback == true)
+                {
+                    StartCoroutine(onSelection(j, trainLabel, objectList[trainLabel]));
+                }
+            }
+            
             marker.Write("Trial Ends");
 
 
 
-            //Deliver sham feedback
-            if (shamFeedback == true)
-            {
-                StartCoroutine(onSelection(trainLabel, objectList[trainLabel]));
-            }
+            //Deliver sham feedback - will always be rigth every time right now because we are passing in the correct label as the selected object
+
 
             //Destroy the training target
-            Destroy(trainTarget);
+            //Destroy(trainTarget);
 
             // Pause before next trial
             yield return new WaitForSecondsRealtime(trainBreak);
@@ -430,11 +446,7 @@ public class MI_Controller : MonoBehaviour
 
             // Turn off trialOn
             trialOn = false;
-            ResetCubeColour();
-
-            // Destroy the train target
-            
-
+            ResetCubeColour();        
 
             print("Training session " + i.ToString() + " complete");
 
@@ -471,7 +483,7 @@ public class MI_Controller : MonoBehaviour
                 if (isNumeric == true)
                 {
                     //Run on selection
-                    StartCoroutine(onSelection(n, objectList[n]));
+                    StartCoroutine(onSelection(numTrainingWindows-1, n, objectList[n])); // NEED TO UPDATE THIS FOR THE WINDOWS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
                 }
             }
         }
@@ -493,7 +505,7 @@ public class MI_Controller : MonoBehaviour
                 if (isNumeric == true)
                 {
                     //Run on selection
-                    StartCoroutine(onSelection(n, objectList[n]));
+                    StartCoroutine(onSelection(numTrainingWindows-1, n, objectList[n])); // NEED TO UPDATE THIS FOR THE WINDOWS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
                 }
 
             }
@@ -519,7 +531,7 @@ public class MI_Controller : MonoBehaviour
         yield return new WaitForSeconds(0.001f);
     }
 
-    public IEnumerator onSelection(int selectedInd, GameObject selectedObject)
+    public IEnumerator onSelection(int windowIdx, int selectedInd, GameObject selectedObject)
     {
         //Turn off the trialOn and reset
         trialOn = false;
@@ -532,21 +544,43 @@ public class MI_Controller : MonoBehaviour
         // LERP over 0.5 seconds
         int interpFrameCount = (int)(refreshRate / 2);
 
+        float scaleIdx = (float)(windowIdx + 1); 
 
         float lerpTime = 0f;
         float lerpDuration = 1f;
-        Vector3 startPosition = cursor.transform.position;
-        Vector3 targetPosition = selectedObject.transform.position;
+
+        float target_x_left = Mathf.Abs(goalPoint_left.transform.position.x * (scaleIdx/numTrainingWindows));
+        Vector3 target_vector_left = new Vector3(target_x_left, 1f, 1f);
+        Vector3 startScaleLeft = Arrow_left.transform.localScale; 
+        print("goal left position: " + goalPoint_left.transform.position.x);
+        print("Target point: " + target_vector_left); 
+        print("Start point: " + startScaleLeft); 
+
+        float target_x_right = Mathf.Abs(goalPoint_right.transform.position.x * (scaleIdx/numTrainingWindows));
+        Vector3 target_vector_right = new Vector3(target_x_right, 1f, 1f);
+        Vector3 startScaleRight = Arrow_right.transform.localScale; 
 
         while (lerpTime < lerpDuration)
         {
-            cursor.transform.position = Vector3.Lerp(startPosition, targetPosition, lerpTime / lerpDuration);
+            // cursor.transform.position = Vector3.Lerp(startPosition, targetPosition, lerpTime / lerpDuration);
+           
+            if (selectedInd == 0)
+            {
+                Arrow_left.transform.localScale = Vector3.Lerp(startScaleLeft, target_vector_left, lerpTime / lerpDuration);
+            }
+            else  
+            {
+                Arrow_right.transform.localScale = Vector3.Lerp(startScaleRight, target_vector_right, lerpTime / lerpDuration);
+
+            }
+
             lerpTime += Time.deltaTime;
             yield return null;
+            //cursor.tranform.
         }
-        cursor.transform.position = targetPosition;
 
-
+        // startScaleLeft = target_vector_left;
+        // cursor.transform.position = targetPosition;
 
         // Flash the target
         //for (int i = 0; i < 3; i++)
@@ -557,6 +591,13 @@ public class MI_Controller : MonoBehaviour
         //    yield return new WaitForSecondsRealtime(0.3F);
 
         //}
+    }
+
+    public IEnumerator onGoal(int selectedInd, GameObject selectedObject)
+    {
+
+
+        yield return null;
     }
 
     /* Checks to see if given values are valid */
