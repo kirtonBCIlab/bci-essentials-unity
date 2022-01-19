@@ -45,10 +45,12 @@ Adapted from: Eli Kinney-Lang & Shaheed Murji "P300_Flashes.cs"
 
 public class MI_Controller : MonoBehaviour
 {
-    /* Public Variables */
+    //SETUP
     public bool setupRequired;          //Determines if MI_Setup needs to be run or if there are already objects with BCI tag
     public Color onColour;              //Color during the 'flash' of the object.
     public Color offColour;             //Color when not flashing of the object.
+
+
     public bool SendLiveInfo;           //This determines whether or not to send live information about the set-up to LSL.
     public int TargetObjectID;          //This can be used to select a 'target' object for individuals to focus on, using the given int ID.
     public int numTrainingSelections;   //Number of training selections to complete

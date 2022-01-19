@@ -174,9 +174,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757541, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: refreshRate
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757541, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: setupRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757541, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: setFreqFlash.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757541, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: setFreqFlash.Array.data[0]
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757541, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: setFreqFlash.Array.data[3]
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4065407625621757542, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
       propertyPath: m_Name
       value: SSVEP_Controller
+      objectReference: {fileID: 0}
+    - target: {fileID: 7509760245157474170, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: numColumns
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
