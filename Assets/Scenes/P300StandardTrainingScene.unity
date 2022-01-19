@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &346037875 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-  m_PrefabInstance: {fileID: 2031419033}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1338150339
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,63 +299,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &2031419033
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938659, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-      propertyPath: m_Name
-      value: BCICube
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
 --- !u!1 &2050621494
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,6 +313,7 @@ GameObject:
   - component: {fileID: 2050621496}
   - component: {fileID: 2050621499}
   - component: {fileID: 2050621500}
+  - component: {fileID: 2050621501}
   m_Layer: 0
   m_Name: P300_Controller
   m_TagString: Untagged
@@ -408,7 +347,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377d478c1dd847744b13e319d2c8fa34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p300_Controller: {fileID: 2050621498}
+  p300_controller: {fileID: 0}
+  p300_events: {fileID: 0}
   startFlashes: 0
 --- !u!114 &2050621497
 MonoBehaviour:
@@ -435,7 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcc648dc3959b344587f0d219353ad8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  setupRequired: 0
+  setupRequired: 1
   refreshRate: 100
   freqHz: 3
   dutyCycle: 0.5
@@ -445,12 +385,11 @@ MonoBehaviour:
   startZ: 0
   distanceX: 1.5
   distanceY: 1.5
-  myObject: {fileID: 346037875}
+  myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
   numRows: 3
   numColumns: 3
   onColour: {r: 0.8490566, g: 0.03604484, b: 0.03604484, a: 0}
   offColour: {r: 0.080322154, g: 0.8962264, b: 0.24004728, a: 0}
-  SendLiveInfo: 0
   TargetObjectID: 0
   trainingLength: 3
   trainBreak: 3
@@ -486,3 +425,15 @@ MonoBehaviour:
   responsePredicate: name='PythonResponse'
   value: PythonResponse
   pyRespIndex: 0
+--- !u!114 &2050621501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050621494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722c5defb6b095d4fbc8c907dd253628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
