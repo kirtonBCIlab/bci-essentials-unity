@@ -309,11 +309,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2050621495}
   - component: {fileID: 2050621498}
-  - component: {fileID: 2050621497}
   - component: {fileID: 2050621496}
   - component: {fileID: 2050621499}
   - component: {fileID: 2050621500}
   - component: {fileID: 2050621501}
+  - component: {fileID: 2050621502}
   m_Layer: 0
   m_Name: P300_Controller
   m_TagString: Untagged
@@ -349,20 +349,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   p300_controller: {fileID: 0}
   p300_events: {fileID: 0}
+  setup: {fileID: 0}
   startFlashes: 0
---- !u!114 &2050621497
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2050621494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80763a8d011fe984fab27c51c54b1eca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  p300_Controller: {fileID: 2050621498}
 --- !u!114 &2050621498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,25 +364,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setupRequired: 1
+  setupOccured: 0
   refreshRate: 100
   freqHz: 3
   dutyCycle: 0.5
-  numFlashes: 3
-  startX: 0
-  startY: 0
-  startZ: 0
-  distanceX: 1.5
-  distanceY: 1.5
+  numFlashes: 2
   myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-  numRows: 3
-  numColumns: 3
   onColour: {r: 0.8490566, g: 0.03604484, b: 0.03604484, a: 0}
   offColour: {r: 0.080322154, g: 0.8962264, b: 0.24004728, a: 0}
   TargetObjectID: 0
-  trainingLength: 3
-  trainBreak: 3
-  object_list: []
-  setup: {fileID: 2050621497}
+  trainingLength: 2
+  trainBreak: 1
+  listExists: 0
+  trialOn: 0
+  objectList: []
+  setup: {fileID: 0}
   singleFlash: {fileID: 2050621496}
 --- !u!114 &2050621499
 MonoBehaviour:
@@ -437,3 +421,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722c5defb6b095d4fbc8c907dd253628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2050621502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050621494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c403024fefd71b0438394dc65d340d27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numColumns: 2
+  numRows: 2
+  myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
+  startX: 0
+  startY: 0
+  startZ: 0
+  distanceX: 2
+  distanceY: 2

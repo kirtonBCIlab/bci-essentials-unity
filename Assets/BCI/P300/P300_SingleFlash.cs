@@ -8,6 +8,7 @@ public class P300_SingleFlash : MonoBehaviour
     //[SerializeField] P300_Controller p300_controller;
     public P300_Controller p300_controller;
     public P300_Events p300_events;
+    public Matrix_Setup setup;
     
 
     public bool startFlashes;   //Whether to automatically start the flashes on awake.
@@ -25,6 +26,7 @@ public class P300_SingleFlash : MonoBehaviour
     {
         p300_controller = GetComponent<P300_Controller>();
         p300_events = GetComponent<P300_Events>();
+        setup = GetComponent<Matrix_Setup>();
     }
 
 
@@ -40,8 +42,8 @@ public class P300_SingleFlash : MonoBehaviour
         c02     c12     c22         6   7   8
         */
 
-        int numRows = p300_controller.numRows;
-        int numCols = p300_controller.numColumns;
+        int numRows = setup.numRows;
+        int numCols = setup.numColumns;
         int numSamples = p300_controller.numFlashes;
 
 
@@ -103,7 +105,7 @@ public class P300_SingleFlash : MonoBehaviour
         float timeOff = (1f / p300_controller.freqHz) * (1f - p300_controller.dutyCycle);
         
         int randomCube;
-        int lastRandomCube = 99999;
+        int lastRandomCube = 99999;         //Makes sure that we don't flash same cube twice in a row
         string selectionString = "";        // string of selections for debuging
         string markerData;                  // markerData to be printed
         System.Random flashRandom = new System.Random();
@@ -152,7 +154,10 @@ public class P300_SingleFlash : MonoBehaviour
                 yield return new WaitForSecondsRealtime(timeOff);
 
                 // Wait timeOff seconds before turning on
-                p300_controller.object_list[randomCube].GetComponent<Renderer>().material.color = p300_controller.onColour;
+                print(randomCube.ToString());
+                p300_controller.turnON(p300_controller.objectList[randomCube]);
+
+                //p300_controller.turnON
 
                 //Handle events if this is the target cube or not //NEW!
                 if (randomCube == p300_controller.TargetObjectID)
@@ -198,9 +203,9 @@ public class P300_SingleFlash : MonoBehaviour
     //Turn off all object values
     public void TurnOffSingle()
     {
-        for (int i = 0; i < p300_controller.object_list.Count; i++)
+        for (int i = 0; i < p300_controller.objectList.Length; i++)
         {
-            p300_controller.object_list[i].GetComponent<Renderer>().material.color = p300_controller.offColour;
+            p300_controller.turnOFF(p300_controller.objectList[i]);
         }
     }
 
@@ -216,15 +221,15 @@ public class P300_SingleFlash : MonoBehaviour
 
     //TODO: Add back in Redraw capabilities for rapid changes.
 
-    public void Redraw()
-    {
-        print("Redrawing Matrix");
-        TurnOffSingle();
-        ResetSingleCounters();
-        p300_controller.object_list.Clear();
-        SetUpSingle();
+    //public void Redraw()
+    //{
+    //    print("Redrawing Matrix");
+    //    TurnOffSingle();
+    //    ResetSingleCounters();
+    //    p300_controller.objectList.Clear();
+    //    SetUpSingle();
 
-    }
+    //}
 
     // Get a random value from a list, input the list and a random object
     private int GetRandomFromList(List<int> list, System.Random thisRandom)
