@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - BCI
+  - Panel1
+  - Panel2
   layers:
   - Default
   - TransparentFX
