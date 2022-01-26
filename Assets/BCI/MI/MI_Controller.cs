@@ -122,11 +122,11 @@ public class MI_Controller : MonoBehaviour
     //public LSLMarkerStream marker;
 
     // MI Specific
-    public GameObject cursor;
-    public GameObject Arrow_left;
-    public GameObject Arrow_right;
-    public GameObject goalPoint_left;
-    public GameObject goalPoint_right;
+    // public GameObject cursor;
+    public GameObject cursorLeft;
+    public GameObject cursorRight;
+    public GameObject targetLeft;
+    public GameObject targetRight;
 
 
 
@@ -408,8 +408,8 @@ public class MI_Controller : MonoBehaviour
             //cursor.transform.position = new Vector3(2, 0, 0);
 
             // Make sure arrows are back to the original size 
-            Arrow_left.transform.localScale = defaultArrowSize;
-            Arrow_right.transform.localScale = defaultArrowSize;
+            cursorLeft.transform.localScale = defaultArrowSize;
+            cursorRight.transform.localScale = defaultArrowSize;
 
             //RunSingleFlash();
             yield return new WaitForSecondsRealtime(trainBreak); // Pause for "trainBreak" seconds
@@ -549,16 +549,16 @@ public class MI_Controller : MonoBehaviour
         float lerpTime = 0f;
         float lerpDuration = 1f;
 
-        float target_x_left = Mathf.Abs(goalPoint_left.transform.position.x * (scaleIdx/numTrainingWindows));
+        float target_x_left = Mathf.Abs(targetLeft.transform.position.x * (scaleIdx/numTrainingWindows));
         Vector3 target_vector_left = new Vector3(target_x_left, 1f, 1f);
-        Vector3 startScaleLeft = Arrow_left.transform.localScale; 
-        print("goal left position: " + goalPoint_left.transform.position.x);
+        Vector3 startScaleLeft = cursorLeft.transform.localScale; 
+        print("goal left position: " + targetLeft.transform.position.x);
         print("Target point: " + target_vector_left); 
         print("Start point: " + startScaleLeft); 
 
-        float target_x_right = Mathf.Abs(goalPoint_right.transform.position.x * (scaleIdx/numTrainingWindows));
+        float target_x_right = Mathf.Abs(targetRight.transform.position.x * (scaleIdx/numTrainingWindows));
         Vector3 target_vector_right = new Vector3(target_x_right, 1f, 1f);
-        Vector3 startScaleRight = Arrow_right.transform.localScale; 
+        Vector3 startScaleRight = cursorRight.transform.localScale; 
 
         while (lerpTime < lerpDuration)
         {
@@ -566,11 +566,11 @@ public class MI_Controller : MonoBehaviour
            
             if (selectedInd == 0)
             {
-                Arrow_left.transform.localScale = Vector3.Lerp(startScaleLeft, target_vector_left, lerpTime / lerpDuration);
+                cursorLeft.transform.localScale = Vector3.Lerp(startScaleLeft, target_vector_left, lerpTime / lerpDuration);
             }
             else  
             {
-                Arrow_right.transform.localScale = Vector3.Lerp(startScaleRight, target_vector_right, lerpTime / lerpDuration);
+                cursorRight.transform.localScale = Vector3.Lerp(startScaleRight, target_vector_right, lerpTime / lerpDuration);
 
             }
 
