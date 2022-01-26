@@ -4,8 +4,7 @@ using System.Collections;
 using LSL4Unity;
 using LSL;
 
-namespace LSL4Unity
-{
+
     //[HelpURL("https://github.com/xfleckx/LSL4Unity/wiki#using-a-marker-stream")]
     public class LSLResponseStream : MonoBehaviour
     {
@@ -96,4 +95,3 @@ namespace LSL4Unity
             return responseStrings;
         }
     }
-}

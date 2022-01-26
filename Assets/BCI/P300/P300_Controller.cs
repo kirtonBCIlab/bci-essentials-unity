@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Assets.LSL4Unity.Scripts;
+//using LSL4Unity;
 
 /*
 P300 Flashes Program
@@ -95,8 +96,13 @@ public class P300_Controller : MonoBehaviour
     private bool locked_keys = false;
 
     /* LSL Variables */
-    private LSLMarkerStream marker;
+    public LSLMarkerStream marker;
     //private Inlet_P300 inletP300;
+
+
+    //Response stream
+    public bool responseExists = false;
+    public LSLResponseStream response;
 
     //Other Scripts to Connect
     [SerializeField] Matrix_Setup setup;
@@ -112,6 +118,7 @@ public class P300_Controller : MonoBehaviour
         marker = GetComponent<LSLMarkerStream>();
         Application.targetFrameRate = refreshRate;
 
+        print("Hello this is supposed to be the marker " + marker);
         print(marker);
     }
 
@@ -146,6 +153,15 @@ public class P300_Controller : MonoBehaviour
     { 
         if(Input.GetKeyDown(KeyCode.S))
         {
+            if (responseExists == false)
+            {
+                //Get response stream from Python
+                print("Looking for a response stream");
+                response = GetComponent<LSLResponseStream>();
+                int diditwork = response.ResolveResponse();
+                print(diditwork.ToString());
+                responseExists = true;
+            }
             RunSingleFlash();
             Debug.Log("Single Flash worked!");
         }
@@ -164,6 +180,48 @@ public class P300_Controller : MonoBehaviour
             marker = null;
             Application.Quit();
         }
+
+        // Make a selection, there must be a better way
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            onSelection(0, objectList[0]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            onSelection(1, objectList[1]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            onSelection(2, objectList[2]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            onSelection(3, objectList[3]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            onSelection(4, objectList[4]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            onSelection(5, objectList[5]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            onSelection(6, objectList[6]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            onSelection(7, objectList[7]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            onSelection(8, objectList[8]);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            onSelection(9, objectList[9]);
+        }
     }
 
     //Setting up the scene:
@@ -174,6 +232,7 @@ public class P300_Controller : MonoBehaviour
 
     public void RunSingleFlash()
     {
+        PopulateList("tag");
         singleFlash.SetUpSingle();
         singleFlash.SingleFlashes();
     }
@@ -200,16 +259,29 @@ public class P300_Controller : MonoBehaviour
     // Turn ON
     public void turnON(GameObject objectToTurnOn)
     {
-        objectToTurnOn.GetComponent<Renderer>().material.color = onColour;
+        //objectToTurnOn.GetComponent<Renderer>().material.color = onColour;
+        objectToTurnOn.GetComponent<UI_SPO>().TurnOn();
     }
     
     // Turn OFF
     public void turnOFF(GameObject objectToTurnOff)
     {
-        objectToTurnOff.GetComponent<Renderer>().material.color = offColour;
+        //objectToTurnOff.GetComponent<Renderer>().material.color = offColour;
+        objectToTurnOff.GetComponent<UI_SPO>().TurnOff();
     }
 
     // TODO: On Selection
+    public void onSelection(int selectedInd, GameObject objectToSelect)
+    {
+        // Stop the singleflash loop
+        singleFlash.startFlashes = false;
+
+        print("Object " + selectedInd.ToString() + " selected");
+
+        // Select the object
+        objectToSelect.GetComponent<UI_SPO>().OnSelection();
+    }
+
 
     // Do Training
     public IEnumerator DoTraining()
@@ -285,6 +357,21 @@ public class P300_Controller : MonoBehaviour
             }
 
         }
+
+        // Find all of the 
+        // if (pMethod == "class")
+        // {
+        //     try 
+        //     {
+        //         objectList = GameObject.Find("SPO");
+        //     }
+        //     catch
+        //     {
+        //         print("Unable to create a list based on class");
+        //     }
+
+        // }
+
         else if (pMethod == "predefined")
         {
             if (listExists == true)
@@ -309,13 +396,78 @@ public class P300_Controller : MonoBehaviour
 
     }
 
-    private void ResetCubeColour()
+    public void ResetCubeColour()
     {
         for (int i = 0; i < objectList.Length; i++)
         {
             turnOFF(objectList[i]);
             //objectList[i].GetComponent<Renderer>().material.color = Color.grey;
         }
+    }
+
+    // Check for a python response every 0.2 seconds
+    private IEnumerator pollPythonResponse()
+    {
+        while(responseExists == true)
+        {
+            yield return new WaitForSecondsRealtime(0.2f);
+            StartCoroutine(pullPythonResponse());
+        }
+    } 
+
+    private IEnumerator pullPythonResponse()
+    {
+        // Initialize the default response string
+        string[] defaultResponseStrings = { "" };
+        string[] responseStrings = defaultResponseStrings;
+        float responseTimeout = 0.2f;
+
+        // Pull the python response and add it to the responseStrings array
+        responseStrings = response.PullResponse(defaultResponseStrings, responseTimeout);
+
+        // Check if there is 
+        bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
+        if (responseStrings[0] != "")
+        {
+            for (int i = 0; i < responseStrings.Length; i++)
+            {
+                string responseString = responseStrings[i];
+                print("WE GOT A RESPONSE");
+                print(responseString);
+
+                int n;
+                bool isNumeric = int.TryParse(responseString, out n);
+                if (isNumeric == true)
+                {
+                    //Run on selection
+                    onSelection(n, objectList[n]);
+                }
+            }
+        }
+
+        if (responseStrings.Length > defaultResponseStrings.Length)
+        {
+            //print(responseStrings);
+
+            //print(responseStrings.Length);
+
+            for (int i = 0; i < responseStrings.Length; i++)
+            {
+                string responseString = responseStrings[i];
+                print("WE GOT A RESPONSE");
+                print(responseString);
+
+                int n;
+                bool isNumeric = int.TryParse(responseString, out n);
+                if (isNumeric == true)
+                {
+                    //Run on selection
+                    onSelection(n, objectList[n]);
+                }
+
+            }
+        }
+        yield return new WaitForSeconds(0.001f);
     }
 
 }

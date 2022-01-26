@@ -12,6 +12,7 @@ public class P300_SingleFlash : MonoBehaviour
     
 
     public bool startFlashes;   //Whether to automatically start the flashes on awake.
+    
 
     //Variables associated with counting the flashes
 
@@ -42,19 +43,21 @@ public class P300_SingleFlash : MonoBehaviour
         c02     c12     c22         6   7   8
         */
 
-        int numRows = setup.numRows;
-        int numCols = setup.numColumns;
+        //int numRows = setup.numRows;
+        //int numCols = setup.numColumns;
+
+        int listLength = p300_controller.objectList.Length;
         int numSamples = p300_controller.numFlashes;
 
 
         //Setting counters for each cube
-        for (int i = 0; i < (numRows * numCols); i++)
+        for (int i = 0; i < (listLength); i++)
         {
             flash_counter.Add(numSamples);
         }
 
         //Set up test single indices
-        for (int i = 0; i < (numRows * numCols); i++)
+        for (int i = 0; i < (listLength); i++)
         {
             s_indexes.Add(i);
         }
@@ -156,6 +159,7 @@ public class P300_SingleFlash : MonoBehaviour
                 // Wait timeOff seconds before turning on
                 print(randomCube.ToString());
                 p300_controller.turnON(p300_controller.objectList[randomCube]);
+                //p300_controller.objectList[randomCube].TurnOn();
 
                 //p300_controller.turnON
 
@@ -192,6 +196,11 @@ public class P300_SingleFlash : MonoBehaviour
         //print(selectionString);
 
         ResetSingleCounters();
+
+        // Reset all cubes to OFF state
+        p300_controller.ResetCubeColour();
+
+
         //Write to LSL stream to indicate end of P300 SingleFlash
         //This is all things to do on the P300 controller.
         p300_controller.WriteMarker("P300 SingleFlash Ends");//marker.Write("P300 SingleFlash Ends");
@@ -206,6 +215,7 @@ public class P300_SingleFlash : MonoBehaviour
         for (int i = 0; i < p300_controller.objectList.Length; i++)
         {
             p300_controller.turnOFF(p300_controller.objectList[i]);
+            //p300_controller.objectList[i].TurnOff();
         }
     }
 
