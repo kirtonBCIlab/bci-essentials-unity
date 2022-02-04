@@ -100,16 +100,7 @@ public class Matrix_Setup : MonoBehaviour
 
     }
 
-    // I DONT THINK THIS BELONGS HERE
-    ///* Sets all objects in a list to a desired colour */
-    //public void Recolour(List<GameObject> object_list, Color color)
-    //{
 
-    //    for (int i = 0; i < object_list.Count; i++)
-    //    {
-    //        object_list[i].GetComponent<Renderer>().material.color = color;
-    //    }
-    //}
 
 
 }

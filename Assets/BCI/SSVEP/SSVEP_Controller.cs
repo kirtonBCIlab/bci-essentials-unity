@@ -347,6 +347,8 @@ public class SSVEP_Controller : MonoBehaviour
             }
 
         }
+
+        //List is predefined
         else if (pMethod == "predefined")
         {
             if(listExists == true)
@@ -390,6 +392,9 @@ public class SSVEP_Controller : MonoBehaviour
             // Set cubes to default colour 
             ResetCubeColour();
         }
+
+        // Collect by children ??
+
         else
         {
             print("No object list exists");

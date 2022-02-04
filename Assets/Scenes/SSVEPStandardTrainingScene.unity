@@ -198,6 +198,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SSVEP_Controller
       objectReference: {fileID: 0}
+    - target: {fileID: 4065407625621757542, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7509760245157474170, guid: 75bdc7262a16f9f4da553ea5b152e025, type: 3}
       propertyPath: numColumns
       value: 4
@@ -436,4 +440,82 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2043511323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2043511327}
+  - component: {fileID: 2043511326}
+  - component: {fileID: 2043511325}
+  - component: {fileID: 2043511324}
+  m_Layer: 0
+  m_Name: New_Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2043511324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043511323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d64fb522813bc7247975d1e5d73d93ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  responsePredicate: name='PythonResponse'
+  value: PythonResponse
+  pyRespIndex: 0
+--- !u!114 &2043511325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043511323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42f6a5f2a177ae14badbe859d5c565d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lslStreamName: Unity_<Paradigma_Name_here>
+  lslStreamType: LSL_Marker_Strings
+--- !u!114 &2043511326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043511323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2d94387fff88ca4ba1fb6065abe69cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refreshRate: 60
+  listExists: 0
+  objectList: []
+  windowLength: 0
+--- !u!4 &2043511327
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043511323}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
