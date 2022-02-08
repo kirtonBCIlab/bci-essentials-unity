@@ -32,24 +32,27 @@ public class Controller : MonoBehaviour
     public bool listExists;
     //public GameObject[] objectList;
     public List<GameObject> objectList;
+    [HideInInspector] public List<GameObject> objectsToRemove;
 
     //stimulusOn/Off + sending Markers
     public float windowLength = 1.0f;
-    private bool stimOn = false;
+    public float interWindowInterval = 0f;
+    public bool stimOn = false;
 
     //Training
     public int numTrainingSelections;
     public int numTrainWindows = 3;
     public float trainBreak = 1f;
     public bool shamFeedback = false;
+    public int trainTarget = 99;
 
     // Receive markers
     private bool receivingMarkers = false;
 
     // Scripts
-    private Matrix_Setup setup;
-    private LSLMarkerStream marker;
-    private LSLResponseStream response;
+    [HideInInspector] public Matrix_Setup setup;
+    [HideInInspector] public LSLMarkerStream marker;
+    [HideInInspector] public LSLResponseStream response;
 
 
     // Start is called before the first frame update
@@ -179,7 +182,7 @@ public class Controller : MonoBehaviour
     }
 
     // Populate a list of SPOs
-    public void populateObjectList(string popMethod)
+    public virtual void populateObjectList(string popMethod)
     {
         // Remove everything from the existing list
         objectList.Clear();
@@ -237,6 +240,23 @@ public class Controller : MonoBehaviour
         }
 
         // Remove from the list any entries that have includeMe set to false
+        print(objectList.Count.ToString());
+
+        
+        foreach (GameObject thisObject in objectList)
+        {
+            if (thisObject.GetComponent<SPO>().includeMe == false)
+            {
+                objectsToRemove.Add(thisObject);
+            }
+        }
+        foreach (GameObject thisObject in objectsToRemove)
+        {
+            objectList.Remove(thisObject);
+        }
+        objectsToRemove.Clear();
+
+        print(objectList.Count.ToString());
 
 
     }
@@ -250,6 +270,10 @@ public class Controller : MonoBehaviour
         try
         {
             StartCoroutine(stimulus());
+
+            // Send the marker to start
+            marker.Write("Trial Started");
+            StartCoroutine(sendMarkers(trainTarget));
         }
         catch
         {
@@ -261,13 +285,16 @@ public class Controller : MonoBehaviour
     {
         // End thhe stimulus Coroutine
         stimOn = false;
+
+        // Send the marker to end
+        marker.Write("Trial Ends");
     }
 
-    // Send a marker
-    public void sendMarker()
-    {
+    //// Send a marker
+    //public void sendMarker()
+    //{
 
-    }
+    //}
 
     // Receive a marker 
     //public  void receiveMarkers()
@@ -292,7 +319,7 @@ public class Controller : MonoBehaviour
     public void selectObject(int objectIndex)
     {
         // When a selection is made, turn the stimulus off
-        stimulusOff();
+        stimOn = false;
 
         try
         {
@@ -305,15 +332,16 @@ public class Controller : MonoBehaviour
             Debug.Log("Could not select object " + objectIndex.ToString() + " from list");
             Debug.Log("Object list contains " + objectList.Count.ToString() + " objects");
         }
+
     }
 
     // Setup a matrix if setup is required
     // Could add this in or leave as a seperate script
-    public void setupMatrix()
-    {
+    //public void setupMatrix()
+    //{
 
 
-    }
+    //}
 
     // Do training
     public virtual IEnumerator doTraining()
@@ -323,7 +351,6 @@ public class Controller : MonoBehaviour
 
         // Get number of selectable objects by counting the objects in the objectList
         int numOptions = objectList.Count;
-        int targetOption;
 
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
@@ -336,44 +363,48 @@ public class Controller : MonoBehaviour
         for (int i = 0; i < numTrainingSelections; i++)
         {
             // Get the target from the array
-            targetOption = trainArray[i];
+            trainTarget = trainArray[i];
 
             // 
-            Debug.Log("Running training selection " + i.ToString() + " on option " + targetOption.ToString());
+            Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
 
             // Turn on train target
-            objectList[targetOption].GetComponent<SPO>().onTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().onTrainTarget();
 
             // Go through the training sequence
             yield return new WaitForSecondsRealtime(3f);
 
-            for (int j = 0; j < numTrainWindows; j++)
-            {
-                stimulusOn();
-                yield return new WaitForSecondsRealtime(windowLength);
-                stimulusOff();
-            }
-                
+            //for (int j = 0; j < numTrainWindows; j++)
+            //{
+            //    stimulusOn();
+            //    yield return new WaitForSecondsRealtime((windowLength + interWindowInterval)*);
+            //    stimulusOff();
+            //}
+
+            stimulusOn();
+            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * numTrainWindows);
+            stimulusOff();
+
             // Turn off train target
-            objectList[targetOption].GetComponent<SPO>().offTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().offTrainTarget();
 
             // If sham feedback is true, then show it
             if(shamFeedback)
             {
-                objectList[targetOption].GetComponent<SPO>().onSelection();
+                objectList[trainTarget].GetComponent<SPO>().onSelection();
             }
+
+            trainTarget = 99;
 
             // Take a break
             yield return new WaitForSecondsRealtime(trainBreak);
-
-
         }
 
     }
 
     // Make a random non repeating array of shuffled subarrays
     // 
-    private int[] makeRNRA(int arrayLength, int numOptions)
+    public int[] makeRNRA(int arrayLength, int numOptions)
     {
         // Make random object
         System.Random trainRandom = new System.Random();
@@ -439,7 +470,7 @@ public class Controller : MonoBehaviour
         return array;
     }
 
-    private void printArray(int[] array)
+    public void printArray(int[] array)
     {
         string[] strings = new string[array.Length];
         for (int i = 0; i < array.Length; i++)
@@ -452,9 +483,6 @@ public class Controller : MonoBehaviour
     // Coroutine for the stimulus
     public virtual IEnumerator stimulus()
     {
-        // Send the marker to start
-        marker.Write("Trial Started");
-
         // Present the stimulus until it is turned off
         while(stimOn)
         {
@@ -490,12 +518,30 @@ public class Controller : MonoBehaviour
             
         }
 
-        // Send the marker to end
-        marker.Write("Trial Ends");
-
         yield return new WaitForSecondsRealtime(0.001f);
     }
 
+    // Send markers
+    public virtual IEnumerator sendMarkers(int trainingIndex = 99)
+    {
+
+        // Make the marker string, this will change based on the paradigm
+        while (stimOn)
+        {
+            string markerString = "marker";
+
+            if (trainingIndex <= objectList.Count)
+            {
+                markerString = markerString + "," + trainingIndex.ToString();
+            }
+
+            // Send the marker
+            marker.Write(markerString);
+
+            // Wait the window length + the inter-window interval
+            yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+        }
+    }
     // Coroutine to continuously receive markers
     public IEnumerator receiveMarkers()
     {

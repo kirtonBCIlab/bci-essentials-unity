@@ -67,7 +67,7 @@ public class SPO : MonoBehaviour
         transform.localScale = new Vector3(objectScale.x / scaleValue, objectScale.y / scaleValue, objectScale.z / scaleValue);
     }
 
-    // Flash
+    // Quick Flash
     private IEnumerator quickFlash()
     {
         for (int i = 0; i < 3; i++)

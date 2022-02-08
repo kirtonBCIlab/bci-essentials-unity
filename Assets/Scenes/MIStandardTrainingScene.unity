@@ -133,9 +133,10 @@ GameObject:
   m_Component:
   - component: {fileID: 199940102}
   - component: {fileID: 199940101}
-  - component: {fileID: 199940099}
+  - component: {fileID: 199940103}
   - component: {fileID: 199940098}
   - component: {fileID: 199940100}
+  - component: {fileID: 199940099}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -158,9 +159,6 @@ MonoBehaviour:
   numColumns: 2
   numRows: 1
   myObject: {fileID: 1048484350530938663, guid: 9528763d6dd0d014bacd23d4f049dfc4, type: 3}
-  startX: 0
-  startY: 0
-  startZ: 0
   distanceX: 4
   distanceY: 0
 --- !u!114 &199940099
@@ -199,7 +197,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 199940097}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e2d94387fff88ca4ba1fb6065abe69cb, type: 3}
   m_Name: 
@@ -208,8 +206,18 @@ MonoBehaviour:
   setupRequired: 1
   listExists: 0
   objectList: []
+  objectsToRemove: []
   windowLength: 1
+  interWindowInterval: 0.5
+  stimOn: 0
   numTrainingSelections: 9
+  numTrainWindows: 3
+  trainBreak: 1
+  shamFeedback: 1
+  trainTarget: 99
+  setup: {fileID: 0}
+  marker: {fileID: 0}
+  response: {fileID: 0}
 --- !u!4 &199940102
 Transform:
   m_ObjectHideFlags: 0
@@ -224,6 +232,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &199940103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199940097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fec4d8ee2a5b9f34da4c9d9c03be90f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refreshRate: 60
+  setupRequired: 1
+  listExists: 0
+  objectList: []
+  objectsToRemove: []
+  windowLength: 1
+  interWindowInterval: -0.9
+  stimOn: 0
+  numTrainingSelections: 9
+  numTrainWindows: 3
+  trainBreak: 1
+  shamFeedback: 1
+  trainTarget: 99
+  setup: {fileID: 0}
+  marker: {fileID: 0}
+  response: {fileID: 0}
 --- !u!1 &786792144
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,9 +354,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cursor
       objectReference: {fileID: 0}
+    - target: {fileID: 661011985944773187, guid: 2df825947f077414db94b8cced958092, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 661011985944773191, guid: 2df825947f077414db94b8cced958092, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 661011985944773191, guid: 2df825947f077414db94b8cced958092, type: 3}
       propertyPath: m_LocalScale.x
@@ -472,7 +512,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1001 &4463326558552459984
 PrefabInstance:
@@ -495,7 +535,7 @@ PrefabInstance:
       objectReference: {fileID: 6396776630637071763, guid: 487094b6b930d7c4485c398415cf4d0c, type: 3}
     - target: {fileID: 4463326556973470820, guid: 9606f21bc59023849970e46f526233f9, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4463326556973470820, guid: 9606f21bc59023849970e46f526233f9, type: 3}
       propertyPath: m_LocalPosition.x

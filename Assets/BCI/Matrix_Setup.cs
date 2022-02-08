@@ -13,23 +13,23 @@ public class Matrix_Setup : MonoBehaviour
     public int numColumns;
     public int numRows;
     public GameObject myObject;
-    public double startX;       //Initial position of X for drawing in the objects
-    public double startY;       //Initial position of Y for drawing in the objects
-    public float startZ;        //Initial position of Z for drawing in the objects
+    private double startX;       //Initial position of X for drawing in the objects
+    private double startY;       //Initial position of Y for drawing in the objects
+    private float startZ;        //Initial position of Z for drawing in the objects
     public double distanceX;    //Distance between objects in X-plane
     public double distanceY;
     private List<GameObject> objectList = new List<GameObject>();
     private GameObject new_obj;
     //private GameObject objects; //This name is a left-over from previous iterations. However it works fine for here.
 
-    private void Awake()
-    {
+    //private void Awake()
+    //{
 
-    }
-    private void Start()
-    {
+    //}
+    //private void Start()
+    //{
 
-    }
+    //}
 
     // Setup the matrix
     // void SetUpMatrix(List<GameObject> objectList)
