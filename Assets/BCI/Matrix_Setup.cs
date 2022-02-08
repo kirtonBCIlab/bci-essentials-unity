@@ -22,15 +22,6 @@ public class Matrix_Setup : MonoBehaviour
     private GameObject new_obj;
     //private GameObject objects; //This name is a left-over from previous iterations. However it works fine for here.
 
-    //private void Awake()
-    //{
-
-    //}
-    //private void Start()
-    //{
-
-    //}
-
     // Setup the matrix
     // void SetUpMatrix(List<GameObject> objectList)
     public void SetUpMatrix()
@@ -53,6 +44,9 @@ public class Matrix_Setup : MonoBehaviour
 
                 //Give the new object the BCI tag
                 new_obj.tag = "BCI";
+
+                //turn off
+                new_obj.GetComponent<SPO>().turnOff();
 
                 //Adding to list
                 objectList.Add(new_obj);

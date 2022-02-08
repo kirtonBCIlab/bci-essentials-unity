@@ -374,15 +374,8 @@ public class Controller : MonoBehaviour
             // Go through the training sequence
             yield return new WaitForSecondsRealtime(3f);
 
-            //for (int j = 0; j < numTrainWindows; j++)
-            //{
-            //    stimulusOn();
-            //    yield return new WaitForSecondsRealtime((windowLength + interWindowInterval)*);
-            //    stimulusOff();
-            //}
-
             stimulusOn();
-            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * numTrainWindows);
+            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
             stimulusOff();
 
             // Turn off train target
