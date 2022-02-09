@@ -407,7 +407,7 @@ public class Controller : MonoBehaviour
 
         // Create an unshuffled array of the possible options
         int[] unshuffledArray = new int[numOptions];
-        for (int i = 0; i < objectList.Count; i++)
+        for (int i = 0; i < numOptions; i++)
         {
             unshuffledArray[i] = i;
         }
