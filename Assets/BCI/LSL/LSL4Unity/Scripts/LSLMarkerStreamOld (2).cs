@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using LSL4Unity;
 using LSL;
 
-namespace LSL4Unity
+namespace Assets.LSL4Unity.Scripts
 {
-//[HelpURL("https://github.com/xfleckx/LSL4Unity/wiki#using-a-marker-stream")]
-    public class LSLMarkerStream : MonoBehaviour
+    [HelpURL("https://github.com/xfleckx/LSL4Unity/wiki#using-a-marker-stream")]
+    public class LSLMarkerStreamOld : MonoBehaviour
     {
         private const string unique_source_id = "D3F83BB699EB49AB94A9FA44B88882AC";
 
@@ -38,14 +37,23 @@ namespace LSL4Unity
             
             lslOutlet = new liblsl.StreamOutlet(lslStreamInfo);
 
-            print("LSL initialized");
+            //Shaheed Additions:
+            // GameObject cubeController = GameObject.Find("CubeController");
+            // P300_Flashes p300Flashes = cubeController.GetComponent<P300_Flashes>();
+
+            // lslOutlet.push_sample(new string[] {(p300Flashes.numRows).ToString()});
+            // lslOutlet.push_sample(new string[] {(p300Flashes.numColumns).ToString()});
+            // lslOutlet.push_sample(new string[] {(p300Flashes.numSamples).ToString()});
+            // lslOutlet.push_sample(new string[] {"SingleFlash"});
+            // lslOutlet.push_sample(new string[] {(p300Flashes.numTrials).ToString()});
+
+
+
         }
 
-        public void Write(string markerString)
+        public void Write(string marker)
         {
-            Debug.Log("Sent Marker : " + markerString);
-
-            sample[0] = markerString;
+            sample[0] = marker;
             lslOutlet.push_sample(sample);
         }
         /*
@@ -60,7 +68,7 @@ namespace LSL4Unity
             sample[0] = marker;
             lslOutlet.push_sample(sample, customTimeStamp);
         }
-        
+        */
 
         public void WriteBeforeFrameIsDisplayed(string marker)
         {
@@ -75,7 +83,6 @@ namespace LSL4Unity
 
             yield return null;
         }
-        */
 
     }
 }

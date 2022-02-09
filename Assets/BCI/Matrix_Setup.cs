@@ -13,23 +13,14 @@ public class Matrix_Setup : MonoBehaviour
     public int numColumns;
     public int numRows;
     public GameObject myObject;
-    public double startX;       //Initial position of X for drawing in the objects
-    public double startY;       //Initial position of Y for drawing in the objects
-    public float startZ;        //Initial position of Z for drawing in the objects
+    private double startX;       //Initial position of X for drawing in the objects
+    private double startY;       //Initial position of Y for drawing in the objects
+    private float startZ;        //Initial position of Z for drawing in the objects
     public double distanceX;    //Distance between objects in X-plane
     public double distanceY;
     private List<GameObject> objectList = new List<GameObject>();
     private GameObject new_obj;
     //private GameObject objects; //This name is a left-over from previous iterations. However it works fine for here.
-
-    private void Awake()
-    {
-
-    }
-    private void Start()
-    {
-
-    }
 
     // Setup the matrix
     // void SetUpMatrix(List<GameObject> objectList)
@@ -53,6 +44,9 @@ public class Matrix_Setup : MonoBehaviour
 
                 //Give the new object the BCI tag
                 new_obj.tag = "BCI";
+
+                //turn off
+                new_obj.GetComponent<SPO>().turnOff();
 
                 //Adding to list
                 objectList.Add(new_obj);
@@ -100,16 +94,7 @@ public class Matrix_Setup : MonoBehaviour
 
     }
 
-    // I DONT THINK THIS BELONGS HERE
-    ///* Sets all objects in a list to a desired colour */
-    //public void Recolour(List<GameObject> object_list, Color color)
-    //{
 
-    //    for (int i = 0; i < object_list.Count; i++)
-    //    {
-    //        object_list[i].GetComponent<Renderer>().material.color = color;
-    //    }
-    //}
 
 
 }
