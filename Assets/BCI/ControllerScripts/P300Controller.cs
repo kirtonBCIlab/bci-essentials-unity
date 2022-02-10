@@ -14,6 +14,9 @@ public class P300Controller : Controller
     public bool singleFlash = true;
     public bool multiFlash = false;
 
+    public bool rowColumn = false;
+    public bool checkerboard = true;
+
     public enum multiFlashMethod {Random};
     
 
@@ -68,12 +71,12 @@ public class P300Controller : Controller
             // Take a break
             yield return new WaitForSecondsRealtime(trainBreak);
         }
+
+        marker.Write("Training Complete");
     }
 
     public override IEnumerator stimulus()
     {
-        var rcMethod = multiFlashMethod.Random;
-
         if (singleFlash)
         {
             int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
@@ -116,15 +119,32 @@ public class P300Controller : Controller
             // Assign object indices to places in the virtual row/column matrix
             //if (rcMethod.ToString() == "Ordered")
             //{
-            int count = 0;
-            for (int i = 0; i < numColumns; i++)
+            if(rowColumn)
             {
-                for (int j = 0; j < numRows; j++)
+                int count = 0;
+                for (int i = 0; i < numColumns; i++)
                 {
-                    if (count <= numSelections)
-                        rcMatrix[i, j] = count;
-                    //print(i.ToString() + j.ToString() + count.ToString());
-                    count++;
+                    for (int j = 0; j < numRows; j++)
+                    {
+                        if (count <= numSelections)
+                            rcMatrix[i, j] = count;
+                        //print(i.ToString() + j.ToString() + count.ToString());
+                        count++;
+                    }
+                }
+            }
+
+            if(checkerboard)
+            {
+                int count = 0;
+                for (int i = 0; i < numColumns; i++)
+                {
+                    for (int j = 0; j < numRows; j++)
+                    {
+                        if (count <= numSelections)
+                            rcMatrix[i, j] = count;
+                        count++;
+                    }
                 }
             }
             //}

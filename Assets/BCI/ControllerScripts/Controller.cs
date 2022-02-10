@@ -129,6 +129,12 @@ public class Controller : MonoBehaviour
         // Press T to do automated training
         if (Input.GetKeyDown(KeyCode.T))
         {
+            // Receive incoming markers
+            if (receivingMarkers == false)
+            {
+                StartCoroutine(receiveMarkers());
+            }
+
             StartCoroutine(doTraining());
         }
 
@@ -393,6 +399,8 @@ public class Controller : MonoBehaviour
             yield return new WaitForSecondsRealtime(trainBreak);
         }
 
+        marker.Write("Training Complete");
+
     }
 
     // Make a random non repeating array of shuffled subarrays
@@ -400,7 +408,8 @@ public class Controller : MonoBehaviour
     public int[] makeRNRA(int arrayLength, int numOptions)
     {
         // Make random object
-        System.Random trainRandom = new System.Random();
+        Debug.Log("Random seed is 42");
+        System.Random trainRandom = new System.Random(42);
 
         // Initialize array
         int[] array = new int[arrayLength];

@@ -139,7 +139,6 @@ public class SSVEPController : Controller
 
     public override IEnumerator stimulus()
     {
-        int ISI_count = 0;
         while (stimOn)
         {
             // Add duty cycle
