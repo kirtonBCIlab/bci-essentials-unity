@@ -31,12 +31,14 @@ public class SPO : MonoBehaviour
     // Turn the stimulus on
     public virtual void turnOn()
     {
+        //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
         this.GetComponent<Renderer>().material.color = onColour;
     }
 
     // Turn off/reset the SPO
     public virtual void turnOff()
     {
+        //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
         this.GetComponent<Renderer>().material.color = offColour;
     }
 
