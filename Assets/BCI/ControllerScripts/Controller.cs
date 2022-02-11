@@ -115,24 +115,7 @@ public class Controller : MonoBehaviour
         // Press S to start/stop stimulus
         if (Input.GetKeyDown(KeyCode.S))
         {
-            // Receive incoming markers
-            if (receivingMarkers == false)
-            { 
-                StartCoroutine(receiveMarkers());
-            }
-
-            // Turn off if on
-            if (stimOn)
-            {
-                stimulusOff();
-            }
-
-            // Turn on if off
-            else
-            {
-                populateObjectList("tag");
-                stimulusOn();
-            }
+            startStopStimulus();
         }
 
         // Press T to do automated training
@@ -272,9 +255,37 @@ public class Controller : MonoBehaviour
         }
         objectsToRemove.Clear();
 
+        for (int i = 0; i < objectList.Count; i++)
+        {
+            GameObject thisObject = objectList[i];
+            thisObject.GetComponent<SPO>().myIndex = i;
+        }
+
         print(objectList.Count.ToString());
 
 
+    }
+
+    public void startStopStimulus()
+    {
+        // Receive incoming markers
+        if (receivingMarkers == false)
+        {
+            StartCoroutine(receiveMarkers());
+        }
+
+        // Turn off if on
+        if (stimOn)
+        {
+            stimulusOff();
+        }
+
+        // Turn on if off
+        else
+        {
+            populateObjectList("tag");
+            stimulusOn();
+        }
     }
 
     // Turn the stimulus on

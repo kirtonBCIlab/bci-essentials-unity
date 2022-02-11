@@ -11,6 +11,7 @@ public class SPO : MonoBehaviour
 
     // Whether or not to include in the Controller object, used to change which objects are selectable
     public bool includeMe = true;
+    public int myIndex;
 
     // Target object
     //GameObject trainingCube;

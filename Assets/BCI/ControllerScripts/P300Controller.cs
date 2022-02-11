@@ -48,14 +48,14 @@ public class P300Controller : Controller
             objectList[trainTarget].GetComponent<SPO>().onTrainTarget();
 
             // Go through the training sequence
-            yield return new WaitForSecondsRealtime(3f);
+            yield return new WaitForSecondsRealtime(trainBreak);
 
             // Calculate the length of the trial
             float trialTime = (onTime + offTime) * (float)numFlashesPerObjectPerSelection * (float)objectList.Count;
 
             stimulusOn();
-            yield return new WaitForSecondsRealtime(trialTime);
-            stimulusOff();
+            yield return new WaitForSecondsRealtime(trialTime + trainBreak);
+            //stimulusOff();
 
             // Turn off train target
             objectList[trainTarget].GetComponent<SPO>().offTrainTarget();
@@ -239,6 +239,7 @@ public class P300Controller : Controller
                 }
             }
         }
+        stimulusOff();
     }
 
     public override IEnumerator sendMarkers(int trainTarget=99)
