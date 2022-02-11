@@ -45,6 +45,15 @@ public class Controller : MonoBehaviour
     public float trainBreak = 1f;
     public bool shamFeedback = false;
     public int trainTarget = 99;
+    
+    //Deal with the BCI Tag in a scene with mor flexibility.
+    [SerializeField]
+    private string _myTag = "BCI";
+    public string myTag
+    {
+        get {return _myTag; }
+        set {_myTag = value; }
+    }
 
     // Receive markers
     private bool receivingMarkers = false;
@@ -102,7 +111,7 @@ public class Controller : MonoBehaviour
 
 
         // Check key down
-
+        
         // Press S to start/stop stimulus
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -201,7 +210,8 @@ public class Controller : MonoBehaviour
             {
                 //Add game objects to list by tag "BCI"
                 //GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
-                GameObject[] objectArray = GameObject.FindGameObjectsWithTag("BCI");
+                //Editing this to be programmable in the editor under myTag
+                GameObject[] objectArray = GameObject.FindGameObjectsWithTag(myTag);
                 for (int i = 0; i < objectArray.Length; i++)
                 {
                     objectList.Add(objectArray[i]);
