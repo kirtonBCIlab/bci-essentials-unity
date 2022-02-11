@@ -132,7 +132,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: onTime
-      value: 1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: offTime
@@ -140,18 +140,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: rowColumn
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: multiFlash
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: refreshRate
-      value: 144
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: singleFlash
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: checkerboard
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
@@ -164,19 +172,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numTrainingSelections
-      value: 9
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: refreshRate
-      value: 144
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: windowLength
-      value: 10
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: setupRequired
@@ -184,7 +192,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numTrainingSelections
-      value: 9
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: setFreqFlash.Array.size
@@ -272,7 +280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106473, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numRows
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106473, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: distanceX
@@ -284,7 +292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106473, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numColumns
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106474, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: m_Name
