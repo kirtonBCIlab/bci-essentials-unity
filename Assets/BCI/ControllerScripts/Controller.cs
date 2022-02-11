@@ -28,13 +28,13 @@ public class Controller : MonoBehaviour
     //Matrix Setup
     public bool setupRequired;
 
-    //populateObjectList
+    //PopulateObjectList
     public bool listExists;
     //public GameObject[] objectList;
     public List<GameObject> objectList;
     [HideInInspector] public List<GameObject> objectsToRemove;
 
-    //stimulusOn/Off + sending Markers
+    //StimulusOn/Off + sending Markers
     public float windowLength = 1.0f;
     public float interWindowInterval = 0f;
     public bool stimOn = false;
@@ -115,7 +115,7 @@ public class Controller : MonoBehaviour
         // Press S to start/stop stimulus
         if (Input.GetKeyDown(KeyCode.S))
         {
-            startStopStimulus();
+            StartStopStimulus();
         }
 
         // Press T to do automated training
@@ -124,10 +124,10 @@ public class Controller : MonoBehaviour
             // Receive incoming markers
             if (receivingMarkers == false)
             {
-                StartCoroutine(receiveMarkers());
+                StartCoroutine(ReceiveMarkers());
             }
 
-            StartCoroutine(doTraining());
+            StartCoroutine(DoTraining());
         }
 
 
@@ -136,43 +136,43 @@ public class Controller : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                selectObject(0);
+                SelectObject(0);
             }
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                selectObject(1);
+                SelectObject(1);
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                selectObject(2);
+                SelectObject(2);
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                selectObject(3);
+                SelectObject(3);
             }
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                selectObject(4);
+                SelectObject(4);
             }
             if (Input.GetKeyDown(KeyCode.Alpha5))
             {
-                selectObject(5);
+                SelectObject(5);
             }
             if (Input.GetKeyDown(KeyCode.Alpha6))
             {
-                selectObject(6);
+                SelectObject(6);
             }
             if (Input.GetKeyDown(KeyCode.Alpha7))
             {
-                selectObject(7);
+                SelectObject(7);
             }
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                selectObject(8);
+                SelectObject(8);
             }
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
-                selectObject(9);
+                SelectObject(9);
             }
         }
 
@@ -180,7 +180,7 @@ public class Controller : MonoBehaviour
     }
 
     // Populate a list of SPOs
-    public virtual void populateObjectList(string popMethod)
+    public virtual void PopulateObjectList(string popMethod)
     {
         // Remove everything from the existing list
         objectList.Clear();
@@ -266,41 +266,41 @@ public class Controller : MonoBehaviour
 
     }
 
-    public void startStopStimulus()
+    public void StartStopStimulus()
     {
         // Receive incoming markers
         if (receivingMarkers == false)
         {
-            StartCoroutine(receiveMarkers());
+            StartCoroutine(ReceiveMarkers());
         }
 
         // Turn off if on
         if (stimOn)
         {
-            stimulusOff();
+            StimulusOff();
         }
 
         // Turn on if off
         else
         {
-            populateObjectList("tag");
-            stimulusOn();
+            PopulateObjectList("tag");
+            StimulusOn();
         }
     }
 
     // Turn the stimulus on
-    public void stimulusOn()
+    public void StimulusOn()
     {
         stimOn = true;
 
         // Start the stimulus Coroutine
         try
         {
-            StartCoroutine(stimulus());
+            StartCoroutine(Stimulus());
 
             // Send the marker to start
             marker.Write("Trial Started");
-            StartCoroutine(sendMarkers(trainTarget));
+            StartCoroutine(SendMarkers(trainTarget));
         }
         catch
         {
@@ -308,7 +308,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public void stimulusOff()
+    public void StimulusOff()
     {
         // End thhe stimulus Coroutine
         stimOn = false;
@@ -324,7 +324,7 @@ public class Controller : MonoBehaviour
     //}
 
     // Receive a marker 
-    //public  void receiveMarkers()
+    //public  void ReceiveMarkers()
     //{
 
     //    // If stream doesn't exist then open it
@@ -343,7 +343,7 @@ public class Controller : MonoBehaviour
     //}
 
     // Select an object from the objectList
-    public void selectObject(int objectIndex)
+    public void SelectObject(int objectIndex)
     {
         // When a selection is made, turn the stimulus off
         stimOn = false;
@@ -351,7 +351,7 @@ public class Controller : MonoBehaviour
         try
         {
             // Run the SPO onSelection script
-            objectList[objectIndex].GetComponent<SPO>().onSelection();
+            objectList[objectIndex].GetComponent<SPO>().OnSelection();
         }
         catch
         {
@@ -371,18 +371,18 @@ public class Controller : MonoBehaviour
     //}
 
     // Do training
-    public virtual IEnumerator doTraining()
+    public virtual IEnumerator DoTraining()
     {   
         // Generate the target list
-        populateObjectList("tag");
+        PopulateObjectList("tag");
 
         // Get number of selectable objects by counting the objects in the objectList
         int numOptions = objectList.Count;
 
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = makeRNRA(numTrainingSelections, numOptions);
-        printArray(trainArray);
+        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        PrintArray(trainArray);
 
         yield return new WaitForSecondsRealtime(0.001f);
 
@@ -396,22 +396,22 @@ public class Controller : MonoBehaviour
             Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
 
             // Turn on train target
-            objectList[trainTarget].GetComponent<SPO>().onTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
             // Go through the training sequence
             yield return new WaitForSecondsRealtime(3f);
 
-            stimulusOn();
+            StimulusOn();
             yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-            stimulusOff();
+            StimulusOff();
 
             // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().offTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
 
             // If sham feedback is true, then show it
             if(shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().onSelection();
+                objectList[trainTarget].GetComponent<SPO>().OnSelection();
             }
 
             trainTarget = 99;
@@ -426,7 +426,7 @@ public class Controller : MonoBehaviour
 
     // Make a random non repeating array of shuffled subarrays
     // 
-    public int[] makeRNRA(int arrayLength, int numOptions)
+    public int[] MakeRNRA(int arrayLength, int numOptions)
     {
         // Make random object
         Debug.Log("Random seed is 42");
@@ -441,7 +441,7 @@ public class Controller : MonoBehaviour
         {
             unshuffledArray[i] = i;
         }
-        //printArray(unshuffledArray);
+        //PrintArray(unshuffledArray);
 
         // Get the number of loops required to generate a list of desired length
         int numLoops = (arrayLength / numOptions);
@@ -460,7 +460,7 @@ public class Controller : MonoBehaviour
             {
                 shuffledArray = unshuffledArray.OrderBy(x => trainRandom.Next()).ToArray();
             }
-            //printArray(shuffledArray);
+            //PrintArray(shuffledArray);
 
             // If this is not the last loop
             if (i < numLoops)
@@ -489,11 +489,11 @@ public class Controller : MonoBehaviour
             }
         }
 
-        //printArray(array);
+        //PrintArray(array);
         return array;
     }
 
-    public void printArray(int[] array)
+    public void PrintArray(int[] array)
     {
         string[] strings = new string[array.Length];
         for (int i = 0; i < array.Length; i++)
@@ -504,7 +504,7 @@ public class Controller : MonoBehaviour
     }
 
     // Coroutine for the stimulus
-    public virtual IEnumerator stimulus()
+    public virtual IEnumerator Stimulus()
     {
         // Present the stimulus until it is turned off
         while(stimOn)
@@ -514,7 +514,7 @@ public class Controller : MonoBehaviour
             {
                 try
                 {
-                    objectList[i].GetComponent<SPO>().turnOn();
+                    objectList[i].GetComponent<SPO>().TurnOn();
                 }
                 catch
                 {
@@ -532,7 +532,7 @@ public class Controller : MonoBehaviour
         {
             try
             {
-                objectList[i].GetComponent<SPO>().turnOff();
+                objectList[i].GetComponent<SPO>().TurnOff();
             }
             catch
             {
@@ -545,7 +545,7 @@ public class Controller : MonoBehaviour
     }
 
     // Send markers
-    public virtual IEnumerator sendMarkers(int trainingIndex = 99)
+    public virtual IEnumerator SendMarkers(int trainingIndex = 99)
     {
 
         // Make the marker string, this will change based on the paradigm
@@ -566,7 +566,7 @@ public class Controller : MonoBehaviour
         }
     }
     // Coroutine to continuously receive markers
-    public IEnumerator receiveMarkers()
+    public IEnumerator ReceiveMarkers()
     {
         if (receivingMarkers == false)
         {
@@ -608,7 +608,7 @@ public class Controller : MonoBehaviour
                     if (isNumeric == true)
                     {
                         //Run on selection
-                        objectList[i].GetComponent<SPO>().onSelection();
+                        objectList[i].GetComponent<SPO>().OnSelection();
                     }
                 }
             }
@@ -630,7 +630,7 @@ public class Controller : MonoBehaviour
                     if (isNumeric == true)
                     {
                         //Run on selection
-                        objectList[i].GetComponent<SPO>().onSelection();
+                        objectList[i].GetComponent<SPO>().OnSelection();
                     }
 
                 }
