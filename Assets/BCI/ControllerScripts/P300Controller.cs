@@ -31,7 +31,7 @@ public class P300Controller : Controller
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
         trainArray = MakeRNRA(numTrainingSelections, numOptions);
-        printArray(trainArray);
+        PrintArray(trainArray);
 
         yield return new WaitForSecondsRealtime(0.001f);
 
@@ -53,7 +53,7 @@ public class P300Controller : Controller
             // Calculate the length of the trial
             float trialTime = (onTime + offTime) * (float)numFlashesPerObjectPerSelection * (float)objectList.Count;
 
-            stimulusOn();
+            StimulusOn();
             yield return new WaitForSecondsRealtime(trialTime + trainBreak);
             //stimulusOff();
 
@@ -239,7 +239,7 @@ public class P300Controller : Controller
                 }
             }
         }
-        stimulusOff();
+        StimulusOff();
     }
 
     public override IEnumerator SendMarkers(int trainTarget=99)

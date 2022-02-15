@@ -109,7 +109,7 @@ public class SSVEPController : Controller
         }
     }
 
-    public override IEnumerator sendMarkers(int trainingIndex = 99)
+    public override IEnumerator SendMarkers(int trainingIndex = 99)
     {
         // Make the marker string, this will change based on the paradigm
         while (stimOn)
@@ -143,7 +143,7 @@ public class SSVEPController : Controller
         }
     }
 
-    public override IEnumerator stimulus()
+    public override IEnumerator Stimulus()
     {
         while (stimOn)
         {

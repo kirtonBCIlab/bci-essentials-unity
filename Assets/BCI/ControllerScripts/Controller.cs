@@ -622,7 +622,7 @@ public class Controller : MonoBehaviour
                     if (isNumeric == true)
                     {
                         //Run on selection
-                        objectList[i].GetComponent<SPO>().OnSelection();
+                        objectList[n].GetComponent<SPO>().OnSelection();
                     }
                 }
             }
@@ -644,7 +644,7 @@ public class Controller : MonoBehaviour
                     if (isNumeric == true)
                     {
                         //Run on selection
-                        objectList[i].GetComponent<SPO>().OnSelection();
+                        objectList[n].GetComponent<SPO>().OnSelection();
                     }
 
                 }
