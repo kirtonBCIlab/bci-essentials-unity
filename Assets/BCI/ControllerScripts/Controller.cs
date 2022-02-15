@@ -541,7 +541,7 @@ public class Controller : MonoBehaviour
             
         }
 
-        yield return new WaitForSecondsRealtime(0.001f);
+        yield return 0;
     }
 
     // Send markers
@@ -579,8 +579,11 @@ public class Controller : MonoBehaviour
         }
 
         //Set interval at which to receive markers
-        float receiveInterval = 0.5f;
+        float receiveInterval = 0.2f;
         float responseTimeout = 1f;
+
+        //Ping count
+        int pingCount = 0;
 
         // Receive markers continuously
         while(receivingMarkers)
@@ -595,13 +598,24 @@ public class Controller : MonoBehaviour
 
             // Check if there is 
             bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
-            if (responseStrings[0] != "")
+
+            
+            if (responseStrings[0] == "ping")
+            {
+                pingCount++;
+                if(pingCount%100 == 0)
+                {
+                    Debug.Log("Ping Count: " + pingCount.ToString());
+                }
+            }
+
+            else if (responseStrings[0] != "")
             {
                 for (int i = 0; i < responseStrings.Length; i++)
                 {
                     string responseString = responseStrings[i];
                     print("WE GOT A RESPONSE");
-                    print(responseString);
+                    print("response : " + responseString);
 
                     int n;
                     bool isNumeric = int.TryParse(responseString, out n);

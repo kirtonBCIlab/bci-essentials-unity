@@ -90,14 +90,18 @@ public class MIController : Controller
         // Make the marker string, this will change based on the paradigm
         while (stimOn)
         {
-            // Desired format is: [windowLength, trainingIndex] 
-
-            string markerString = windowLength.ToString();
-
+            // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
+            string trainingString;
             if (trainingIndex <= objectList.Count)
             {
-                markerString = markerString + "," + trainingIndex.ToString();
+                trainingString = trainingIndex.ToString();
             }
+            else
+            {
+                trainingString = "-1";
+            }
+
+            string markerString = "mi," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString();
 
             // Send the marker
             marker.Write(markerString);

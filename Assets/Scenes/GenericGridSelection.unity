@@ -180,15 +180,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: refreshRate
-      value: 60
+      value: 144
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: windowLength
-      value: 2
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: setupRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: interWindowInterval
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106467, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numTrainingSelections
@@ -305,6 +309,10 @@ PrefabInstance:
     - target: {fileID: 4280385885900106476, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: refreshRate
       value: 144
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106476, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: windowLength
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106477, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: m_RootOrder
