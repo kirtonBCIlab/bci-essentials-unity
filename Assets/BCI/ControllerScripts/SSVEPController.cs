@@ -114,18 +114,24 @@ public class SSVEPController : Controller
         // Make the marker string, this will change based on the paradigm
         while (stimOn)
         {
-            // Desired format is: [windowLength, training frequencies, trainingIndex] 
-
-            string markerString = windowLength.ToString();
+            // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
+            string freqString = "";
             for (int i = 0; i < realFreqFlash.Length; i++)
             {
-                markerString = markerString + "," + realFreqFlash[i].ToString();
+                freqString = freqString + "," + realFreqFlash[i].ToString();
             }
 
+            string trainingString;
             if (trainingIndex <= objectList.Count)
             {
-                markerString = markerString + "," + trainingIndex.ToString();
+                trainingString = trainingIndex.ToString();
             }
+            else
+            {
+                trainingString = "-1";
+            }
+
+            string markerString = "ssvep," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString() + freqString;
 
             // Send the marker
             marker.Write(markerString);
