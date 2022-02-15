@@ -20,17 +20,17 @@ public class P300Controller : Controller
     public enum multiFlashMethod {Random};
     
 
-    public override IEnumerator doTraining()
+    public override IEnumerator DoTraining()
     {
         // Generate the target list
-        populateObjectList("tag");
+        PopulateObjectList("tag");
 
         // Get number of selectable objects by counting the objects in the objectList
         int numOptions = objectList.Count;
 
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = makeRNRA(numTrainingSelections, numOptions);
+        trainArray = MakeRNRA(numTrainingSelections, numOptions);
         printArray(trainArray);
 
         yield return new WaitForSecondsRealtime(0.001f);
@@ -45,7 +45,7 @@ public class P300Controller : Controller
             Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
 
             // Turn on train target
-            objectList[trainTarget].GetComponent<SPO>().onTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
             // Go through the training sequence
             yield return new WaitForSecondsRealtime(trainBreak);
@@ -58,12 +58,12 @@ public class P300Controller : Controller
             //stimulusOff();
 
             // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().offTrainTarget();
+            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
 
             // If sham feedback is true, then show it
             if (shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().onSelection();
+                objectList[trainTarget].GetComponent<SPO>().OnSelection();
             }
 
             trainTarget = 99;
@@ -75,12 +75,12 @@ public class P300Controller : Controller
         marker.Write("Training Complete");
     }
 
-    public override IEnumerator stimulus()
+    public override IEnumerator Stimulus()
     {
         if (singleFlash)
         {
             int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
-            int[] stimOrder = makeRNRA(totalFlashes, objectList.Count);
+            int[] stimOrder = MakeRNRA(totalFlashes, objectList.Count);
 
             for (int i = 0; i < stimOrder.Length; i++)
             {
@@ -88,7 +88,7 @@ public class P300Controller : Controller
                 GameObject currentObject = objectList[stimOrder[i]];
 
                 //Turn on
-                currentObject.GetComponent<SPO>().turnOn();
+                currentObject.GetComponent<SPO>().TurnOn();
                 string markerString = "s," + stimOrder[i].ToString();
 
                 if (trainTarget <= objectList.Count)
@@ -101,7 +101,7 @@ public class P300Controller : Controller
                 yield return new WaitForSecondsRealtime(onTime);
 
                 //Turn off
-                currentObject.GetComponent<SPO>().turnOff();
+                currentObject.GetComponent<SPO>().TurnOff();
 
                 //Wait
                 yield return new WaitForSecondsRealtime(offTime);
@@ -154,8 +154,8 @@ public class P300Controller : Controller
             int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
 
             // Create a random order to flash rows and columns
-            int[] columnStimOrder = makeRNRA(totalColumnFlashes, numColumns);
-            int[] rowStimOrder = makeRNRA(totalRowFlashes, numRows);
+            int[] columnStimOrder = MakeRNRA(totalColumnFlashes, numColumns);
+            int[] rowStimOrder = MakeRNRA(totalRowFlashes, numRows);
 
             for (int i = 0; i < totalColumnFlashes; i++)
             {
@@ -167,7 +167,7 @@ public class P300Controller : Controller
                 for (int n = 0; n < numRows; n++)
                 {
                     GameObject currentObject = objectList[rcMatrix[n,columnIndex]];
-                    currentObject.GetComponent<SPO>().turnOn();
+                    currentObject.GetComponent<SPO>().TurnOn();
 
                     //Add to marker
                     markerString = markerString + "," + rcMatrix[n,columnIndex].ToString();
@@ -189,7 +189,7 @@ public class P300Controller : Controller
                 for (int n = 0; n < numRows; n++)
                 {
                     GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
-                    currentObject.GetComponent<SPO>().turnOff();
+                    currentObject.GetComponent<SPO>().TurnOff();
                 }
 
                 //Wait
@@ -207,7 +207,7 @@ public class P300Controller : Controller
                     {
                         //Turn on row
                         GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                        currentObject.GetComponent<SPO>().turnOn();
+                        currentObject.GetComponent<SPO>().TurnOn();
 
                         //Add to marker
                         markerString1 = markerString1 + "," + rcMatrix[rowIndex, m].ToString();
@@ -230,7 +230,7 @@ public class P300Controller : Controller
                     {
                         //Turn on row
                         GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                        currentObject.GetComponent<SPO>().turnOff();
+                        currentObject.GetComponent<SPO>().TurnOff();
                     }
 
 
@@ -242,7 +242,7 @@ public class P300Controller : Controller
         stimulusOff();
     }
 
-    public override IEnumerator sendMarkers(int trainTarget=99)
+    public override IEnumerator SendMarkers(int trainTarget=99)
     {
         // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
         yield return new WaitForSecondsRealtime(0.001f);

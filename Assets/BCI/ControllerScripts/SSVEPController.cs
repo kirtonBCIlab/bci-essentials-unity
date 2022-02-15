@@ -16,7 +16,7 @@ public class SSVEPController : Controller
     private int[] frame_on_count = new int[99];
 
 
-    public override void populateObjectList(string popMethod)
+    public override void PopulateObjectList(string popMethod)
     {
         // Remove everything from the existing list
         objectList.Clear();
@@ -151,7 +151,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_on_count[i])
                     {
                         // turn the cube off
-                        objectList[i].GetComponent<SPO>().turnOff();
+                        objectList[i].GetComponent<SPO>().TurnOff();
                         frames_on[i] = 0;
                         frame_count[i] = 0;
                     }
@@ -161,7 +161,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_off_count[i])
                     {
                         // turn the cube on
-                        objectList[i].GetComponent<SPO>().turnOn();
+                        objectList[i].GetComponent<SPO>().TurnOn();
                         frames_on[i] = 1;
                         frame_count[i] = 0;
                     }
@@ -172,7 +172,7 @@ public class SSVEPController : Controller
         for (int i = 0; i < objectList.Count; i++)
         {
             // turn the cube off
-            objectList[i].GetComponent<SPO>().turnOff();
+            objectList[i].GetComponent<SPO>().TurnOff();
         }
     }
 }

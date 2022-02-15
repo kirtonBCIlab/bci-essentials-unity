@@ -16,46 +16,34 @@ public class SPO : MonoBehaviour
     // Target object
     //GameObject trainingCube;
 
-    //private GameObject trainTarget;
-    // Start is called before the first frame update
-    //void Start()
-    //{
-        
-    //}
-
-    // Update is called once per frame
-    //void Update()
-    //{
-        
-    //}
 
     // Turn the stimulus on
-    public virtual void turnOn()
+    public virtual void TurnOn()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
         this.GetComponent<Renderer>().material.color = onColour;
     }
 
     // Turn off/reset the SPO
-    public virtual void turnOff()
+    public virtual void TurnOff()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
         this.GetComponent<Renderer>().material.color = offColour;
     }
 
     // What to do on selection
-    public virtual void onSelection()
+    public virtual void OnSelection()
     {
         // This is free form, do whatever you want on selection
 
-        StartCoroutine(quickFlash());
+        StartCoroutine(QuickFlash());
  
         // Reset
-        turnOff();
+        TurnOff();
     }
 
     // What to do when targeted for training selection
-    public virtual void onTrainTarget()
+    public virtual void OnTrainTarget()
     {
         float scaleValue = 1.4f;
         Vector3 objectScale = transform.localScale;
@@ -63,7 +51,7 @@ public class SPO : MonoBehaviour
     }
 
     // What to do when untargeted
-    public virtual void offTrainTarget()
+    public virtual void OffTrainTarget()
     {
         float scaleValue = 1.4f;
         Vector3 objectScale = transform.localScale;
@@ -71,13 +59,13 @@ public class SPO : MonoBehaviour
     }
 
     // Quick Flash
-    private IEnumerator quickFlash()
+    private IEnumerator QuickFlash()
     {
         for (int i = 0; i < 3; i++)
         {
-            turnOn();
+            TurnOn();
             yield return new WaitForSecondsRealtime(0.2F);
-            turnOff();
+            TurnOff();
             yield return new WaitForSecondsRealtime(0.2F);
         }
     }

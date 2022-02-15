@@ -7,7 +7,7 @@ using UnityEngine;
 */
 public class MIController : Controller
 {
-    public override void populateObjectList(string popMethod)
+    public override void PopulateObjectList(string popMethod)
     {
         // Remove everything from the existing list
         objectList.Clear();
@@ -85,7 +85,7 @@ public class MIController : Controller
         }
     }
 
-    public override IEnumerator sendMarkers(int trainingIndex = 99)
+    public override IEnumerator SendMarkers(int trainingIndex = 99)
     {
         // Make the marker string, this will change based on the paradigm
         while (stimOn)
