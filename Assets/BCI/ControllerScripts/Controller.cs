@@ -569,7 +569,7 @@ public class Controller : MonoBehaviour
         }
 
         //Set interval at which to receive markers
-        float receiveInterval = 0.2f;
+        float receiveInterval = 0.05f;
         float responseTimeout = 1f;
 
         //Ping count
