@@ -1,0 +1,31 @@
+using UnityEngine;
+
+[RequireComponent(typeof(AudioSource))]
+public class TargetAudio: MonoBehaviour
+{
+    public AudioClip targetSound
+    public AudioClip nonTargetSound
+
+    private AudioSource audioSource;
+
+    //Start
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        //Extending capability to include audio and different events on flash. Subscribing to these events.
+        P300_Audio_Events.current.OnTargetFlash += OnTargetFlash;
+        P300_Audio_Events.current.OnNonTargetFlash += OnNonTargetFlash;
+    }
+
+    private void OnTargetFlash()
+    {
+        audioSource.clip = targetSound;
+        audioSource.Play();
+    }
+
+    private void OnNonTargetFlash()
+    {
+        audioSource.clip = nonTargetSound;
+        audioSource.Play();
+    }
+}
