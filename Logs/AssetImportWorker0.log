@@ -151,3 +151,4 @@ Received Import Request.
 Start importing Assets/BCI/Prefabs/BCICube.prefab using Guid(9528763d6dd0d014bacd23d4f049dfc4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c2b5eee79f964173296b381b2992112d') in 0.626060 seconds 
   Import took 0.644331 seconds .
 
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file
