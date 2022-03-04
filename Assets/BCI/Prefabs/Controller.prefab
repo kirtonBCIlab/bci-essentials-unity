@@ -62,6 +62,7 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
+  _myTag: BCI
   setup: {fileID: 0}
   marker: {fileID: 0}
   response: {fileID: 0}
@@ -90,6 +91,7 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 1
   trainTarget: 99
+  _myTag: BCI
   setup: {fileID: 0}
   marker: {fileID: 0}
   response: {fileID: 0}
@@ -113,18 +115,22 @@ MonoBehaviour:
   windowLength: 1
   interWindowInterval: 0
   stimOn: 0
-  numTrainingSelections: 0
-  numTrainWindows: 3
+  numTrainingSelections: 6
+  numTrainWindows: 0
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
+  _myTag: BCI
   setup: {fileID: 0}
   marker: {fileID: 0}
   response: {fileID: 0}
-  numFlashesPerObjectPerSelection: 3
+  numFlashesPerObjectPerSelection: 6
   onTime: 0.2
   offTime: 0.3
   singleFlash: 1
+  multiFlash: 0
+  rowColumn: 0
+  checkerboard: 1
 --- !u!114 &4280385885900106467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,9 +156,12 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
+  _myTag: BCI
   setup: {fileID: 0}
   marker: {fileID: 0}
   response: {fileID: 0}
+  setFreqFlash: []
+  realFreqFlash: []
 --- !u!114 &4280385885900106473
 MonoBehaviour:
   m_ObjectHideFlags: 0
