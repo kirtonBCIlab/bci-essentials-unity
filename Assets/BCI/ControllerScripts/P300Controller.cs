@@ -17,8 +17,8 @@ public class P300Controller : Controller
     public bool rowColumn = false;
     public bool checkerboard = true;
 
-    public enum multiFlashMethod {Random};
-    
+    public enum multiFlashMethod { Random };
+
 
     public override IEnumerator DoTraining()
     {
@@ -89,12 +89,19 @@ public class P300Controller : Controller
 
                 //Turn on
                 currentObject.GetComponent<SPO>().TurnOn();
-                string markerString = "s," + stimOrder[i].ToString();
+
+                string markerString = "p300,s," + objectList.Count.ToString();
 
                 if (trainTarget <= objectList.Count)
                 {
                     markerString = markerString + "," + trainTarget.ToString();
                 }
+                else
+                {
+                    markerString = markerString + "," + "-1";
+                }
+                markerString = markerString + "," + stimOrder[i].ToString();
+
                 marker.Write(markerString);
 
                 //Wait
@@ -119,7 +126,7 @@ public class P300Controller : Controller
             // Assign object indices to places in the virtual row/column matrix
             //if (rcMethod.ToString() == "Ordered")
             //{
-            if(rowColumn)
+            if (rowColumn)
             {
                 int count = 0;
                 for (int i = 0; i < numColumns; i++)
@@ -134,7 +141,7 @@ public class P300Controller : Controller
                 }
             }
 
-            if(checkerboard)
+            if (checkerboard)
             {
                 int count = 0;
                 for (int i = 0; i < numColumns; i++)
@@ -160,24 +167,34 @@ public class P300Controller : Controller
             for (int i = 0; i < totalColumnFlashes; i++)
             {
                 //Initialize marker string
-                string markerString = "m";
+                string markerString = "p300,m," + objectList.Count.ToString();
+
+                //Add training target
+                if (trainTarget <= objectList.Count)
+                {
+                    markerString = markerString + "," + trainTarget.ToString();
+                }
+                else
+                {
+                    markerString = markerString + "," + "-1";
+                }
 
                 // Turn on column 
                 int columnIndex = columnStimOrder[i];
                 for (int n = 0; n < numRows; n++)
                 {
-                    GameObject currentObject = objectList[rcMatrix[n,columnIndex]];
+                    GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
                     currentObject.GetComponent<SPO>().TurnOn();
 
                     //Add to marker
-                    markerString = markerString + "," + rcMatrix[n,columnIndex].ToString();
+                    markerString = markerString + "," + rcMatrix[n, columnIndex].ToString();
                 }
 
-                // Add train target to marker
-                if (trainTarget <= objectList.Count)
-                {
-                    markerString = markerString + "," + trainTarget.ToString();
-                }
+                //// Add train target to marker
+                //if (trainTarget <= objectList.Count)
+                //{
+                //    markerString = markerString + "," + trainTarget.ToString();
+                //}
 
                 // Send marker
                 marker.Write(markerString);
@@ -199,7 +216,18 @@ public class P300Controller : Controller
                 if (i <= totalRowFlashes)
                 {
                     //Initialize marker string
-                    string markerString1 = "m";
+                    string markerString1 = "p300,m," + objectList.Count.ToString();
+
+
+                    // Add training target
+                    if (trainTarget <= objectList.Count)
+                    {
+                        markerString1 = markerString1 + "," + trainTarget.ToString();
+                    }
+                    else
+                    {
+                        markerString1 = markerString1 + "," + "-1";
+                    }
 
                     // Turn on row
                     int rowIndex = rowStimOrder[i];
@@ -213,11 +241,11 @@ public class P300Controller : Controller
                         markerString1 = markerString1 + "," + rcMatrix[rowIndex, m].ToString();
                     }
 
-                    //Add train target to marker
-                    if (trainTarget <= objectList.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
+                    ////Add train target to marker
+                    //if (trainTarget <= objectList.Count)
+                    //{
+                    //    markerString1 = markerString1 + "," + trainTarget.ToString();
+                    //}
 
                     //Send Marker
                     marker.Write(markerString1);
@@ -242,9 +270,11 @@ public class P300Controller : Controller
         StimulusOff();
     }
 
-    public override IEnumerator SendMarkers(int trainTarget=99)
+    public override IEnumerator SendMarkers(int trainTarget = 99)
     {
         // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
         yield return new WaitForSecondsRealtime(0.001f);
     }
+
+
 }
