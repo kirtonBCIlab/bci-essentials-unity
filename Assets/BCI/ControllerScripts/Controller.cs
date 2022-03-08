@@ -58,6 +58,13 @@ public class Controller : MonoBehaviour
     // Receive markers
     private bool receivingMarkers = false;
 
+    // Variables related to Iterative training
+    public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
+    public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
+
+    private int selectionCounter = 0;
+    private int updateCounter = 0;
+
     // Scripts
     [HideInInspector] public Matrix_Setup setup;
     [HideInInspector] public LSLMarkerStream marker;
@@ -128,6 +135,24 @@ public class Controller : MonoBehaviour
             }
 
             StartCoroutine(DoTraining());
+        }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            if (receivingMarkers == false)
+            {
+                StartCoroutine(ReceiveMarkers());
+            }
+
+            try
+            {
+                StartCoroutine(DoIterativeTraining());
+            }
+            catch
+            {
+                
+            }
+            
         }
 
 
@@ -421,6 +446,85 @@ public class Controller : MonoBehaviour
         }
 
         marker.Write("Training Complete");
+
+    }
+
+    public virtual IEnumerator DoIterativeTraining()
+    {
+        // Generate the target list
+        PopulateObjectList("tag");
+
+        int numOptions = objectList.Count;
+
+        // Create a random non repeating array 
+        int[] trainArray = new int[numTrainingSelections];
+        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        PrintArray(trainArray);
+
+        yield return 0;
+
+        // Loop for each training target
+        for (int i = 0; i < numTrainingSelections; i++)
+        {
+
+            if (selectionCounter >= numSelectionsBeforeTraining)
+            {
+                if (updateCounter == 0)
+                {
+                    // update the classifier
+                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+                    marker.Write("Update Classifier");
+                    updateCounter++;
+                }
+                else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
+                {
+                    // update the classifier
+                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+                    marker.Write("Update Classifier");
+                    updateCounter++;
+                }
+            }
+
+            // Get the target from the array
+            trainTarget = trainArray[i];
+
+            // 
+            Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+
+            // Turn on train target
+            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+
+            // Go through the training sequence
+            yield return new WaitForSecondsRealtime(3f);
+            yield return new WaitForSecondsRealtime(3f);
+
+            StimulusOn();
+            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
+            StimulusOff();
+
+            // Turn off train target
+            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+
+            // If sham feedback is true, then show it
+            if (shamFeedback)
+            {
+                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+            }
+
+            trainTarget = 99;
+
+            // Take a break
+            yield return new WaitForSecondsRealtime(trainBreak);
+
+            selectionCounter++;
+        }
+
+        marker.Write("Training Complete");
+
+        yield return 0;
+
 
     }
 
