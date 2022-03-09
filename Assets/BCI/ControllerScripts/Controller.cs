@@ -683,7 +683,7 @@ public class Controller : MonoBehaviour
         }
 
         //Set interval at which to receive markers
-        float receiveInterval = 0.2f;
+        float receiveInterval = 0.1f;
         float responseTimeout = 1f;
 
         //Ping count
@@ -718,7 +718,7 @@ public class Controller : MonoBehaviour
                 for (int i = 0; i < responseStrings.Length; i++)
                 {
                     string responseString = responseStrings[i];
-                    print("WE GOT A RESPONSE");
+                    //print("WE GOT A RESPONSE");
                     print("response : " + responseString);
 
                     int n;
@@ -740,7 +740,7 @@ public class Controller : MonoBehaviour
                 for (int i = 0; i < responseStrings.Length; i++)
                 {
                     string responseString = responseStrings[i];
-                    print("WE GOT A RESPONSE");
+                    //print("WE GOT A RESPONSE");
                     print(responseString);
 
                     int n;

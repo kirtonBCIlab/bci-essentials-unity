@@ -85,6 +85,12 @@ public class MIController : Controller
         }
     }
 
+    // Coroutine for the stimulus, wait there is no stimulus
+    public override IEnumerator Stimulus()
+    {
+        yield return 0;
+    }
+
     public override IEnumerator SendMarkers(int trainingIndex = 99)
     {
         // Make the marker string, this will change based on the paradigm
