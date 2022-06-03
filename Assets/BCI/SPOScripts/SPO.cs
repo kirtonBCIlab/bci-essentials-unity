@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 // Base class for the Stimulus Presenting Objects (SPOs)
 
@@ -13,22 +14,29 @@ public class SPO : MonoBehaviour
     public bool includeMe = true;
     public int myIndex;
 
-    // Target object
-    //GameObject trainingCube;
+    //Use a boolean to indicate whether or not this SPO has a subset image
+    [SerializeField]
+    public bool hasImageChild = false;
 
 
     // Turn the stimulus on
-    public virtual void TurnOn()
+    public virtual float TurnOn()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-        this.GetComponent<Renderer>().material.color = onColour;
+        { this.GetComponent<Renderer>().material.color = onColour; }
+
+
+        //Return time since stim
+        return Time.time;
+
+
     }
 
     // Turn off/reset the SPO
     public virtual void TurnOff()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-        this.GetComponent<Renderer>().material.color = offColour;
+        { this.GetComponent<Renderer>().material.color = offColour; }
     }
 
     // What to do on selection
@@ -37,7 +45,7 @@ public class SPO : MonoBehaviour
         // This is free form, do whatever you want on selection
 
         StartCoroutine(QuickFlash());
- 
+
         // Reset
         TurnOff();
     }
@@ -59,7 +67,7 @@ public class SPO : MonoBehaviour
     }
 
     // Quick Flash
-    private IEnumerator QuickFlash()
+    public IEnumerator QuickFlash()
     {
         for (int i = 0; i < 3; i++)
         {
