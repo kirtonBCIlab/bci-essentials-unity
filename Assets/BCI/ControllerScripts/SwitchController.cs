@@ -4,10 +4,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-/*An extension of the controller class to add MI functionality
+/*An extension of the controller class to add Switch functionality
+ *
 
 */
-public class MIController : Controller
+public class SwitchController : Controller
 {
 
 
@@ -204,7 +205,7 @@ public class MIController : Controller
                 trainingString = "-1";
             }
 
-            string markerString = "mi," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString();
+            string markerString = "switch," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString();
 
             // Send the marker
             marker.Write(markerString);

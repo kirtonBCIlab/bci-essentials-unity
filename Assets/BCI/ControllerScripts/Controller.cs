@@ -43,6 +43,7 @@ public class Controller : MonoBehaviour
     //Training
     public int numTrainingSelections;
     public int numTrainWindows = 3;
+    public float pauseBeforeTraining = 2;
     public bool trainTargetPersistent = false;
     public float trainTargetPresentationTime = 3f;
     public float trainBreak = 1f;
@@ -428,9 +429,93 @@ public class Controller : MonoBehaviour
         marker.Write("Training Complete");
     }
 
+    //public virtual IEnumerator DoIterativeTraining()
+    //{
+    //    // Generate the target list
+    //    PopulateObjectList("tag");
+
+    //    int numOptions = objectList.Count;
+
+    //    // Create a random non repeating array 
+    //    int[] trainArray = new int[numTrainingSelections];
+    //    trainArray = MakeRNRA(numTrainingSelections, numOptions);
+    //    PrintArray(trainArray);
+
+    //    yield return 0;
+
+    //    // Loop for each training target
+    //    for (int i = 0; i < numTrainingSelections; i++)
+    //    {
+
+    //        if (selectionCounter >= numSelectionsBeforeTraining)
+    //        {
+    //            if (updateCounter == 0)
+    //            {
+    //                // update the classifier
+    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+    //                marker.Write("Update Classifier");
+    //                updateCounter++;
+    //            }
+    //            else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
+    //            {
+    //                // update the classifier
+    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+    //                marker.Write("Update Classifier");
+    //                updateCounter++;
+    //            }
+    //        }
+
+    //        // Get the target from the array
+    //        trainTarget = trainArray[i];
+
+    //        // 
+    //        Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+
+    //        // Turn on train target
+    //        objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+
+    //        // Go through the training sequence
+    //        yield return new WaitForSecondsRealtime(pauseBeforeTraining);
+
+    //        StimulusOn();
+    //        yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
+    //        StimulusOff();
+
+    //        // Turn off train target
+    //        objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+
+    //        // If sham feedback is true, then show it
+    //        if (shamFeedback)
+    //        {
+    //            objectList[trainTarget].GetComponent<SPO>().OnSelection();
+    //        }
+
+    //        // Take a break
+    //        yield return new WaitForSecondsRealtime(trainBreak);
+
+    //        trainTarget = 99;
+    //        selectionCounter++;
+    //    }
+
+    //    marker.Write("Training Complete");
+
+    //    yield return 0;
+
+
+    //}
+
     public virtual IEnumerator DoUserTraining()
     {
         UnityEngine.Debug.Log("No user training available for this paradigm");
+
+        yield return null;
+    }
+
+    public virtual IEnumerator DoIterativeTraining()
+    {
+        UnityEngine.Debug.Log("No iterative training available for this controller");
 
         yield return null;
     }
