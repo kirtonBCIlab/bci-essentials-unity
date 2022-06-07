@@ -1,99 +1,102 @@
 using System;
-using UnityEngine;
 using System.Collections;
-using LSL4Unity;
+using System.Collections.Generic;
+using UnityEngine;
 using LSL;
 
-namespace LSL4Unity
+public class LSLResponseStream : MonoBehaviour
 {
-    //[HelpURL("https://github.com/xfleckx/LSL4Unity/wiki#using-a-marker-stream")]
-    public class LSLResponseStream : MonoBehaviour
+    //The predicate by which to recognize the python response stream
+    public string responsePredicate = "name='PythonResponse'";
+    //private string[] responseStrings = {""};
+
+    public StreamInfo[] responseInfo;
+    public StreamInlet responseInlet;
+    //public responseInlet  liblsl.StreamInlet(responseInfo[0]);
+    //public liblsl.StreamInlet(responseInfo) responseInlet;
+
+    // responseInlet.open_stream();
+    public string value = "PythonResponse";
+    public int pyRespIndex;
+
+
+    public int ResolveResponse()
     {
-        //The predicate by which to recognize the python response stream
-        public string responsePredicate = "name='PythonResponse'";
-        //private string[] responseStrings = {""};
+        // Resolve stream not working, crashes unity, use resolve streams instead and then find a way to pick the right one
+        responseInfo = LSL.LSL.resolve_streams();
 
-        public liblsl.StreamInfo[] responseInfo;
-        public liblsl.StreamInlet responseInlet;
-        //public responseInlet  liblsl.StreamInlet(responseInfo[0]);
-        //public liblsl.StreamInlet(responseInfo) responseInlet;
-
-        // responseInlet.open_stream();
-        public string value = "PythonResponse";
-        public int pyRespIndex;
-
-        
-        public int ResolveResponse()
+        for (int i = 0; i < responseInfo.Length; i++)
         {
-            // Resolve stream not working, crashes unity, use resolve streams instead and then find a way to pick the right one
-            responseInfo = liblsl.resolve_streams();
-            
-            for (int i = 0; i < responseInfo.Length; i++)
+            Debug.Log("Response info " + i.ToString() + ":\n");
+            Debug.Log(responseInfo[i].name());
+
+            if (responseInfo[i].name() == value)
             {
-                print("Response info " + i.ToString() + ":\n");
-                print(responseInfo[i].name());
+                pyRespIndex = i;
+                Debug.Log("Got Python Response");
+                responseInlet = new StreamInlet(responseInfo[i]);
+                Debug.Log("Created the inlet");
 
-                if(responseInfo[i].name() == value)
+                //responseInlet.open_stream();
+                //print("Opened the stream");
+
+                // Try to open the stream, timeout after 2 seconds
+                try
                 {
-                    pyRespIndex = i;
-                    print("Got Python Response");
-                    responseInlet = new liblsl.StreamInlet(responseInfo[i]);
-                    print("Created the inlet");
+                    double timeout = 2.0;
+                    responseInlet.open_stream(timeout);
+                    Debug.Log("Opened the stream successfully");
 
-                    //responseInlet.open_stream();
-                    //print("Opened the stream");
-
-                    // Try to open the stream, timeout after 2 seconds
-                    try
-                    {
-                        double timeout = 2.0;
-                        responseInlet.open_stream(timeout);
-                        print("Opened the stream successfully");
-
-                        // If we are successful in opening the python stream then we do not need to look further
-                        i = 99;
-                    }
-                    catch (Exception e)
-                    {
-                        print(e.Message);
-                    }
+                    // If we are successful in opening the python stream then we do not need to look further
+                    i = 99;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e.Message);
                 }
             }
-
-            // Tried moving it down here so that it only opens the last Python Response stream, and it still crashes
-            // Aparently this is unnecessary anyway because if the stream is not opened it will be opened implicitly 
-            //double timeout = 2.0;
-            //responseInlet.open_stream(timeout);
-            //print("Opened the stream");
-
-            return 1;
-
         }
-       
 
-        public string[] PullResponse(string[] responseStrings, double timeout)
-        {
-            // Try to pull sample
-            try
-            {
-                //double timeout = 0.1;
-                double result = responseInlet.pull_sample(responseStrings, timeout);
-                if (result != 0)
-                {
-                    //print(result);
-                    for (int i = 0; i < responseStrings.Length; i++)
-                    {
-                        print(responseStrings[i]);
-                    }
-                }
+        // Tried moving it down here so that it only opens the last Python Response stream, and it still crashes
+        // Aparently this is unnecessary anyway because if the stream is not opened it will be opened implicitly 
+        //double timeout = 2.0;
+        //responseInlet.open_stream(timeout);
+        //print("Opened the stream");
 
-            }
-            catch //(Exception e)
-            {
-                //print(e.Message);
+        return 1;
 
-            }
-            return responseStrings;
-        }
     }
+
+    //void Start()
+    //{
+    //    StreamInfo streamInfo = new StreamInfo(StreamName, StreamType, 1, liblsl.IRREGULAR_RATE, LSL.channel_format_t.cf_float32);
+
+    //    intlet = new StreamOutlet(streamInfo);
+    //}
+
+    public string[] PullResponse(string[] responseStrings, double timeout)
+    {
+        // Try to pull sample
+        try
+        {
+            //double timeout = 0.1;
+            double result = responseInlet.pull_sample(responseStrings, timeout);
+            if (result != 0)
+            {
+                //print(result);
+                for (int i = 0; i < responseStrings.Length; i++)
+                {
+                    //print(responseStrings[i]);
+                }
+            }
+
+        }
+        catch //(Exception e)
+        {
+            //print(e.Message);
+
+        }
+        return responseStrings;
+    }
+
 }

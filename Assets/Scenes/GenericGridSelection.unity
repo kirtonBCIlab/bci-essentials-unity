@@ -132,11 +132,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: onTime
-      value: 0.15
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: offTime
-      value: 0.25
+      value: 0.075
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: m_Enabled
@@ -144,11 +144,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: rowColumn
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: multiFlash
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: refreshRate
@@ -156,7 +156,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: singleFlash
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: checkerboard
@@ -173,6 +173,18 @@ PrefabInstance:
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numTrainWindows
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: checkerBoardCols
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: checkerBoardRows
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
+      propertyPath: numFlashesUpperLimit
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106466, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: numTrainingSelections
@@ -300,7 +312,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106473, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: distanceX
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4280385885900106473, guid: 7b05171d4afef204b8054af1c0847232, type: 3}
       propertyPath: distanceY

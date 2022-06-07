@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using LSL4Unity;
+using System;
+//using LSLMarkerStreams;
 
 /*SSVEP Controller
  * This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
@@ -42,33 +43,30 @@ public class Controller : MonoBehaviour
     //Training
     public int numTrainingSelections;
     public int numTrainWindows = 3;
+    public float pauseBeforeTraining = 2;
+    public bool trainTargetPersistent = false;
+    public float trainTargetPresentationTime = 3f;
     public float trainBreak = 1f;
     public bool shamFeedback = false;
     public int trainTarget = 99;
-    
+
     //Deal with the BCI Tag in a scene with mor flexibility.
     [SerializeField]
     private string _myTag = "BCI";
     public string myTag
     {
-        get {return _myTag; }
-        set {_myTag = value; }
+        get { return _myTag; }
+        set { _myTag = value; }
     }
 
     // Receive markers
     private bool receivingMarkers = false;
 
-    // Variables related to Iterative training
-    public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
-    public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
-
-    private int selectionCounter = 0;
-    private int updateCounter = 0;
-
     // Scripts
     [HideInInspector] public Matrix_Setup setup;
     [HideInInspector] public LSLMarkerStream marker;
     [HideInInspector] public LSLResponseStream response;
+
 
 
     // Start is called before the first frame update
@@ -83,17 +81,21 @@ public class Controller : MonoBehaviour
         Application.targetFrameRate = refreshRate;
 
         //Setup if required
-        if(setupRequired)
+        if (setupRequired)
         {
             try
             {
                 setup.SetUpMatrix();
             }
-            catch
+            catch (Exception e)
             {
                 Debug.Log("Setup failed, make sure that the fields in setup matrix are filled");
+                Debug.Log(e.Message);
             }
         }
+
+        // settingsMenu = GameObject.FindGameObjectWithTag("Settings");
+        // settingsMenu.SetActive(false);
     }
 
     // Update is called once per frame
@@ -118,7 +120,7 @@ public class Controller : MonoBehaviour
 
 
         // Check key down
-        
+
         // Press S to start/stop stimulus
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -137,22 +139,9 @@ public class Controller : MonoBehaviour
             StartCoroutine(DoTraining());
         }
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.U))
         {
-            if (receivingMarkers == false)
-            {
-                StartCoroutine(ReceiveMarkers());
-            }
-
-            try
-            {
-                StartCoroutine(DoIterativeTraining());
-            }
-            catch
-            {
-                
-            }
-            
+            StartCoroutine(DoUserTraining());
         }
 
 
@@ -200,8 +189,6 @@ public class Controller : MonoBehaviour
                 SelectObject(9);
             }
         }
-
-
     }
 
     // Populate a list of SPOs
@@ -210,7 +197,7 @@ public class Controller : MonoBehaviour
         // Remove everything from the existing list
         objectList.Clear();
 
-        print("populating the list using method " + popMethod);
+        //print("populating the list using method " + popMethod);
         //Collect objects with the BCI tag
         if (popMethod == "tag")
         {
@@ -264,9 +251,9 @@ public class Controller : MonoBehaviour
         }
 
         // Remove from the list any entries that have includeMe set to false
-        print(objectList.Count.ToString());
+        //print(objectList.Count.ToString());
 
-        
+
         foreach (GameObject thisObject in objectList)
         {
             if (thisObject.GetComponent<SPO>().includeMe == false)
@@ -286,7 +273,7 @@ public class Controller : MonoBehaviour
             thisObject.GetComponent<SPO>().myIndex = i;
         }
 
-        print(objectList.Count.ToString());
+        //print(objectList.Count.ToString());
 
 
     }
@@ -314,26 +301,31 @@ public class Controller : MonoBehaviour
     }
 
     // Turn the stimulus on
-    public void StimulusOn()
+    public virtual void StimulusOn(bool sendConstantMarkers = true)
     {
         stimOn = true;
+
+        // Send the marker to start
+        marker.Write("Trial Started");
 
         // Start the stimulus Coroutine
         try
         {
             StartCoroutine(Stimulus());
 
-            // Send the marker to start
-            marker.Write("Trial Started");
-            StartCoroutine(SendMarkers(trainTarget));
+            // Not required for P300
+            if (sendConstantMarkers)
+            {
+                StartCoroutine(SendMarkers(trainTarget));
+            }
         }
         catch
         {
-            
+            UnityEngine.Debug.Log("start stimulus coroutine error");
         }
     }
 
-    public void StimulusOff()
+    public virtual void StimulusOff()
     {
         // End thhe stimulus Coroutine
         stimOn = false;
@@ -341,31 +333,6 @@ public class Controller : MonoBehaviour
         // Send the marker to end
         marker.Write("Trial Ends");
     }
-
-    //// Send a marker
-    //public void sendMarker()
-    //{
-
-    //}
-
-    // Receive a marker 
-    //public  void ReceiveMarkers()
-    //{
-
-    //    // If stream doesn't exist then open it
-    //    //if (responseExists == false)
-    //    //{
-    //    //    //Get response stream from Python
-    //    //    print("Looking for a response stream");
-    //    //    response = GetComponent<LSLResponseStream>();
-    //    //    int diditwork = response.ResolveResponse();
-    //    //    print(diditwork.ToString());
-    //    //    responseExists = true;
-    //    //}
-
-    //    // Receive Marker
-
-    //}
 
     // Select an object from the objectList
     public void SelectObject(int objectIndex)
@@ -397,7 +364,7 @@ public class Controller : MonoBehaviour
 
     // Do training
     public virtual IEnumerator DoTraining()
-    {   
+    {
         // Generate the target list
         PopulateObjectList("tag");
 
@@ -423,89 +390,29 @@ public class Controller : MonoBehaviour
             // Turn on train target
             objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
+
+            yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
+
+            if (trainTargetPersistent == false)
+            {
+                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
+
             // Go through the training sequence
-            yield return new WaitForSecondsRealtime(3f);
+            //yield return new WaitForSecondsRealtime(3f);
 
             StimulusOn();
             yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
             StimulusOff();
 
             // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
-
-            // If sham feedback is true, then show it
-            if(shamFeedback)
+            if (trainTargetPersistent == true)
             {
-                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
             }
 
-            trainTarget = 99;
-
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
-        }
-
-        marker.Write("Training Complete");
-
-    }
-
-    public virtual IEnumerator DoIterativeTraining()
-    {
-        // Generate the target list
-        PopulateObjectList("tag");
-
-        int numOptions = objectList.Count;
-
-        // Create a random non repeating array 
-        int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
-        PrintArray(trainArray);
-
-        yield return 0;
-
-        // Loop for each training target
-        for (int i = 0; i < numTrainingSelections; i++)
-        {
-
-            if (selectionCounter >= numSelectionsBeforeTraining)
-            {
-                if (updateCounter == 0)
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-                else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-            }
-
-            // Get the target from the array
-            trainTarget = trainArray[i];
-
-            // 
-            Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
-
-            // Turn on train target
-            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-            // Go through the training sequence
-            yield return new WaitForSecondsRealtime(3f);
-            yield return new WaitForSecondsRealtime(3f);
-
-            StimulusOn();
-            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-            StimulusOff();
-
-            // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
 
             // If sham feedback is true, then show it
             if (shamFeedback)
@@ -517,15 +424,100 @@ public class Controller : MonoBehaviour
 
             // Take a break
             yield return new WaitForSecondsRealtime(trainBreak);
-
-            selectionCounter++;
         }
 
         marker.Write("Training Complete");
+    }
 
-        yield return 0;
+    //public virtual IEnumerator DoIterativeTraining()
+    //{
+    //    // Generate the target list
+    //    PopulateObjectList("tag");
+
+    //    int numOptions = objectList.Count;
+
+    //    // Create a random non repeating array 
+    //    int[] trainArray = new int[numTrainingSelections];
+    //    trainArray = MakeRNRA(numTrainingSelections, numOptions);
+    //    PrintArray(trainArray);
+
+    //    yield return 0;
+
+    //    // Loop for each training target
+    //    for (int i = 0; i < numTrainingSelections; i++)
+    //    {
+
+    //        if (selectionCounter >= numSelectionsBeforeTraining)
+    //        {
+    //            if (updateCounter == 0)
+    //            {
+    //                // update the classifier
+    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+    //                marker.Write("Update Classifier");
+    //                updateCounter++;
+    //            }
+    //            else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
+    //            {
+    //                // update the classifier
+    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+    //                marker.Write("Update Classifier");
+    //                updateCounter++;
+    //            }
+    //        }
+
+    //        // Get the target from the array
+    //        trainTarget = trainArray[i];
+
+    //        // 
+    //        Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+
+    //        // Turn on train target
+    //        objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+
+    //        // Go through the training sequence
+    //        yield return new WaitForSecondsRealtime(pauseBeforeTraining);
+
+    //        StimulusOn();
+    //        yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
+    //        StimulusOff();
+
+    //        // Turn off train target
+    //        objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+
+    //        // If sham feedback is true, then show it
+    //        if (shamFeedback)
+    //        {
+    //            objectList[trainTarget].GetComponent<SPO>().OnSelection();
+    //        }
+
+    //        // Take a break
+    //        yield return new WaitForSecondsRealtime(trainBreak);
+
+    //        trainTarget = 99;
+    //        selectionCounter++;
+    //    }
+
+    //    marker.Write("Training Complete");
+
+    //    yield return 0;
 
 
+    //}
+
+    public virtual IEnumerator DoUserTraining()
+    {
+        UnityEngine.Debug.Log("No user training available for this paradigm");
+
+        yield return null;
+    }
+
+    public virtual IEnumerator DoIterativeTraining()
+    {
+        UnityEngine.Debug.Log("No iterative training available for this controller");
+
+        yield return null;
     }
 
     // Make a random non repeating array of shuffled subarrays
@@ -533,8 +525,8 @@ public class Controller : MonoBehaviour
     public int[] MakeRNRA(int arrayLength, int numOptions)
     {
         // Make random object
-        Debug.Log("Random seed is 42");
-        System.Random trainRandom = new System.Random(42);
+        //Debug.Log("Random seed is 42");
+        System.Random trainRandom = new System.Random();
 
         // Initialize array
         int[] array = new int[arrayLength];
@@ -604,14 +596,14 @@ public class Controller : MonoBehaviour
         {
             strings[i] = array[i].ToString();
         }
-        print(string.Join(" ",strings));
+        print(string.Join(" ", strings));
     }
 
     // Coroutine for the stimulus
     public virtual IEnumerator Stimulus()
     {
         // Present the stimulus until it is turned off
-        while(stimOn)
+        while (stimOn)
         {
             // What to do each frame
             for (int i = 0; i < objectList.Count; i++)
@@ -642,7 +634,7 @@ public class Controller : MonoBehaviour
             {
                 Debug.Log("There is no object " + i.ToString());
             }
-            
+
         }
 
         yield return 0;
@@ -683,14 +675,14 @@ public class Controller : MonoBehaviour
         }
 
         //Set interval at which to receive markers
-        float receiveInterval = 0.1f;
-        float responseTimeout = 1f;
+        float receiveInterval = 1 / refreshRate;
+        float responseTimeout = 0f;
 
         //Ping count
         int pingCount = 0;
 
         // Receive markers continuously
-        while(receivingMarkers)
+        while (receivingMarkers)
         {
             // Receive markers
             // Initialize the default response string
@@ -703,11 +695,11 @@ public class Controller : MonoBehaviour
             // Check if there is 
             bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
 
-            
+
             if (responseStrings[0] == "ping")
             {
                 pingCount++;
-                if(pingCount%100 == 0)
+                if (pingCount % 100 == 0)
                 {
                     Debug.Log("Ping Count: " + pingCount.ToString());
                 }
@@ -731,33 +723,13 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            if (responseStrings.Length > defaultResponseStrings.Length)
-            {
-                //print(responseStrings);
-
-                //print(responseStrings.Length);
-
-                for (int i = 0; i < responseStrings.Length; i++)
-                {
-                    string responseString = responseStrings[i];
-                    //print("WE GOT A RESPONSE");
-                    print(responseString);
-
-                    int n;
-                    bool isNumeric = int.TryParse(responseString, out n);
-                    if (isNumeric == true)
-                    {
-                        //Run on selection
-                        objectList[n].GetComponent<SPO>().OnSelection();
-                    }
-
-                }
-            }
-
             // Wait for the next receive interval
             yield return new WaitForSecondsRealtime(receiveInterval);
         }
 
         Debug.Log("Done receiving markers");
     }
+
+
+
 }
