@@ -1,2 +1,4 @@
 # BCIEssentials
- MVP for full stack BCI, P300, SSVEP, and MI
+A Unity base environment for streamlined development of BCI appliations.
+
+Pairs nicely with [bci-essentials-python](https://github.com/kirtonBCIlab/bci-essentials-python)
