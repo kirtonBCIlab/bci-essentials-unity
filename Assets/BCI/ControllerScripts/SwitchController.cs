@@ -10,8 +10,6 @@ using UnityEngine.UI;
 */
 public class SwitchController : Controller
 {
-
-
     // Variables related to Iterative training
     public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
     public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
@@ -20,10 +18,16 @@ public class SwitchController : Controller
     protected int selectionCounter = 0;
     protected int updateCounter = 0;
 
+    // Populate object list is a little different here because it starts from 1
     public override void PopulateObjectList(string popMethod)
     {
         // Remove everything from the existing list
         objectList.Clear();
+
+        // Add neutral object
+        GameObject neutralObject = GameObject.FindGameObjectWithTag("Neutral");
+        objectList.Add(neutralObject);
+
 
         print("populating the list using method " + popMethod);
         //Collect objects with the BCI tag
@@ -46,6 +50,10 @@ public class SwitchController : Controller
             {
                 //the list does not exist
                 print("Unable to create a list based on 'BCI' object tag");
+
+                // Clear the list
+                objectList.Clear();
+
                 listExists = false;
             }
 
@@ -89,12 +97,6 @@ public class SwitchController : Controller
             objectList.Remove(thisObject);
         }
         objectsToRemove.Clear();
-
-        // Warn about the number of objects to be selected from, if greater than 2
-        if (objectList.Count > 2)
-        {
-            print("Warning: Selecting between more than 2 objects!");
-        }
     }
 
     // Coroutine for the stimulus, wait there is no stimulus
@@ -103,11 +105,12 @@ public class SwitchController : Controller
         yield return 0;
     }
 
-    public override IEnumerator DoIterativeTraining()
+    public override IEnumerator DoTraining()
     {
         // Generate the target list
         PopulateObjectList("tag");
 
+        // Get number of selectable objects by counting the objects in the objectList
         int numOptions = objectList.Count;
 
         // Create a random non repeating array 
@@ -115,33 +118,11 @@ public class SwitchController : Controller
         trainArray = MakeRNRA(numTrainingSelections, numOptions);
         PrintArray(trainArray);
 
-        yield return 0;
-
+        yield return new WaitForSecondsRealtime(0.001f);
 
         // Loop for each training target
         for (int i = 0; i < numTrainingSelections; i++)
         {
-
-            if (selectionCounter >= numSelectionsBeforeTraining)
-            {
-                if (updateCounter == 0)
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-                else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-            }
-
             // Get the target from the array
             trainTarget = trainArray[i];
 
@@ -151,42 +132,43 @@ public class SwitchController : Controller
             // Turn on train target
             objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
-            // Go through the training sequence
-            yield return new WaitForSecondsRealtime(pauseBeforeTraining);
 
+            yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
+
+            if (trainTargetPersistent == false)
+            {
+                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
+
+            // Go through the training sequence
+            //yield return new WaitForSecondsRealtime(3f);
 
             StimulusOn();
-            for (int j = 0; j < (numTrainWindows - 1); j++)
-            {
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-                if (shamFeedback)
-                {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
-                }
-            }
+            yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
             StimulusOff();
 
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
-
             // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+            if (trainTargetPersistent == true)
+            {
+                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+            }
 
-            // Reset objects
 
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
+            // If sham feedback is true, then show it
+            if (shamFeedback)
+            {
+                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+            }
 
             trainTarget = 99;
-            selectionCounter++;
+
+            // Take a break
+            yield return new WaitForSecondsRealtime(trainBreak);
         }
 
-        // Send marker
         marker.Write("Training Complete");
-
-        yield return 0;
-
     }
 
     public override IEnumerator SendMarkers(int trainingIndex = 99)
@@ -194,7 +176,7 @@ public class SwitchController : Controller
         // Make the marker string, this will change based on the paradigm
         while (stimOn)
         {
-            // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
+            // Desired format is: [switch, number of switches, window length, training labels (or -1 if n/a)] 
             string trainingString;
             if (trainingIndex <= objectList.Count)
             {
@@ -207,6 +189,8 @@ public class SwitchController : Controller
 
             string markerString = "switch," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString();
 
+            //string markerString = "switch," + objectList.Count.ToString() + "," +  windowLength.ToString() +  "," + trainingString;
+
             // Send the marker
             marker.Write(markerString);
 
@@ -215,5 +199,88 @@ public class SwitchController : Controller
 
 
         }
+    }
+
+    // Coroutine to continuously receive markers
+    public override IEnumerator ReceiveMarkers()
+    {
+        if (receivingMarkers == false)
+        {
+            //Get response stream from Python
+            print("Looking for a response stream");
+            response = GetComponent<LSLResponseStream>();
+            int diditwork = response.ResolveResponse();
+            print(diditwork.ToString());
+            receivingMarkers = true;
+        }
+
+        //Set interval at which to receive markers
+        float receiveInterval = 1 / refreshRate;
+        float responseTimeout = 0f;
+
+        //Ping count
+        int pingCount = 0;
+
+        // Receive markers continuously
+        while (receivingMarkers)
+        {
+            // Receive markers
+            // Initialize the default response string
+            string[] defaultResponseStrings = { "" };
+            string[] responseStrings = defaultResponseStrings;
+
+            // Pull the python response and add it to the responseStrings array
+            responseStrings = response.PullResponse(defaultResponseStrings, responseTimeout);
+
+            // Check if there is 
+            bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
+
+
+            if (responseStrings[0] == "ping")
+            {
+                pingCount++;
+                if (pingCount % 100 == 0)
+                {
+                    Debug.Log("Ping Count: " + pingCount.ToString());
+                }
+            }
+
+            else if (responseStrings[0] != "")
+            {
+                for (int i = 0; i < responseStrings.Length; i++)
+                {
+                    string responseString = responseStrings[i];
+                    //print("WE GOT A RESPONSE");
+                    print("response : " + responseString);
+
+
+                    // want the response in format float1, float2, ..., floatN
+                    try
+                    {
+                        string[] activationStrings = responseString.Split(',');
+                        int n = 0;
+                        foreach (var activationString in activationStrings)
+                        {
+                            float activationFloat;
+                            bool didItWork = float.TryParse(activationString, out activationFloat);
+
+
+                            objectList[n].GetComponent<SwitchSPO>().OnActivation(activationFloat);
+
+                            n++;
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            // Wait for the next receive interval
+            yield return new WaitForSecondsRealtime(receiveInterval);
+        }
+
+        Debug.Log("Done receiving markers");
     }
 }

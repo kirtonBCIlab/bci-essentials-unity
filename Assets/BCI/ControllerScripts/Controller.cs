@@ -60,7 +60,7 @@ public class Controller : MonoBehaviour
     }
 
     // Receive markers
-    private bool receivingMarkers = false;
+    protected bool receivingMarkers = false;
 
     // Scripts
     [HideInInspector] public Matrix_Setup setup;
@@ -125,6 +125,12 @@ public class Controller : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.S))
         {
             StartStopStimulus();
+        }
+
+        // Press C to start continuous
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            
         }
 
         // Press T to do automated training
@@ -662,7 +668,7 @@ public class Controller : MonoBehaviour
         }
     }
     // Coroutine to continuously receive markers
-    public IEnumerator ReceiveMarkers()
+    public virtual IEnumerator ReceiveMarkers()
     {
         if (receivingMarkers == false)
         {
