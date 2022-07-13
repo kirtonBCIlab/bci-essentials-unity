@@ -15,6 +15,7 @@ public class NeutralSPO : SPO
 
             Color tempColor = objectArray[i].GetComponent<Renderer>().material.color;
             tempColor.a = 0f;
+            objectArray[i].GetComponent<SwitchSPO>().ResetPosition();
             objectArray[i].GetComponent<Renderer>().material.color = tempColor;
             //stimImage.color = tempColor;
         }

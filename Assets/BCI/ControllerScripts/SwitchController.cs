@@ -14,6 +14,7 @@ public class SwitchController : Controller
     public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
     public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
 
+    public bool trainingComplete;
 
     protected int selectionCounter = 0;
     protected int updateCounter = 0;
@@ -41,6 +42,7 @@ public class SwitchController : Controller
                 for (int i = 0; i < objectArray.Length; i++)
                 {
                     objectList.Add(objectArray[i]);
+                    objectArray[i].GetComponent<SwitchSPO>().myIndex = i;
                 }
 
                 //The object list exists
@@ -97,6 +99,15 @@ public class SwitchController : Controller
             objectList.Remove(thisObject);
         }
         objectsToRemove.Clear();
+    }
+
+    public override void StimulusOff()
+    {
+        // End thhe stimulus Coroutine
+        stimOn = false;
+
+        // Send the marker to end
+        marker.Write("Trial Ends");
     }
 
     // Coroutine for the stimulus, wait there is no stimulus
@@ -168,7 +179,94 @@ public class SwitchController : Controller
             yield return new WaitForSecondsRealtime(trainBreak);
         }
 
+        ResetActivations();
         marker.Write("Training Complete");
+    }
+
+    public override IEnumerator DoIterativeTraining()
+    {
+        // Generate the target list
+        PopulateObjectList("tag");
+
+        int numOptions = objectList.Count;
+
+        // Create a random non repeating array 
+        int[] trainArray = new int[numTrainingSelections];
+        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        PrintArray(trainArray);
+
+        yield return 0;
+
+
+        // Loop for each training target
+        for (int i = 0; i < numTrainingSelections; i++)
+        {
+
+            if (selectionCounter >= numSelectionsBeforeTraining)
+            {
+                if (updateCounter == 0)
+                {
+                    // update the classifier
+                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+                    marker.Write("Update Classifier");
+                    updateCounter++;
+                }
+                else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
+                {
+                    // update the classifier
+                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
+
+                    marker.Write("Update Classifier");
+                    updateCounter++;
+                }
+            }
+
+            // Get the target from the array
+            trainTarget = trainArray[i];
+
+            // 
+            Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+
+            // Turn on train target
+            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+
+            // Go through the training sequence
+            yield return new WaitForSecondsRealtime(pauseBeforeTraining);
+
+
+            StimulusOn();
+            for (int j = 0; j < (numTrainWindows - 1); j++)
+            {
+                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+            }
+            StimulusOff();
+
+            // Take a break
+            yield return new WaitForSecondsRealtime(trainBreak);
+
+            // Turn off train target
+            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+
+            // Reset objects
+
+            // Take a break
+            yield return new WaitForSecondsRealtime(trainBreak);
+
+            trainTarget = 99;
+            selectionCounter++;
+        }
+
+        yield return new WaitForSecondsRealtime(3);
+
+        // Send marker
+        trainingComplete = true;
+        marker.Write("Training Complete");
+
+        ResetActivations();
+
+        yield return 0;
+
     }
 
     public override IEnumerator SendMarkers(int trainingIndex = 99)
@@ -258,21 +356,41 @@ public class SwitchController : Controller
                     try
                     {
                         string[] activationStrings = responseString.Split(',');
-                        int n = 0;
+                        int n = 1;
                         foreach (var activationString in activationStrings)
                         {
+                            Debug.Log(activationString);
+
+                            // check if activation string is a number
                             float activationFloat;
-                            bool didItWork = float.TryParse(activationString, out activationFloat);
+                            bool isActivation = float.TryParse(activationString, out activationFloat);
 
+                            // if it is then pass the activation floats to OnActivation
+                            if (isActivation)
+                            {
+                                //float activationFloat;
+                                //bool didItWork = float.TryParse(activationString, out activationFloat);
+                                //Debug.Log(didItWork);
 
-                            objectList[n].GetComponent<SwitchSPO>().OnActivation(activationFloat);
+                                // if it is an appropriate time, send the activation
+                                if (trainingComplete)
+                                {
+                                    float activationDuration = (windowLength - 0.5f);
+                                    objectList[n].GetComponent<SwitchSPO>().OnActivation(activationFloat, windowLength);
+                                }
 
-                            n++;
+                                n++;
+                            }
+                            // otherwise wait for the next response
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
                     catch
                     {
-
+                        //do nothing
                     }
                 }
             }
@@ -282,5 +400,20 @@ public class SwitchController : Controller
         }
 
         Debug.Log("Done receiving markers");
+    }
+
+    public void ResetActivations()
+    {
+        foreach (GameObject thisObject in objectList)
+        {
+            try
+            {
+                thisObject.GetComponent<SwitchSPO>().ResetPosition();
+            }
+            catch
+            {
+
+            }
+        }
     }
 }

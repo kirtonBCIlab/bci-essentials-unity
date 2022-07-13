@@ -14,20 +14,36 @@ public class SwitchSPO : SPO
     //Time to rise
     public float timeToRise = 4f;
 
-    
+    //Controller
+    public GameObject controller;
+
+    void Start()
+    {
+        controller = GameObject.Find("SwitchController");
+        //private GameObject controller = GameObject.Find("SwitchController");
+    }
+
     // What to do with the activation value, between 0 and 1
-    public void OnActivation(float activationValue)
+    public void OnActivation(float activationValue, float activationDuration)
     {
         // Do an action corresponding to activation level
+        // Go to height
+        float activationHeight = maxHeight * activationValue;
+        StartCoroutine(MoveUp(activationHeight, activationDuration, false));
 
         // If the activation value is above the threshold then do something else
         if(activationValue >= threshold)
         {
-            OnSelection();
+            this.GetComponent<Renderer>().material.color = onColour;
+        }
+        // else change it back
+        else
+        {
+            this.GetComponent<Renderer>().material.color = offColour;
         }
 
         // Reset
-        TurnOff();
+        // TurnOff();
     }
 
     // What to do on selection
@@ -36,32 +52,75 @@ public class SwitchSPO : SPO
         StartCoroutine(QuickFlash());
 
         // Reset
-        TurnOff();
+        // TurnOff();
     }
 
     // What to do when targeted for training selection
     public override void OnTrainTarget()
     {
-        StartCoroutine(MoveUp(maxHeight, timeToRise));
+        // Make the other targets turn off 
+        GameObject[] objectArray = GameObject.FindGameObjectsWithTag("BCI");
+        for (int i = 0; i < objectArray.Length; i++)
+        {
+            // turn off all the other SPOs
+            if (i != myIndex)
+            {
+                Color tempColor = objectArray[i].GetComponent<Renderer>().material.color;
+                tempColor.a = 0f;
+                objectArray[i].GetComponent<SwitchSPO>().ResetPosition();
+                objectArray[i].GetComponent<Renderer>().material.color = tempColor;
+            }
+
+        }
+
+        // Return sham or feedback
+
+        ResetPosition();
+
+        // if sham feedback
+        bool shamFeedback;
+        shamFeedback = controller.GetComponent<SwitchController>().shamFeedback;
+        if(shamFeedback)
+        {
+            StartCoroutine(MoveUp(maxHeight, timeToRise, true));
+        }
     }
 
     // What to do when untargeted
     public override void OffTrainTarget()
     {
+        GameObject[] objectArray = GameObject.FindGameObjectsWithTag("BCI");
+        for (int i = 0; i < objectArray.Length; i++)
+        {
+            // turn on all the other SPOs
+            if (i != myIndex)
+            {
+                Color tempColor = objectArray[i].GetComponent<Renderer>().material.color;
+                tempColor.a = 1f;
+                objectArray[i].GetComponent<Renderer>().material.color = tempColor;
+            }
+        }
+
         ResetPosition();
     }
 
-    public IEnumerator MoveUp(float targetHeight, float duration)
+    public IEnumerator MoveUp(float targetHeight, float duration, bool resetPos)
     {
         float elapsedTime = 0;
+        float totalDistanceToMove;
         float distanceToMove;
 
+        Debug.Log("moving up " + targetHeight.ToString() + " units over " + duration.ToString() + " seconds");
+        Debug.Log("initial position " + this.transform.position.y);
+
+        //ResetPosition();
+        totalDistanceToMove = targetHeight - this.transform.position.y;
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
 
-            distanceToMove = targetHeight * (Time.deltaTime / duration);
+            distanceToMove = totalDistanceToMove * (Time.deltaTime / duration);
 
             this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + distanceToMove, this.transform.position.z);
 
@@ -69,7 +128,13 @@ public class SwitchSPO : SPO
             yield return 0;
         }
 
-        ResetPosition();
+        Debug.Log("final position " + this.transform.position.y);
+
+        if (resetPos)
+        {
+            ResetPosition();
+        }
+        //ResetPosition();
     }
 
     public void ResetPosition()

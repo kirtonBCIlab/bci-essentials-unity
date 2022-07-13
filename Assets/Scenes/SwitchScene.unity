@@ -159,14 +159,14 @@ MonoBehaviour:
   listExists: 0
   objectList: []
   objectsToRemove: []
-  windowLength: 1
+  windowLength: 2
   interWindowInterval: 0
   stimOn: 0
-  numTrainingSelections: 10
+  numTrainingSelections: 4
   numTrainWindows: 4
   pauseBeforeTraining: 0
   trainTargetPersistent: 1
-  trainTargetPresentationTime: 3
+  trainTargetPresentationTime: 0
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
@@ -174,8 +174,9 @@ MonoBehaviour:
   setup: {fileID: 0}
   marker: {fileID: 0}
   response: {fileID: 0}
-  numSelectionsBeforeTraining: 3
-  numSelectionsBetweenTraining: 3
+  numSelectionsBeforeTraining: 2
+  numSelectionsBetweenTraining: 2
+  trainingComplete: 0
 --- !u!4 &133417032
 Transform:
   m_ObjectHideFlags: 0
@@ -353,7 +354,8 @@ MonoBehaviour:
   threshold: 0.5
   minHeight: 0
   maxHeight: 4
-  timeToRise: 4
+  timeToRise: 7
+  controller: {fileID: 0}
 --- !u!65 &1173735603
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -601,7 +603,8 @@ MonoBehaviour:
   threshold: 0.5
   minHeight: 0
   maxHeight: -4
-  timeToRise: 4
+  timeToRise: 7
+  controller: {fileID: 0}
 --- !u!65 &1679447659
 BoxCollider:
   m_ObjectHideFlags: 0

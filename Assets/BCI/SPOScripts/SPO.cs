@@ -18,7 +18,6 @@ public class SPO : MonoBehaviour
     [SerializeField]
     public bool hasImageChild = false;
 
-
     // Turn the stimulus on
     public virtual float TurnOn()
     {
