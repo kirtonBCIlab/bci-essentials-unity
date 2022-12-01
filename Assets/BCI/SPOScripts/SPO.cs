@@ -28,8 +28,6 @@ public class SPO : MonoBehaviour
 
         //Return time since stim
         return Time.time;
-
-
     }
 
     // Turn off/reset the SPO
