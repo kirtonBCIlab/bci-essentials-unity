@@ -3,9 +3,10 @@ A Unity base environment for streamlined development of BCI applications.
 
 Pairs nicely with [bci-essentials-python](https://github.com/kirtonBCIlab/bci-essentials-python)
 
+## Note - running on Apple silicon:
+To run on Apple silicon (ex: M1), the Lab Streaming Layer plugin library needs to be replaced:
 
-The steps for Unity on mac are (coutesy of @adamgulamhusein):
-1. Download bci-essentials-unity
-2. Download liblsl.bz2 file for pylsl from their GitHub (open/unzip)
-3. Replace package lib folder with new liblsl lib folder
-4. Give computer permisson to .dylib files
+1. Download the latest [liblsl release](https://github.com/sccn/liblsl/releases) for MacOS (arm-64)
+
+2. Unzip the archive and copy the lib/*.dylib files into ./Assets/Plugins/lib
+
