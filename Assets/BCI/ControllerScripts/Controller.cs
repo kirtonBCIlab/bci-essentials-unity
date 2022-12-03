@@ -15,6 +15,7 @@ using System;
  * Methods
  * 
  * 
+ * 
  */
 
 public class Controller : MonoBehaviour
@@ -139,6 +140,19 @@ public class Controller : MonoBehaviour
             StartCoroutine(DoTraining());
         }
 
+        // Press I to do Iterative training (MI only)
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            // Receive incoming markers
+            if (receivingMarkers == false)
+            {
+                StartCoroutine(ReceiveMarkers());
+            }
+
+            StartCoroutine(DoIterativeTraining());
+        }
+
+        // Press U to do User training, stimulus without BCI
         if (Input.GetKeyDown(KeyCode.U))
         {
             StartCoroutine(DoUserTraining());
@@ -146,47 +160,47 @@ public class Controller : MonoBehaviour
 
 
         // Check for a selection if stim is on
-        if (stimOn)
+        if (stimOn )
         {
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                SelectObject(0);
+                StartCoroutine(SelectObject(0));
             }
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                SelectObject(1);
+                StartCoroutine(SelectObject(1));
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                SelectObject(2);
+                StartCoroutine(SelectObject(2));
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                SelectObject(3);
+                StartCoroutine(SelectObject(3));
             }
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                SelectObject(4);
+                StartCoroutine(SelectObject(4));
             }
             if (Input.GetKeyDown(KeyCode.Alpha5))
             {
-                SelectObject(5);
+                StartCoroutine(SelectObject(5));
             }
             if (Input.GetKeyDown(KeyCode.Alpha6))
             {
-                SelectObject(6);
+                StartCoroutine(SelectObject(6));
             }
             if (Input.GetKeyDown(KeyCode.Alpha7))
             {
-                SelectObject(7);
+                StartCoroutine(SelectObject(7));
             }
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                SelectObject(8);
+                StartCoroutine(SelectObject(8));
             }
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
-                SelectObject(9);
+                StartCoroutine(SelectObject(9));
             }
         }
     }
@@ -272,10 +286,6 @@ public class Controller : MonoBehaviour
             GameObject thisObject = objectList[i];
             thisObject.GetComponent<SPO>().myIndex = i;
         }
-
-        //print(objectList.Count.ToString());
-
-
     }
 
     public void StartStopStimulus()
@@ -335,10 +345,18 @@ public class Controller : MonoBehaviour
     }
 
     // Select an object from the objectList
-    public void SelectObject(int objectIndex)
+    public IEnumerator SelectObject(int objectIndex)
     {
         // When a selection is made, turn the stimulus off
-        stimOn = false;
+        //stimOn = false;
+
+        Debug.Log("Waiting to select object " + objectIndex.ToString());
+
+        // Wait for stimulus to end
+        while(stimOn == true)
+        {
+            yield return null; 
+        }
 
         try
         {
@@ -428,83 +446,6 @@ public class Controller : MonoBehaviour
 
         marker.Write("Training Complete");
     }
-
-    //public virtual IEnumerator DoIterativeTraining()
-    //{
-    //    // Generate the target list
-    //    PopulateObjectList("tag");
-
-    //    int numOptions = objectList.Count;
-
-    //    // Create a random non repeating array 
-    //    int[] trainArray = new int[numTrainingSelections];
-    //    trainArray = MakeRNRA(numTrainingSelections, numOptions);
-    //    PrintArray(trainArray);
-
-    //    yield return 0;
-
-    //    // Loop for each training target
-    //    for (int i = 0; i < numTrainingSelections; i++)
-    //    {
-
-    //        if (selectionCounter >= numSelectionsBeforeTraining)
-    //        {
-    //            if (updateCounter == 0)
-    //            {
-    //                // update the classifier
-    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-    //                marker.Write("Update Classifier");
-    //                updateCounter++;
-    //            }
-    //            else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
-    //            {
-    //                // update the classifier
-    //                Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-    //                marker.Write("Update Classifier");
-    //                updateCounter++;
-    //            }
-    //        }
-
-    //        // Get the target from the array
-    //        trainTarget = trainArray[i];
-
-    //        // 
-    //        Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
-
-    //        // Turn on train target
-    //        objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-    //        // Go through the training sequence
-    //        yield return new WaitForSecondsRealtime(pauseBeforeTraining);
-
-    //        StimulusOn();
-    //        yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-    //        StimulusOff();
-
-    //        // Turn off train target
-    //        objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
-
-    //        // If sham feedback is true, then show it
-    //        if (shamFeedback)
-    //        {
-    //            objectList[trainTarget].GetComponent<SPO>().OnSelection();
-    //        }
-
-    //        // Take a break
-    //        yield return new WaitForSecondsRealtime(trainBreak);
-
-    //        trainTarget = 99;
-    //        selectionCounter++;
-    //    }
-
-    //    marker.Write("Training Complete");
-
-    //    yield return 0;
-
-
-    //}
 
     public virtual IEnumerator DoUserTraining()
     {
