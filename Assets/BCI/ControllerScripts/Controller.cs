@@ -141,7 +141,7 @@ public class Controller : MonoBehaviour
         }
 
         // Press I to do Iterative training (MI only)
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             // Receive incoming markers
             if (receivingMarkers == false)
