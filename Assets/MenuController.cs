@@ -19,7 +19,7 @@ public class MenuController : MonoBehaviour
         if (canvas.gameObject.activeInHierarchy == false)
         {
             canvas.gameObject.SetActive(true);
-            Time.timeScale = 0;
+            Time.timeScale = 1; //EKL TO FIX LATER - Make this better.
         }
         else
         {
