@@ -61,7 +61,7 @@ public class Controller : MonoBehaviour
     }
 
     // Receive markers
-    private bool receivingMarkers = false;
+    protected bool receivingMarkers = false;
 
     // Scripts
     [HideInInspector] public Matrix_Setup setup;
@@ -288,7 +288,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public void StartStopStimulus()
+    public virtual void StartStopStimulus()
     {
         // Receive incoming markers
         if (receivingMarkers == false)
@@ -311,7 +311,7 @@ public class Controller : MonoBehaviour
     }
 
     // Turn the stimulus on
-    public virtual void StimulusOn(bool sendConstantMarkers = true)
+    protected virtual void StimulusOn(bool sendConstantMarkers = true)
     {
         stimOn = true;
 
@@ -335,7 +335,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public virtual void StimulusOff()
+    protected virtual void StimulusOff()
     {
         // End thhe stimulus Coroutine
         stimOn = false;
