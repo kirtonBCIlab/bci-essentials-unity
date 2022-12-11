@@ -1,17 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
-/*An extension of the controller class to add Switch functionality
- *
-
-*/
+/// <summary>
+/// An extension of the controller class to add Switch functionality
+/// </summary>
 public class SwitchController : Controller
 {
-
-
     // Variables related to Iterative training
     public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
     public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
@@ -79,7 +73,7 @@ public class SwitchController : Controller
         // Remove from the list any entries that have includeMe set to false
         foreach (GameObject thisObject in objectList)
         {
-            if (thisObject.GetComponent<SPO>().includeMe == false)
+            if (thisObject.GetComponent<SPO>().Selectable == false)
             {
                 objectsToRemove.Add(thisObject);
             }
@@ -162,7 +156,7 @@ public class SwitchController : Controller
 
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                    objectList[trainTarget].GetComponent<SPO>().Select();
                 }
             }
             StimulusOff();

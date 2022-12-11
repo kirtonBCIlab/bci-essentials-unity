@@ -270,7 +270,7 @@ public class Controller : MonoBehaviour
 
         foreach (GameObject thisObject in objectList)
         {
-            if (thisObject.GetComponent<SPO>().includeMe == false)
+            if (thisObject.GetComponent<SPO>().Selectable == false)
             {
                 objectsToRemove.Add(thisObject);
             }
@@ -284,7 +284,7 @@ public class Controller : MonoBehaviour
         for (int i = 0; i < objectList.Count; i++)
         {
             GameObject thisObject = objectList[i];
-            thisObject.GetComponent<SPO>().myIndex = i;
+            thisObject.GetComponent<SPO>().SelectablePoolIndex = i;
         }
     }
 
@@ -361,7 +361,7 @@ public class Controller : MonoBehaviour
         try
         {
             // Run the SPO onSelection script
-            objectList[objectIndex].GetComponent<SPO>().OnSelection();
+            objectList[objectIndex].GetComponent<SPO>().Select();
         }
         catch
         {
@@ -435,7 +435,7 @@ public class Controller : MonoBehaviour
             // If sham feedback is true, then show it
             if (shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                objectList[trainTarget].GetComponent<SPO>().Select();
             }
 
             trainTarget = 99;
@@ -551,7 +551,7 @@ public class Controller : MonoBehaviour
             {
                 try
                 {
-                    objectList[i].GetComponent<SPO>().TurnOn();
+                    objectList[i].GetComponent<SPO>().StartStimulus();
                 }
                 catch
                 {
@@ -569,7 +569,7 @@ public class Controller : MonoBehaviour
         {
             try
             {
-                objectList[i].GetComponent<SPO>().TurnOff();
+                objectList[i].GetComponent<SPO>().StopStimulus();
             }
             catch
             {
@@ -659,7 +659,7 @@ public class Controller : MonoBehaviour
                     if (isNumeric == true)
                     {
                         //Run on selection
-                        objectList[n].GetComponent<SPO>().OnSelection();
+                        objectList[n].GetComponent<SPO>().Select();
                     }
                 }
             }

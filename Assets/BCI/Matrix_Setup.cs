@@ -46,7 +46,7 @@ public class Matrix_Setup : MonoBehaviour
                 new_obj.tag = "BCI";
 
                 //turn off
-                new_obj.GetComponent<SPO>().TurnOff();
+                new_obj.GetComponent<SPO>().StopStimulus();
 
                 //Adding to list
                 objectList.Add(new_obj);
