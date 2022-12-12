@@ -658,9 +658,7 @@ public class Controller : MonoBehaviour
                     print("response : " + responseString);
 
                     // If there are square brackets then remove them
-                    responseString = String.Concat(responseString.Split('['));
-                    responseString = String.Concat(responseString.Split(']'));
-                    responseString = String.Concat(responseString.Split('.'));
+                    responseString.Replace("[", "").Replace("]","").Replace(".", "");
 
                     // If it is a single value then select that value
                     int n;
