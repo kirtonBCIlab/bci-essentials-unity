@@ -18,12 +18,25 @@ public class SPO : MonoBehaviour
     [SerializeField]
     public bool hasImageChild = false;
 
+    // Get the renderer
+    private Renderer _renderer;
+    private SpriteRenderer _SpriteRenderer;
+
+    void Awake()
+    {
+        // Renderer for if your object is a 3D object
+        this.TryGetComponent<Renderer>(out _renderer);
+
+        // SpriteRenderer for if your object is a 2D sprite
+        this.TryGetComponent(out SpriteRenderer _spriteRenderer);
+    }
+
 
     // Turn the stimulus on
     public virtual float TurnOn()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-        { this.GetComponent<Renderer>().material.color = onColour; }
+        { _renderer.material.color = onColour; }
 
 
         //Return time since stim
@@ -34,7 +47,7 @@ public class SPO : MonoBehaviour
     public virtual void TurnOff()
     {
         //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-        { this.GetComponent<Renderer>().material.color = offColour; }
+        { _renderer.material.color = offColour; }
     }
 
     // What to do on selection

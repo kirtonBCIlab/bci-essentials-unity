@@ -51,6 +51,9 @@ public class Controller : MonoBehaviour
     public bool shamFeedback = false;
     public int trainTarget = 99;
 
+    // Selection
+    protected bool voteOnWindows = false;
+
     //Deal with the BCI Tag in a scene with mor flexibility.
     [SerializeField]
     private string _myTag = "BCI";
@@ -61,7 +64,7 @@ public class Controller : MonoBehaviour
     }
 
     // Receive markers
-    private bool receivingMarkers = false;
+    protected bool receivingMarkers = false;
 
     // Scripts
     [HideInInspector] public Matrix_Setup setup;
@@ -288,7 +291,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public void StartStopStimulus()
+    public virtual void StartStopStimulus()
     {
         // Receive incoming markers
         if (receivingMarkers == false)
@@ -311,7 +314,7 @@ public class Controller : MonoBehaviour
     }
 
     // Turn the stimulus on
-    public virtual void StimulusOn(bool sendConstantMarkers = true)
+    protected virtual void StimulusOn(bool sendConstantMarkers = true)
     {
         stimOn = true;
 
@@ -335,7 +338,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public virtual void StimulusOff()
+    protected virtual void StimulusOff()
     {
         // End thhe stimulus Coroutine
         stimOn = false;
@@ -654,12 +657,56 @@ public class Controller : MonoBehaviour
                     //print("WE GOT A RESPONSE");
                     print("response : " + responseString);
 
+                    // If there are square brackets then remove them
+                    responseString.Replace("[", "").Replace("]","").Replace(".", "");
+
+                    // If it is a single value then select that value
                     int n;
                     bool isNumeric = int.TryParse(responseString, out n);
                     if (isNumeric == true)
                     {
                         //Run on selection
                         objectList[n].GetComponent<SPO>().OnSelection();
+                    }
+
+                    if (voteOnWindows == true)
+                    {
+                        // Otherwise split 
+                        string[] responses = responseString.Split(" ");
+
+                        int[] objectVotes = new int[objectList.Count];
+
+                        foreach(string response in responses)
+                        {
+                            isNumeric = int.TryParse(response, out n);
+                            if (isNumeric == true)
+                            {
+                                //Run the vote
+                                objectVotes[n] = objectVotes[n] + 1;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        if (isNumeric == false)
+                        {
+                            continue;
+                        }
+
+                        // make a selection based on the vote
+                        int voteSelection = 0;
+                        for (int v=1; v<objectList.Count; v++)
+                        {
+                            if (objectVotes[v] > objectVotes[voteSelection])
+                            {
+                                voteSelection = v;
+                            }
+                        }
+
+                        //Run on selection
+                        UnityEngine.Debug.Log("Voting selected object " + voteSelection.ToString());
+                        objectList[voteSelection].GetComponent<SPO>().OnSelection();
                     }
                 }
             }

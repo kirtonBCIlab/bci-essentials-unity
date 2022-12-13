@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using System;
+using System.Text;
 using System.Linq;
 
 public class P300Controller : Controller
@@ -23,8 +24,6 @@ public class P300Controller : Controller
     public bool checkerboard = true;
     public int checkerBoardRows = 5;
     public int checkerBoardCols = 6;
-
-    public enum multiFlashMethod { Random };
 
     private float timeOfFlash = 0;
     private float timeOfWrite = 0;
@@ -201,25 +200,21 @@ public class P300Controller : Controller
                 // 
                 GameObject currentObject = objectList[stimOrder[i]];
 
-                /////
-                //This block keeps taking longer and longer... maybe.... try timing it?
-                string markerString = "p300,s," + objectList.Count.ToString();
+                // Build the marker string
+                StringBuilder markerStringBldr = new StringBuilder("p300,s,");
+                markerStringBldr.Append(objectList.Count.ToString());
 
                 if (trainTarget <= objectList.Count)
                 {
-                    markerString = markerString + "," + trainTarget.ToString();
+                    markerStringBldr.AppendFormat(",{0}",trainTarget.ToString());
                 }
                 else
                 {
-                    markerString = markerString + "," + "-1";
+                    markerStringBldr.Append(",-1");
                 }
-                markerString = markerString + "," + stimOrder[i].ToString();
+                markerStringBldr.AppendFormat(",{0}", stimOrder[i].ToString());
 
-                ///
-                ////create and start a Stopwatch instance
-                //Stopwatch stopwatch = Stopwatch.StartNew();
-
-                //Turn on
+                UnityEngine.Debug.Log(markerStringBldr.ToString());
 
                 timeOfFlash = currentObject.GetComponent<SPO>().TurnOn();
 
@@ -227,7 +222,7 @@ public class P300Controller : Controller
                 //Send marker
                 if (blockOutGoingLSL == false)
                 {
-                    marker.Write(markerString);
+                    marker.Write(markerStringBldr.ToString());
                 }
                 oldTimeOfWrite = timeOfWrite;
                 timeOfWrite = Time.time;
@@ -253,22 +248,27 @@ public class P300Controller : Controller
         }
         if (multiFlash)
         {
-            // For multi flash selection, create virtual rows and columns
-            int numSelections = objectList.Count;
-            int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-            int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
+            // Check if there are any real rows/columns
 
-            int[,] rcMatrix = new int[numColumns, numRows];
+
 
             // Assign object indices to places in the virtual row/column matrix
             //if (rcMethod.ToString() == "Ordered")
             //{
             if (rowColumn)
             {
+                // For row/column flash selection, create virtual rows and columns
+                int numSelections = objectList.Count;
+                int numRows = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
+                int numColumns = (int)Math.Ceiling((float)numSelections / (float)numRows);
+
+                UnityEngine.Debug.Log("This matrix is " + numRows.ToString() + " rows X " + numColumns.ToString() + "columns");
+
+                int[,] rcMatrix = new int[numRows, numColumns];
                 int count = 0;
-                for (int i = 0; i < numColumns; i++)
+                for (int i = 0; i < numRows; i++)
                 {
-                    for (int j = 0; j < numRows; j++)
+                    for (int j = 0; j < numColumns; j++)
                     {
                         if (count <= numSelections)
                             rcMatrix[i, j] = count;
@@ -285,102 +285,115 @@ public class P300Controller : Controller
                 int[] columnStimOrder = MakeRNRA(totalColumnFlashes, numColumns);
                 int[] rowStimOrder = MakeRNRA(totalRowFlashes, numRows);
 
-                for (int i = 0; i < totalColumnFlashes; i++)
+                // Repeat until the greater of rows/columns is completed
+                
+                for (int i = 0; i < Math.Max(totalColumnFlashes, totalRowFlashes); i++)
                 {
-                    //Initialize marker string
-                    string markerString = "p300,m," + objectList.Count.ToString();
-
-                    //Add training target
-                    if (trainTarget <= objectList.Count)
-                    {
-                        markerString = markerString + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString = markerString + "," + "-1";
-                    }
-
-                    // Turn on column 
-                    int columnIndex = columnStimOrder[i];
-                    for (int n = 0; n < numRows; n++)
-                    {
-                        GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
-
-
-                        //Add to marker
-                        markerString = markerString + "," + rcMatrix[n, columnIndex].ToString();
-                    }
-
-                    for (int n = 0; n < numRows; n++)
-                    {
-                        GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
-                        currentObject.GetComponent<SPO>().TurnOn();
-                    }
-
-                    //// Add train target to marker
-                    //if (trainTarget <= objectList.Count)
-                    //{
-                    //    markerString = markerString + "," + trainTarget.ToString();
-                    //}
-
-                    // Send marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString);
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off column
-                    for (int n = 0; n < numRows; n++)
-                    {
-                        GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
-                        currentObject.GetComponent<SPO>().TurnOff();
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-
-                    // Flash row if available
-                    if (i <= totalRowFlashes)
+                    // Flash column if available
+                    if (i < totalColumnFlashes)
                     {
                         //Initialize marker string
-                        string markerString1 = "p300,m," + objectList.Count.ToString();
+                        StringBuilder markerStringBldr = new StringBuilder("p300,m,");
+                        markerStringBldr.Append(objectList.Count.ToString());
 
+                        //Add training target
+                        if (trainTarget <= objectList.Count)
+                        {
+                            markerStringBldr.AppendFormat(",{0}", trainTarget.ToString());
+                        }
+                        else
+                        {
+                            markerStringBldr.Append(",-1");
+                        }
+
+                        // Turn on column 
+                        int columnIndex = columnStimOrder[i];
+                        for (int n = 0; n < numRows; n++)
+                        {
+                            try
+                            {
+                                GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
+
+                                //Add to marker
+                                markerStringBldr.AppendFormat(",{0}", rcMatrix[n, columnIndex].ToString());
+
+                                currentObject.GetComponent<SPO>().TurnOn();
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+                        }
+
+                        // Send marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerStringBldr.ToString());
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off column
+                        for (int n = 0; n < numRows; n++)
+                        {
+                            try
+                            {
+                                GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
+                                currentObject.GetComponent<SPO>().TurnOff();                            
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
+
+                    // Flash row if available
+                    if (i < totalRowFlashes)
+                    {
+                        //Initialize marker string
+                        StringBuilder markerStringBldr1 = new StringBuilder("p300,m,");
+                        markerStringBldr1.Append(objectList.Count.ToString());
 
                         // Add training target
                         if (trainTarget <= objectList.Count)
                         {
-                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                            markerStringBldr1.AppendFormat(",{0}", trainTarget.ToString());
                         }
                         else
                         {
-                            markerString1 = markerString1 + "," + "-1";
+                            markerStringBldr1.Append(",-1");
                         }
 
                         // Turn on row
                         int rowIndex = rowStimOrder[i];
                         for (int m = 0; m < numColumns; m++)
                         {
-                            //Turn on row
-                            GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                            currentObject.GetComponent<SPO>().TurnOn();
+                            try
+                            {
+                                //Turn on row
+                                GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
+                                currentObject.GetComponent<SPO>().TurnOn();
 
-                            //Add to marker
-                            markerString1 = markerString1 + "," + rcMatrix[rowIndex, m].ToString();
+                                //Add to marker
+                                markerStringBldr1.AppendFormat(",{0}", rcMatrix[rowIndex, m].ToString());
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+
                         }
-
-                        ////Add train target to marker
-                        //if (trainTarget <= objectList.Count)
-                        //{
-                        //    markerString1 = markerString1 + "," + trainTarget.ToString();
-                        //}
 
                         //Send Marker
                         if (blockOutGoingLSL == false)
                         {
-                            marker.Write(markerString1);
+                            marker.Write(markerStringBldr1.ToString());
                         }
 
                         //Wait
@@ -389,11 +402,18 @@ public class P300Controller : Controller
                         //Turn off Row
                         for (int m = 0; m < numColumns; m++)
                         {
-                            //Turn on row
-                            GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                            currentObject.GetComponent<SPO>().TurnOff();
-                        }
+                            try
+                            {
+                                //Turn on row
+                                GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
+                                currentObject.GetComponent<SPO>().TurnOff();
+                            }
+                            catch
+                            {
+                                continue;
+                            }
 
+                        }
 
                         //Wait
                         yield return new WaitForSecondsRealtime(offTime);
@@ -776,8 +796,33 @@ public class P300Controller : Controller
         yield return null;
     }
 
+    public override void StartStopStimulus()
+    {
+        // Receive incoming markers
+        if (receivingMarkers == false)
+        {
+            StartCoroutine(ReceiveMarkers());
+        }
+
+        // P300 is special because the stimulus takes a fixed length of time 
+        // and will cause issues if stopped prematurely
+
+        // Turn off if on
+        if (stimOn)
+        {
+            StimulusOff();
+        }
+
+        // Turn on if off
+        else
+        {
+            PopulateObjectList("tag");
+            StimulusOn();
+        }
+    }
+
     // Turn the stimulus on
-    public override void StimulusOn(bool sendConstantMarkers = true)
+    protected override void StimulusOn(bool sendConstantMarkers = true)
     {
         stimOn = true;
 
@@ -804,7 +849,7 @@ public class P300Controller : Controller
         }
     }
 
-    public override void StimulusOff()
+    protected override void StimulusOff()
     {
         // End thhe stimulus Coroutine
         stimOn = false;
