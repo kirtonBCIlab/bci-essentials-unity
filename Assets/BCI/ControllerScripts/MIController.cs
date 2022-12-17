@@ -111,7 +111,7 @@ public class MIController : Controller
 
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, numOptions);
         PrintArray(trainArray);
 
         yield return 0;

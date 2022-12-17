@@ -50,7 +50,7 @@ public class P300Controller : Controller
 
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, numOptions);
         PrintArray(trainArray);
 
         yield return null;
@@ -193,7 +193,7 @@ public class P300Controller : Controller
         if (singleFlash)
         {
             int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
-            int[] stimOrder = MakeRNRA(totalFlashes, objectList.Count);
+            int[] stimOrder = ArrayUtilities.GenerateRNRA(totalFlashes, objectList.Count);
 
             for (int i = 0; i < stimOrder.Length; i++)
             {
@@ -282,8 +282,8 @@ public class P300Controller : Controller
                 int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
 
                 // Create a random order to flash rows and columns
-                int[] columnStimOrder = MakeRNRA(totalColumnFlashes, numColumns);
-                int[] rowStimOrder = MakeRNRA(totalRowFlashes, numRows);
+                int[] columnStimOrder = ArrayUtilities.GenerateRNRA(totalColumnFlashes, numColumns);
+                int[] rowStimOrder = ArrayUtilities.GenerateRNRA(totalRowFlashes, numRows);
 
                 // Repeat until the greater of rows/columns is completed
                 
