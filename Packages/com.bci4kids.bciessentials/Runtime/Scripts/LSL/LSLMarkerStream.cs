@@ -1,7 +1,7 @@
 ﻿using LSL;
 using UnityEngine;
 
-namespace BCIEssentials
+namespace BCIEssentials.LSL
 {
     public class LSLMarkerStream : MonoBehaviour
     {

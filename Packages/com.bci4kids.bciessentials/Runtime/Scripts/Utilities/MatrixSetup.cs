@@ -8,7 +8,7 @@ namespace BCIEssentials.Utilities
     /// Instantiates a matrix of BCI objects.
     /// All objects are given the tag "BCI" so that they can be collected by the controller script.
     /// </summary>
-    public class MatrixSetup : MatrixSetupBase
+    public class MatrixSetup : MonoBehaviour
     {
         [SerializeField] private SPO _spoPrefab;
 
@@ -19,13 +19,20 @@ namespace BCIEssentials.Utilities
 
         public readonly List<SPO> MatrixObjects = new();
 
-        public override void SetUpMatrix()
+        public void Initialize(SPO prefab, int columns, int rows)
+        {
+            _spoPrefab = prefab;
+            _numColumns = columns;
+            _numColumns = rows;
+        }
+
+        public void SetUpMatrix()
         {
             InstantiateMatrixObjects();
             CenterCameraToMatrix();
         }
 
-        public override void DestroyMatrix()
+        public void DestroyMatrix()
         {
             foreach (var spo in MatrixObjects)
             {
@@ -37,7 +44,7 @@ namespace BCIEssentials.Utilities
 
             MatrixObjects.Clear();
         }
-
+        
         private void InstantiateMatrixObjects()
         {
             for (int rowIndex = _numRows - 1; rowIndex > -1; rowIndex--)
@@ -94,11 +101,5 @@ namespace BCIEssentials.Utilities
 
             Debug.Log($"Camera Position set to: ({centerPosition.x}, {centerPosition.y}, {centerPosition.z})");
         }
-    }
-
-    public abstract class MatrixSetupBase : MonoBehaviour
-    {
-        public abstract void SetUpMatrix();
-        public abstract void DestroyMatrix();
     }
 }

@@ -2,7 +2,7 @@ using System;
 using LSL;
 using UnityEngine;
 
-namespace BCIEssentials
+namespace BCIEssentials.LSL
 {
     public class LSLResponseStream : MonoBehaviour
     {

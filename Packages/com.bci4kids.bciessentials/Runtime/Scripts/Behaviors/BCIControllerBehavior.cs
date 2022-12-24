@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using System;
 using BCIEssentials.Controllers;
+using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using Random = System.Random;
@@ -57,7 +58,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected bool receivingMarkers = false;
 
         // Scripts
-        [SerializeField] protected MatrixSetupBase setup;
+        [SerializeField] protected MatrixSetup setup;
 
         protected LSLMarkerStream marker;
         protected LSLResponseStream response;
