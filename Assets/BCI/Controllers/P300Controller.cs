@@ -1,6 +1,6 @@
 using UnityEngine;
-using System;
 using BCIEssentials.ControllerBehaviors;
+using BCIEssentials.LSL;
 
 public class P300Controller : P300ControllerBehavior
 {
@@ -15,7 +15,7 @@ public class P300Controller : P300ControllerBehavior
     protected override void Start()
     {
         // Attach Scripts
-        setup = GetComponent<Matrix_Setup>();
+        setup = GetComponent<Matrix_Setup>()?.ToBciMatrixSetup();
         Initialize(GetComponent<LSLMarkerStream>(), GetComponent<LSLResponseStream>());
         
         // Set the target framerate

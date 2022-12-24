@@ -1,6 +1,6 @@
 using UnityEngine;
-using System;
 using BCIEssentials.ControllerBehaviors;
+using BCIEssentials.LSL;
 
 //using LSLMarkerStreams;
 
@@ -30,7 +30,7 @@ public class Controller : BCIControllerBehavior
     protected override void Start()
     {
         // Attach Scripts
-        setup = GetComponent<Matrix_Setup>();
+        setup = GetComponent<Matrix_Setup>()?.ToBciMatrixSetup();
         Initialize(GetComponent<LSLMarkerStream>(), GetComponent<LSLResponseStream>());
         
         // Set the target framerate
