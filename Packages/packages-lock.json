@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.bci4kids.bciessentials": {
+      "version": "file:com.bci4kids.bciessentials",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.labstreaminglayer.lsl4unity": "1.16.0"
+      }
+    },
+    "com.labstreaminglayer.lsl4unity": {
+      "version": "file:LSL4Unity",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.collab-proxy": {
       "version": "1.17.7",
       "depth": 0,
