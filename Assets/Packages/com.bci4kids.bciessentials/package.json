@@ -1,0 +1,23 @@
+{
+  "name": "com.bci4kids.bciessentials",
+  "version": "1.0.0",
+  "displayName": "BCI Essentials",
+  "description": "A Unity base environment for streamlined development of BCI applications",
+  "unity": "2021.3",
+  "unityRelease": "15f1",
+  "documentationUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity",
+  "changelogUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity/releases",
+  "license": "MIT",
+  "author": {
+    "name": "BCI Games",
+    "email": "contact@bci.games\n",
+    "url": "https://bci.games/"
+  },
+  "samples": [
+    {
+      "displayName": "BCI Controller Setup",
+      "path": "Samples/BCIControllerSetup",
+      "description": "Demonstration of a BCI Controller setup with behaviors"
+    }
+  ]
+}
