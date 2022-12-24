@@ -5,8 +5,7 @@ Pairs nicely with [bci-essentials-python](https://github.com/kirtonBCIlab/bci-es
 
 ## Installing the BCI Essentials Package
 You can install the BCI Essentials package through Unity's Package Manager
-1. Install the [LSL4Unity](https://github.com/labstreaminglayer/LSL4Unity) custom package
-   - Easiest as a submodule in your packages folder (`git submodule add https://github.com/labstreaminglayer/LSL4Unity`)
+1. Add [LSL4Unity](https://github.com/labstreaminglayer/LSL4Unity.git) package
 2. Install the BCI Essentials using the Package Manager
    1. Add using Git URL `https://github.com/kirtonBCIlab/bci-essentials-unity.git?path=/packages/com.bci4kids.bciessentials`
 

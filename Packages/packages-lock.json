@@ -9,10 +9,11 @@
       }
     },
     "com.labstreaminglayer.lsl4unity": {
-      "version": "file:LSL4Unity",
+      "version": "https://github.com/labstreaminglayer/LSL4Unity.git",
       "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
+      "source": "git",
+      "dependencies": {},
+      "hash": "a3096a95c8de3bcfb2ff2216e7607ed1b2efd642"
     },
     "com.unity.collab-proxy": {
       "version": "1.17.7",
