@@ -15,5 +15,27 @@
   },
   "dependencies": {
     "com.labstreaminglayer.lsl4unity" : "1.16.0"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Controller Hotswapping Example",
+      "description": "Demonstrates how to set up a BCI controller with multiple behavior types which can be switched at runtime.",
+      "path": "Samples~/BCIControllerBehaviors"
+    },
+    {
+      "displayName": "MI Controller Training",
+      "description": "A training exercise scene for the MI Controller behavior type.",
+      "path": "Samples~/MIControllerTraining"
+    },
+    {
+      "displayName": "P300 Controller Training",
+      "description": "A training exercise scene for the P300 Controller behavior type.",
+      "path": "Samples~/P300ControllerTraining"
+    },
+    {
+      "displayName": "SSVE Controller Training",
+      "description": "A training exercise scene for the SSVE Controller behavior type.",
+      "path": "Samples~/SSVEControllerTraining"
+    }
+  ]
 }
