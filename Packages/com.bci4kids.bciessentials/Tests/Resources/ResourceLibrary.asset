@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: ResourceLibrary
   m_EditorClassIdentifier: 
   _emptyScene: {fileID: 102900000, guid: a563f1f71c53be340a498a15e2bbbe32, type: 3}
+  _defaultScene: {fileID: 102900000, guid: b3462e97501a80a469bdf247879b58cd, type: 3}
