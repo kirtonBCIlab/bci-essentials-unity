@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BCIEssentials.StimulusObjects;
 using UnityEngine;
@@ -10,25 +11,36 @@ namespace BCIEssentials.Utilities
     /// </summary>
     public class MatrixSetup : MonoBehaviour
     {
-        [SerializeField] private int _numColumns;
-        [SerializeField] private int _numRows;
-        
-        [Space]
         [SerializeField] private SPO _spoPrefab;
-        [SerializeField] private Vector2 _spacing;
+
+        [Space] [SerializeField] private int _numColumns = 1;
+        [SerializeField] private int _numRows = 1;
+        [SerializeField] private Vector2 _spacing = Vector2.one;
 
         public readonly List<SPO> MatrixObjects = new();
 
         public void Initialize(SPO prefab, int columns, int rows, Vector2 spacing)
         {
             _spoPrefab = prefab;
-            _numColumns = columns;
-            _numColumns = rows;
+            _numColumns = Math.Max(1, columns);
+            _numRows = Math.Max(1, rows);
             _spacing = spacing;
         }
 
+        [ContextMenu("Set Up Matrix")]
         public void SetUpMatrix()
         {
+            if (_spoPrefab == null)
+            {
+                Debug.LogError("No SPO for matrix");
+                return;
+            }
+
+            if (MatrixObjects.Count > 0)
+            {
+                DestroyMatrix();
+            }
+
             InstantiateMatrixObjects();
             CenterCameraToMatrix();
         }
@@ -45,10 +57,10 @@ namespace BCIEssentials.Utilities
 
             MatrixObjects.Clear();
         }
-        
+
         private void InstantiateMatrixObjects()
         {
-            for (int rowIndex = _numRows - 1; rowIndex > -1; rowIndex--)
+            for (int rowIndex = 0; rowIndex < _numRows; rowIndex++)
             {
                 for (int columnIndex = 0; columnIndex < _numColumns; columnIndex++)
                 {
@@ -61,19 +73,16 @@ namespace BCIEssentials.Utilities
 
                     //Setup GameObject
                     var spoGameObject = spo.gameObject;
+                    spoGameObject.SetActive(true);
                     spoGameObject.name = $"Object {MatrixObjects.Count}";
                     spoGameObject.tag = "BCI";
 
                     //Setting position of object
-                    var startingPosition = Vector3.zero;
-                    startingPosition.x += columnIndex;
-                    startingPosition.y += rowIndex;
-                    startingPosition += (Vector3)_spacing;
+                    var position = (Vector3)_spacing;
+                    position.x *= columnIndex;
+                    position.y *= rowIndex;
 
-                    spoGameObject.transform.position = startingPosition;
-
-                    //Activating objects
-                    spoGameObject.SetActive(true);
+                    spoGameObject.transform.position = position;
                 }
             }
         }
@@ -87,7 +96,7 @@ namespace BCIEssentials.Utilities
             }
 
             var centerPosition = totalPosition / MatrixObjects.Count;
-            centerPosition.z = -10f ;
+            centerPosition.z = -10f;
 
             var mainCamera = Camera.main;
             if (mainCamera == null)

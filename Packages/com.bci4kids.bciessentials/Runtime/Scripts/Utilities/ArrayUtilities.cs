@@ -46,30 +46,34 @@ namespace BCIEssentials.Utilities
                     PopulateOptions();
                 }
 
-                var draw = DrawValue();
+                var (drawIndex, draw) = DrawValue();
                 while (draw == lastDraw && redrawCount < 10)
                 {
                     ++redrawCount; //Lets not get stuck in a loop
-                    draw = DrawValue();
+                    (drawIndex, draw) = DrawValue();
                 }
                 
+                availableOptions.RemoveAt(drawIndex);
                 randomizedOptions[i] = draw;
                 lastDraw = draw;
             }
 
-            int DrawValue()
+            (int, int) DrawValue()
             {
                 var randomIndex = random.Next(0, availableOptions.Count - 1);
-                return availableOptions[randomIndex];
+                return (randomIndex, availableOptions[randomIndex]);
             }
             
             void PopulateOptions()
             {
                 availableOptions.Clear();
-            
-                for (int i = minRangeValue; i < maxRangeValue - minRangeValue; i++)
+
+                var option = minRangeValue;
+                availableOptions.Add(option);
+                while (option < maxRangeValue)
                 {
-                    availableOptions.Add(i);
+                    ++option;
+                    availableOptions.Add(option);
                 }
             }
             

@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace BCIEssentials.StimulusObjects
 {
+    [RequireComponent(typeof(MeshRenderer))]
     public class SPO : MonoBehaviour
     {
         public Color onColour; //Color during the 'flash' of the object.
@@ -17,13 +18,20 @@ namespace BCIEssentials.StimulusObjects
         //Use a boolean to indicate whether or not this SPO has a subset image
         [SerializeField] public bool hasImageChild = false;
 
+        private MeshRenderer _renderer;
+
+        private void Awake()
+        {
+            _renderer = GetComponent<MeshRenderer>();
+        }
 
         // Turn the stimulus on
         public virtual float TurnOn()
         {
             //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
+            if(_renderer != null && _renderer.material != null)
             {
-                this.GetComponent<Renderer>().material.color = onColour;
+                _renderer.material.color = onColour;
             }
 
 
@@ -35,8 +43,9 @@ namespace BCIEssentials.StimulusObjects
         public virtual void TurnOff()
         {
             //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
+            if(_renderer != null && _renderer.material != null)
             {
-                this.GetComponent<Renderer>().material.color = offColour;
+                _renderer.material.color = offColour;
             }
         }
 

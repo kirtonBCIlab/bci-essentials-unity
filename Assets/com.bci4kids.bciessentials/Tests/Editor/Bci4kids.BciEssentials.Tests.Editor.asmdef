@@ -1,13 +1,14 @@
 {
-    "name": "Tests",
+    "name": "Bci4kids.BciEssentials.Tests.Editor",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Bci4Kids.BciEssentials.Runtime",
-        "Bci4kids.BciEssentials.Tests.Resources"
+        "Bci4Kids.BciEssentials.Runtime"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

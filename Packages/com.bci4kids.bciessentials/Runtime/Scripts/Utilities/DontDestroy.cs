@@ -8,7 +8,7 @@ namespace BCIEssentials.Utilities
 
         private void Awake()
         {
-            if (instance != this)
+            if (instance != null && instance != this && instance.gameObject != null)
             {
                 //Replace this with the updated one....see if this makes everything worse.
                 Destroy(instance.gameObject);
