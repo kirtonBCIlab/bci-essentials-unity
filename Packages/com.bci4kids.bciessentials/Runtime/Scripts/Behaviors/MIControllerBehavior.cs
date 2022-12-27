@@ -11,6 +11,8 @@ namespace BCIEssentials.ControllerBehaviors
 
     public class MIControllerBehavior : BCIControllerBehavior
     {
+        public override BehaviorType BehaviorType => BehaviorType.MI;
+
         // Variables related to Iterative training
         public int numSelectionsBeforeTraining = 3; // How many selections to make before creating the classifier
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier

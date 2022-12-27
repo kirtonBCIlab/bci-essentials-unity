@@ -3,12 +3,15 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Linq;
+using BCIEssentials.Controllers;
 using Random = System.Random;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     public class P300ControllerBehavior : BCIControllerBehavior
     {
+        public override BehaviorType BehaviorType => BehaviorType.P300;
+        
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
         public Random randNumFlashes = new Random();

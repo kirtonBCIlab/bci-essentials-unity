@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GameJamDemo.unity
     guid: 03370cc5af6aa2046a8f2741967b1f44
   - enabled: 1
-    path: Assets/Scenes/MITraining.unity
+    path: Assets/com.bci4kids.bciessentials/Samples/MIControllerExample/Scenes/MITraining.unity
     guid: 9fe2056da4f5fdb4794b47ac4c913cea
   - enabled: 1
     path: Assets/Scenes/SSVEPtraining.unity

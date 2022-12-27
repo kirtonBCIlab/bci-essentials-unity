@@ -10,20 +10,21 @@ namespace BCIEssentials.Utilities
     /// </summary>
     public class MatrixSetup : MonoBehaviour
     {
-        [SerializeField] private SPO _spoPrefab;
-
-        [Space]
         [SerializeField] private int _numColumns;
         [SerializeField] private int _numRows;
-        [SerializeField] private Vector2 _startDistance;
+        
+        [Space]
+        [SerializeField] private SPO _spoPrefab;
+        [SerializeField] private Vector2 _spacing;
 
         public readonly List<SPO> MatrixObjects = new();
 
-        public void Initialize(SPO prefab, int columns, int rows)
+        public void Initialize(SPO prefab, int columns, int rows, Vector2 spacing)
         {
             _spoPrefab = prefab;
             _numColumns = columns;
             _numColumns = rows;
+            _spacing = spacing;
         }
 
         public void SetUpMatrix()
@@ -67,8 +68,7 @@ namespace BCIEssentials.Utilities
                     var startingPosition = Vector3.zero;
                     startingPosition.x += columnIndex;
                     startingPosition.y += rowIndex;
-                    startingPosition =
-                        Vector3.Scale(startingPosition, new Vector3(_startDistance.x, _startDistance.y, 1));
+                    startingPosition += (Vector3)_spacing;
 
                     spoGameObject.transform.position = startingPosition;
 

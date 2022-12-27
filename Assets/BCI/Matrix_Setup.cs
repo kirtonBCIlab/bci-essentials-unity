@@ -98,7 +98,16 @@ public class Matrix_Setup : MonoBehaviour
     public MatrixSetup ToBciMatrixSetup()
     {
         var setup = gameObject.AddComponent<MatrixSetup>();
-        setup.Initialize(myObject.GetComponent<SPO>(), numColumns, numColumns);
+        setup.Initialize(myObject.GetComponent<SPO>(), numColumns, numColumns, new Vector2((float)distanceX, (float)distanceY));
         return setup;
     }
+
+#if UNITY_EDITOR
+    [ContextMenu("Convert To BCI Matrix Setup")]
+    private void SwapToBciMatrixSetup()
+    {
+        ToBciMatrixSetup();
+        DestroyImmediate(this);
+    }
+#endif
 }

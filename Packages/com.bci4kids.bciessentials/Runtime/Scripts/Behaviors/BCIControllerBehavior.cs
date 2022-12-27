@@ -14,10 +14,9 @@ namespace BCIEssentials.ControllerBehaviors
     /// <summary>
     /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
     /// </summary>
-    public class BCIControllerBehavior : MonoBehaviour
+    public abstract class BCIControllerBehavior : MonoBehaviour
     {
-        [SerializeField] private BehaviorType _behaviorType = BehaviorType.Unset;
-        public BehaviorType BehaviorType => _behaviorType;
+        public abstract BehaviorType BehaviorType { get; }
 
         [SerializeField] private int targetFrameRate = 60;
 
