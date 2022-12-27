@@ -141,7 +141,7 @@ MonoBehaviour:
   shamFeedback: 0
   trainTarget: 99
   _myTag: BCI
-  setup: {fileID: 0}
+  setup: {fileID: 5532972414438851522}
   setFreqFlash:
   - 8
   - 10
@@ -309,7 +309,7 @@ MonoBehaviour:
   shamFeedback: 0
   trainTarget: 99
   _myTag: BCI
-  setup: {fileID: 0}
+  setup: {fileID: 5532972415639130385}
   numFlashesLowerLimit: 9
   numFlashesUpperLimit: 12
   onTime: 0.1
