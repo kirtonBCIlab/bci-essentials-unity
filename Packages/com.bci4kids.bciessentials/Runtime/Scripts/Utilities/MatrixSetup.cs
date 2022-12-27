@@ -75,7 +75,6 @@ namespace BCIEssentials.Utilities
                     var spoGameObject = spo.gameObject;
                     spoGameObject.SetActive(true);
                     spoGameObject.name = $"Object {MatrixObjects.Count}";
-                    spoGameObject.tag = "BCI";
 
                     //Setting position of object
                     var position = (Vector3)_spacing;
