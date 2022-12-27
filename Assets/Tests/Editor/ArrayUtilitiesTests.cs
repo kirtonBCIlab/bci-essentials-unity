@@ -4,7 +4,7 @@ using System.Linq;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
 
-namespace BCIEssentials.Tests.Utilities
+namespace BCIEssentials.Tests.Editor
 {
     internal class ArrayUtilitiesTests
     {
