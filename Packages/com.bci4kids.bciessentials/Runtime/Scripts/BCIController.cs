@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BCIEssentials.LSL;
 using BCIEssentials.ControllerBehaviors;
@@ -15,23 +16,31 @@ namespace BCIEssentials.Controllers
         [SerializeField] private bool _dontDestroyActiveInstance = true;
 
         public static BCIController Instance { get; private set; }
-        public BCIControllerBehavior ActiveBehavior { get; private set; }
+        public IBciBehavior ActiveBehavior { get; private set; }
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
 
+#if UNITY_EDITOR
+        public void TestInitializable(bool dontDestroyInstance)
+        {
+            _dontDestroyActiveInstance = dontDestroyInstance;
+        }
+#endif
         private void Awake()
         {
             if (_lslMarkerStream == null && !TryGetComponent(out _lslMarkerStream))
             {
                 Debug.LogError($"No component of type {typeof(LSLMarkerStream)} found");
                 enabled = false;
+                return;
             }
 
             if (_lslResponseStream == null && !TryGetComponent(out _lslResponseStream))
             {
                 Debug.LogError($"No component of type {typeof(LSLResponseStream)} found");
                 enabled = false;
+                return;
             }
 
             if (Instance != null)
@@ -45,7 +54,15 @@ namespace BCIEssentials.Controllers
 
             if (_dontDestroyActiveInstance)
             {
-                DontDestroyOnLoad(this);
+                DontDestroyOnLoad(gameObject);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
             }
         }
 
@@ -58,25 +75,6 @@ namespace BCIEssentials.Controllers
                 {
                     action?.Invoke();
                 }
-            }
-        }
-
-        public void ChangeBehavior(BehaviorType behaviorType)
-        {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.CleanUp();
-            }
-
-            if (Instance._registeredBehaviors.TryGetValue(behaviorType, out var requestedBehavior))
-            {
-                Instance.ActiveBehavior = requestedBehavior;
-                Instance.ActiveBehavior.Initialize(_lslMarkerStream, _lslResponseStream);
-                Debug.Log($"New BCI Controller active of type {behaviorType}");
-            }
-            else
-            {
-                Debug.LogError($"Unable to find a registered behavior for type {behaviorType}]");
             }
         }
 
@@ -100,6 +98,25 @@ namespace BCIEssentials.Controllers
             _keyBindings.TryAdd(KeyCode.Alpha7, () => { Instance.SelectObject(7); });
             _keyBindings.TryAdd(KeyCode.Alpha8, () => { Instance.SelectObject(8); });
             _keyBindings.TryAdd(KeyCode.Alpha9, () => { Instance.SelectObject(9); });
+        }
+
+        public void ChangeBehavior(BehaviorType behaviorType)
+        {
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.CleanUp();
+            }
+
+            if (Instance._registeredBehaviors.TryGetValue(behaviorType, out var requestedBehavior))
+            {
+                Instance.ActiveBehavior = requestedBehavior;
+                Instance.ActiveBehavior.Initialize(_lslMarkerStream, _lslResponseStream);
+                Debug.Log($"New BCI Controller active of type {behaviorType}");
+            }
+            else
+            {
+                Debug.LogError($"Unable to find a registered behavior for type {behaviorType}]");
+            }
         }
 
         public bool RegisterBehavior(BCIControllerBehavior behavior, bool setAsActive = false)
@@ -152,12 +169,7 @@ namespace BCIEssentials.Controllers
 
         public void StimulusOn(bool sendConstantMarkers = true)
         {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
-
-            Instance.ActiveBehavior.StimulusOn(sendConstantMarkers);
+            Instance.ActiveBehavior?.StimulusOn(sendConstantMarkers);
         }
 
         public void StimulusOff()
@@ -182,33 +194,18 @@ namespace BCIEssentials.Controllers
 
         public void SelectObject(int objectIndex)
         {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
-
-            Instance.ActiveBehavior.SelectObject(objectIndex);
+            Instance.ActiveBehavior?.SelectObject(objectIndex);
         }
 
         public void StartAutomatedTraining()
         {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
-
-            Instance.ActiveBehavior.StartAutomatedTraining();
+            Instance.ActiveBehavior?.StartAutomatedTraining();
         }
 
 
         public void StartIterativeTraining()
         {
-            if (Instance.ActiveBehavior == null || Instance.ActiveBehavior.BehaviorType == BehaviorType.MI)
-            {
-                return;
-            }
-
-            Instance.ActiveBehavior.StartIterativeTraining();
+            Instance.ActiveBehavior?.StartIterativeTraining();
         }
 
         public void StartUserTraining()

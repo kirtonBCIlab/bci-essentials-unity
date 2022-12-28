@@ -14,7 +14,7 @@ namespace BCIEssentials.ControllerBehaviors
     /// <summary>
     /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
     /// </summary>
-    public abstract class BCIControllerBehavior : MonoBehaviour
+    public abstract class BCIControllerBehavior : MonoBehaviour, IBciBehavior
     {
         public abstract BehaviorType BehaviorType { get; }
 

@@ -3,7 +3,7 @@ using UnityEngine.TestTools;
 
 namespace BCIEssentials.Tests.Utilities
 {
-    internal class PlayModeTestRunnerBase
+    public class PlayModeTestRunnerBase
     {
         [UnitySetUp]
         public virtual IEnumerator TestSetup()
