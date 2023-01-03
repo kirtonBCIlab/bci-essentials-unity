@@ -128,8 +128,7 @@ namespace BCIEssentials.Tests
             [UnityTest]
             public IEnumerator WhenDestroyedAndNotInstance_ThenInstanceNotNull()
             {
-                var existingController = BCIControllerTests.CreateController();
-                existingController.gameObject.SetActive(true);
+                CreateController(true, true);
                 _testController.gameObject.SetActive(true);
 
                 yield return LoadEmptySceneAsync();
@@ -158,7 +157,7 @@ namespace BCIEssentials.Tests
             [TestCase(typeof(SSVEPControllerBehavior))]
             public void WhenRegisterBehavior_ThenBehaviorRegistered(Type behaviorType)
             {
-                var behavior = new GameObject().AddComponent(behaviorType);
+                var behavior = _testControllerObject.AddComponent(behaviorType);
                 
                 var registered = _testController.RegisterBehavior((BCIControllerBehavior) behavior);
                 
@@ -271,41 +270,17 @@ namespace BCIEssentials.Tests
                 
                 UnityEngine.Assertions.Assert.IsNull(_testController.ActiveBehavior);
             }
-        }
 
-        public class BCIControllerAndUpdateWithKeyBindings : PlayModeTestRunnerBase
-        {
-            private BCIController _testController;
-            private IBciBehavior _mockBehavior;
-            
-            [UnitySetUp]
-            public override IEnumerator TestSetup()
+            [Test]
+            public void WhenChangeBehavior_ThenActiveBehaviorChanged()
             {
-                yield return base.TestSetup();
-
-                _testController = CreateController();
-                _mockBehavior = Substitute.For<IBciBehavior>();
-            }
-
-            [UnityTest]
-            public IEnumerator WhenKeyCodeS_ThenStartStopStimulusInvoked()
-            {
-                yield return null;
-            }
-        }
-
-        private static BCIController CreateController(bool dontDestroyInstance = true, bool setActive = false)
-        {
-            var gameObject = new GameObject();
-            gameObject.SetActive(setActive);
+                var behavior = _testControllerObject.AddComponent<P300ControllerBehavior>();
+                _testController.RegisterBehavior(behavior);
                 
-            gameObject.AddComponent<LSLMarkerStream>();
-            gameObject.AddComponent<LSLResponseStream>();
-
-            var controller = gameObject.AddComponent<BCIController>();
-            controller.TestInitializable(dontDestroyInstance);
+                _testController.ChangeBehavior(BehaviorType.P300);
                 
-            return controller;
+                Assert.AreEqual(_testController.ActiveBehavior, behavior);
+            }
         }
     }
 }

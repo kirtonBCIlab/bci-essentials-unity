@@ -32,6 +32,27 @@ namespace BCIEssentials.Tests
                 yield return null;
             }
         }
+        
+        public static IEnumerator LoadDefaultSceneAsync()
+        {
+            if (_resourceLibrary == null && !TryGetResourceLibrary(out _resourceLibrary))
+            {
+                yield break;
+            }
+
+            var scenePath = AssetDatabase.GetAssetPath(_resourceLibrary.DefaultScene);
+            if (string.IsNullOrEmpty(scenePath))
+            {
+                yield break;
+            }
+
+            var loadOperation =
+                EditorSceneManager.LoadSceneAsyncInPlayMode(scenePath, new LoadSceneParameters(LoadSceneMode.Single));
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+        }
 
         private static bool TryGetResourceLibrary(out ResourceLibraryAsset library)
         {

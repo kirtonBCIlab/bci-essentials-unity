@@ -1,5 +1,5 @@
 using System;
-using LSL;
+using UnityEditor;
 using UnityEngine;
 
 namespace BCIEssentials.LSL
@@ -24,37 +24,37 @@ namespace BCIEssentials.LSL
         public int ResolveResponse()
         {
             // Resolve stream not working, crashes unity, use resolve streams instead and then find a way to pick the right one
-            //responseInfo = LSL.LSL.resolve_streams();
+            responseInfo = LSL.resolve_streams();
+            
 
             for (int i = 0; i < responseInfo.Length; i++)
             {
-                Debug.Log("Response info " + i.ToString() + ":\n");
-                Debug.Log(responseInfo[i].name());
+                var responseName = responseInfo[i].name();
+                Debug.Log($"Response info: {responseName} ({i})");
 
-                if (responseInfo[i].name() == value)
+                if (!responseName.Equals(value)) continue;
+                
+                pyRespIndex = i;
+                Debug.Log("Got Python Response");
+                responseInlet = new StreamInlet(responseInfo[i]);
+                Debug.Log("Created the inlet");
+
+                //responseInlet.open_stream();
+                //print("Opened the stream");
+
+                // Try to open the stream, timeout after 2 seconds
+                try
                 {
-                    pyRespIndex = i;
-                    Debug.Log("Got Python Response");
-                    responseInlet = new StreamInlet(responseInfo[i]);
-                    Debug.Log("Created the inlet");
+                    double timeout = 2.0;
+                    responseInlet.open_stream(timeout);
+                    Debug.Log("Opened the stream successfully");
 
-                    //responseInlet.open_stream();
-                    //print("Opened the stream");
-
-                    // Try to open the stream, timeout after 2 seconds
-                    try
-                    {
-                        double timeout = 2.0;
-                        responseInlet.open_stream(timeout);
-                        Debug.Log("Opened the stream successfully");
-
-                        // If we are successful in opening the python stream then we do not need to look further
-                        i = 99;
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log(e.Message);
-                    }
+                    // If we are successful in opening the python stream then we do not need to look further
+                    i = 99;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e.Message);
                 }
             }
 

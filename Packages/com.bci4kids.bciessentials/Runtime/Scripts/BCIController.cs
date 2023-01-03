@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using BCIEssentials.LSL;
 using BCIEssentials.ControllerBehaviors;
@@ -13,10 +12,10 @@ namespace BCIEssentials.Controllers
         [SerializeField] private LSLResponseStream _lslResponseStream;
         
         [Space]
-        [SerializeField] private bool _dontDestroyActiveInstance = true;
+        [SerializeField] private bool _dontDestroyActiveInstance;
 
         public static BCIController Instance { get; private set; }
-        public IBciBehavior ActiveBehavior { get; private set; }
+        public BCIControllerBehavior ActiveBehavior { get; private set; }
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
@@ -164,12 +163,33 @@ namespace BCIEssentials.Controllers
             }
         }
 
+        public bool HasBehaviorForType(BehaviorType type)
+        {
+            return _registeredBehaviors.ContainsKey(type);
+        }
+        
+        public bool HasBehaviorOfType<T>() where T : BCIControllerBehavior
+        {
+            foreach (var value in _registeredBehaviors.Values)
+            {
+                if (value is T)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
 
         #region Behavior Passthroughs
 
         public void StimulusOn(bool sendConstantMarkers = true)
         {
-            Instance.ActiveBehavior?.StimulusOn(sendConstantMarkers);
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.StimulusOn(sendConstantMarkers);
+            }
         }
 
         public void StimulusOff()
@@ -194,18 +214,27 @@ namespace BCIEssentials.Controllers
 
         public void SelectObject(int objectIndex)
         {
-            Instance.ActiveBehavior?.SelectObject(objectIndex);
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.SelectObject(objectIndex);
+            }
         }
 
         public void StartAutomatedTraining()
         {
-            Instance.ActiveBehavior?.StartAutomatedTraining();
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.StartAutomatedTraining();
+            }
         }
 
 
         public void StartIterativeTraining()
         {
-            Instance.ActiveBehavior?.StartIterativeTraining();
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.StartIterativeTraining();
+            }
         }
 
         public void StartUserTraining()

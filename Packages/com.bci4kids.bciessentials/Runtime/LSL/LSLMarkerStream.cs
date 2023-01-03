@@ -1,5 +1,4 @@
-﻿using LSL;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCIEssentials.LSL
 {

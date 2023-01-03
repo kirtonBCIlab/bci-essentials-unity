@@ -28,6 +28,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         //public GameObject[] objectList;
         [SerializeField] protected List<SPO> objectList = new();
+        public List<SPO> ObjectList => objectList;
 
         //StimulusOn/Off + sending Markers
         public float windowLength = 1.0f;
@@ -110,9 +111,6 @@ namespace BCIEssentials.ControllerBehaviors
         // Populate a list of SPOs
         public virtual void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
-            // Remove everything from the existing list
-            objectList.Clear();
-
             //Populate the selected list
             switch (populationMethod)
             {
@@ -123,6 +121,7 @@ namespace BCIEssentials.ControllerBehaviors
                     throw new NotImplementedException("Populating by children is not yet implemented");
                 default:
                 case SpoPopulationMethod.Tag:
+                    objectList.Clear();
                     GameObject[] taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
                     foreach (var taggedGO in taggedGOs)
                     {
@@ -297,8 +296,7 @@ namespace BCIEssentials.ControllerBehaviors
             int numOptions = objectList.Count;
 
             // Create a random non repeating array 
-            int[] trainArray = new int[numTrainingSelections];
-            trainArray = MakeRNRA(numTrainingSelections, numOptions);
+            int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
             PrintArray(trainArray);
 
             yield return new WaitForSecondsRealtime(0.001f);
@@ -366,75 +364,6 @@ namespace BCIEssentials.ControllerBehaviors
             Debug.Log("No iterative training available for this controller");
 
             yield return null;
-        }
-
-        // Make a random non repeating array of shuffled subarrays
-        // 
-        public int[] MakeRNRA(int arrayLength, int numOptions)
-        {
-            // Make random object
-            //Debug.Log("Random seed is 42");
-            Random trainRandom = new Random();
-
-            // Initialize array
-            int[] array = new int[arrayLength];
-
-            // Create an unshuffled array of the possible options
-            int[] unshuffledArray = new int[numOptions];
-            for (int i = 0; i < numOptions; i++)
-            {
-                unshuffledArray[i] = i;
-            }
-            //PrintArray(unshuffledArray);
-
-            // Get the number of loops required to generate a list of desired length
-            int numLoops = (arrayLength / numOptions);
-            int remainder = arrayLength % numOptions;
-
-            // Set last value to something well outside the realm of possible options
-            int lastValue = 999;
-
-            // Create new shuffled list containing all selections 
-            for (int i = 0; i <= numLoops; i++)
-            {
-                // Shuffle the array 
-                int[] shuffledArray = unshuffledArray.OrderBy(x => trainRandom.Next()).ToArray();
-                // Reshuffle until first val of shuffled array doesn't match last
-                while (shuffledArray[0] == lastValue)
-                {
-                    shuffledArray = unshuffledArray.OrderBy(x => trainRandom.Next()).ToArray();
-                }
-                //PrintArray(shuffledArray);
-
-                // If this is not the last loop
-                if (i < numLoops)
-                {
-                    // Add the full shuffled array to the big array
-                    for (int j = 0; j < numOptions; j++)
-                    {
-                        int ind = (i * (numOptions)) + j;
-                        //print(ind.ToString());
-                        array[ind] = shuffledArray[j];
-                    }
-
-                    lastValue = shuffledArray[numOptions - 1];
-                }
-
-                // If this is the last loop
-                if (i == numLoops)
-                {
-                    // Add the partial array to the big array
-                    for (int k = 0; k < remainder; k++)
-                    {
-                        int ind = (i * (numOptions)) + k;
-                        //print(ind.ToString());
-                        array[ind] = shuffledArray[k];
-                    }
-                }
-            }
-
-            //PrintArray(array);
-            return array;
         }
 
         public void PrintArray(int[] array)
@@ -528,7 +457,7 @@ namespace BCIEssentials.ControllerBehaviors
             int pingCount = 0;
 
             // Receive markers continuously
-            while (receivingMarkers)
+            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
             {
                 // Receive markers
                 // Initialize the default response string

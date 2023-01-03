@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BCIEssentials.Controllers;
+using BCIEssentials.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -54,8 +55,7 @@ namespace BCIEssentials.ControllerBehaviors
             int numOptions = objectList.Count;
 
             // Create a random non repeating array 
-            int[] trainArray = new int[numTrainingSelections];
-            trainArray = MakeRNRA(numTrainingSelections, numOptions);
+            int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
             PrintArray(trainArray);
 
             yield return 0;

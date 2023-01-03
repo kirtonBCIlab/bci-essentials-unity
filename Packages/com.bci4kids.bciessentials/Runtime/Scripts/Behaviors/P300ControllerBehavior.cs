@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 using BCIEssentials.Controllers;
+using BCIEssentials.Utilities;
 using Random = System.Random;
 
 namespace BCIEssentials.ControllerBehaviors
@@ -57,8 +58,7 @@ namespace BCIEssentials.ControllerBehaviors
             int numOptions = objectList.Count;
 
             // Create a random non repeating array 
-            int[] trainArray = new int[numTrainingSelections];
-            trainArray = MakeRNRA(numTrainingSelections, numOptions);
+            int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
             PrintArray(trainArray);
 
             yield return null;
@@ -204,7 +204,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (singleFlash)
             {
                 int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
-                int[] stimOrder = MakeRNRA(totalFlashes, objectList.Count);
+                int[] stimOrder = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, objectList.Count);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
@@ -295,8 +295,8 @@ namespace BCIEssentials.ControllerBehaviors
                     int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
 
                     // Create a random order to flash rows and columns
-                    int[] columnStimOrder = MakeRNRA(totalColumnFlashes, numColumns);
-                    int[] rowStimOrder = MakeRNRA(totalRowFlashes, numRows);
+                    int[] columnStimOrder = ArrayUtilities.GenerateRNRA(totalColumnFlashes, 0, numColumns);
+                    int[] rowStimOrder = ArrayUtilities.GenerateRNRA(totalRowFlashes, 0, numRows);
 
                     for (int i = 0; i < totalColumnFlashes; i++)
                     {
