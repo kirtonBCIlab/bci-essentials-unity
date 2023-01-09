@@ -27,7 +27,7 @@ namespace BCIEssentials.Tests
 
             _testController = CreateController(false, true);
             _testControllerObject = _testController.gameObject;
-            _behavior = _testControllerObject.AddComponent<MockBCIControllerBehavior>();
+            _behavior = _testControllerObject.AddComponent<EmptyBCIControllerBehavior>();
 
             yield return null;
         }
@@ -35,7 +35,7 @@ namespace BCIEssentials.Tests
         [Test]
         public void OnStart_ThenBehaviorRegistered()
         {
-            var isRegistered = _testController.HasBehaviorOfType<MockBCIControllerBehavior>();
+            var isRegistered = _testController.HasBehaviorOfType<EmptyBCIControllerBehavior>();
             Assert.IsTrue(isRegistered);
         }
 
@@ -44,7 +44,7 @@ namespace BCIEssentials.Tests
         {
             Object.DestroyImmediate(_behavior);
 
-            var isRegistered = _testController.HasBehaviorOfType<MockBCIControllerBehavior>();
+            var isRegistered = _testController.HasBehaviorOfType<EmptyBCIControllerBehavior>();
             Assert.IsFalse(isRegistered);
         }
 
@@ -139,9 +139,8 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenRunStimulus_ThenSPOsTurnedOnAndOff()
         {
-            var enableStimulus = AddCoroutineRunner(DelayForFrames(5, () => _behavior.stimOn = false),
-                destroyOnComplete: false);
-            var runStimulus = AddCoroutineRunner(_behavior.Stimulus(), destroyOnComplete: false);
+            var enableStimulus = AddCoroutineRunner(DelayForFrames(5, () => _behavior.stimOn = false));
+            var runStimulus = AddCoroutineRunner(_behavior.Stimulus());
 
             var mockSpo = new GameObject().AddComponent<MockSPO>();
             SetField(_behavior, "objectList", new List<SPO> { mockSpo });
@@ -165,7 +164,7 @@ namespace BCIEssentials.Tests
         }
     }
 
-    public class BCIControllerBehaviorTestsWhenSendReceiveMarkers : PlayModeTestRunnerBase
+    public class BCIControllerBehaviorTests_WhenSendReceiveMarkers : PlayModeTestRunnerBase
     {
         private static (string, int)[] k_WhenReceiveMarkersTestMarkerValues =
         {
@@ -188,7 +187,7 @@ namespace BCIEssentials.Tests
 
             _testController = CreateController(false, true);
 
-            _behavior = _testController.gameObject.AddComponent<MockBCIControllerBehavior>();
+            _behavior = _testController.gameObject.AddComponent<EmptyBCIControllerBehavior>();
             _behavior.stimOn = true;
             _behavior.windowLength = 1;
             _behavior.interWindowInterval = 1;
@@ -211,11 +210,9 @@ namespace BCIEssentials.Tests
             var streamResponses = new List<string[]>();
 
             var enableStimulusRunner =
-                AddCoroutineRunner(DelayForSeconds(testDurationSeconds, () => _behavior.stimOn = false),
-                    destroyOnComplete: false);
-            var listenForMarkerRunner = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses),
-                destroyOnComplete: false);
-            var behaviorSendMarkers = AddCoroutineRunner(_behavior.SendMarkers(), destroyOnComplete: false);
+                AddCoroutineRunner(DelayForSeconds(testDurationSeconds, () => _behavior.stimOn = false));
+            var listenForMarkerRunner = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses));
+            var behaviorSendMarkers = AddCoroutineRunner(_behavior.SendMarkers());
 
             //Run Test
             listenForMarkerRunner.StartRun();
@@ -231,9 +228,9 @@ namespace BCIEssentials.Tests
         public IEnumerator WhenReceiveMarkersWithResponseValues_ThenExpectedSpoSelected(
             [ValueSource(nameof(k_WhenReceiveMarkersTestMarkerValues))] (string, int) testValues)
         {
-            var testDurationRunner = AddCoroutineRunner(DelayForSeconds(6, StopAllCoroutineRunners), destroyOnComplete: false);
+            var testDurationRunner = AddCoroutineRunner(DelayForSeconds(6, StopAllCoroutineRunners));
             var sendMarkerRunner = AddCoroutineRunner(WriteMockMarker(AddComponent<LSLMarkerStream>(), testValues.Item1, 1));
-            var behaviorRunner = AddCoroutineRunner(_behavior.ReceiveMarkers(), destroyOnComplete: false);
+            var behaviorRunner = AddCoroutineRunner(_behavior.ReceiveMarkers());
 
             var selectedIndex = -1;
             for (var i = 0; i < 6; i++)
@@ -282,4 +279,73 @@ namespace BCIEssentials.Tests
             }
         }
     }
+
+    public class BCIControllerBehaviorTests_WhenDoTraining : PlayModeTestRunnerBase
+    {
+        private BCIController _testController;
+        private BCIControllerBehavior _behavior;
+
+        [UnitySetUp]
+        public override IEnumerator TestSetup()
+        {
+            yield return LoadDefaultSceneAsync();
+
+            _testController = CreateController(false, true);
+            _behavior = _testController.gameObject.AddComponent<EmptyBCIControllerBehavior>();
+            _testController.RegisterBehavior(_behavior, true);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenDoTrainingForTrainingCount_ThenSPOsTrained()
+        {
+            var behaviorRunner = AddCoroutineRunner(_behavior.DoTraining());
+            _behavior.numTrainingSelections = 2;
+
+            int spoCount = 3;
+            int sposTrained = 0;
+            for (int i = 0; i < spoCount; i++)
+            {
+                AddSPOToScene<MockSPO>().OnTrainTargetAction = () => ++sposTrained;
+            }
+
+            behaviorRunner.StartRun();
+            yield return new WaitWhile(() => behaviorRunner.IsRunning);
+
+            Assert.AreEqual(2, sposTrained);
+            Assert.AreEqual(_behavior.ObjectList.Count, spoCount);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenDoTrainingAndTrainTargetPersistent_ThenSPOsTrained()
+        {
+            var behaviorRunner = AddCoroutineRunner(_behavior.DoTraining());
+            _behavior.numTrainingSelections = 1;
+            _behavior.trainTargetPersistent = true;
+
+            bool trainingOffCalled = false;
+            AddSPOToScene<MockSPO>().OffTrainTargetAction = () => trainingOffCalled = true;
+
+            behaviorRunner.StartRun();
+            yield return new WaitWhile(() => behaviorRunner.IsRunning);
+
+            Assert.IsTrue(trainingOffCalled);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenDoTrainingAndShamFeedback_ThenSPOsTrained()
+        {
+            var behaviorRunner = AddCoroutineRunner(_behavior.DoTraining());
+            _behavior.numTrainingSelections = 1;
+            _behavior.shamFeedback = true;
+
+            bool onSelectedCalled = false;
+            AddSPOToScene<MockSPO>().OnSelectionAction = () => onSelectedCalled = true;
+
+            behaviorRunner.StartRun();
+            yield return new WaitWhile(() => behaviorRunner.IsRunning);
+
+            Assert.IsTrue(onSelectedCalled);
+        }
+    }
+    
 }

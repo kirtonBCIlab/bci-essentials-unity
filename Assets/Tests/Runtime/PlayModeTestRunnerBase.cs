@@ -11,6 +11,20 @@ using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests.Utilities
 {
+    public class InClassName
+    {
+        public InClassName(GameObject gameObject, IEnumerator coroutine, Action onComplete = null)
+        {
+            GameObject = gameObject;
+            Coroutine = coroutine;
+            OnComplete = onComplete;
+        }
+
+        public GameObject GameObject { get; private set; }
+        public IEnumerator Coroutine { get; private set; }
+        public Action OnComplete { get; private set; }
+    }
+
     public class PlayModeTestRunnerBase
     {
         [UnitySetUp]
@@ -85,24 +99,18 @@ namespace BCIEssentials.Tests.Utilities
             return gameObject.AddComponent<T>();
         }
 
-        protected static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null,
-            bool destroyOnComplete = true)
+        protected static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null)
         {
-            return AddCoroutineRunner(new GameObject(), coroutine, onComplete, destroyOnComplete);
+            return AddCoroutineRunner(new InClassName(new GameObject(), coroutine, onComplete));
         }
 
-        protected static CoroutineRunner AddCoroutineRunner(GameObject gameObject, IEnumerator coroutine, Action onComplete = null,
-            bool destroyOnComplete = true)
+        protected static CoroutineRunner AddCoroutineRunner(InClassName inClassName)
         {
-            var runner = AddComponent<CoroutineRunner>(gameObject);
-            runner.Routine = coroutine;
+            var runner = AddComponent<CoroutineRunner>(inClassName.GameObject);
+            runner.Routine = inClassName.Coroutine;
             runner.OnCompleteEvent = () =>
             {
-                onComplete?.Invoke();
-                if (destroyOnComplete && runner != null)
-                {
-                    Object.Destroy(runner.gameObject);
-                }
+                inClassName.OnComplete?.Invoke();
             };
 
             return runner;
