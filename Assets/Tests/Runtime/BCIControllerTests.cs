@@ -4,7 +4,6 @@ using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 using BCIEssentials.Tests.Utilities;
-using NSubstitute;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

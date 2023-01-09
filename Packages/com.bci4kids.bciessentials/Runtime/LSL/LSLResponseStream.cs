@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BCIEssentials.LSL
 {
-    public class LSLResponseStream : MonoBehaviour
+    public class LSLResponseStream : MonoBehaviour, IResponseStream
     {
         //The predicate by which to recognize the python response stream
         public string responsePredicate = "name='PythonResponse'";
@@ -17,6 +17,7 @@ namespace BCIEssentials.LSL
         //public liblsl.StreamInlet(responseInfo) responseInlet;
 
         // responseInlet.open_stream();
+        //TODO: Not make this hardcoded+
         public string value = "PythonResponse";
         public int pyRespIndex;
 
@@ -25,7 +26,10 @@ namespace BCIEssentials.LSL
         {
             // Resolve stream not working, crashes unity, use resolve streams instead and then find a way to pick the right one
             responseInfo = LSL.resolve_streams();
-            
+            if (responseInfo.Length == 0)
+            {
+                return -1;
+            }
 
             for (int i = 0; i < responseInfo.Length; i++)
             {
@@ -48,9 +52,7 @@ namespace BCIEssentials.LSL
                     double timeout = 2.0;
                     responseInlet.open_stream(timeout);
                     Debug.Log("Opened the stream successfully");
-
-                    // If we are successful in opening the python stream then we do not need to look further
-                    i = 99;
+                    break;
                 }
                 catch (Exception e)
                 {
@@ -101,5 +103,10 @@ namespace BCIEssentials.LSL
             return responseStrings;
         }
 
+    }
+
+    public interface IResponseStream
+    {
+        
     }
 }

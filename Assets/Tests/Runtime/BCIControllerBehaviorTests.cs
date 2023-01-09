@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
@@ -16,11 +17,6 @@ namespace BCIEssentials.Tests
 {
     public class BCIControllerBehaviorTests : PlayModeTestRunnerBase
     {
-        private class MockBCIControllerBehavior : BCIControllerBehavior
-        {
-            public override BehaviorType BehaviorType => BehaviorType.Unset;
-        }
-
         private BCIController _testController;
         private GameObject _testControllerObject;
         private BCIControllerBehavior _behavior;
@@ -106,7 +102,7 @@ namespace BCIEssentials.Tests
             var included = AddSPOToScene();
 
             //Deliberate use of default
-            _behavior.PopulateObjectList();
+            _behavior.PopulateObjectList(SpoPopulationMethod.Tag);
 
             Assert.AreEqual(1, _behavior.ObjectList.Count);
             UnityEngine.Assertions.Assert.AreEqual(included, _behavior.ObjectList[0]);
@@ -144,147 +140,124 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenRunStimulus_ThenSPOsTurnedOnAndOff()
         {
-            var enableStimulus = AddCoroutineRunner(DelayForFrames(5, () => _behavior.stimOn = false), destroyOnComplete:false);
-            var runStimulus = AddCoroutineRunner(_behavior.Stimulus(), destroyOnComplete:false);
-            
+            var enableStimulus = AddCoroutineRunner(DelayForFrames(5, () => _behavior.stimOn = false),
+                destroyOnComplete: false);
+            var runStimulus = AddCoroutineRunner(_behavior.Stimulus(), destroyOnComplete: false);
+
             var mockSpo = new GameObject().AddComponent<MockSPO>();
-            SetField(_behavior, "objectList", new List<SPO>{ mockSpo });
-            
+            SetField(_behavior, "objectList", new List<SPO> { mockSpo });
+
             int turnedOnCount = 0;
-            mockSpo.TurnOnAction = () =>
-            {
-                ++turnedOnCount;
-            };
-            
+            mockSpo.TurnOnAction = () => { ++turnedOnCount; };
+
             int turnedOffCount = 0;
-            mockSpo.TurnOffAction = () =>
-            {
-                ++turnedOffCount;
-            };
-            
-            
+            mockSpo.TurnOffAction = () => { ++turnedOffCount; };
+
+
             //Run Test
             _behavior.stimOn = true;
             enableStimulus.StartRun();
             runStimulus.StartRun();
-            yield return new WaitWhile(()=> runStimulus.IsRunning);
-            
-            
+            yield return new WaitWhile(() => runStimulus.IsRunning);
+
+
             Assert.AreEqual(5, turnedOnCount);
             Assert.AreEqual(1, turnedOffCount);
+        }
+    }
+
+    public class BCIControllerBehaviorTestsWhenSendReceiveMarkers : PlayModeTestRunnerBase
+    {
+        private static (string, int)[] k_WhenReceiveMarkersTestMarkerValues =
+        {
+            ("", -1),
+            ("ping", -1),
+            ("notavalue", -1),
+            ("500", -1),
+            ("0", 0),
+            ("1", 1),
+            ("5", 5)
+        };
+
+        private BCIController _testController;
+        private BCIControllerBehavior _behavior;
+
+        [UnitySetUp]
+        public override IEnumerator TestSetup()
+        {
+            yield return LoadDefaultSceneAsync();
+
+            _testController = CreateController(false, true);
+
+            _behavior = _testController.gameObject.AddComponent<MockBCIControllerBehavior>();
+            _behavior.stimOn = true;
+            _behavior.windowLength = 1;
+            _behavior.interWindowInterval = 1;
+
+            _testController.RegisterBehavior(_behavior, true);
+        }
+
+        [TearDown]
+        public void TestCleanup()
+        {
+            StopAllCoroutineRunners();
         }
 
         [UnityTest]
         public IEnumerator WhenSendMarkers_ThenMarkerSentInIntervals()
         {
             var testDurationSeconds = 6;
-            _testController.ChangeBehavior(BehaviorType.Unset);
-            _behavior.stimOn = true;
-            _behavior.windowLength = 1;
-            _behavior.interWindowInterval = 1;
-            
             var streamListener = AddComponent<LSLResponseStream>();
             streamListener.value = "UnityMarkerStream";
             var streamResponses = new List<string[]>();
-            
-            var enableStimulus = AddCoroutineRunner(DelayForSeconds(testDurationSeconds, ()=> _behavior.stimOn = false), destroyOnComplete:false);
-            var responseListener = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses), destroyOnComplete:false);
-            var runSendMarkers = AddCoroutineRunner(_behavior.SendMarkers(), destroyOnComplete:false);
-            
+
+            var enableStimulusRunner =
+                AddCoroutineRunner(DelayForSeconds(testDurationSeconds, () => _behavior.stimOn = false),
+                    destroyOnComplete: false);
+            var listenForMarkerRunner = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses),
+                destroyOnComplete: false);
+            var behaviorSendMarkers = AddCoroutineRunner(_behavior.SendMarkers(), destroyOnComplete: false);
+
             //Run Test
-            responseListener.StartRun();
-            enableStimulus.StartRun();
-            runSendMarkers.StartRun();
-            yield return new WaitWhile(()=> runSendMarkers.IsRunning);
-            responseListener.StopRun();
+            listenForMarkerRunner.StartRun();
+            enableStimulusRunner.StartRun();
+            behaviorSendMarkers.StartRun();
+            yield return new WaitWhile(() => behaviorSendMarkers.IsRunning);
 
-            Assert.AreEqual(testDurationSeconds / (_behavior.windowLength + _behavior.interWindowInterval ), streamResponses.Count);
+            Assert.AreEqual(testDurationSeconds / (_behavior.windowLength + _behavior.interWindowInterval),
+                streamResponses.Count);
         }
 
         [UnityTest]
-        [TestCase("ping")]
-        [TestCase("")]
-        [TestCase("notaselection")]
-        public IEnumerator WhenReceiveMarkersAndHasInvalidResponse_ThenNoSpoSelected(string markerValue)
+        public IEnumerator WhenReceiveMarkersWithResponseValues_ThenExpectedSpoSelected(
+            [ValueSource(nameof(k_WhenReceiveMarkersTestMarkerValues))] (string, int) testValues)
         {
-            var testDurationSeconds = 6;
-            _testController.ChangeBehavior(BehaviorType.Unset);
-            _behavior.windowLength = 1;
-            _behavior.interWindowInterval = 1;
+            var testDurationRunner = AddCoroutineRunner(DelayForSeconds(6, StopAllCoroutineRunners), destroyOnComplete: false);
+            var sendMarkerRunner = AddCoroutineRunner(WriteMockMarker(AddComponent<LSLMarkerStream>(), testValues.Item1, 1));
+            var behaviorRunner = AddCoroutineRunner(_behavior.ReceiveMarkers(), destroyOnComplete: false);
 
-            int selectedIndex = -1;
-            for (int i = 0; i < 5; i++)
+            var selectedIndex = -1;
+            for (var i = 0; i < 6; i++)
             {
                 var spo = AddSPOToScene<MockSPO>();
                 spo.OnSelectionAction = () => selectedIndex = spo.myIndex;
             }
             
-            var sendMarkers = AddCoroutineRunner(SendMockMarker(AddComponent<LSLMarkerStream>(), markerValue, 1));
-            var receiveMarkers = AddCoroutineRunner(_behavior.ReceiveMarkers(), destroyOnComplete:false);
-            AddCoroutineRunner(DelayForSeconds(testDurationSeconds, _behavior.StopAllCoroutines), destroyOnComplete:false);
+            _behavior.PopulateObjectList();
 
-            
-            receiveMarkers.StartRun();
-            sendMarkers.StartRun();
-            yield return new WaitWhile(() => receiveMarkers.IsRunning);
-            
-            UnityEngine.Assertions.Assert.IsNull(selectedSPO);
-        }
-        
-        [UnityTest]
-        [TestCase(1)]
-        [TestCase(5)]
-        public IEnumerator WhenReceiveMarkersAndHasValidResponse_ThenNoSpoSelected(int markerValue)
-        {
-            var testDurationSeconds = 6;
-            _testController.ChangeBehavior(BehaviorType.Unset);
-            _behavior.windowLength = 1;
-            _behavior.interWindowInterval = 1;
+            testDurationRunner.StartRun();
+            sendMarkerRunner.StartRun();
+            behaviorRunner.StartRun();
+            yield return new WaitWhile(() => behaviorRunner.IsRunning);
 
-            int selectedIndex = -1;
-            for (int i = 0; i < 5; i++)
-            {
-                var spo = AddSPOToScene<MockSPO>();
-                spo.OnSelectionAction = () => selectedIndex = spo.myIndex;
-            }
-            
-            var sendMarkers = AddCoroutineRunner(SendMockMarker(AddComponent<LSLMarkerStream>(), markerValue.ToString(), 1));
-            var receiveMarkers = AddCoroutineRunner(_behavior.ReceiveMarkers(), destroyOnComplete:false);
-            AddCoroutineRunner(DelayForSeconds(testDurationSeconds, _behavior.StopAllCoroutines), destroyOnComplete:false);
-
-            
-            receiveMarkers.StartRun();
-            sendMarkers.StartRun();
-            yield return new WaitWhile(() => receiveMarkers.IsRunning);
-            
-            Assert.AreEqual(markerValue, selectedIndex);
-        }
-
-        private IEnumerator DelayForFrames(int frameCount, Action onRun)
-        {
-            int framesRan = 0;
-
-            while (framesRan < frameCount)
-            {
-                ++framesRan;
-                Debug.Log(framesRan);
-                yield return null;
-            }
-            
-            onRun?.Invoke();
-        }
-
-        private IEnumerator DelayForSeconds(float seconds, Action onRun)
-        {
-            yield return new WaitForSecondsRealtime(seconds);
-            onRun?.Invoke();
+            Assert.AreEqual(testValues.Item2, selectedIndex);
         }
 
         private IEnumerator ListenForMarkerStreams(LSLResponseStream responseStream, List<string[]> responses)
         {
             responseStream.ResolveResponse();
             yield return new WaitForEndOfFrame();
-            
+
             while (true)
             {
                 var response = responseStream.PullResponse(new string[1], 0);
@@ -292,17 +265,21 @@ namespace BCIEssentials.Tests
                 {
                     responses.Add(response);
                 }
-                
+
                 yield return new WaitForSecondsRealtime(1 / Application.targetFrameRate);
             }
         }
 
-        private IEnumerator SendMockMarker(LSLMarkerStream markerStream, string value,
+        private IEnumerator WriteMockMarker(LSLMarkerStream markerStream, string value,
             float intervalSeconds = 0.1f)
         {
+            markerStream.StreamName = "PythonResponse";
+            markerStream.InitializeStream();
+
             while (true)
             {
-                //markerStream.
+                markerStream.Write(value);
+                yield return new WaitForSeconds(intervalSeconds);
             }
         }
     }

@@ -8,30 +8,33 @@ namespace BCIEssentials.Tests
     {
         public IEnumerator Routine;
         public Action OnCompleteEvent;
-        
-        public bool IsRunning { get; private set; }
 
+        public bool IsRunning => _runningRoutine != null;
+
+        private Coroutine _runningRoutine;
+        
         public void StartRun()
         {
             StopRun();
-            StartCoroutine(DoRun());
+            _runningRoutine = StartCoroutine(DoRun());
         }
 
         public void StopRun()
         {
-            StopAllCoroutines();
+            if (!IsRunning) return;
+            StopCoroutine(_runningRoutine);
+            _runningRoutine = null;
         }
 
         private IEnumerator DoRun()
         {
-            IsRunning = true;
             if (Routine != null)
             {
                 yield return Routine;
             }
 
-            IsRunning = false;
             OnCompleteEvent?.Invoke();
+            StopRun();
         }
     }
 }

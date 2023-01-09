@@ -1,31 +1,63 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace BCIEssentials.LSL
 {
-    public class LSLMarkerStream : MonoBehaviour
+    public class LSLMarkerStream : MonoBehaviour, IMarkerStream
     {
-        private StreamOutlet outlet;
-
         public string StreamName = "UnityMarkerStream";
         public string StreamType = "LSL_Marker_Strings";
         public string StreamId = "MyStreamID-Unity1234";
 
-        private string[] sample = new string[1];
+        private StreamOutlet _outlet;
+        public StreamOutlet StreamOutlet => _outlet;
+        
+        private readonly string[] _sample = new string[1];
 
         void Start()
         {
-            StreamInfo streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string);
+            if (_outlet == null)
+            {
+                InitializeStream();
+            }
+        }
 
-            outlet = new StreamOutlet(streamInfo);
+        private void OnDestroy()
+        {
+            _outlet?.Close();
+        }
+
+        public void InitializeStream()
+        {
+            if (_outlet != null)
+            {
+                Debug.LogWarning($"Stream already initialized");
+                return;
+            }
+            
+            var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string);
+            _outlet = new StreamOutlet(streamInfo);
+        }
+
+        public void EndStream()
+        {
+            _outlet?.Close();
         }
 
         public void Write(string markerString)
         {
-            sample[0] = markerString;
-            outlet.push_sample(sample);
+            _sample[0] = markerString;
+            _outlet.push_sample(_sample);
 
-            Debug.Log("Sent Marker : " + markerString);
+            Debug.Log($"Sent Marker : {markerString}");
         }
 
+    }
+
+    public interface IMarkerStream
+    {
+        public void InitializeStream();
+
+        public void Write(string markerString);
     }
 }

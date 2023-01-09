@@ -460,40 +460,29 @@ namespace BCIEssentials.ControllerBehaviors
             while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
             {
                 // Receive markers
-                // Initialize the default response string
-                string[] defaultResponseStrings = { "" };
-                string[] responseStrings = defaultResponseStrings;
-
                 // Pull the python response and add it to the responseStrings array
-                responseStrings = response.PullResponse(defaultResponseStrings, responseTimeout);
+                var responseStrings = response.PullResponse(new[]{ "" }, responseTimeout);
+                var responseString = responseStrings[0];
 
-                // Check if there is 
-                bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
-
-
-                if (responseStrings[0] == "ping")
+                if (responseString.Equals("ping"))
                 {
                     pingCount++;
                     if (pingCount % 100 == 0)
                     {
-                        Debug.Log("Ping Count: " + pingCount.ToString());
+                        Debug.Log($"Ping Count: {pingCount}");
                     }
                 }
-
-                else if (responseStrings[0] != "")
+                else if (!responseString.Equals(""))
                 {
+                    //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+                    //Question: Do we get more than once response string?
                     for (int i = 0; i < responseStrings.Length; i++)
                     {
-                        string responseString = responseStrings[i];
-                        //print("WE GOT A RESPONSE");
-                        print("response : " + responseString);
-
-                        int n;
-                        bool isNumeric = int.TryParse(responseString, out n);
-                        if (isNumeric == true)
+                        Debug.Log($"response : {responseString}");
+                        if (int.TryParse(responseString, out var index) && index < objectList.Count)
                         {
                             //Run on selection
-                            objectList[n].GetComponent<SPO>().OnSelection();
+                            objectList[index].GetComponent<SPO>().OnSelection();
                         }
                     }
                 }

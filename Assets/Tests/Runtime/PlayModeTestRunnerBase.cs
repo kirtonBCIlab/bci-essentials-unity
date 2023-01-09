@@ -16,10 +16,11 @@ namespace BCIEssentials.Tests.Utilities
         [UnitySetUp]
         public virtual IEnumerator TestSetup()
         {
+            Debug.Log("<color=green>Test Started</color>");
             yield return LoadEmptySceneAsync();
         }
 
-        public static BCIController CreateController(bool dontDestroyInstance = false, bool setActive = false)
+        protected static BCIController CreateController(bool dontDestroyInstance = false, bool setActive = false)
         {
             var gameObject = new GameObject();
             gameObject.SetActive(false);
@@ -38,30 +39,30 @@ namespace BCIEssentials.Tests.Utilities
             return controller;
         }
 
-        public static SPO AddSPOToScene(string tag = "BCI", bool includeMe = true)
+        protected static SPO AddSPOToScene(string tag = "BCI", bool includeMe = true)
         {
             return AddSPOToScene<SPO>(tag, includeMe);
         }
         
-        public static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
+        protected static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
         {
-            var spo = new GameObject { tag = tag }.AddComponent<T>();
+            var spo = new GameObject { tag = string.IsNullOrEmpty(tag) ? "Untagged" : tag }.AddComponent<T>();
             spo.includeMe = includeMe;
 
             return spo;
         }
 
-        public IEnumerator LoadEmptySceneAsync()
+        protected IEnumerator LoadEmptySceneAsync()
         {
             yield return EditorSceneLoader.LoadEmptySceneAsync();
         }
 
-        public IEnumerator LoadDefaultSceneAsync()
+        protected IEnumerator LoadDefaultSceneAsync()
         {
             yield return EditorSceneLoader.LoadDefaultSceneAsync();
         }
 
-        public static void SetField<T>(T component, string name, object value)
+        protected static void SetField<T>(T component, string name, object value)
         {
             var info = component.GetType()
                 .GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -74,23 +75,23 @@ namespace BCIEssentials.Tests.Utilities
             info.SetValue(component, value);
         }
 
-        public static T AddComponent<T>() where T : MonoBehaviour
+        protected static T AddComponent<T>() where T : MonoBehaviour
         {
             return AddComponent<T>(new GameObject());
         }
 
-        public static T AddComponent<T>(GameObject gameObject) where T : MonoBehaviour
+        protected static T AddComponent<T>(GameObject gameObject) where T : MonoBehaviour
         {
             return gameObject.AddComponent<T>();
         }
 
-        public static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null,
+        protected static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null,
             bool destroyOnComplete = true)
         {
             return AddCoroutineRunner(new GameObject(), coroutine, onComplete, destroyOnComplete);
         }
 
-        public static CoroutineRunner AddCoroutineRunner(GameObject gameObject, IEnumerator coroutine, Action onComplete = null,
+        protected static CoroutineRunner AddCoroutineRunner(GameObject gameObject, IEnumerator coroutine, Action onComplete = null,
             bool destroyOnComplete = true)
         {
             var runner = AddComponent<CoroutineRunner>(gameObject);
@@ -105,6 +106,37 @@ namespace BCIEssentials.Tests.Utilities
             };
 
             return runner;
+        }
+
+        protected static void StopAllCoroutineRunners()
+        {
+            foreach (var runner in Object.FindObjectsOfType<CoroutineRunner>())
+            {
+                if (runner != null)
+                {
+                    runner.StopRun();
+                }
+            }
+        }
+
+        protected IEnumerator DelayForFrames(int frameCount, Action onContinue)
+        {
+            int framesRan = 0;
+
+            while (framesRan < frameCount)
+            {
+                ++framesRan;
+                Debug.Log(framesRan);
+                yield return null;
+            }
+            
+            onContinue?.Invoke();
+        }
+
+        protected IEnumerator DelayForSeconds(float seconds, Action onContinue)
+        {
+            yield return new WaitForSecondsRealtime(seconds);
+            onContinue?.Invoke();
         }
     }
 }
