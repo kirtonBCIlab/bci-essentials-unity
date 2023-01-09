@@ -104,8 +104,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void CleanUp()
         {
             setup.DestroyMatrix();
-
-            //TODO: Stop running coroutines
+            StopAllCoroutines();
         }
 
         // Populate a list of SPOs
@@ -297,7 +296,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
-            PrintArray(trainArray);
+            LogArrayValues(trainArray);
 
             yield return new WaitForSecondsRealtime(0.001f);
 
@@ -366,15 +365,9 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        public void PrintArray(int[] array)
+        public static void LogArrayValues(int[] values)
         {
-            string[] strings = new string[array.Length];
-            for (int i = 0; i < array.Length; i++)
-            {
-                strings[i] = array[i].ToString();
-            }
-
-            print(string.Join(" ", strings));
+            print(string.Join(", ", values));
         }
 
         // Coroutine for the stimulus
@@ -461,7 +454,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 // Receive markers
                 // Pull the python response and add it to the responseStrings array
-                var responseStrings = response.PullResponse(new[]{ "" }, responseTimeout);
+                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
                 var responseString = responseStrings[0];
 
                 if (responseString.Equals("ping"))

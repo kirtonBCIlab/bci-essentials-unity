@@ -59,7 +59,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
-            PrintArray(trainArray);
+            LogArrayValues(trainArray);
 
             yield return null;
 
@@ -491,9 +491,9 @@ namespace BCIEssentials.ControllerBehaviors
 
                     // Print the white and black indices
                     Debug.Log("blacks");
-                    PrintArray(blackList);
+                    LogArrayValues(blackList);
                     Debug.Log("whites");
-                    PrintArray(whiteList);
+                    LogArrayValues(whiteList);
 
                     // reshape the black and white arrays to 2D
                     int[,] blackMat = new int[bwRows, bwCols];
@@ -525,7 +525,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[c] = blackMat[br, c];
                             }
 
-                            PrintArray(objectsToFlash);
+                            LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + objectList.Count.ToString();
@@ -585,7 +585,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[c] = whiteMat[wr, c];
                             }
 
-                            PrintArray(objectsToFlash);
+                            LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + objectList.Count.ToString();
@@ -644,7 +644,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[r] = blackMat[r, bc];
                             }
 
-                            PrintArray(objectsToFlash);
+                            LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + objectList.Count.ToString();
@@ -703,7 +703,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[r] = whiteMat[r, wc];
                             }
 
-                            PrintArray(objectsToFlash);
+                            LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + objectList.Count.ToString();

@@ -56,7 +56,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
-            PrintArray(trainArray);
+            LogArrayValues(trainArray);
 
             yield return 0;
 
