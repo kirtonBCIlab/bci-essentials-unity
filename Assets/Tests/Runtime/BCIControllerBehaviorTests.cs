@@ -130,7 +130,7 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenPopulateObjectListWithChildrenMethod_THenThrows()
+        public void WhenPopulateObjectListWithChildrenMethod_ThenThrows()
         {
             Assert.Throws<NotImplementedException>(
                 () => { _behavior.PopulateObjectList(SpoPopulationMethod.Children); });
