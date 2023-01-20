@@ -12,7 +12,6 @@ public class SwitchfromMainCamera : MonoBehaviour
     public void ElevationView() {
         mainCamera.enabled = false;
         elevationCamera.enabled = true;
-    
 
     }
     public void InclineView() {
@@ -28,5 +27,16 @@ public class SwitchfromMainCamera : MonoBehaviour
         elevationCamera.enabled = false;
         inclineCamera.enabled = false;
         rotationCamera.enabled = false;
+    }
+
+    //Change GameObject to Canvas Object - so we can turnOn/Off Canvas.
+    public void TurnOffGameObject(GameObject go)
+    {
+        go.SetActive(false);
+    }
+
+    public void TurnOnGameObject(GameObject go)
+    {
+        go.SetActive(true);
     }
 }
