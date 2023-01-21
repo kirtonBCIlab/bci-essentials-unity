@@ -10,8 +10,8 @@ using UnityEngine;
 //This class contains the functions needed to set-up the P300 matrices for flashing.
 public class Matrix_Setup : MonoBehaviour
 {
-    public int numColumns;
     public int numRows;
+    public int numColumns;
     public GameObject myObject;
     private double startX;       //Initial position of X for drawing in the objects
     private double startY;       //Initial position of Y for drawing in the objects

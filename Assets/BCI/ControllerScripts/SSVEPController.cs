@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -14,6 +15,11 @@ public class SSVEPController : Controller
     private int[] frame_off_count = new int[99];
     private int[] frame_on_count = new int[99];
 
+    void Awake()
+    {
+        // Set vote on windows to true because we want to make exactly one decision for all windows in a given selection
+        voteOnWindows = true;
+    }
 
     public override void PopulateObjectList(string popMethod)
     {
@@ -75,7 +81,7 @@ public class SSVEPController : Controller
         // Remove from the list any entries that have includeMe set to false
         foreach (GameObject thisObject in objectList)
         {
-            if (thisObject.GetComponent<SPO>().Selectable == false)
+            if (thisObject.GetComponent<SPO>().includeMe == false)
             {
                 objectsToRemove.Add(thisObject);
             }
@@ -87,13 +93,6 @@ public class SSVEPController : Controller
         objectsToRemove.Clear();
 
         realFreqFlash = new float[objectList.Count];
-
-        //int[] frames_on;
-        //int[] frames_off;
-        //int[] frame_count;
-        //float period;
-        //int[] frame_off_count;
-        //int[] frame_on_count;
 
         for (int i = 0; i < objectList.Count; i++)
         {
@@ -144,9 +143,15 @@ public class SSVEPController : Controller
 
     public override IEnumerator Stimulus()
     {
+        // Get a list of the SPO components
+        SPO[] SPOList = new SPO[objectList.Count];
+        for(int i=0; i<objectList.Count; i++)
+        {
+            SPOList[i] = objectList[i].GetComponent<SPO>();
+        }
+
         while (stimOn)
         {
-            // Add duty cycle
             // Generate the flashing
             for (int i = 0; i < objectList.Count; i++)
             {
@@ -156,7 +161,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_on_count[i])
                     {
                         // turn the cube off
-                        objectList[i].GetComponent<SPO>().StopStimulus();
+                        SPOList[i].TurnOff();
                         frames_on[i] = 0;
                         frame_count[i] = 0;
                     }
@@ -166,7 +171,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_off_count[i])
                     {
                         // turn the cube on
-                        objectList[i].GetComponent<SPO>().StartStimulus();
+                        SPOList[i].TurnOn();
                         frames_on[i] = 1;
                         frame_count[i] = 0;
                     }
@@ -174,10 +179,12 @@ public class SSVEPController : Controller
             }
             yield return 0;
         }
+
+        // Turn them all off when we are done
         for (int i = 0; i < objectList.Count; i++)
         {
             // turn the cube off
-            objectList[i].GetComponent<SPO>().StopStimulus();
+            SPOList[i].TurnOff();
         }
     }
 }
