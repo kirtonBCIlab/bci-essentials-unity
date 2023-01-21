@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Obsolete("Use Stimulus Effects instead.")]
 public class MITrainingSPO : SPO
 {
     private Vector3 originalPosition;

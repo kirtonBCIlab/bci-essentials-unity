@@ -706,7 +706,7 @@ public class Controller : MonoBehaviour
 
                         //Run on selection
                         UnityEngine.Debug.Log("Voting selected object " + voteSelection.ToString());
-                        objectList[voteSelection].GetComponent<SPO>().OnSelection();
+                        objectList[voteSelection].GetComponent<SPO>().Select();
                     }
                 }
             }

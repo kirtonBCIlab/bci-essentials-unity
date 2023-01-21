@@ -81,7 +81,7 @@ public class SSVEPController : Controller
         // Remove from the list any entries that have includeMe set to false
         foreach (GameObject thisObject in objectList)
         {
-            if (thisObject.GetComponent<SPO>().includeMe == false)
+            if (thisObject.GetComponent<SPO>().Selectable == false)
             {
                 objectsToRemove.Add(thisObject);
             }
@@ -161,7 +161,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_on_count[i])
                     {
                         // turn the cube off
-                        SPOList[i].TurnOff();
+                        SPOList[i].StopStimulus();
                         frames_on[i] = 0;
                         frame_count[i] = 0;
                     }
@@ -171,7 +171,7 @@ public class SSVEPController : Controller
                     if (frame_count[i] >= frame_off_count[i])
                     {
                         // turn the cube on
-                        SPOList[i].TurnOn();
+                        SPOList[i].StartStimulus();
                         frames_on[i] = 1;
                         frame_count[i] = 0;
                     }
@@ -184,7 +184,7 @@ public class SSVEPController : Controller
         for (int i = 0; i < objectList.Count; i++)
         {
             // turn the cube off
-            SPOList[i].TurnOff();
+            SPOList[i].StopStimulus();
         }
     }
 }
