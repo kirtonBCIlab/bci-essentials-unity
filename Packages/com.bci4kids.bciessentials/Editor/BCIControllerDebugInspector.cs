@@ -6,7 +6,7 @@ namespace BCIEssentials.Controllers.Editor
     [CustomEditor(typeof(BCIController))]
     public class BCIControllerDebugInspector : UnityEditor.Editor
     {
-        private BehaviorType _requestedBehavior;
+        private BCIBehaviorType _requestedBehavior;
         
         public override void OnInspectorGUI()
         {
@@ -14,7 +14,7 @@ namespace BCIEssentials.Controllers.Editor
             
             GUILayout.Space(20);
             EditorGUILayout.TextField("Debug Controls", EditorStyles.boldLabel);
-            _requestedBehavior =  (BehaviorType)EditorGUILayout.EnumPopup("Behavior Type:", _requestedBehavior);
+            _requestedBehavior =  (BCIBehaviorType)EditorGUILayout.EnumPopup("Behavior Type:", _requestedBehavior);
             if (GUILayout.Button("Request Behavior"))
             {
                 var controller = (BCIController)target;

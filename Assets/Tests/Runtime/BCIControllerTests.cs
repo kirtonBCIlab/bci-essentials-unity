@@ -276,7 +276,7 @@ namespace BCIEssentials.Tests
                 var behavior = _testControllerObject.AddComponent<P300ControllerBehavior>();
                 _testController.RegisterBehavior(behavior);
                 
-                _testController.ChangeBehavior(BehaviorType.P300);
+                _testController.ChangeBehavior(BCIBehaviorType.P300);
                 
                 Assert.AreEqual(_testController.ActiveBehavior, behavior);
             }

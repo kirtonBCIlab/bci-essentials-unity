@@ -8,7 +8,7 @@ namespace BCIEssentials.ControllerBehaviors
 {
     public class SSVEPControllerBehavior : BCIControllerBehavior
     {
-        public override BehaviorType BehaviorType => BehaviorType.SSVEP;
+        public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         
         [SerializeField] private float[] setFreqFlash;
         [SerializeField] private float[] realFreqFlash;

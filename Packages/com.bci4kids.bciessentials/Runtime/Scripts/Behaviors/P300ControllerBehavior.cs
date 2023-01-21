@@ -11,7 +11,7 @@ namespace BCIEssentials.ControllerBehaviors
 {
     public class P300ControllerBehavior : BCIControllerBehavior
     {
-        public override BehaviorType BehaviorType => BehaviorType.P300;
+        public override BCIBehaviorType BehaviorType => BCIBehaviorType.P300;
         
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;

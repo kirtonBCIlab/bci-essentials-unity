@@ -18,7 +18,7 @@ namespace BCIEssentials.ControllerBehaviors
     /// </summary>
     public class SwitchControllerBehavior : BCIControllerBehavior
     {
-        public override BehaviorType BehaviorType => BehaviorType.Unset;
+        public override BCIBehaviorType BehaviorType => BCIBehaviorType.Unset;
         
         // Variables related to Iterative training
         [SerializeField] [Tooltip("How many selections to make before creating the classifier")]

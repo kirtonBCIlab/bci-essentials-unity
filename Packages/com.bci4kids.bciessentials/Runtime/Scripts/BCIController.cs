@@ -18,7 +18,7 @@ namespace BCIEssentials.Controllers
         public BCIControllerBehavior ActiveBehavior { get; private set; }
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
-        private Dictionary<BehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
+        private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
 
 #if UNITY_EDITOR
         public void TestInitializable(bool dontDestroyInstance)
@@ -99,7 +99,7 @@ namespace BCIEssentials.Controllers
             _keyBindings.TryAdd(KeyCode.Alpha9, () => { Instance.SelectObject(9); });
         }
 
-        public void ChangeBehavior(BehaviorType behaviorType)
+        public void ChangeBehavior(BCIBehaviorType behaviorType)
         {
             if (Instance.ActiveBehavior != null)
             {
@@ -163,7 +163,7 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public bool HasBehaviorForType(BehaviorType type)
+        public bool HasBehaviorForType(BCIBehaviorType type)
         {
             return _registeredBehaviors.ContainsKey(type);
         }

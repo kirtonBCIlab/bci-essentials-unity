@@ -1,6 +1,6 @@
 namespace BCIEssentials.Controllers
 {
-    public enum BehaviorType
+    public enum BCIBehaviorType
     {
         Unset,
         P300,

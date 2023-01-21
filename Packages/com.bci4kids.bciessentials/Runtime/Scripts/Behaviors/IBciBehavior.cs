@@ -1,9 +1,12 @@
+using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     public interface IBciBehavior
     {
+        public BCIBehaviorType Type { get; }
+        
         public void Initialize(LSLMarkerStream markerStream, LSLResponseStream responseStream);
 
         public void CleanUp();
