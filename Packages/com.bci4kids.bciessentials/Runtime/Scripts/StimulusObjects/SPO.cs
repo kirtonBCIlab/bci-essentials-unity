@@ -1,65 +1,68 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 // Base class for the Stimulus Presenting Objects (SPOs)
 
 namespace BCIEssentials.StimulusObjects
 {
-    [RequireComponent(typeof(MeshRenderer))]
+   /// <summary>
+    /// Base class for the Stimulus Presenting Objects (SPOs)
+    /// </summary>
     public class SPO : MonoBehaviour
     {
-        public Color onColour; //Color during the 'flash' of the object.
-        public Color offColour; //Color when not flashing of the object.
+        [Space(20)]
+        [Tooltip("Invoked when the SPO Controller requests this stimulus to start.")]
+        public UnityEvent StartStimulusEvent = new();
 
-        // Whether or not to include in the Controller object, used to change which objects are selectable
+        [Tooltip("Invoked when the SPO Controller requests this stimulus to stop.")]
+        public UnityEvent StopStimulusEvent = new();
+
+        [Tooltip("Invoked when the SPO Controller selects this SPO")]
+        public UnityEvent OnSelectedEvent = new();
+
+
+        /// <summary>
+        /// Determines if this object is available to be selected
+        /// by the <see cref="Controller"/>;
+        /// </summary>
         public bool Selectable = true;
+
+        /// <summary>
+        /// Assigned by the SPO Controller, this represents the
+        /// index of this SPO in the controllers pool of selectables. 
+        /// </summary>
         public int SelectablePoolIndex;
 
-        //Use a boolean to indicate whether or not this SPO has a subset image
-        [SerializeField] public bool hasImageChild = false;
-
-        private MeshRenderer _renderer;
-
-        private void Awake()
-        {
-            _renderer = GetComponent<MeshRenderer>();
-        }
-
-        // Turn the stimulus on
+        /// <summary>
+        /// Request this SPO stimulus to begin.
+        /// </summary>
+        /// <returns>The time at the beginning of this frame using <see cref="Time.time"/></returns>
         public virtual float StartStimulus()
         {
-            //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-            if(_renderer != null && _renderer.material != null)
-            {
-                _renderer.material.color = onColour;
-            }
+            StartStimulusEvent?.Invoke();
 
-
-            //Return time since stim
+            //Stimulus request time
             return Time.time;
         }
 
-        // Turn off/reset the SPO
+        /// <summary>
+        /// Request this SPO stimulus to end.
+        /// </summary>
         public virtual void StopStimulus()
         {
-            //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
-            if(_renderer != null && _renderer.material != null)
-            {
-                _renderer.material.color = offColour;
-            }
+            StopStimulusEvent?.Invoke();
         }
 
-        // What to do on selection
+        /// <summary>
+        /// When this SPO has been selected.
+        /// </summary>
         public virtual void Select()
         {
-            // This is free form, do whatever you want on selection
-
-            StartCoroutine(QuickFlash());
-
-            // Reset
-            StopStimulus();
+            OnSelectedEvent?.Invoke();
         }
 
+        //TODO: Remove when refactored training out
         // What to do when targeted for training selection
         public virtual void OnTrainTarget()
         {
@@ -77,18 +80,5 @@ namespace BCIEssentials.StimulusObjects
             transform.localScale = new Vector3(objectScale.x / scaleValue, objectScale.y / scaleValue,
                 objectScale.z / scaleValue);
         }
-
-        // Quick Flash
-        public IEnumerator QuickFlash()
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                StartStimulus();
-                yield return new WaitForSecondsRealtime(0.2F);
-                StopStimulus();
-                yield return new WaitForSecondsRealtime(0.2F);
-            }
-        }
-
     }
 }

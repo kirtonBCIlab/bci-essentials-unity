@@ -1,191 +1,142 @@
-using System.Collections;
-using System.Collections.Generic;
+using BCIEssentials.LSL;
 using UnityEngine;
-using System;
-using BCIEssentials.StimulusObjects;
+using BCIEssentials.ControllerBehaviors;
 
-public class SSVEPController : Controller
+namespace BCIEssentials.Controllers
 {
-    public float[] setFreqFlash;
-    public float[] realFreqFlash;
-
-    private int[] frames_on = new int[99];
-    //private int[] frames_off = new int[99];
-    private int[] frame_count = new int[99];
-    private float period;
-    private int[] frame_off_count = new int[99];
-    private int[] frame_on_count = new int[99];
-
-    void Awake()
+    public class SSVEPController : SSVEPControllerBehavior
     {
-        // Set vote on windows to true because we want to make exactly one decision for all windows in a given selection
-        voteOnWindows = true;
-    }
+        //Display
+        public int refreshRate = 60;
+        private float currentRefreshRate;
+        private float sumRefreshRate;
+        private float avgRefreshRate;
+        private int refreshCounter = 0;
 
-    public override void PopulateObjectList(string popMethod)
-    {
-        // Remove everything from the existing list
-        objectList.Clear();
-
-        print("populating the list using method " + popMethod);
-        //Collect objects with the BCI tag
-        if (popMethod == "tag")
+        // Start is called before the first frame update
+        protected override void Start()
         {
-            try
+            // Attach Scripts
+            Initialize(GetComponent<LSLMarkerStream>(), GetComponent<LSLResponseStream>());
+
+            // Set the target framerate
+            Application.targetFrameRate = refreshRate;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            // Check the average framerate every second
+            currentRefreshRate = 1 / Time.deltaTime;
+            refreshCounter += 1;
+            sumRefreshRate += currentRefreshRate;
+            if (refreshCounter >= refreshRate)
             {
-                //Add game objects to list by tag "BCI"
-                //GameObject[] objectList = GameObject.FindGameObjectsWithTag("BCI");
-                GameObject[] objectArray = GameObject.FindGameObjectsWithTag("BCI");
-                for (int i = 0; i < objectArray.Length; i++)
+                avgRefreshRate = sumRefreshRate / (float)refreshCounter;
+                if (avgRefreshRate < 0.95 * (float)refreshRate)
                 {
-                    objectList.Add(objectArray[i]);
+                    Debug.Log("Refresh rate is below 95% of target, avg refresh rate " + avgRefreshRate.ToString());
                 }
-                //objectList.Add(GameObject.FindGameObjectsWithTag("BCI"));
 
-                //The object list exists
-                listExists = true;
-            }
-            catch
-            {
-                //the list does not exist
-                print("Unable to create a list based on 'BCI' object tag");
-                listExists = false;
+                sumRefreshRate = 0;
+                refreshCounter = 0;
             }
 
-        }
 
-        //List is predefined
-        else if (popMethod == "predefined")
-        {
-            if (listExists == true)
+
+            // Check key down
+
+            // Press S to start/stop stimulus
+            if (Input.GetKeyDown(KeyCode.S))
             {
-                print("The predefined list exists");
-            }
-            if (listExists == false)
-            {
-                print("The predefined list doesn't exist, try a different pMethod");
-            }
-        }
-
-        // Collect by children ??
-        else if (popMethod == "children")
-        {
-            Debug.Log("Populute by children is not yet implemented");
-        }
-
-        // Womp womp
-        else
-        {
-            print("No object list exists");
-        }
-
-        // Remove from the list any entries that have includeMe set to false
-        foreach (GameObject thisObject in objectList)
-        {
-            if (thisObject.GetComponent<SPO>().Selectable == false)
-            {
-                objectsToRemove.Add(thisObject);
-            }
-        }
-        foreach (GameObject thisObject in objectsToRemove)
-        {
-            objectList.Remove(thisObject);
-        }
-        objectsToRemove.Clear();
-
-        realFreqFlash = new float[objectList.Count];
-
-        for (int i = 0; i < objectList.Count; i++)
-        {
-            frames_on[i] = 0;
-            frame_count[i] = 0;
-            period = (float)refreshRate / (float)setFreqFlash[i];
-            // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
-            frame_off_count[i] = (int)Math.Ceiling(period / 2);
-            frame_on_count[i] = (int)Math.Floor(period / 2);
-            realFreqFlash[i] = (refreshRate / (float)(frame_off_count[i] + frame_on_count[i]));
-            print("frequency " + (i + 1).ToString() + " : " + realFreqFlash[i].ToString());
-        }
-    }
-
-    public override IEnumerator SendMarkers(int trainingIndex = 99)
-    {
-        // Make the marker string, this will change based on the paradigm
-        while (stimOn)
-        {
-            // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
-            string freqString = "";
-            for (int i = 0; i < realFreqFlash.Length; i++)
-            {
-                freqString = freqString + "," + realFreqFlash[i].ToString();
+                StartStopStimulus();
             }
 
-            string trainingString;
-            if (trainingIndex <= objectList.Count)
+            // Press T to do automated training
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                trainingString = trainingIndex.ToString();
-            }
-            else
-            {
-                trainingString = "-1";
-            }
-
-            string markerString = "ssvep," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString() + freqString;
-
-            // Send the marker
-            marker.Write(markerString);
-
-            // Wait the window length + the inter-window interval
-            yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-
-        }
-    }
-
-    public override IEnumerator Stimulus()
-    {
-        // Get a list of the SPO components
-        SPO[] SPOList = new SPO[objectList.Count];
-        for(int i=0; i<objectList.Count; i++)
-        {
-            SPOList[i] = objectList[i].GetComponent<SPO>();
-        }
-
-        while (stimOn)
-        {
-            // Generate the flashing
-            for (int i = 0; i < objectList.Count; i++)
-            {
-                frame_count[i]++;
-                if (frames_on[i] == 1)
+                // Receive incoming markers
+                if (receivingMarkers == false)
                 {
-                    if (frame_count[i] >= frame_on_count[i])
-                    {
-                        // turn the cube off
-                        SPOList[i].StopStimulus();
-                        frames_on[i] = 0;
-                        frame_count[i] = 0;
-                    }
+                    StartCoroutine(ReceiveMarkers());
                 }
-                else
+
+                StartCoroutine(DoTraining());
+            }
+
+            // Press I to do Iterative training (MI only)
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                // Receive incoming markers
+                if (receivingMarkers == false)
                 {
-                    if (frame_count[i] >= frame_off_count[i])
-                    {
-                        // turn the cube on
-                        SPOList[i].StartStimulus();
-                        frames_on[i] = 1;
-                        frame_count[i] = 0;
-                    }
+                    StartCoroutine(ReceiveMarkers());
+                }
+
+                StartCoroutine(DoIterativeTraining());
+            }
+
+            // Press U to do User training, stimulus without BCI
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                StartCoroutine(DoUserTraining());
+            }
+
+
+            // Check for a selection if stim is on
+            if (stimOn)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha0))
+                {
+                    StartCoroutine(SelectObjectAfterRun(0));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    StartCoroutine(SelectObjectAfterRun(1));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    StartCoroutine(SelectObjectAfterRun(2));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha3))
+                {
+                    StartCoroutine(SelectObjectAfterRun(3));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha4))
+                {
+                    StartCoroutine(SelectObjectAfterRun(4));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha5))
+                {
+                    StartCoroutine(SelectObjectAfterRun(5));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha6))
+                {
+                    StartCoroutine(SelectObjectAfterRun(6));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha7))
+                {
+                    StartCoroutine(SelectObjectAfterRun(7));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha8))
+                {
+                    StartCoroutine(SelectObjectAfterRun(8));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha9))
+                {
+                    StartCoroutine(SelectObjectAfterRun(9));
                 }
             }
-            yield return 0;
-        }
-
-        // Turn them all off when we are done
-        for (int i = 0; i < objectList.Count; i++)
-        {
-            // turn the cube off
-            SPOList[i].StopStimulus();
         }
     }
+
 }

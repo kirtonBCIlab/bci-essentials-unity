@@ -10,7 +10,6 @@ namespace BCIEssentials.Tests
     internal class SPOTests : PlayModeTestRunnerBase
     {
         private SPO _testSpo;
-        private MeshRenderer _testSpoRenderer;
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
@@ -18,11 +17,10 @@ namespace BCIEssentials.Tests
             yield return base.TestSetup();
 
             _testSpo = new GameObject().AddComponent<SPO>();
-            _testSpoRenderer = _testSpo.GetComponent<MeshRenderer>();
         }
 
         [Test]
-        public void WhenTurnOn_ThenReturnsTime()
+        public void WhenStartStimulus_ThenReturnsTime()
         {
             var expectedResult = Time.time;
 
@@ -32,25 +30,45 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenTurnOn_ThenMaterialColorIsOnColor()
+        public void WhenStartStimulus_ThenEventInvoked()
         {
-            _testSpo.onColour = Color.blue;
-            _testSpoRenderer.material.color = Color.green;
+            var eventCalled = false;
+            _testSpo.StartStimulusEvent.AddListener(() =>
+            {
+                eventCalled = true;
+            });
 
             _testSpo.StartStimulus();
 
-            Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
+            Assert.IsTrue(eventCalled);
         }
 
         [Test]
-        public void WhenTurnOff_ThenMaterialColorIsOffColor()
+        public void WhenSelect_ThenEventInvoked()
         {
-            _testSpo.offColour = Color.blue;
-            _testSpoRenderer.material.color = Color.green;
+            var eventCalled = false;
+            _testSpo.OnSelectedEvent.AddListener(() =>
+            {
+                eventCalled = true;
+            });
+
+            _testSpo.Select();
+
+            Assert.IsTrue(eventCalled);
+        }
+
+        [Test]
+        public void WhenStopStimulus_ThenEventInvoked()
+        {
+            var eventCalled = false;
+            _testSpo.StopStimulusEvent.AddListener(() =>
+            {
+                eventCalled = true;
+            });
 
             _testSpo.StopStimulus();
 
-            Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
+            Assert.IsTrue(eventCalled);
         }
 
         [Test]
@@ -73,30 +91,6 @@ namespace BCIEssentials.Tests
             _testSpo.OffTrainTarget();
 
             Assert.AreEqual(expectedScale, _testSpo.transform.localScale);
-        }
-
-        [Test]
-        public void WhenOnSelection_ThenStimulusEffectRan()
-        {
-            _testSpo.onColour = Color.red;
-            _testSpo.offColour = Color.blue;
-            _testSpoRenderer.material.color = Color.green;
-
-            _testSpo.Select();
-
-            Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
-        }
-
-        [UnityTest]
-        public IEnumerator WhenQuickFlash_ThenStimulusEffectRan()
-        {
-            _testSpo.onColour = Color.red;
-            _testSpo.offColour = Color.blue;
-            _testSpoRenderer.material.color = Color.green;
-
-            yield return _testSpo.QuickFlash();
-
-            Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
         }
     }
 }
