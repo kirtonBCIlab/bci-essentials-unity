@@ -97,7 +97,7 @@ public class P300Controller : Controller
             // If sham feedback is true, then show it
             if (shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                objectList[trainTarget].GetComponent<SPO>().Select();
             }
 
             // Turn off train target
@@ -161,7 +161,7 @@ public class P300Controller : Controller
         // If sham feedback is true, then show it
         if (shamFeedback)
         {
-            objectList[trainTarget].GetComponent<SPO>().OnSelection();
+            objectList[trainTarget].GetComponent<SPO>().Select();
         }
 
         // Turn off train target
@@ -217,7 +217,7 @@ public class P300Controller : Controller
 
                 UnityEngine.Debug.Log(markerStringBldr.ToString());
 
-                timeOfFlash = currentObject.GetComponent<SPO>().TurnOn();
+                timeOfFlash = currentObject.GetComponent<SPO>().StartStimulus();
 
 
                 //Send marker
@@ -241,7 +241,7 @@ public class P300Controller : Controller
                 yield return new WaitForSecondsRealtime(onTime);
 
                 //Turn off
-                currentObject.GetComponent<SPO>().TurnOff();
+                currentObject.GetComponent<SPO>().StopStimulus();
 
                 //Wait
                 yield return new WaitForSecondsRealtime(offTime);
@@ -318,7 +318,7 @@ public class P300Controller : Controller
                                 //Add to marker
                                 markerStringBldr.AppendFormat(",{0}", rcMatrix[n, columnIndex].ToString());
 
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
                             }
                             catch
                             {
@@ -341,7 +341,7 @@ public class P300Controller : Controller
                             try
                             {
                                 GameObject currentObject = objectList[rcMatrix[n, columnIndex]];
-                                currentObject.GetComponent<SPO>().TurnOff();                            
+                                currentObject.GetComponent<SPO>().StopStimulus();                            
                             }
                             catch
                             {
@@ -379,7 +379,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
 
                                 //Add to marker
                                 markerStringBldr1.AppendFormat(",{0}", rcMatrix[rowIndex, m].ToString());
@@ -407,7 +407,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[rcMatrix[rowIndex, m]];
-                                currentObject.GetComponent<SPO>().TurnOff();
+                                currentObject.GetComponent<SPO>().StopStimulus();
                             }
                             catch
                             {
@@ -566,7 +566,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -589,7 +589,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOff();
+                                currentObject.GetComponent<SPO>().StopStimulus();
                             }
                         }
 
@@ -628,7 +628,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -651,7 +651,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOff();
+                                currentObject.GetComponent<SPO>().StopStimulus();
                             }
                         }
 
@@ -689,7 +689,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -712,7 +712,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOff();
+                                currentObject.GetComponent<SPO>().StopStimulus();
                             }
                         }
 
@@ -750,7 +750,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOn();
+                                currentObject.GetComponent<SPO>().StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -773,7 +773,7 @@ public class P300Controller : Controller
                             {
                                 //Turn on row
                                 GameObject currentObject = objectList[objectsToFlash[fi]];
-                                currentObject.GetComponent<SPO>().TurnOff();
+                                currentObject.GetComponent<SPO>().StopStimulus();
                             }
                         }
 
