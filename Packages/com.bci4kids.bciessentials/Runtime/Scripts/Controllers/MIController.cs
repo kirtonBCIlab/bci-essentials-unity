@@ -1,153 +1,145 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using BCIEssentials.StimulusObjects;
+using BCIEssentials.ControllerBehaviors;
+using BCIEssentials.LSL;
 using UnityEngine;
-using UnityEngine.UI;
 
-/*An extension of the controller class to add MI functionality
+namespace BCIEssentials.Controllers
+{
+     /*An extension of the controller class to add MI functionality
 
 */
-public class MIController : Controller
-{
 
-
-    // Variables related to Iterative training
-    public int numSelectionsBeforeTraining = 3;        // How many selections to make before creating the classifier
-    public int numSelectionsBetweenTraining = 3;       // How many selections to make before updating the classifier
-
-
-    protected int selectionCounter = 0;
-    protected int updateCounter = 0;
-
-    public override void PopulateObjectList(string popMethod)
+    public class MIController : MIControllerBehavior
     {
-        base.PopulateObjectList(popMethod);
+        //Display
+        public int refreshRate = 60;
+        private float currentRefreshRate;
+        private float sumRefreshRate;
+        private float avgRefreshRate;
+        private int refreshCounter = 0;
 
-        // Warn about the number of objects to be selected from, if greater than 2
-        if (objectList.Count > 2)
+        // Start is called before the first frame update
+        protected override void Start()
         {
-            print("Warning: Selecting between more than 2 objects!");
-        }
-    }
+            // Attach Scripts
+            Initialize(GetComponent<LSLMarkerStream>(), GetComponent<LSLResponseStream>());
 
-    // Coroutine for the stimulus, wait there is no stimulus
-    public override IEnumerator Stimulus()
-    {
-        yield return 0;
-    }
-
-    public override IEnumerator DoIterativeTraining()
-    {
-        // Generate the target list
-        PopulateObjectList("tag");
-
-        int numOptions = objectList.Count;
-
-        // Create a random non repeating array 
-        int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
-        PrintArray(trainArray);
-
-        yield return 0;
-
-
-        // Loop for each training target
-        for (int i = 0; i < numTrainingSelections; i++)
-        {
-
-            if (selectionCounter >= numSelectionsBeforeTraining)
-            {
-                if (updateCounter == 0)
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-                else if (selectionCounter >= numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
-                {
-                    // update the classifier
-                    Debug.Log("Updating the classifier after " + selectionCounter.ToString() + " selections");
-
-                    marker.Write("Update Classifier");
-                    updateCounter++;
-                }
-            }
-
-            // Get the target from the array
-            trainTarget = trainArray[i];
-
-            // 
-            Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
-
-            // Turn on train target
-            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-            // Go through the training sequence
-            yield return new WaitForSecondsRealtime(pauseBeforeTraining);
-
-
-            StimulusOn();
-            for (int j = 0; j < (numTrainWindows - 1); j++)
-            {
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-                if (shamFeedback)
-                {
-                    objectList[trainTarget].GetComponent<SPO>().Select();
-                }
-            }
-            StimulusOff();
-
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
-
-            // Turn off train target
-            objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
-
-            // Reset objects
-
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
-
-            trainTarget = 99;
-            selectionCounter++;
+            // Set the target framerate
+            Application.targetFrameRate = refreshRate;
         }
 
-        // Send marker
-        marker.Write("Training Complete");
-
-        yield return 0;
-
-    }
-
-    public override IEnumerator SendMarkers(int trainingIndex = 99)
-    {
-        // Make the marker string, this will change based on the paradigm
-        while (stimOn)
+        // Update is called once per frame
+        void Update()
         {
-            // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
-            string trainingString;
-            if (trainingIndex <= objectList.Count)
+            // Check the average framerate every second
+            currentRefreshRate = 1 / Time.deltaTime;
+            refreshCounter += 1;
+            sumRefreshRate += currentRefreshRate;
+            if (refreshCounter >= refreshRate)
             {
-                trainingString = trainingIndex.ToString();
+                avgRefreshRate = sumRefreshRate / (float)refreshCounter;
+                if (avgRefreshRate < 0.95 * (float)refreshRate)
+                {
+                    Debug.Log("Refresh rate is below 95% of target, avg refresh rate " + avgRefreshRate.ToString());
+                }
+
+                sumRefreshRate = 0;
+                refreshCounter = 0;
             }
-            else
+
+
+
+            // Check key down
+
+            // Press S to start/stop stimulus
+            if (Input.GetKeyDown(KeyCode.S))
             {
-                trainingString = "-1";
+                StartStopStimulus();
             }
 
-            string markerString = "mi," + objectList.Count.ToString() + "," + trainingString + "," + windowLength.ToString();
+            // Press T to do automated training
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                // Receive incoming markers
+                if (receivingMarkers == false)
+                {
+                    StartCoroutine(ReceiveMarkers());
+                }
 
-            // Send the marker
-            marker.Write(markerString);
+                StartCoroutine(DoTraining());
+            }
 
-            // Wait the window length + the inter-window interval
-            yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+            // Press I to do Iterative training (MI only)
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                // Receive incoming markers
+                if (receivingMarkers == false)
+                {
+                    StartCoroutine(ReceiveMarkers());
+                }
+
+                StartCoroutine(DoIterativeTraining());
+            }
+
+            // Press U to do User training, stimulus without BCI
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                StartCoroutine(DoUserTraining());
+            }
 
 
+            // Check for a selection if stim is on
+            if (stimOn)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha0))
+                {
+                    StartCoroutine(SelectObjectAfterRun(0));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    StartCoroutine(SelectObjectAfterRun(1));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    StartCoroutine(SelectObjectAfterRun(2));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha3))
+                {
+                    StartCoroutine(SelectObjectAfterRun(3));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha4))
+                {
+                    StartCoroutine(SelectObjectAfterRun(4));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha5))
+                {
+                    StartCoroutine(SelectObjectAfterRun(5));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha6))
+                {
+                    StartCoroutine(SelectObjectAfterRun(6));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha7))
+                {
+                    StartCoroutine(SelectObjectAfterRun(7));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha8))
+                {
+                    StartCoroutine(SelectObjectAfterRun(8));
+                }
+
+                if (Input.GetKeyDown(KeyCode.Alpha9))
+                {
+                    StartCoroutine(SelectObjectAfterRun(9));
+                }
+            }
         }
     }
 }

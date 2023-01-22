@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 6315613983219455413, guid: eb4653bccd17fbe4ba9797b360db8a96, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
   _numColumns: 2
   _numRows: 1
   _spacing: {x: 4, y: 0}
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 6315613983219455413, guid: eb4653bccd17fbe4ba9797b360db8a96, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
   _numColumns: 3
   _numRows: 2
   _spacing: {x: 2, y: 2}
@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 6315613983219455413, guid: eb4653bccd17fbe4ba9797b360db8a96, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
   _numColumns: 3
   _numRows: 3
   _spacing: {x: 2, y: 2}
