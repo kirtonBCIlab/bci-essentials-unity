@@ -96,7 +96,7 @@ public class MIController : Controller
 
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                    objectList[trainTarget].GetComponent<SPO>().Select();
                 }
             }
             StimulusOff();

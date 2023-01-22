@@ -70,7 +70,7 @@ namespace BCIEssentials.Utilities
 
                     //Setup SPO
                     MatrixObjects.Add(spo);
-                    spo.TurnOff();
+                    spo.StopStimulus();
 
                     //Setup GameObject
                     var spoGameObject = spo.gameObject;

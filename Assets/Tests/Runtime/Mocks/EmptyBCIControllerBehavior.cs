@@ -6,6 +6,6 @@ namespace BCIEssentials.Tests
 {
     public class EmptyBCIControllerBehavior : BCIControllerBehavior
     {
-        public override BehaviorType BehaviorType => BehaviorType.Unset;
+        public override BCIBehaviorType BehaviorType => BCIBehaviorType.Unset;
     }
 }

@@ -26,7 +26,7 @@ namespace BCIEssentials.Tests
         {
             var expectedResult = Time.time;
 
-            var result = _testSpo.TurnOn();
+            var result = _testSpo.StartStimulus();
 
             Assert.AreEqual(expectedResult, result);
         }
@@ -37,7 +37,7 @@ namespace BCIEssentials.Tests
             _testSpo.onColour = Color.blue;
             _testSpoRenderer.material.color = Color.green;
 
-            _testSpo.TurnOn();
+            _testSpo.StartStimulus();
 
             Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
         }
@@ -48,7 +48,7 @@ namespace BCIEssentials.Tests
             _testSpo.offColour = Color.blue;
             _testSpoRenderer.material.color = Color.green;
 
-            _testSpo.TurnOff();
+            _testSpo.StopStimulus();
 
             Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
         }
@@ -82,7 +82,7 @@ namespace BCIEssentials.Tests
             _testSpo.offColour = Color.blue;
             _testSpoRenderer.material.color = Color.green;
 
-            _testSpo.OnSelection();
+            _testSpo.Select();
 
             Assert.AreEqual(Color.blue, _testSpoRenderer.material.color);
         }

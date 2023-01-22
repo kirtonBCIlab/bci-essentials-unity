@@ -24,7 +24,7 @@ namespace BCIEssentials.Tests
         {
             _testSpo.transform.position = new Vector3(5, 5, 5);
             
-            _testSpo.TurnOff();
+            _testSpo.StopStimulus();
             
             Assert.AreEqual(Vector3.zero, _testSpo.transform.position);
         }
@@ -35,9 +35,9 @@ namespace BCIEssentials.Tests
             var expectedPosition = new Vector3(5, 5, 5);
             _testSpo.transform.position = expectedPosition;
 
-            _testSpo.TurnOn();
+            _testSpo.StartStimulus();
             _testSpo.transform.position = Vector3.zero;
-            _testSpo.TurnOff();
+            _testSpo.StopStimulus();
             
             Assert.AreEqual(expectedPosition, _testSpo.transform.position);
         }

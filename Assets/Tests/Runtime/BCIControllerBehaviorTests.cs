@@ -236,7 +236,7 @@ namespace BCIEssentials.Tests
             for (var i = 0; i < 6; i++)
             {
                 var spo = AddSPOToScene<MockSPO>();
-                spo.OnSelectionAction = () => selectedIndex = spo.myIndex;
+                spo.OnSelectionAction = () => selectedIndex = spo.SelectablePoolIndex;
             }
             
             _behavior.PopulateObjectList();

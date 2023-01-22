@@ -96,7 +96,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                     if (shamFeedback)
                     {
-                        objectList[trainTarget].OnSelection();
+                        objectList[trainTarget].Select();
                     }
                 }
 

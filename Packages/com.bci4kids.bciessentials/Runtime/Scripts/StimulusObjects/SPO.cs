@@ -12,8 +12,8 @@ namespace BCIEssentials.StimulusObjects
         public Color offColour; //Color when not flashing of the object.
 
         // Whether or not to include in the Controller object, used to change which objects are selectable
-        public bool includeMe = true;
-        public int myIndex;
+        public bool Selectable = true;
+        public int SelectablePoolIndex;
 
         //Use a boolean to indicate whether or not this SPO has a subset image
         [SerializeField] public bool hasImageChild = false;
@@ -26,7 +26,7 @@ namespace BCIEssentials.StimulusObjects
         }
 
         // Turn the stimulus on
-        public virtual float TurnOn()
+        public virtual float StartStimulus()
         {
             //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
             if(_renderer != null && _renderer.material != null)
@@ -40,7 +40,7 @@ namespace BCIEssentials.StimulusObjects
         }
 
         // Turn off/reset the SPO
-        public virtual void TurnOff()
+        public virtual void StopStimulus()
         {
             //This is just for an object renderer (e.g. 3D object). Use <SpriteRenderer> for 2D
             if(_renderer != null && _renderer.material != null)
@@ -50,14 +50,14 @@ namespace BCIEssentials.StimulusObjects
         }
 
         // What to do on selection
-        public virtual void OnSelection()
+        public virtual void Select()
         {
             // This is free form, do whatever you want on selection
 
             StartCoroutine(QuickFlash());
 
             // Reset
-            TurnOff();
+            StopStimulus();
         }
 
         // What to do when targeted for training selection
@@ -83,9 +83,9 @@ namespace BCIEssentials.StimulusObjects
         {
             for (int i = 0; i < 3; i++)
             {
-                TurnOn();
+                StartStimulus();
                 yield return new WaitForSecondsRealtime(0.2F);
-                TurnOff();
+                StopStimulus();
                 yield return new WaitForSecondsRealtime(0.2F);
             }
         }

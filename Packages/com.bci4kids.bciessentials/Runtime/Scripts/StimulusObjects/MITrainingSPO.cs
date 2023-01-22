@@ -7,7 +7,7 @@ namespace BCIEssentials.StimulusObjects
         private Vector3 originalPosition;
 
         // Start is called before the first frame update
-        public override float TurnOn()
+        public override float StartStimulus()
         {
             // Record current location
             originalPosition = transform.position;
@@ -18,14 +18,14 @@ namespace BCIEssentials.StimulusObjects
 
         }
 
-        public override void TurnOff()
+        public override void StopStimulus()
         {
             // Reset to Original
             transform.position = new Vector3(originalPosition.x, originalPosition.y, originalPosition.z);
 
         }
 
-        public override void OnSelection()
+        public override void Select()
         {
             // Move up a little bit
             Vector3 myCurrentPosition = transform.position;

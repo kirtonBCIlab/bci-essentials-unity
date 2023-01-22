@@ -90,7 +90,7 @@ namespace BCIEssentials.ControllerBehaviors
                         if (frame_count[i] >= frame_on_count[i])
                         {
                             // turn the cube off
-                            objectList[i].GetComponent<SPO>().TurnOff();
+                            objectList[i].GetComponent<SPO>().StopStimulus();
                             frames_on[i] = 0;
                             frame_count[i] = 0;
                         }
@@ -100,7 +100,7 @@ namespace BCIEssentials.ControllerBehaviors
                         if (frame_count[i] >= frame_off_count[i])
                         {
                             // turn the cube on
-                            objectList[i].GetComponent<SPO>().TurnOn();
+                            objectList[i].GetComponent<SPO>().StartStimulus();
                             frames_on[i] = 1;
                             frame_count[i] = 0;
                         }
@@ -113,7 +113,7 @@ namespace BCIEssentials.ControllerBehaviors
             for (int i = 0; i < objectList.Count; i++)
             {
                 // turn the cube off
-                objectList[i].GetComponent<SPO>().TurnOff();
+                objectList[i].GetComponent<SPO>().StopStimulus();
             }
         }
     }

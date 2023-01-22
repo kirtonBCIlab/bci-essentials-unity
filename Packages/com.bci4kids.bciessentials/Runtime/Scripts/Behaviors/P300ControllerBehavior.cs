@@ -106,7 +106,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // If sham feedback is true, then show it
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                    objectList[trainTarget].GetComponent<SPO>().Select();
                 }
 
                 // Turn off train target
@@ -171,7 +171,7 @@ namespace BCIEssentials.ControllerBehaviors
             // If sham feedback is true, then show it
             if (shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                objectList[trainTarget].GetComponent<SPO>().Select();
             }
 
             // Turn off train target
@@ -232,7 +232,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                     //Turn on
 
-                    timeOfFlash = currentObject.GetComponent<SPO>().TurnOn();
+                    timeOfFlash = currentObject.GetComponent<SPO>().StartStimulus();
 
 
                     //Send marker
@@ -257,7 +257,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return new WaitForSecondsRealtime(onTime);
 
                     //Turn off
-                    currentObject.GetComponent<SPO>().TurnOff();
+                    currentObject.GetComponent<SPO>().StopStimulus();
 
                     //Wait
                     yield return new WaitForSecondsRealtime(offTime);
@@ -317,7 +317,7 @@ namespace BCIEssentials.ControllerBehaviors
                         int columnIndex = columnStimOrder[i];
                         for (int n = 0; n < numRows; n++)
                         {
-                            objectList[rcMatrix[n, columnIndex]]?.TurnOn();
+                            objectList[rcMatrix[n, columnIndex]]?.StartStimulus();
                             markerString = markerString + "," + rcMatrix[n, columnIndex];
                         }
 
@@ -339,7 +339,7 @@ namespace BCIEssentials.ControllerBehaviors
                         //Turn off column
                         for (int n = 0; n < numRows; n++)
                         {
-                            objectList[rcMatrix[n, columnIndex]]?.TurnOff();
+                            objectList[rcMatrix[n, columnIndex]]?.StopStimulus();
                         }
 
                         //Wait
@@ -367,7 +367,7 @@ namespace BCIEssentials.ControllerBehaviors
                             for (int m = 0; m < numColumns; m++)
                             {
                                 //Turn on row
-                                objectList[rcMatrix[rowIndex, m]]?.TurnOn();
+                                objectList[rcMatrix[rowIndex, m]]?.StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + rcMatrix[rowIndex, m];
@@ -391,7 +391,7 @@ namespace BCIEssentials.ControllerBehaviors
                             //Turn off Row
                             for (int m = 0; m < numColumns; m++)
                             {
-                                objectList[rcMatrix[rowIndex, m]].TurnOff();
+                                objectList[rcMatrix[rowIndex, m]].StopStimulus();
                             }
 
 
@@ -546,7 +546,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOn();
+                                    objectList[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -568,7 +568,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOff();
+                                    objectList[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -606,7 +606,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOn();
+                                    objectList[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -628,7 +628,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOff();
+                                    objectList[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -665,7 +665,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOn();
+                                    objectList[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -687,7 +687,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOff();
+                                    objectList[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -724,7 +724,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOn();
+                                    objectList[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -746,7 +746,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].TurnOff();
+                                    objectList[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 

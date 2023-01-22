@@ -124,7 +124,7 @@ namespace BCIEssentials.ControllerBehaviors
                     GameObject[] taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
                     foreach (var taggedGO in taggedGOs)
                     {
-                        if (taggedGO.TryGetComponent<SPO>(out var spo) && spo.includeMe)
+                        if (taggedGO.TryGetComponent<SPO>(out var spo) && spo.Selectable)
                         {
                             AddSpo(spo);
                         }
@@ -137,7 +137,7 @@ namespace BCIEssentials.ControllerBehaviors
             void AddSpo(SPO spo)
             {
                 objectList.Add(spo);
-                spo.myIndex = objectList.Count - 1;
+                spo.SelectablePoolIndex = objectList.Count - 1;
             }
         }
 
@@ -267,7 +267,7 @@ namespace BCIEssentials.ControllerBehaviors
             try
             {
                 // Run the SPO onSelection script
-                objectList[objectIndex].GetComponent<SPO>().OnSelection();
+                objectList[objectIndex].GetComponent<SPO>().Select();
             }
             catch
             {
@@ -339,7 +339,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // If sham feedback is true, then show it
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                    objectList[trainTarget].GetComponent<SPO>().Select();
                 }
 
                 trainTarget = 99;
@@ -381,7 +381,7 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     try
                     {
-                        objectList[i].GetComponent<SPO>().TurnOn();
+                        objectList[i].GetComponent<SPO>().StartStimulus();
                     }
                     catch
                     {
@@ -398,7 +398,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 try
                 {
-                    objectList[i].GetComponent<SPO>().TurnOff();
+                    objectList[i].GetComponent<SPO>().StopStimulus();
                 }
                 catch
                 {
@@ -475,7 +475,7 @@ namespace BCIEssentials.ControllerBehaviors
                         if (int.TryParse(responseString, out var index) && index < objectList.Count)
                         {
                             //Run on selection
-                            objectList[index].GetComponent<SPO>().OnSelection();
+                            objectList[index].GetComponent<SPO>().Select();
                         }
                     }
                 }

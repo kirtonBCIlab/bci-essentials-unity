@@ -61,7 +61,7 @@ namespace BCIEssentials.Tests.Utilities
         protected static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
         {
             var spo = new GameObject { tag = string.IsNullOrEmpty(tag) ? "Untagged" : tag }.AddComponent<T>();
-            spo.includeMe = includeMe;
+            spo.Selectable = includeMe;
 
             return spo;
         }

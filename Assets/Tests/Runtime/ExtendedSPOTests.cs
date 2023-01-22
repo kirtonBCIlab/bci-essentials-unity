@@ -25,7 +25,7 @@ namespace BCIEssentials.Tests
             _testSpo.transform.localScale = new Vector3(5, 5, 5);
             var expectedScale = Vector3.one * 5 * 1.4f; //1.4 is a magic number used by the SPO
 
-            _testSpo.TurnOn();
+            _testSpo.StartStimulus();
 
             Assert.AreEqual(expectedScale, _testSpo.transform.localScale);
         }
@@ -36,7 +36,7 @@ namespace BCIEssentials.Tests
             _testSpo.transform.localScale = new Vector3(5, 5, 5);
             var expectedScale = Vector3.one * 5 / 1.4f; //1.4 is a magic number used by the SPO
 
-            _testSpo.TurnOff();
+            _testSpo.StopStimulus();
 
             Assert.AreEqual(expectedScale, _testSpo.transform.localScale);
         }
@@ -44,7 +44,7 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenOnSelected_ThenGameObjectDestroyed()
         {
-            _testSpo.OnSelection();
+            _testSpo.Select();
             yield return new WaitForEndOfFrame();
             
             UnityEngine.Assertions.Assert.IsNull(_testSpo);

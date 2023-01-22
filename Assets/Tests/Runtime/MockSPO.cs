@@ -7,7 +7,7 @@ namespace BCIEssentials.Tests
     {
         public Action TurnOnAction;
 
-        public override float TurnOn()
+        public override float StartStimulus()
         {
             TurnOnAction?.Invoke();
 
@@ -17,7 +17,7 @@ namespace BCIEssentials.Tests
 
         public Action TurnOffAction;
 
-        public override void TurnOff()
+        public override void StopStimulus()
         {
             TurnOffAction?.Invoke();
         }
@@ -25,7 +25,7 @@ namespace BCIEssentials.Tests
 
         public Action OnSelectionAction;
 
-        public override void OnSelection()
+        public override void Select()
         {
             OnSelectionAction?.Invoke();
         }

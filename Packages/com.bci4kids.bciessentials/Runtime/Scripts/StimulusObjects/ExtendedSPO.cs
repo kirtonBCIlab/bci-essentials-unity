@@ -5,7 +5,7 @@ namespace BCIEssentials.StimulusObjects
     public class ExtendedSPO : SPO
     {
         // Start is called before the first frame update
-        public override float TurnOn()
+        public override float StartStimulus()
         {
             // Make Big
             float scaleValue = 1.4f;
@@ -19,7 +19,7 @@ namespace BCIEssentials.StimulusObjects
 
         }
 
-        public override void TurnOff()
+        public override void StopStimulus()
         {
             // Make Small
             float scaleValue = 1.4f;
@@ -29,7 +29,7 @@ namespace BCIEssentials.StimulusObjects
 
         }
 
-        public override void OnSelection()
+        public override void Select()
         {
             // Blow Up
             Destroy(transform.gameObject);

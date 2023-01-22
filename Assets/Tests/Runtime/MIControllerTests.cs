@@ -52,7 +52,7 @@ namespace BCIEssentials.Tests
 
             Assert.AreEqual(1, _testController.objectList.Count);
             UnityEngine.Assertions.Assert.AreEqual(included.gameObject, _testController.objectList[0]);
-            Assert.AreEqual(0, _testController.objectList[0].GetComponent<SPO>().myIndex);
+            Assert.AreEqual(0, _testController.objectList[0].GetComponent<SPO>().SelectablePoolIndex);
         }
 
         [Test]
@@ -70,9 +70,9 @@ namespace BCIEssentials.Tests
 
             Assert.AreEqual(2, _testController.objectList.Count);
             UnityEngine.Assertions.Assert.AreEqual(noTag, _testController.objectList[0]);
-            Assert.AreEqual(0, _testController.objectList[0].GetComponent<SPO>().myIndex);
+            Assert.AreEqual(0, _testController.objectList[0].GetComponent<SPO>().SelectablePoolIndex);
             UnityEngine.Assertions.Assert.AreEqual(included, _testController.objectList[1]);
-            Assert.AreEqual(1, _testController.objectList[1].GetComponent<SPO>().myIndex);
+            Assert.AreEqual(1, _testController.objectList[1].GetComponent<SPO>().SelectablePoolIndex);
         }
 
         [Test]
