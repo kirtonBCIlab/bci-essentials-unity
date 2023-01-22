@@ -1,0 +1,16 @@
+{
+    "name": "Bci4Kids.BciEssentials.Runtime",
+    "rootNamespace": "BCIEssentials",
+    "references": [
+        "GUID:e280ff789d4407a47998ba70fab1034b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

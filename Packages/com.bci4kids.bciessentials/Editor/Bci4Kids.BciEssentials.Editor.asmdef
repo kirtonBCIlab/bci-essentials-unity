@@ -1,0 +1,18 @@
+{
+    "name": "Bci4Kids.BciEssentials.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:27e35130f064fa542959e6f4eeb604f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
