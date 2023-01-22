@@ -1,11 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Obsolete("Use Stimulus Effects instead.")]
 public class ExtendedSPO : SPO
 {
-    // Start is called before the first frame update
-    public override float TurnOn()
+    public override float StartStimulus()
     {
         // Make Big
         float scaleValue = 1.4f;
@@ -18,7 +19,7 @@ public class ExtendedSPO : SPO
 
     }
 
-    public override void TurnOff()
+    public override void StopStimulus()
     {
         // Make Small
         float scaleValue = 1.4f;
@@ -27,7 +28,7 @@ public class ExtendedSPO : SPO
 
     }
 
-    public override void OnSelection()
+    public override void Select()
     {
         // Blow Up
         Destroy(transform.gameObject);

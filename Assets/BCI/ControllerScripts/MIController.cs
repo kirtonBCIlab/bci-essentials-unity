@@ -78,7 +78,7 @@ public class MIController : Controller
         // Remove from the list any entries that have includeMe set to false
         foreach (GameObject thisObject in objectList)
         {
-            if (thisObject.GetComponent<SPO>().includeMe == false)
+            if (thisObject.GetComponent<SPO>().Selectable == false)
             {
                 objectsToRemove.Add(thisObject);
             }
@@ -161,7 +161,7 @@ public class MIController : Controller
 
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OnSelection();
+                    objectList[trainTarget].GetComponent<SPO>().Select();
                 }
             }
             StimulusOff();
