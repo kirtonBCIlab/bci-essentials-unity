@@ -573,10 +573,13 @@ public class Controller : MonoBehaviour
             // Pull the python response and add it to the responseStrings array
             responseStrings = response.GetResponses();
 
-            // Check if there is 
-            bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
-
-
+            if (responseStrings.Length == 0)
+            {
+                // Wait for the next receive interval
+                yield return new WaitForSecondsRealtime(receiveInterval);
+                continue;
+            }
+            
             if (responseStrings[0] == "ping")
             {
                 pingCount++;

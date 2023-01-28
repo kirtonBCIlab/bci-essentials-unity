@@ -450,7 +450,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Receive markers
                 // Pull the python response and add it to the responseStrings array
                 var responseStrings = response.GetResponses();
-                var responseString = responseStrings[0];
+                var responseString = responseStrings.Length > 0 ? responseStrings[0]: string.Empty;
 
                 if (responseString.Equals("ping"))
                 {

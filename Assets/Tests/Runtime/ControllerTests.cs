@@ -245,21 +245,19 @@ namespace BCIEssentials.Tests
             var testDurationSeconds = 6;
             var streamListener = AddComponent<LSLResponseStream>();
             streamListener.Connect("UnityMarkerStream");
-            var streamResponses = new List<string[]>();
 
             var enableStimulusRunner =
                 AddCoroutineRunner(DelayForSeconds(testDurationSeconds, () => _testController.stimOn = false));
-            var listenForMarkerRunner = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses));
             var behaviorSendMarkers = AddCoroutineRunner(_testController.SendMarkers());
 
             //Run Test
-            listenForMarkerRunner.StartRun();
             enableStimulusRunner.StartRun();
             behaviorSendMarkers.StartRun();
             yield return new WaitWhile(() => behaviorSendMarkers.IsRunning);
 
-            Assert.AreEqual(testDurationSeconds / (_testController.windowLength + _testController.interWindowInterval),
-                streamResponses.Count);
+            var markersSent = testDurationSeconds / (_testController.windowLength + _testController.interWindowInterval);
+            var responses = streamListener.GetResponses();
+            Assert.AreEqual(responses.Length, markersSent);
         }
 
         [UnityTest]
@@ -285,23 +283,6 @@ namespace BCIEssentials.Tests
             yield return new WaitWhile(() => behaviorRunner.IsRunning);
 
             Assert.AreEqual(testValues.Item2, selectedIndex);
-        }
-
-        private IEnumerator ListenForMarkerStreams(LSLResponseStream responseStream, List<string[]> responses)
-        {
-            responseStream.Connect();
-            yield return new WaitForEndOfFrame();
-
-            while (true)
-            {
-                var response = responseStream.GetResponses();
-                if (response.Length > 0 && !response[0].Equals(""))
-                {
-                    responses.Add(response);
-                }
-
-                yield return new WaitForSecondsRealtime(1 / Application.targetFrameRate);
-            }
         }
 
         private IEnumerator WriteMockMarker(LSLMarkerStream markerStream, string value,
