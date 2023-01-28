@@ -385,7 +385,7 @@ MonoBehaviour:
   _spoPrefab: {fileID: 7639228323464969584, guid: c0245393d39f6d945a4b2a73743ad415, type: 3}
   _numColumns: 2
   _numRows: 1
-  _spacing: {x: 4, y: 0}
+  _spacing: {x: 2, y: 0}
 --- !u!114 &4280385884592448033
 MonoBehaviour:
   m_ObjectHideFlags: 0

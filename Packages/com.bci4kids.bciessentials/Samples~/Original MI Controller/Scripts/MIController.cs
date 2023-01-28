@@ -41,12 +41,10 @@ public class MIController : Controller
     {
         // Generate the target list
         PopulateObjectList("tag");
-
-        int numOptions = objectList.Count;
-
+        
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        trainArray = MakeRNRA(numTrainingSelections, objectList.Count - 1);
         PrintArray(trainArray);
 
         yield return 0;

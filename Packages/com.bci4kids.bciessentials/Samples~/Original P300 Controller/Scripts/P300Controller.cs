@@ -47,12 +47,9 @@ public class P300Controller : Controller
         // Generate the target list
         PopulateObjectList("tag");
 
-        // Get number of selectable objects by counting the objects in the objectList
-        int numOptions = objectList.Count;
-
         // Create a random non repeating array 
         int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, numOptions);
+        trainArray = MakeRNRA(numTrainingSelections, objectList.Count - 1);
         PrintArray(trainArray);
 
         yield return null;
