@@ -15,7 +15,15 @@ namespace BCIEssentials.StimulusEffects
         [Header("Flash Settings")]
         [SerializeField]
         [Tooltip("Material Color to assign while flashing is on")]
-        private Color _flashOnColor;
+        private Color _flashOnColor = Color.red;
+        
+        [SerializeField]
+        [Tooltip("Material Color to assign while flashing is off")]
+        private Color _flashOffColor = Color.white;
+
+        [SerializeField]
+        [Tooltip("If the flash on color is applied on start or the flash off color.")]
+        private bool _startOn;
         
         [SerializeField]
         [Min(0)]
@@ -28,7 +36,6 @@ namespace BCIEssentials.StimulusEffects
         public bool IsPlaying => _effectRoutine != null;
 
 
-        private Color _originalColor;
         private Coroutine _effectRoutine;
 
         private void Awake()
@@ -43,6 +50,8 @@ namespace BCIEssentials.StimulusEffects
             {
                 Debug.LogWarning($"No material assigned to renderer component on {gameObject.name}.");
             }
+
+            AssignMaterialColor(_startOn ? _flashOnColor: _flashOffColor);
         }
 
         public override void SetOn()
@@ -52,18 +61,18 @@ namespace BCIEssentials.StimulusEffects
                 return;
             }
 
-            _originalColor = _renderer.material.color;
             AssignMaterialColor(_flashOnColor);
+            IsOn = true;
         }
 
         public override void SetOff()
         {
-            if (!IsOn || _renderer == null || _renderer.material == null)
+            if (_renderer == null || _renderer.material == null)
             {
                 return;
             }
             
-            AssignMaterialColor(_originalColor);
+            AssignMaterialColor(_flashOffColor);
             IsOn = false;
         }
 
@@ -99,7 +108,7 @@ namespace BCIEssentials.StimulusEffects
                     AssignMaterialColor(_flashOnColor);
                     yield return new WaitForSecondsRealtime(_flashDurationSeconds);
 
-                    AssignMaterialColor(_originalColor);
+                    AssignMaterialColor(_flashOffColor);
                     yield return new WaitForSecondsRealtime(_flashDurationSeconds);
                 }
             }
