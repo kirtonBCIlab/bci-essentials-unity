@@ -39,22 +39,22 @@ namespace BCIEssentials.LSL
         /// <summary>
         /// If the target stream was discovered and available.
         /// </summary>
-        public bool Connected => _responseInlet is { IsClosed: false };
+        public bool Connected => _streamInlet is { IsClosed: false };
         
         /// <summary>
         /// If the target stream is being polled for responses.
         /// </summary>
-        public bool Polling => _receivingMarkers != null;
+        public bool Polling => _polling != null;
 
         /// <summary>
         /// If responses have been received and stored during polling.
         /// <see cref="GetResponses"/> does not reset this. 
         /// </summary>
-        public bool HasPolledResponses => _responses.Count > 0;
+        public bool HasStoredResponses => _responsesStore.Count > 0;
         
-        private StreamInlet _responseInlet;
-        private Coroutine _receivingMarkers;
-        private readonly List<string> _responses = new();
+        private StreamInlet _streamInlet;
+        private Coroutine _polling;
+        private readonly List<string> _responsesStore = new();
 
         /// <summary>
         /// Attempt to resolve the target stream using <see cref="_targetStreamName"/>.
@@ -77,10 +77,10 @@ namespace BCIEssentials.LSL
             var streamInfos = LSL.resolve_stream("name", targetStreamName, 0, _resolveTimeout);
             if (streamInfos.Length <= 0) return;
             
-            _responseInlet = new StreamInlet(streamInfos[0]);
-            _responseInlet.open_stream();
+            _streamInlet = new StreamInlet(streamInfos[0]);
+            _streamInlet.open_stream();
             
-            Debug.Log($"Connected to stream: {_responseInlet}");
+            Debug.Log($"Connected to stream: {_streamInlet}");
         }
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace BCIEssentials.LSL
             
             if (Connected)
             {
-                _responseInlet?.close_stream();
-                _responseInlet?.Dispose();
-                _responseInlet = null;
+                _streamInlet?.close_stream();
+                _streamInlet?.Dispose();
+                _streamInlet = null;
             }
         }
 
@@ -121,10 +121,10 @@ namespace BCIEssentials.LSL
 
             foreach (var response in GetResponses())
             {
-                _responses.Add(response);
+                _responsesStore.Add(response);
             }
             
-            _receivingMarkers = StartCoroutine(PollForSamples(onResponseCallback));
+            _polling = StartCoroutine(PollForSamples(onResponseCallback));
         }
 
         /// <summary>
@@ -132,11 +132,11 @@ namespace BCIEssentials.LSL
         /// </summary>
         public void StopPolling()
         {
-            _responses.Clear();
-            if (_receivingMarkers != null)
+            _responsesStore.Clear();
+            if (_polling != null)
             {
-                StopCoroutine(_receivingMarkers);
-                _receivingMarkers = null;
+                StopCoroutine(_polling);
+                _polling = null;
             }
         }
         
@@ -155,24 +155,24 @@ namespace BCIEssentials.LSL
 
             var responses = new List<string>();
             
-            if (HasPolledResponses)
+            if (HasStoredResponses)
             {
-                foreach (var response in _responses)
+                foreach (var response in _responsesStore)
                 {
                     responses.Add(response);
                 }
                 
-                _responses.Clear();
+                _responsesStore.Clear();
             }
             
             if (!Polling)
             {
-                var availableSamples = _responseInlet.samples_available();
+                var availableSamples = _streamInlet.samples_available();
                 var sample = new[] { "" };
 
                 for (int i = 0; i < availableSamples; i++)
                 {
-                    _responseInlet.pull_sample(sample);
+                    _streamInlet.pull_sample(sample);
                     responses.Add(sample[0]);
                 }
 
@@ -187,7 +187,7 @@ namespace BCIEssentials.LSL
         /// </summary>
         public void ClearPolledResponses()
         {
-            _responses.Clear();
+            _responsesStore.Clear();
         }
         
         private IEnumerator PollForSamples(Action<string[]> onResponse = null)
@@ -196,18 +196,18 @@ namespace BCIEssentials.LSL
             while (true)
             {
                 var responses = new []{""};
-                double result = _responseInlet.pull_sample(responses, 0);
+                double result = _streamInlet.pull_sample(responses, 0);
                 if (result != 0)
                 {
                     foreach (var response in responses)
                     {
-                        _responses.Add(response);
+                        _responsesStore.Add(response);
                     }
 
                     if (onResponse != null)
                     {
                         onResponse.Invoke(responses);
-                        _responses.Clear();
+                        _responsesStore.Clear();
                     }
                 }
                 
@@ -219,7 +219,7 @@ namespace BCIEssentials.LSL
     public interface IResponseStream
     {
         public bool Connected { get; }
-        public bool HasPolledResponses { get; }
+        public bool HasStoredResponses { get; }
         
         public void Connect();
         public void Connect(string targetStringName);

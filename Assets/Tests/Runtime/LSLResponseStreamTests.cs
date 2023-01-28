@@ -94,7 +94,7 @@ namespace BCIEssentials.Tests
             _testResponseStream.Disconnect();
             
             Assert.IsFalse(_testResponseStream.Connected);
-            Assert.IsFalse(_testResponseStream.HasPolledResponses);
+            Assert.IsFalse(_testResponseStream.HasStoredResponses);
         }
 
         [UnityTest]
@@ -107,7 +107,7 @@ namespace BCIEssentials.Tests
             _testResponseStream.StartPolling();
             yield return new WaitWhile(()=> writeMarkers.IsRunning);
             
-            Assert.IsTrue(_testResponseStream.HasPolledResponses);
+            Assert.IsTrue(_testResponseStream.HasStoredResponses);
         }
 
         [UnityTest]
@@ -132,13 +132,13 @@ namespace BCIEssentials.Tests
             
             _testMarkerStream.Write("amarkervalue");
             yield return null;
-            var hadResponses = _testResponseStream.HasPolledResponses;
+            var hadResponses = _testResponseStream.HasStoredResponses;
             _testResponseStream.StopPolling();
             yield return null;
             _testMarkerStream.Write("amarkervalue");
             yield return null;
             
-            Assert.AreNotEqual(hadResponses, _testResponseStream.HasPolledResponses);
+            Assert.AreNotEqual(hadResponses, _testResponseStream.HasStoredResponses);
         }
 
         [UnityTest]
@@ -171,7 +171,7 @@ namespace BCIEssentials.Tests
             var responses = _testResponseStream.GetResponses();
             
             Assert.AreEqual(sentMarkers, responses.Length);
-            Assert.False(_testResponseStream.HasPolledResponses);
+            Assert.False(_testResponseStream.HasStoredResponses);
         }
 
         [Test]
@@ -181,11 +181,11 @@ namespace BCIEssentials.Tests
             _testMarkerStream.Write("amarkervalue");
             _testResponseStream.StartPolling();
 
-            var hadResponses = _testResponseStream.HasPolledResponses;
+            var hadResponses = _testResponseStream.HasStoredResponses;
             
             _testResponseStream.ClearPolledResponses();
             
-            Assert.AreNotEqual(hadResponses, _testResponseStream.HasPolledResponses);
+            Assert.AreNotEqual(hadResponses, _testResponseStream.HasStoredResponses);
         }
     }
 }
