@@ -59,31 +59,19 @@ namespace BCIEssentials.Controllers
             // Press T to do automated training
             if (Input.GetKeyDown(KeyCode.T))
             {
-                // Receive incoming markers
-                if (receivingMarkers == false)
-                {
-                    StartCoroutine(ReceiveMarkers());
-                }
-
-                StartCoroutine(DoTraining());
+                StartAutomatedTraining();
             }
 
             // Press I to do Iterative training (MI only)
             if (Input.GetKeyDown(KeyCode.I))
             {
-                // Receive incoming markers
-                if (receivingMarkers == false)
-                {
-                    StartCoroutine(ReceiveMarkers());
-                }
-
-                StartCoroutine(DoIterativeTraining());
+                StartIterativeTraining();
             }
 
             // Press U to do User training, stimulus without BCI
             if (Input.GetKeyDown(KeyCode.U))
             {
-                StartCoroutine(DoUserTraining());
+                StartUserTraining();
             }
 
 

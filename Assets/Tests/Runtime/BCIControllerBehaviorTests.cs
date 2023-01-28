@@ -228,8 +228,7 @@ public class BCIControllerBehaviorTests_WhenSendReceiveMarkers : PlayModeTestRun
         {
             var testDurationRunner = AddCoroutineRunner(DelayForSeconds(6, StopAllCoroutineRunners));
             var sendMarkerRunner = AddCoroutineRunner(WriteMockMarker(AddComponent<LSLMarkerStream>(), testValues.Item1, 1));
-            var behaviorRunner = AddCoroutineRunner(_behavior.ReceiveMarkers());
-
+            
             var selectedIndex = -1;
             for (var i = 0; i < 6; i++)
             {
@@ -241,8 +240,8 @@ public class BCIControllerBehaviorTests_WhenSendReceiveMarkers : PlayModeTestRun
 
             testDurationRunner.StartRun();
             sendMarkerRunner.StartRun();
-            behaviorRunner.StartRun();
-            yield return new WaitWhile(() => behaviorRunner.IsRunning);
+            _behavior.ReceiveMarkers();
+            yield return new WaitWhile(() => testDurationRunner.IsRunning);
 
             Assert.AreEqual(testValues.Item2, selectedIndex);
         }
