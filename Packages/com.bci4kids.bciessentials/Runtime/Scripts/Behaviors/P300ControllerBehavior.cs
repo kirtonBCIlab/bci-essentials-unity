@@ -204,7 +204,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (singleFlash)
             {
                 int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
-                int[] stimOrder = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, objectList.Count);
+                int[] stimOrder = ArrayUtilities.GenerateRNRA(totalFlashes, 0, objectList.Count - 1);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {

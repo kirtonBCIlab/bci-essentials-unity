@@ -20,22 +20,22 @@
     {
       "displayName": "Controller Hotswapping Example",
       "description": "Demonstrates how to set up a BCI controller with multiple behavior types which can be switched at runtime.",
-      "path": "Samples~/BCIControllerBehaviors"
+      "path": "Samples~/Controller Hotswapping Example"
     },
     {
       "displayName": "Original MI Controller",
       "description": "An example setup for the prepackage style MI Controller.",
-      "path": "Samples~/MIController"
+      "path": "Samples~/Original MI Controller"
     },
     {
       "displayName": "Original P300 Controller",
       "description": "An example setup for the prepackage style P300 Controller.",
-      "path": "Samples~/P300Controller"
+      "path": "Samples~/Original P300 Controller"
     },
     {
       "displayName": "Original SSVEP Controller",
       "description": "An example setup for the prepackage style SSVEP Controller.",
-      "path": "Samples~/SSVEPController"
+      "path": "Samples~/Original SSVEP Controller"
     }
   ]
 }
