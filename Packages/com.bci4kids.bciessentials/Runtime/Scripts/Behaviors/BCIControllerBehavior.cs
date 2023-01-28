@@ -101,6 +101,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void CleanUp()
         {
             setup.DestroyMatrix();
+            responseStream.Disconnect();
             StopAllCoroutines();
         }
 
