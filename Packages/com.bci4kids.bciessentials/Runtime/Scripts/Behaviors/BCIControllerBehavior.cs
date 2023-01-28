@@ -18,6 +18,7 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public abstract BCIBehaviorType BehaviorType { get; }
 
+        [SerializeField] private bool _selfRegistering = true;
         [SerializeField] private int targetFrameRate = 60;
 
         //Matrix Setup
@@ -65,17 +66,17 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual void Start()
         {
-            if (BCIController.Instance != null)
+            if (_selfRegistering)
             {
-                BCIController.Instance.RegisterBehavior(this);
+                RegisterWithControllerInstance();
             }
         }
 
         private void OnDestroy()
         {
-            if (BCIController.Instance != null)
+            if (_selfRegistering)
             {
-                BCIController.Instance.UnregisterBehavior(this);
+                UnregisterFromControllerInstance();
             }
         }
 
@@ -105,6 +106,22 @@ namespace BCIEssentials.ControllerBehaviors
         {
             setup.DestroyMatrix();
             StopAllCoroutines();
+        }
+
+        public void RegisterWithControllerInstance()
+        {
+            if (BCIController.Instance != null)
+            {
+                BCIController.Instance.RegisterBehavior(this);
+            }
+        }
+
+        public void UnregisterFromControllerInstance()
+        {
+            if (BCIController.Instance != null)
+            {
+                BCIController.Instance.UnregisterBehavior(this);
+            }
         }
 
         // Populate a list of SPOs
@@ -285,6 +302,129 @@ namespace BCIEssentials.ControllerBehaviors
 
         //}
 
+        // Coroutine for the stimulus
+        public virtual IEnumerator Stimulus()
+        {
+            // Present the stimulus until it is turned off
+            while (stimOn)
+            {
+                // What to do each frame
+                for (int i = 0; i < objectList.Count; i++)
+                {
+                    try
+                    {
+                        objectList[i].GetComponent<SPO>().StartStimulus();
+                    }
+                    catch
+                    {
+                        Debug.Log("There is no object " + i.ToString());
+                    }
+                }
+
+                //Wait until next frame
+                yield return 0;
+            }
+
+            // Reset the SPOs
+            for (int i = 0; i < objectList.Count; i++)
+            {
+                try
+                {
+                    objectList[i].GetComponent<SPO>().StopStimulus();
+                }
+                catch
+                {
+                    Debug.Log("There is no object " + i.ToString());
+                }
+            }
+
+            yield return 0;
+        }
+
+        #region Markers
+
+        // Send markers
+        public virtual IEnumerator SendMarkers(int trainingIndex = 99)
+        {
+            // Make the marker string, this will change based on the paradigm
+            while (stimOn)
+            {
+                string markerString = "marker";
+
+                if (trainingIndex <= objectList.Count)
+                {
+                    markerString = markerString + "," + trainingIndex.ToString();
+                }
+
+                // Send the marker
+                marker.Write(markerString);
+
+                // Wait the window length + the inter-window interval
+                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+            }
+        }
+
+        // Coroutine to continuously receive markers
+        public IEnumerator ReceiveMarkers()
+        {
+            if (receivingMarkers == false)
+            {
+                //Get response stream from Python
+                print("Looking for a response stream");
+                int diditwork = response.ResolveResponse();
+                print(diditwork.ToString());
+                receivingMarkers = true;
+            }
+
+            //Set interval at which to receive markers
+            float receiveInterval = 1 / Application.targetFrameRate;
+            float responseTimeout = 0f;
+
+            //Ping count
+            int pingCount = 0;
+
+            // Receive markers continuously
+            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
+            {
+                // Receive markers
+                // Pull the python response and add it to the responseStrings array
+                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
+                var responseString = responseStrings[0];
+
+                if (responseString.Equals("ping"))
+                {
+                    pingCount++;
+                    if (pingCount % 100 == 0)
+                    {
+                        Debug.Log($"Ping Count: {pingCount}");
+                    }
+                }
+                else if (!responseString.Equals(""))
+                {
+                    //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+                    //Question: Do we get more than once response string?
+                    for (int i = 0; i < responseStrings.Length; i++)
+                    {
+                        Debug.Log($"response : {responseString}");
+                        if (int.TryParse(responseString, out var index) && index < objectList.Count)
+                        {
+                            //Run on selection
+                            objectList[index].GetComponent<SPO>().Select();
+                        }
+                    }
+                }
+
+                // Wait for the next receive interval
+                yield return new WaitForSecondsRealtime(receiveInterval);
+            }
+
+            Debug.Log("Done receiving markers");
+        }
+
+        #endregion
+
+        #region Training
+
         // Do training
         public virtual IEnumerator DoTraining()
         {
@@ -365,126 +505,11 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        #endregion
+
         public static void LogArrayValues(int[] values)
         {
             print(string.Join(", ", values));
-        }
-
-        // Coroutine for the stimulus
-        public virtual IEnumerator Stimulus()
-        {
-            // Present the stimulus until it is turned off
-            while (stimOn)
-            {
-                // What to do each frame
-                for (int i = 0; i < objectList.Count; i++)
-                {
-                    try
-                    {
-                        objectList[i].GetComponent<SPO>().StartStimulus();
-                    }
-                    catch
-                    {
-                        Debug.Log("There is no object " + i.ToString());
-                    }
-                }
-
-                //Wait until next frame
-                yield return 0;
-            }
-
-            // Reset the SPOs
-            for (int i = 0; i < objectList.Count; i++)
-            {
-                try
-                {
-                    objectList[i].GetComponent<SPO>().StopStimulus();
-                }
-                catch
-                {
-                    Debug.Log("There is no object " + i.ToString());
-                }
-            }
-
-            yield return 0;
-        }
-
-        // Send markers
-        public virtual IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            // Make the marker string, this will change based on the paradigm
-            while (stimOn)
-            {
-                string markerString = "marker";
-
-                if (trainingIndex <= objectList.Count)
-                {
-                    markerString = markerString + "," + trainingIndex.ToString();
-                }
-
-                // Send the marker
-                marker.Write(markerString);
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-            }
-        }
-
-        // Coroutine to continuously receive markers
-        public IEnumerator ReceiveMarkers()
-        {
-            if (receivingMarkers == false)
-            {
-                //Get response stream from Python
-                print("Looking for a response stream");
-                int diditwork = response.ResolveResponse();
-                print(diditwork.ToString());
-                receivingMarkers = true;
-            }
-
-            //Set interval at which to receive markers
-            float receiveInterval = 1 / Application.targetFrameRate;
-            float responseTimeout = 0f;
-
-            //Ping count
-            int pingCount = 0;
-
-            // Receive markers continuously
-            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
-            {
-                // Receive markers
-                // Pull the python response and add it to the responseStrings array
-                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
-                var responseString = responseStrings[0];
-
-                if (responseString.Equals("ping"))
-                {
-                    pingCount++;
-                    if (pingCount % 100 == 0)
-                    {
-                        Debug.Log($"Ping Count: {pingCount}");
-                    }
-                }
-                else if (!responseString.Equals(""))
-                {
-                    //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                    //Question: Do we get more than once response string?
-                    for (int i = 0; i < responseStrings.Length; i++)
-                    {
-                        Debug.Log($"response : {responseString}");
-                        if (int.TryParse(responseString, out var index) && index < objectList.Count)
-                        {
-                            //Run on selection
-                            objectList[index].GetComponent<SPO>().Select();
-                        }
-                    }
-                }
-
-                // Wait for the next receive interval
-                yield return new WaitForSecondsRealtime(receiveInterval);
-            }
-
-            Debug.Log("Done receiving markers");
         }
     }
 }

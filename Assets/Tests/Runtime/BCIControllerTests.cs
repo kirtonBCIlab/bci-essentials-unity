@@ -11,6 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests
 {
+    [TestFixture]
     public class BCIControllerTests
     {
         public class BCIControllerAndOnAwake : PlayModeTestRunnerBase

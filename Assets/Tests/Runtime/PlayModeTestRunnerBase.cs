@@ -78,8 +78,8 @@ namespace BCIEssentials.Tests.Utilities
 
         protected static void SetField<T>(T component, string name, object value)
         {
-            var info = component.GetType()
-                .GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var componentType = component.GetType();
+            var info = GetFieldRecursive(componentType, name);
             if (info == null)
             {
                 Assert.Fail($"No field for name {name} on object");
@@ -87,6 +87,25 @@ namespace BCIEssentials.Tests.Utilities
             }
 
             info.SetValue(component, value);
+
+            FieldInfo GetFieldRecursive(Type type, string fieldName)
+            {
+                var infoRecursive = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                if (infoRecursive != null)
+                {
+                    return infoRecursive;
+                }
+                
+                var baseType = type.BaseType;
+                if (baseType == null || baseType == typeof(MonoBehaviour))
+                {
+                    return null;
+                }
+                
+                infoRecursive = GetFieldRecursive(baseType, fieldName);
+
+                return infoRecursive;
+            }
         }
 
         protected static T AddComponent<T>() where T : MonoBehaviour

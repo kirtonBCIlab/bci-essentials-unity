@@ -25,7 +25,7 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(false, true);
+            _testController = CreateController();
             _testControllerObject = _testController.gameObject;
             _behavior = _testControllerObject.AddComponent<EmptyBCIControllerBehavior>();
 
@@ -33,19 +33,67 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void OnStart_ThenBehaviorRegistered()
+        public void WhenRegisterWithControllerInstance_ThenBehaviorRegistered()
         {
-            var isRegistered = _testController.HasBehaviorOfType<EmptyBCIControllerBehavior>();
-            Assert.IsTrue(isRegistered);
+            _testControllerObject.SetActive(true);
+            _behavior.RegisterWithControllerInstance();
+            
+            Assert.IsTrue(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
         [Test]
-        public void OnDestroy_ThenBehaviorUnregistered()
+        public void WhenUnregisterFromControllerInstance_ThenBehaviorUnregistered()
         {
+            _behavior.RegisterWithControllerInstance();
+            
+            _behavior.UnregisterFromControllerInstance();
+            
+            Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
+        }
+
+        [UnityTest]
+        public IEnumerator OnStartAndSelfRegister_ThenBehaviorRegistered()
+        {
+            SetField(_behavior, "_selfRegistering", true);
+            
+            _testControllerObject.SetActive(true);
+            yield return null;
+            
+            Assert.IsTrue(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
+        }
+
+        [UnityTest]
+        public IEnumerator OnStartAndNotSelfRegister_ThenBehaviorNotRegistered()
+        {
+            SetField(_behavior, "_selfRegistering", false);
+            _testControllerObject.SetActive(true);
+            yield return null;
+            
+            Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
+        }
+
+        [UnityTest]
+        public IEnumerator OnDestroyAndSelfRegister_ThenBehaviorUnregistered()
+        {
+            SetField(_behavior, "_selfRegistering", true);
+            _testControllerObject.SetActive(true);
+            yield return null;
+            
             Object.DestroyImmediate(_behavior);
 
-            var isRegistered = _testController.HasBehaviorOfType<EmptyBCIControllerBehavior>();
-            Assert.IsFalse(isRegistered);
+            Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
+        }
+
+        [UnityTest]
+        public IEnumerator OnDestroyAndNotSelfRegister_ThenBehaviorNotUnregistered()
+        {
+            SetField(_behavior, "_selfRegistering", false);
+            _behavior.RegisterWithControllerInstance();
+            yield return null;
+            
+            Object.DestroyImmediate(_behavior);
+
+            Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
         [Test]
