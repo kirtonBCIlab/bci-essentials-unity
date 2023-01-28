@@ -433,28 +433,23 @@ namespace BCIEssentials.ControllerBehaviors
         // Coroutine to continuously receive markers
         public IEnumerator ReceiveMarkers()
         {
-            if (receivingMarkers == false)
+            if (!response.Connected)
             {
-                //Get response stream from Python
-                print("Looking for a response stream");
-                int diditwork = response.ResolveResponse();
-                print(diditwork.ToString());
-                receivingMarkers = true;
+                response.Connect();
             }
 
             //Set interval at which to receive markers
             float receiveInterval = 1 / Application.targetFrameRate;
-            float responseTimeout = 0f;
 
             //Ping count
             int pingCount = 0;
 
             // Receive markers continuously
-            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
+            while (true) //TODO: Nothing sets this to false, relies on stopping coroutine instead
             {
                 // Receive markers
                 // Pull the python response and add it to the responseStrings array
-                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
+                var responseStrings = response.GetResponses();
                 var responseString = responseStrings[0];
 
                 if (responseString.Equals("ping"))

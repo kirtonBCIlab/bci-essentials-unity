@@ -244,7 +244,7 @@ namespace BCIEssentials.Tests
         {
             var testDurationSeconds = 6;
             var streamListener = AddComponent<LSLResponseStream>();
-            streamListener.value = "UnityMarkerStream";
+            streamListener.Connect("UnityMarkerStream");
             var streamResponses = new List<string[]>();
 
             var enableStimulusRunner =
@@ -289,12 +289,12 @@ namespace BCIEssentials.Tests
 
         private IEnumerator ListenForMarkerStreams(LSLResponseStream responseStream, List<string[]> responses)
         {
-            responseStream.ResolveResponse();
+            responseStream.Connect();
             yield return new WaitForEndOfFrame();
 
             while (true)
             {
-                var response = responseStream.PullResponse(new string[1], 0);
+                var response = responseStream.GetResponses();
                 if (response.Length > 0 && !response[0].Equals(""))
                 {
                     responses.Add(response);
