@@ -8,6 +8,7 @@ using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.Utilities;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
+using Tests.Resources.Scripts;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
@@ -54,7 +55,10 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator OnStartAndSelfRegister_ThenBehaviorRegistered()
         {
-            SetField(_behavior, "_selfRegistering", true);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegister = true
+            });
             
             _testControllerObject.SetActive(true);
             yield return null;
@@ -63,9 +67,26 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
+        public IEnumerator OnStartAndSelfRegisterAsActive_ThenBehaviorRegisteredAndSetToActive()
+        {
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegisterAsActive = true
+            });
+            
+            _testControllerObject.SetActive(true);
+            yield return null;
+            
+            Assert.AreEqual(_behavior.BehaviorType, _testController.ActiveBehavior.BehaviorType);
+        }
+
+        [UnityTest]
         public IEnumerator OnStartAndNotSelfRegister_ThenBehaviorNotRegistered()
         {
-            SetField(_behavior, "_selfRegistering", false);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegister = false
+            });
             _testControllerObject.SetActive(true);
             yield return null;
             
@@ -75,7 +96,10 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator OnDestroyAndSelfRegister_ThenBehaviorUnregistered()
         {
-            SetField(_behavior, "_selfRegistering", true);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegister = true
+            });
             _testControllerObject.SetActive(true);
             yield return null;
             
@@ -87,7 +111,10 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator OnDestroyAndNotSelfRegister_ThenBehaviorNotUnregistered()
         {
-            SetField(_behavior, "_selfRegistering", false);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegister = false
+            });
             _behavior.RegisterWithControllerInstance();
             yield return null;
             
@@ -97,16 +124,39 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenInitialize_ThenTargetFrameRateSet()
+        [TestCase(-1)]
+        [TestCase(5)]
+        [TestCase(500)]
+        public void WhenInitializeWithValidTargetFrameRate_ThenTargetFrameRateSet(int targetFrameRate)
         {
-            int previousFrameRate = Application.targetFrameRate;
-            Application.targetFrameRate = 500;
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                targetFrameRate = targetFrameRate
+            });
+            
+            _behavior.Initialize(null, null);
+
+            Assert.AreEqual(targetFrameRate, Application.targetFrameRate);
+
+            Application.targetFrameRate = -1;
+        }
+        
+        [Test]
+        [TestCase(0)]
+        [TestCase(-5)]
+        [TestCase(-500)]
+        public void WhenInitializeWithInvalidTargetFrameRate_ThenTargetFrameRateNotSet(int targetFrameRate)
+        {
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                targetFrameRate = targetFrameRate
+            });
 
             _behavior.Initialize(null, null);
 
-            Assert.AreEqual(60, Application.targetFrameRate);
+            Assert.AreNotEqual(targetFrameRate, Application.targetFrameRate);
 
-            Application.targetFrameRate = previousFrameRate;
+            Application.targetFrameRate = -1;
         }
 
         [Test]
@@ -115,8 +165,11 @@ namespace BCIEssentials.Tests
             var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
             matrix.Initialize(spo, 2, 2, Vector2.one);
-            SetField(_behavior, "setupRequired", true);
-            SetField(_behavior, "setup", matrix);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                setupRequired = true,
+                setup = matrix
+            });
 
             _behavior.Initialize(null, null);
 
@@ -130,7 +183,10 @@ namespace BCIEssentials.Tests
             var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
             matrix.Initialize(spo, 2, 2, Vector2.one);
-            SetField(_behavior, "setup", matrix);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                setup = matrix
+            });
             matrix.SetUpMatrix();
 
             _behavior.CleanUp();
@@ -140,6 +196,22 @@ namespace BCIEssentials.Tests
             Assert.AreEqual(1, Object.FindObjectsOfType<SPO>().Length);
         }
 
+        [UnityTest]
+        public IEnumerator WhenCleanUpAndStimulusRunning_ThenStimulusRunStopped()
+        {
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selfRegisterAsActive = true
+            });
+            _testControllerObject.SetActive(true);
+            yield return null; //Wait for monobehaviors
+            _behavior.StartStimulusRun();
+            
+            _behavior.CleanUp();
+            
+            Assert.IsFalse(_behavior.StimulusRunning);
+        }
+        
         [Test]
         public void WhenPopulateObjectListWithTagMethod_ThenObjectListPopulated()
         {
@@ -151,80 +223,57 @@ namespace BCIEssentials.Tests
             //Deliberate use of default
             _behavior.PopulateObjectList(SpoPopulationMethod.Tag);
 
-            Assert.AreEqual(1, _behavior.ObjectList.Count);
-            UnityEngine.Assertions.Assert.AreEqual(included, _behavior.ObjectList[0]);
+            Assert.AreEqual(1, _behavior.SelectableSPOs.Count);
+            UnityEngine.Assertions.Assert.AreEqual(included, _behavior.SelectableSPOs[0]);
         }
 
         [Test]
-        public void WhenPopulateObjectListWithPredefinedMethod_ThenObjectListPopulated()
+        public void WhenPopulateObjectListWithPredefinedMethod_ThenObjectListPopulatedWithExistingValues()
         {
-            var noComponent = new GameObject { tag = _behavior.myTag };
-            var noTag = AddSPOToScene("");
-            var included = AddSPOToScene();
-            var falseIncludeMe = AddSPOToScene(includeMe: false);
-            SetField(_behavior, "objectList", new List<SPO>
+            var existingSPOs = new List<SPO>
             {
-                noTag,
-                included,
-                falseIncludeMe
+                AddSPOToScene(),
+                AddSPOToScene(),
+                AddSPOToScene()
+            };
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = existingSPOs
             });
 
-            _behavior.PopulateObjectList(SpoPopulationMethod.Predefined);
+            _behavior.PopulateObjectList(SpoPopulationMethod.Children);
 
-            Assert.AreEqual(3, _behavior.ObjectList.Count);
-            UnityEngine.Assertions.Assert.AreEqual(noTag, _behavior.ObjectList[0]);
-            UnityEngine.Assertions.Assert.AreEqual(included, _behavior.ObjectList[1]);
-            UnityEngine.Assertions.Assert.AreEqual(falseIncludeMe, _behavior.ObjectList[2]);
+            Assert.AreEqual(existingSPOs.Count, _behavior.SelectableSPOs.Count);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[0], _behavior.SelectableSPOs[0]);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[1], _behavior.SelectableSPOs[1]);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[2], _behavior.SelectableSPOs[2]);
         }
 
         [Test]
-        public void WhenPopulateObjectListWithChildrenMethod_ThenThrows()
+        public void WhenPopulateObjectListWithChildrenMethod_ThenObjectListPopulatedWithExistingValues()
         {
-            Assert.Throws<NotImplementedException>(
-                () => { _behavior.PopulateObjectList(SpoPopulationMethod.Children); });
-        }
+            var existingSPOs = new List<SPO>
+            {
+                AddSPOToScene(),
+                AddSPOToScene(),
+                AddSPOToScene()
+            };
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = existingSPOs
+            });
 
-        [UnityTest]
-        public IEnumerator WhenRunStimulus_ThenSPOsTurnedOnAndOff()
-        {
-            var enableStimulus = AddCoroutineRunner(DelayForFrames(5, () => _behavior.stimOn = false));
-            var runStimulus = AddCoroutineRunner(_behavior.Stimulus());
+            _behavior.PopulateObjectList(SpoPopulationMethod.Children);
 
-            var mockSpo = new GameObject().AddComponent<MockSPO>();
-            SetField(_behavior, "objectList", new List<SPO> { mockSpo });
-
-            int turnedOnCount = 0;
-            mockSpo.TurnOnAction = () => { ++turnedOnCount; };
-
-            int turnedOffCount = 0;
-            mockSpo.TurnOffAction = () => { ++turnedOffCount; };
-
-
-            //Run Test
-            _behavior.stimOn = true;
-            enableStimulus.StartRun();
-            runStimulus.StartRun();
-            yield return new WaitWhile(() => runStimulus.IsRunning);
-
-
-            Assert.AreEqual(5, turnedOnCount);
-            Assert.AreEqual(1, turnedOffCount);
+            Assert.AreEqual(existingSPOs.Count, _behavior.SelectableSPOs.Count);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[0], _behavior.SelectableSPOs[0]);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[1], _behavior.SelectableSPOs[1]);
+            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[2], _behavior.SelectableSPOs[2]);
         }
     }
 
     public class BCIControllerBehaviorTests_WhenSendReceiveMarkers : PlayModeTestRunnerBase
     {
-        private static (string, int)[] k_WhenReceiveMarkersTestMarkerValues =
-        {
-            ("", -1),
-            ("ping", -1),
-            ("notavalue", -1),
-            ("500", -1),
-            ("0", 0),
-            ("1", 1),
-            ("5", 5)
-        };
-
         private BCIController _testController;
         private BCIControllerBehavior _behavior;
 
@@ -233,10 +282,12 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(false, true);
+            _testController = CreateController(new BCIControllerExtensions.Properties
+            {
+                _dontDestroyActiveInstance = false
+            }, true);
 
             _behavior = _testController.gameObject.AddComponent<EmptyBCIControllerBehavior>();
-            _behavior.stimOn = true;
             _behavior.windowLength = 1;
             _behavior.interWindowInterval = 1;
 
@@ -247,84 +298,6 @@ namespace BCIEssentials.Tests
         public void TestCleanup()
         {
             StopAllCoroutineRunners();
-        }
-
-        [UnityTest]
-        public IEnumerator WhenSendMarkers_ThenMarkerSentInIntervals()
-        {
-            var testDurationSeconds = 6;
-            var streamListener = AddComponent<LSLResponseStream>();
-            streamListener.value = "UnityMarkerStream";
-            var streamResponses = new List<string[]>();
-
-            var enableStimulusRunner =
-                AddCoroutineRunner(DelayForSeconds(testDurationSeconds, () => _behavior.stimOn = false));
-            var listenForMarkerRunner = AddCoroutineRunner(ListenForMarkerStreams(streamListener, streamResponses));
-            var behaviorSendMarkers = AddCoroutineRunner(_behavior.SendMarkers());
-
-            //Run Test
-            listenForMarkerRunner.StartRun();
-            enableStimulusRunner.StartRun();
-            behaviorSendMarkers.StartRun();
-            yield return new WaitWhile(() => behaviorSendMarkers.IsRunning);
-
-            Assert.AreEqual(testDurationSeconds / (_behavior.windowLength + _behavior.interWindowInterval),
-                streamResponses.Count);
-        }
-
-        [UnityTest]
-        public IEnumerator WhenReceiveMarkersWithResponseValues_ThenExpectedSpoSelected(
-            [ValueSource(nameof(k_WhenReceiveMarkersTestMarkerValues))] (string, int) testValues)
-        {
-            var testDurationRunner = AddCoroutineRunner(DelayForSeconds(6, StopAllCoroutineRunners));
-            var sendMarkerRunner = AddCoroutineRunner(WriteMockMarker(AddComponent<LSLMarkerStream>(), testValues.Item1, 1));
-            var behaviorRunner = AddCoroutineRunner(_behavior.ReceiveMarkers());
-
-            var selectedIndex = -1;
-            for (var i = 0; i < 6; i++)
-            {
-                var spo = AddSPOToScene<MockSPO>();
-                spo.OnSelectionAction = () => selectedIndex = spo.SelectablePoolIndex;
-            }
-            
-            _behavior.PopulateObjectList();
-
-            testDurationRunner.StartRun();
-            sendMarkerRunner.StartRun();
-            behaviorRunner.StartRun();
-            yield return new WaitWhile(() => behaviorRunner.IsRunning);
-
-            Assert.AreEqual(testValues.Item2, selectedIndex);
-        }
-
-        private IEnumerator ListenForMarkerStreams(LSLResponseStream responseStream, List<string[]> responses)
-        {
-            responseStream.ResolveResponse();
-            yield return new WaitForEndOfFrame();
-
-            while (true)
-            {
-                var response = responseStream.PullResponse(new string[1], 0);
-                if (response.Length > 0 && !response[0].Equals(""))
-                {
-                    responses.Add(response);
-                }
-
-                yield return new WaitForSecondsRealtime(1 / Application.targetFrameRate);
-            }
-        }
-
-        private IEnumerator WriteMockMarker(LSLMarkerStream markerStream, string value,
-            float intervalSeconds = 0.1f)
-        {
-            markerStream.StreamName = "PythonResponse";
-            markerStream.InitializeStream();
-
-            while (true)
-            {
-                markerStream.Write(value);
-                yield return new WaitForSeconds(intervalSeconds);
-            }
         }
     }
 
@@ -338,7 +311,10 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(false, true);
+            _testController = CreateController(new BCIControllerExtensions.Properties
+            {
+                _dontDestroyActiveInstance = false
+            }, true);
             _behavior = _testController.gameObject.AddComponent<EmptyBCIControllerBehavior>();
             _testController.RegisterBehavior(_behavior, true);
         }
@@ -360,7 +336,7 @@ namespace BCIEssentials.Tests
             yield return new WaitWhile(() => behaviorRunner.IsRunning);
 
             Assert.AreEqual(2, sposTrained);
-            Assert.AreEqual(_behavior.ObjectList.Count, spoCount);
+            Assert.AreEqual(_behavior.SelectableSPOs.Count, spoCount);
         }
 
         [UnityTest]
@@ -387,7 +363,7 @@ namespace BCIEssentials.Tests
             _behavior.shamFeedback = true;
 
             bool onSelectedCalled = false;
-            AddSPOToScene<MockSPO>().OnSelectionAction = () => onSelectedCalled = true;
+            AddSPOToScene<MockSPO>().OnSelectedEvent.AddListener(() => onSelectedCalled = true);
 
             behaviorRunner.StartRun();
             yield return new WaitWhile(() => behaviorRunner.IsRunning);

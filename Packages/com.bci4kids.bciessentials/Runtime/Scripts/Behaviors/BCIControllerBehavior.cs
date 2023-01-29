@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using System;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
-using Random = System.Random;
+using UnityEngine.Serialization;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -16,27 +15,38 @@ namespace BCIEssentials.ControllerBehaviors
     /// </summary>
     public abstract class BCIControllerBehavior : MonoBehaviour
     {
+        /// <summary>
+        /// The type of BCI behavior implemented.
+        /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
 
-        [SerializeField] private bool _selfRegistering = true;
-        [SerializeField] private int targetFrameRate = 60;
+        [SerializeField]
+        [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
+        private bool _selfRegister = true;
+        
+        [SerializeField]
+        [Tooltip("Whether to set as active behavior when self registering.")]
+        private bool _selfRegisterAsActive;
+        
+        [SerializeField]
+        [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
+        [Min(-1)]
+        private int targetFrameRate = 60;
 
-        //Matrix Setup
-        public bool setupRequired;
+        [SerializeField]
+        [Tooltip("Provide an initial set of SPO.")]
+        protected List<SPO> _selectableSPOs = new();
 
-        //PopulateObjectList
-        public bool listExists;
 
-        //public GameObject[] objectList;
-        [SerializeField] protected List<SPO> objectList = new();
-        public List<SPO> ObjectList => objectList;
+        #region Refactorable Properties
 
         //StimulusOn/Off + sending Markers
         public float windowLength = 1.0f;
         public float interWindowInterval = 0f;
-        public bool stimOn = false;
 
         //Training
+        [SerializeField] protected MatrixSetup setup;
+        public bool setupRequired;
         public int numTrainingSelections;
         public int numTrainWindows = 3;
         public float pauseBeforeTraining = 2;
@@ -46,76 +56,111 @@ namespace BCIEssentials.ControllerBehaviors
         public bool shamFeedback = false;
         public int trainTarget = 99;
 
-        //Deal with the BCI Tag in a scene with mor flexibility.
-        [SerializeField] private string _myTag = "BCI";
+        [FormerlySerializedAs("_myTag")]
+        public string myTag = "BCI";
 
-        public string myTag
-        {
-            get { return _myTag; }
-            set { _myTag = value; }
-        }
+        #endregion
 
-        // Receive markers
-        protected bool receivingMarkers = false;
+        /// <summary>
+        /// If a stimulus run is currently taking place.
+        /// </summary>
+        public bool StimulusRunning { get; protected set; }
+        
+        /// <summary>
+        /// Available SPOs for selection during a Stimulus run
+        /// </summary>
+        public List<SPO> SelectableSPOs => _selectableSPOs;
+        
+        /// <summary>
+        /// The 
+        /// </summary>
+        public SPO LastSelectedSPO { get; private set; }
 
-        // Scripts
-        [SerializeField] protected MatrixSetup setup;
-
+        
         protected LSLMarkerStream marker;
         protected LSLResponseStream response;
 
+        protected Coroutine _receiveMarkers;
+        protected Coroutine _sendMarkers;
+        
+        protected Coroutine _runStimulus;
+        protected Coroutine _waitToSelect;
+
+
+        #region Life Cycle Methods
+
         protected virtual void Start()
         {
-            if (_selfRegistering)
+            if (_selfRegister)
             {
-                RegisterWithControllerInstance();
+                RegisterWithControllerInstance(_selfRegisterAsActive);
             }
         }
 
         private void OnDestroy()
         {
-            if (_selfRegistering)
+            if (_selfRegister)
             {
                 UnregisterFromControllerInstance();
             }
         }
 
+        /// <summary>
+        /// Initialize the behavior ready for future stimulus runs.
+        /// </summary>
+        /// <param name="lslMarkerStream">The lsl stream to write markers to.</param>
+        /// <param name="lslResponseStream">The stream to poll for markers.</param>
         public void Initialize(LSLMarkerStream lslMarkerStream, LSLResponseStream lslResponseStream)
         {
-            Application.targetFrameRate = targetFrameRate;
-
             marker = lslMarkerStream;
             response = lslResponseStream;
 
-            //Setup if required
+            //A value of -1 is the default
+            //A value of 0 can break stimulus effects
+            if (targetFrameRate is -1 or > 0)
+            {
+                Application.targetFrameRate = targetFrameRate; 
+            }
+            
             if (setupRequired)
             {
-                try
-                {
-                    setup.SetUpMatrix();
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Setup failed, make sure that the fields in setup matrix are filled");
-                    Debug.Log(e.Message);
-                }
+                setup.SetUpMatrix();
             }
         }
 
+        /// <summary>
+        /// Stop running coroutines and clean up any resources
+        /// controlled by this behavior.
+        /// </summary>
         public void CleanUp()
         {
-            setup.DestroyMatrix();
-            StopAllCoroutines();
+            if (setup != null)
+            {
+                setup.DestroyMatrix();
+            }
+
+            StimulusRunning = false;
+            StopCoroutineReference(ref _receiveMarkers);
+            StopCoroutineReference(ref _sendMarkers);
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _waitToSelect);
         }
 
-        public void RegisterWithControllerInstance()
+        /// <summary>
+        /// Register this behavior with the active <see cref="BCIController.Instance"/>.
+        /// <param name="setAsActive">If true will attempt to set itself as active behavior.</param>
+        /// </summary>
+        public void RegisterWithControllerInstance(bool setAsActive = false)
         {
             if (BCIController.Instance != null)
             {
-                BCIController.Instance.RegisterBehavior(this);
+                BCIController.Instance.RegisterBehavior(this, setAsActive);
             }
         }
 
+        /// <summary>
+        /// Unregister this behavior from the active <see cref="BCIController.Instance"/>.
+        /// </summary>
         public void UnregisterFromControllerInstance()
         {
             if (BCIController.Instance != null)
@@ -124,44 +169,140 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        // Populate a list of SPOs
-        public virtual void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        #endregion
+
+        #region Stimulus Methods
+
+        /// <summary>
+        /// <para>Invokes <see cref="StartStimulusRun"/> if <see cref="StimulusRunning"/> is false.</para>
+        /// <para>Invokes <see cref="StopStimulusRun"/> if <see cref="StimulusRunning"/> is true.</para>
+        /// </summary>
+        public void StartStopStimulusRun()
         {
-            //Populate the selected list
-            switch (populationMethod)
+            if (StimulusRunning)
             {
-                case SpoPopulationMethod.Predefined:
-                    listExists = true;
-                    break;
-                case SpoPopulationMethod.Children:
-                    throw new NotImplementedException("Populating by children is not yet implemented");
-                default:
-                case SpoPopulationMethod.Tag:
-                    objectList.Clear();
-                    GameObject[] taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
-                    foreach (var taggedGO in taggedGOs)
-                    {
-                        if (taggedGO.TryGetComponent<SPO>(out var spo) && spo.Selectable)
-                        {
-                            AddSpo(spo);
-                        }
-                    }
-
-                    listExists = true;
-                    break;
+                StopStimulusRun();
             }
-
-            void AddSpo(SPO spo)
+            else
             {
-                objectList.Add(spo);
-                spo.SelectablePoolIndex = objectList.Count - 1;
+                StartStimulusRun();
             }
         }
 
         /// <summary>
-        /// Obsolete Method. Use enum variation.
+        /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
-        /// <param name="populationMethod"></param>
+        /// <param name="sendConstantMarkers">
+        /// If true will also write to the marker stream until
+        /// the stimulus run ends or the number of markers sent equals <see cref="trainTarget"/>.
+        /// </param>
+        public virtual void StartStimulusRun(bool sendConstantMarkers = true)
+        {
+            if (StimulusRunning)
+            {
+                StopStimulusRun();
+            }
+            
+            StimulusRunning = true;
+            LastSelectedSPO = null;
+            
+            // Send the marker to start
+            marker.Write("Trial Started");
+
+            ReceiveMarkers();
+            PopulateObjectList();
+            StopStartCoroutine(ref _runStimulus, RunStimulus());
+
+            // Not required for P300
+            if (sendConstantMarkers)
+            {
+                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
+            }
+        }
+
+        /// <summary>
+        /// Stops the current stimulus run.
+        /// </summary>
+        public virtual void StopStimulusRun()
+        {
+            StimulusRunning = false;
+
+            // Send the marker to end
+            marker.Write("Trial Ends");
+        }
+        
+        protected IEnumerator RunStimulus()
+        {
+            while (StimulusRunning)
+            {
+                yield return OnStimulusRunBehavior();
+            }
+
+            yield return OnStimulusRunComplete();
+            
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _sendMarkers);
+        }
+
+        /// <summary>
+        /// Behavior to invoke during a stimulus run.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerator OnStimulusRunBehavior()
+        {
+            yield break;
+        }
+
+        /// <summary>
+        /// Behavior that is run after a stimulus run has ended.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerator OnStimulusRunComplete()
+        {
+            yield break;
+        }
+
+        #endregion
+
+        #region SPO Management
+
+        /// <summary>
+        /// Populate the <see cref="SelectableSPOs"/> using a particular method.
+        /// </summary>
+        /// <param name="populationMethod">Method of population to use</param>
+        public virtual void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        {
+            switch (populationMethod)
+            {
+                case SpoPopulationMethod.Predefined:
+                    //Use the current contents of object list
+                    break;
+                case SpoPopulationMethod.Children:
+                    Debug.LogWarning("Populating by children is not yet implemented");
+                    break;
+                default:
+                case SpoPopulationMethod.Tag:
+                    _selectableSPOs.Clear();
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    foreach (var taggedGO in taggedGOs)
+                    {
+                        if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
+                        {
+                            continue;
+                        }
+
+                        _selectableSPOs.Add(spo);
+                        spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Obsolete Method.
+        /// <para>Use <see cref="PopulateObjectList(BCIEssentials.Controllers.SpoPopulationMethod)"/></para>
+        /// </summary>
+        /// <param name="populationMethod">method serializable to <see cref="SpoPopulationMethod"/></param>
         [Obsolete]
         public void PopulateObjectList(string populationMethod)
         {
@@ -174,184 +315,85 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList(method);
         }
 
-        public void StartStopStimulus()
+        /// <summary>
+        /// Select an object from <see cref="SelectableSPOs"/>.
+        /// </summary>
+        /// <param name="objectIndex">The index value of the object to select.</param>
+        /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
+        public void SelectSPO(int objectIndex, bool stopStimulusRun = true)
         {
-            // Receive incoming markers
-            if (receivingMarkers == false)
+            var objectCount = _selectableSPOs.Count;
+            if (objectCount == 0)
             {
-                StartCoroutine(ReceiveMarkers());
-            }
-
-            // Turn off if on
-            if (stimOn)
-            {
-                StimulusOff();
-            }
-
-            // Turn on if off
-            else
-            {
-                PopulateObjectList();
-                StimulusOn();
-            }
-        }
-
-        // Turn the stimulus on
-        public virtual void StimulusOn(bool sendConstantMarkers = true)
-        {
-            stimOn = true;
-
-            // Send the marker to start
-            marker.Write("Trial Started");
-
-            // Start the stimulus Coroutine
-            try
-            {
-                StartCoroutine(Stimulus());
-
-                // Not required for P300
-                if (sendConstantMarkers)
-                {
-                    StartCoroutine(SendMarkers(trainTarget));
-                }
-            }
-            catch
-            {
-                Debug.Log("start stimulus coroutine error");
-            }
-        }
-
-        public virtual void StimulusOff()
-        {
-            // End thhe stimulus Coroutine
-            stimOn = false;
-
-            // Send the marker to end
-            marker.Write("Trial Ends");
-        }
-
-        // Select an object from the objectList
-        public void SelectObject(int objectIndex)
-        {
-            if (!stimOn)
-            {
+                Debug.Log("No Objects to select");
                 return;
             }
 
-            StartCoroutine(SelectObjectAfterRun(objectIndex));
-        }
-
-        public void StartAutomatedTraining()
-        {
-            // Receive incoming markers
-            if (receivingMarkers == false)
+            if (objectIndex < 0 || objectIndex >= objectCount)
             {
-                StartCoroutine(ReceiveMarkers());
+                Debug.LogWarning($"Invalid Selection. Must be or be between 0 and {_selectableSPOs.Count}");
+                return;
             }
 
-            StartCoroutine(DoTraining());
-        }
-
-        public void StartIterativeTraining()
-        {
-            // Receive incoming markers
-            if (receivingMarkers == false)
+            var spo = _selectableSPOs[objectIndex];
+            if (spo == null)
             {
-                StartCoroutine(ReceiveMarkers());
+                Debug.LogWarning("SPO is now null and can't be selected");
+                return;
             }
+            
+            spo.Select();
+            LastSelectedSPO = spo;
+            Debug.Log($"SPO '{spo.gameObject.name}' selected.");
 
-            StartCoroutine(DoIterativeTraining());
+            if (stopStimulusRun)
+            {
+                StopStimulusRun();
+            }
         }
 
-        public void StartUserTraining()
+        /// <summary>
+        /// Select an object from <see cref="SelectableSPOs"/> if no objects were
+        /// selected during a stimulus run.
+        /// </summary>
+        /// <param name="objectIndex"></param>
+        public void SelectSPOAtEndOfRun(int objectIndex)
         {
-            StartCoroutine(DoUserTraining());
+            StopStartCoroutine(ref _waitToSelect, InvokeAfterStimulusRun(() =>
+            {
+                if (LastSelectedSPO != null)
+                {
+                    return;
+                }
+                
+                SelectSPO(objectIndex);
+                _waitToSelect = null;
+            }));
         }
 
-        protected IEnumerator SelectObjectAfterRun(int objectIndex)
+        protected IEnumerator InvokeAfterStimulusRun(Action action)
         {
-            // When a selection is made, turn the stimulus off
-            //stimOn = false;
-
-            Debug.Log("Waiting to select object " + objectIndex.ToString());
-
-            // Wait for stimulus to end
-            while (stimOn == true)
+            while (StimulusRunning)
             {
                 yield return null;
             }
 
-            try
-            {
-                // Run the SPO onSelection script
-                objectList[objectIndex].GetComponent<SPO>().Select();
-            }
-            catch
-            {
-                // Debug
-                Debug.Log("Could not select object " + objectIndex.ToString() + " from list");
-                Debug.Log("Object list contains " + objectList.Count.ToString() + " objects");
-            }
+            action?.Invoke();
         }
 
-        // Setup a matrix if setup is required
-        // Could add this in or leave as a seperate script
-        //public void setupMatrix()
-        //{
-
-
-        //}
-
-        // Coroutine for the stimulus
-        public virtual IEnumerator Stimulus()
-        {
-            // Present the stimulus until it is turned off
-            while (stimOn)
-            {
-                // What to do each frame
-                for (int i = 0; i < objectList.Count; i++)
-                {
-                    try
-                    {
-                        objectList[i].GetComponent<SPO>().StartStimulus();
-                    }
-                    catch
-                    {
-                        Debug.Log("There is no object " + i.ToString());
-                    }
-                }
-
-                //Wait until next frame
-                yield return 0;
-            }
-
-            // Reset the SPOs
-            for (int i = 0; i < objectList.Count; i++)
-            {
-                try
-                {
-                    objectList[i].GetComponent<SPO>().StopStimulus();
-                }
-                catch
-                {
-                    Debug.Log("There is no object " + i.ToString());
-                }
-            }
-
-            yield return 0;
-        }
-
+        #endregion
+        
         #region Markers
 
         // Send markers
         public virtual IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
-            while (stimOn)
+            while (StimulusRunning)
             {
                 string markerString = "marker";
 
-                if (trainingIndex <= objectList.Count)
+                if (trainingIndex <= _selectableSPOs.Count)
                 {
                     markerString = markerString + "," + trainingIndex.ToString();
                 }
@@ -364,16 +406,28 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        // Coroutine to continuously receive markers
-        public IEnumerator ReceiveMarkers()
+        protected void ReceiveMarkers()
         {
-            if (receivingMarkers == false)
+            StopStartCoroutine(ref _receiveMarkers, PollForMarkers());
+        }
+
+        protected IEnumerator PollForMarkers()
+        {
+            if (response.responseInlet == null || response.responseInlet.IsClosed)
             {
-                //Get response stream from Python
-                print("Looking for a response stream");
-                int diditwork = response.ResolveResponse();
-                print(diditwork.ToString());
-                receivingMarkers = true;
+                Debug.Log("Looking for a response stream");
+                int resolveCode = response.ResolveResponse();
+
+                if (resolveCode > 0)
+                {
+                    Debug.Log($"Resolved Stream with code: '{resolveCode}'");
+                }
+                else
+                {
+                    Debug.LogError("Failed to open response");
+                    _receiveMarkers = null;
+                    yield break;
+                }
             }
 
             //Set interval at which to receive markers
@@ -384,7 +438,7 @@ namespace BCIEssentials.ControllerBehaviors
             int pingCount = 0;
 
             // Receive markers continuously
-            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
+            while (true) //TODO: Nothing sets this to false, relies on stopping coroutine instead
             {
                 // Receive markers
                 // Pull the python response and add it to the responseStrings array
@@ -406,10 +460,9 @@ namespace BCIEssentials.ControllerBehaviors
                     for (int i = 0; i < responseStrings.Length; i++)
                     {
                         Debug.Log($"response : {responseString}");
-                        if (int.TryParse(responseString, out var index) && index < objectList.Count)
+                        if (int.TryParse(responseString, out var index))
                         {
-                            //Run on selection
-                            objectList[index].GetComponent<SPO>().Select();
+                            SelectSPO(index);
                         }
                     }
                 }
@@ -417,13 +470,27 @@ namespace BCIEssentials.ControllerBehaviors
                 // Wait for the next receive interval
                 yield return new WaitForSecondsRealtime(receiveInterval);
             }
-
-            Debug.Log("Done receiving markers");
         }
-
         #endregion
 
         #region Training
+
+        public void StartAutomatedTraining()
+        {
+            ReceiveMarkers();
+            StartCoroutine(DoTraining());
+        }
+
+        public void StartIterativeTraining()
+        {
+            ReceiveMarkers();
+            StartCoroutine(DoIterativeTraining());
+        }
+
+        public void StartUserTraining()
+        {
+            StartCoroutine(DoUserTraining());
+        }
 
         // Do training
         public virtual IEnumerator DoTraining()
@@ -432,7 +499,7 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList();
 
             // Get number of selectable objects by counting the objects in the objectList
-            int numOptions = objectList.Count;
+            int numOptions = _selectableSPOs.Count;
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
@@ -450,14 +517,14 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
 
                 // Turn on train target
-                objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
 
                 yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
 
                 if (trainTargetPersistent == false)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
                 }
 
                 yield return new WaitForSecondsRealtime(0.5f);
@@ -465,21 +532,21 @@ namespace BCIEssentials.ControllerBehaviors
                 // Go through the training sequence
                 //yield return new WaitForSecondsRealtime(3f);
 
-                StimulusOn();
+                StartStimulusRun();
                 yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-                StimulusOff();
+                StopStimulusRun();
 
                 // Turn off train target
                 if (trainTargetPersistent == true)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
                 }
 
 
                 // If sham feedback is true, then show it
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().Select();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
                 }
 
                 trainTarget = 99;
@@ -507,9 +574,33 @@ namespace BCIEssentials.ControllerBehaviors
 
         #endregion
 
-        public static void LogArrayValues(int[] values)
+        #region Helper Methods
+
+        protected static void LogArrayValues(int[] values)
         {
             print(string.Join(", ", values));
         }
+
+        protected void StopStartCoroutine(ref Coroutine reference, IEnumerator routine)
+        {
+            if (reference != null)
+            {
+                StopCoroutine(reference);
+            }
+
+            reference = StartCoroutine(routine);
+        }
+
+        protected void StopCoroutineReference(ref Coroutine reference)
+        {
+            if (reference != null)
+            {
+                StopCoroutine(reference);
+            }
+
+            reference = null;
+        }
+
+        #endregion
     }
 }

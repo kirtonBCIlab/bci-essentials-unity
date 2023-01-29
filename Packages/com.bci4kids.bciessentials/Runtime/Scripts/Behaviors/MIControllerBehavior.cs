@@ -5,10 +5,6 @@ using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-     /*An extension of the controller class to add MI functionality
-
-*/
-
     public class MIControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
@@ -26,16 +22,10 @@ namespace BCIEssentials.ControllerBehaviors
             base.PopulateObjectList(populationMethod);
 
             // Warn about the number of objects to be selected from, if greater than 2
-            if (objectList.Count > 2)
+            if (_selectableSPOs.Count > 2)
             {
                 print("Warning: Selecting between more than 2 objects!");
             }
-        }
-
-        // Coroutine for the stimulus, wait there is no stimulus
-        public override IEnumerator Stimulus()
-        {
-            yield return 0;
         }
 
         public override IEnumerator DoIterativeTraining()
@@ -43,7 +33,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Generate the target list
             PopulateObjectList();
 
-            int numOptions = objectList.Count;
+            int numOptions = _selectableSPOs.Count;
 
             // Create a random non repeating array 
             int[] trainArray = new int[numTrainingSelections];
@@ -83,30 +73,30 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.Log($"Running training selection {i} on option {trainTarget}");
 
                 // Turn on train target
-                objectList[trainTarget].OnTrainTarget();
+                _selectableSPOs[trainTarget].OnTrainTarget();
 
                 // Go through the training sequence
                 yield return new WaitForSecondsRealtime(pauseBeforeTraining);
 
 
-                StimulusOn();
+                StartStimulusRun();
                 for (int j = 0; j < (numTrainWindows - 1); j++)
                 {
                     yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
 
                     if (shamFeedback)
                     {
-                        objectList[trainTarget].Select();
+                        _selectableSPOs[trainTarget].Select();
                     }
                 }
 
-                StimulusOff();
+                StopStimulusRun();
 
                 // Take a break
                 yield return new WaitForSecondsRealtime(trainBreak);
 
                 // Turn off train target
-                objectList[trainTarget].OffTrainTarget();
+                _selectableSPOs[trainTarget].OffTrainTarget();
 
                 // Reset objects
 
@@ -127,13 +117,13 @@ namespace BCIEssentials.ControllerBehaviors
         public override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
-            while (stimOn)
+            while (StimulusRunning)
             {
                 // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
-                string trainingString = trainingIndex <= objectList.Count ? trainingIndex.ToString() : "-1";
+                string trainingString = trainingIndex <= _selectableSPOs.Count ? trainingIndex.ToString() : "-1";
 
                 // Send the marker
-                marker.Write($"mi, {objectList.Count}, {trainingString}, {windowLength}");
+                marker.Write($"mi, {_selectableSPOs.Count}, {trainingString}, {windowLength}");
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);

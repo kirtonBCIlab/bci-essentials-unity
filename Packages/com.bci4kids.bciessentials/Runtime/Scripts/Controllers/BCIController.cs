@@ -20,13 +20,12 @@ namespace BCIEssentials.Controllers
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
 
-#if UNITY_EDITOR
-        public void TestInitializable(bool dontDestroyInstance)
-        {
-            _dontDestroyActiveInstance = dontDestroyInstance;
-        }
-#endif
         private void Awake()
+        {
+            Initialize();
+        }
+
+        public void Initialize()
         {
             if (_lslMarkerStream == null && !TryGetComponent(out _lslMarkerStream))
             {
@@ -188,7 +187,7 @@ namespace BCIEssentials.Controllers
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.ActiveBehavior.StimulusOn(sendConstantMarkers);
+                Instance.ActiveBehavior.StartStimulusRun(sendConstantMarkers);
             }
         }
 
@@ -199,7 +198,7 @@ namespace BCIEssentials.Controllers
                 return;
             }
 
-            Instance.ActiveBehavior.StimulusOff();
+            Instance.ActiveBehavior.StopStimulusRun();
         }
 
         public void StartStopStimulus()
@@ -209,14 +208,14 @@ namespace BCIEssentials.Controllers
                 return;
             }
 
-            Instance.ActiveBehavior.StartStopStimulus();
+            Instance.ActiveBehavior.StartStopStimulusRun();
         }
 
         public void SelectObject(int objectIndex)
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.ActiveBehavior.SelectObject(objectIndex);
+                Instance.ActiveBehavior.SelectSPO(objectIndex);
             }
         }
 

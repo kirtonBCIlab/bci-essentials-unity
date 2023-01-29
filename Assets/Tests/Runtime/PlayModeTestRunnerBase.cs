@@ -5,6 +5,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
 using NUnit.Framework;
+using Tests.Resources.Scripts;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
@@ -34,7 +35,7 @@ namespace BCIEssentials.Tests.Utilities
             yield return LoadEmptySceneAsync();
         }
 
-        protected static BCIController CreateController(bool dontDestroyInstance = false, bool setActive = false)
+        protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null, bool setActive = false)
         {
             var gameObject = new GameObject();
             gameObject.SetActive(false);
@@ -43,7 +44,7 @@ namespace BCIEssentials.Tests.Utilities
             gameObject.AddComponent<LSLResponseStream>();
 
             var controller = gameObject.AddComponent<BCIController>();
-            controller.TestInitializable(dontDestroyInstance);
+            controller.SetInspectorProperties(inspectorProperties);
 
             if (setActive)
             {
@@ -76,46 +77,16 @@ namespace BCIEssentials.Tests.Utilities
             yield return EditorSceneLoader.LoadDefaultSceneAsync();
         }
 
-        protected static void SetField<T>(T component, string name, object value)
+        protected static T AddComponent<T>(Action<T> setup = null) where T : MonoBehaviour
         {
-            var componentType = component.GetType();
-            var info = GetFieldRecursive(componentType, name);
-            if (info == null)
-            {
-                Assert.Fail($"No field for name {name} on object");
-                return;
-            }
-
-            info.SetValue(component, value);
-
-            FieldInfo GetFieldRecursive(Type type, string fieldName)
-            {
-                var infoRecursive = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-                if (infoRecursive != null)
-                {
-                    return infoRecursive;
-                }
-                
-                var baseType = type.BaseType;
-                if (baseType == null || baseType == typeof(MonoBehaviour))
-                {
-                    return null;
-                }
-                
-                infoRecursive = GetFieldRecursive(baseType, fieldName);
-
-                return infoRecursive;
-            }
+            return AddComponent(new GameObject(), setup);
         }
 
-        protected static T AddComponent<T>() where T : MonoBehaviour
+        protected static T AddComponent<T>(GameObject gameObject, Action<T> setup = null) where T : MonoBehaviour
         {
-            return AddComponent<T>(new GameObject());
-        }
-
-        protected static T AddComponent<T>(GameObject gameObject) where T : MonoBehaviour
-        {
-            return gameObject.AddComponent<T>();
+            var t = gameObject.AddComponent<T>();
+            setup?.Invoke(t);
+            return t;
         }
 
         protected static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null)

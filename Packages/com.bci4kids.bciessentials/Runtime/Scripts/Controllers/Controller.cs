@@ -22,6 +22,7 @@ using BCIEssentials.Utilities;
  * 
  */
 
+[Obsolete]
 public class Controller : MonoBehaviour
 {
     //Display
@@ -395,8 +396,7 @@ public class Controller : MonoBehaviour
         PopulateObjectList("tag");
 
         // Create a random non repeating array 
-        int[] trainArray = new int[numTrainingSelections];
-        trainArray = MakeRNRA(numTrainingSelections, objectList.Count - 1);
+        int[] trainArray = MakeRNRA(numTrainingSelections, objectList.Count - 1);
         PrintArray(trainArray);
 
         yield return new WaitForSecondsRealtime(0.001f);

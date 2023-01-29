@@ -60,12 +60,6 @@ namespace BCIEssentials.LSL
                 }
             }
 
-            // Tried moving it down here so that it only opens the last Python Response stream, and it still crashes
-            // Aparently this is unnecessary anyway because if the stream is not opened it will be opened implicitly 
-            //double timeout = 2.0;
-            //responseInlet.open_stream(timeout);
-            //print("Opened the stream");
-
             return 1;
 
         }
