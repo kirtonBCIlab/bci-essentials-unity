@@ -1,7 +1,7 @@
 using BCIEssentials.LSL;
 using UnityEngine;
 
-namespace Tests.Resources.Scripts
+namespace BCIEssentials.Tests.TestResources
 {
     public static class BCIControllerExtensions
     {

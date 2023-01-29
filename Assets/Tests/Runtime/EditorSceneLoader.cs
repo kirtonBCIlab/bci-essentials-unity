@@ -1,5 +1,5 @@
 using System.Collections;
-using BCIEssentials.Tests.Resources;
+using BCIEssentials.Tests.TestResources;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;

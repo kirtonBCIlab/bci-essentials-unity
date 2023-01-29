@@ -1,7 +1,6 @@
-using BCIEssentials.Tests.Resources;
 using UnityEditor;
 
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.TestResources
 {
     public static class ResourceLibrary
     {

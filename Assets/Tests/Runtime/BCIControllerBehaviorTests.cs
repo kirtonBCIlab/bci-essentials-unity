@@ -1,14 +1,12 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
-using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.Utilities;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
-using Tests.Resources.Scripts;
+using BCIEssentials.Tests.TestResources;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;

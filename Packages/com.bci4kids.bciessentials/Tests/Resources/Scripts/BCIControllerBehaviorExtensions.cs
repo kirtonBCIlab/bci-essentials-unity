@@ -3,7 +3,7 @@ using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
-namespace Tests.Resources.Scripts
+namespace BCIEssentials.Tests.TestResources
 {
     public static class BCIControllerBehaviorExtensions
     {
