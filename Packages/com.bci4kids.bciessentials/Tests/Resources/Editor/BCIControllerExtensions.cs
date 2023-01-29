@@ -1,5 +1,5 @@
+using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
-using UnityEngine;
 
 namespace BCIEssentials.Tests.TestResources
 {
@@ -12,7 +12,7 @@ namespace BCIEssentials.Tests.TestResources
             public bool? _dontDestroyActiveInstance;
         }
 
-        public static T SetInspectorProperties<T>(this T component, Properties properties) where T : Component
+        public static T AssignInspectorProperties<T>(this T component, Properties properties) where T : BCIController
         {
             if (properties == null)
             {

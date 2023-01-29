@@ -36,7 +36,7 @@ namespace BCIEssentials.Tests
         {
             _testControllerObject.SetActive(true);
             _behavior.RegisterWithControllerInstance();
-            
+
             Assert.IsTrue(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
@@ -44,9 +44,9 @@ namespace BCIEssentials.Tests
         public void WhenUnregisterFromControllerInstance_ThenBehaviorUnregistered()
         {
             _behavior.RegisterWithControllerInstance();
-            
+
             _behavior.UnregisterFromControllerInstance();
-            
+
             Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
@@ -57,10 +57,10 @@ namespace BCIEssentials.Tests
             {
                 _selfRegister = true
             });
-            
+
             _testControllerObject.SetActive(true);
             yield return null;
-            
+
             Assert.IsTrue(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
@@ -71,10 +71,10 @@ namespace BCIEssentials.Tests
             {
                 _selfRegisterAsActive = true
             });
-            
+
             _testControllerObject.SetActive(true);
             yield return null;
-            
+
             Assert.AreEqual(_behavior.BehaviorType, _testController.ActiveBehavior.BehaviorType);
         }
 
@@ -87,7 +87,7 @@ namespace BCIEssentials.Tests
             });
             _testControllerObject.SetActive(true);
             yield return null;
-            
+
             Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
@@ -100,7 +100,7 @@ namespace BCIEssentials.Tests
             });
             _testControllerObject.SetActive(true);
             yield return null;
-            
+
             Object.DestroyImmediate(_behavior);
 
             Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
@@ -115,7 +115,7 @@ namespace BCIEssentials.Tests
             });
             _behavior.RegisterWithControllerInstance();
             yield return null;
-            
+
             Object.DestroyImmediate(_behavior);
 
             Assert.IsFalse(_testController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
@@ -131,14 +131,14 @@ namespace BCIEssentials.Tests
             {
                 targetFrameRate = targetFrameRate
             });
-            
+
             _behavior.Initialize(null, null);
 
             Assert.AreEqual(targetFrameRate, Application.targetFrameRate);
 
             Application.targetFrameRate = -1;
         }
-        
+
         [Test]
         [TestCase(0)]
         [TestCase(-5)]
@@ -204,12 +204,12 @@ namespace BCIEssentials.Tests
             _testControllerObject.SetActive(true);
             yield return null; //Wait for monobehaviors
             _behavior.StartStimulusRun();
-            
+
             _behavior.CleanUp();
-            
+
             Assert.IsFalse(_behavior.StimulusRunning);
         }
-        
+
         [Test]
         public void WhenPopulateObjectListWithTagMethod_ThenObjectListPopulated()
         {
@@ -268,6 +268,55 @@ namespace BCIEssentials.Tests
             UnityEngine.Assertions.Assert.AreEqual(existingSPOs[1], _behavior.SelectableSPOs[1]);
             UnityEngine.Assertions.Assert.AreEqual(existingSPOs[2], _behavior.SelectableSPOs[2]);
         }
+
+        [Test]
+        public void WhenSelectSPO_ThenSPOSelected()
+        {
+            var spo = AddSPOToScene();
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = new List<SPO>
+                {
+                    spo,
+                }
+            });
+            
+            _behavior.SelectSPO(0);
+            
+            Assert.AreEqual(spo, _behavior.LastSelectedSPO);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenSelectSPOAndStopStimulusRun_ThenSPOSelectedAndStimulusRunEnded()
+        {
+            _testController.Initialize();
+            _behavior.RegisterWithControllerInstance(true);
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = new List<SPO>
+                {
+                    AddSPOToScene(),
+                }
+            }).gameObject.SetActive(true);
+            
+            _behavior.StartStimulusRun();
+            yield return null;
+            _behavior.SelectSPO(0, true);
+            
+            Assert.False(_behavior.StimulusRunning);
+        }
+
+        [UnityTest]
+        public IEnumerator WhenSelectSPOAtEndOfRun_ThenSPOSelected()
+        {
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator WhenSelectSPOAtEndOfRunAndSpoSelectedDuringRun_ThenSpoSelectedNotSelected()
+        {
+            yield return null;
+        }
     }
 
     public class BCIControllerBehaviorTests_WhenSendReceiveMarkers : PlayModeTestRunnerBase
@@ -318,7 +367,7 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
-        public IEnumerator WhenDoTrainingForTrainingCount_ThenSPOsTrained()
+        public IEnumerator WhenDoTrainingForTrainingCount_ThenSposTrained()
         {
             var behaviorRunner = AddCoroutineRunner(_behavior.DoTraining());
             _behavior.numTrainingSelections = 2;
@@ -369,5 +418,4 @@ namespace BCIEssentials.Tests
             Assert.IsTrue(onSelectedCalled);
         }
     }
-    
 }

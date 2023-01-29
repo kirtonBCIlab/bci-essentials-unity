@@ -42,7 +42,7 @@ namespace BCIEssentials.Tests.Utilities
             gameObject.AddComponent<LSLResponseStream>();
 
             var controller = gameObject.AddComponent<BCIController>();
-            controller.SetInspectorProperties(inspectorProperties);
+            controller.AssignInspectorProperties(inspectorProperties);
 
             if (setActive)
             {
@@ -77,7 +77,7 @@ namespace BCIEssentials.Tests.Utilities
 
         protected static T AddComponent<T>(Action<T> setup = null) where T : MonoBehaviour
         {
-            return AddComponent(new GameObject(), setup);
+            return AddComponent<T>(new GameObject(), setup);
         }
 
         protected static T AddComponent<T>(GameObject gameObject, Action<T> setup = null) where T : MonoBehaviour
@@ -94,14 +94,14 @@ namespace BCIEssentials.Tests.Utilities
 
         protected static CoroutineRunner AddCoroutineRunner(InClassName inClassName)
         {
-            var runner = AddComponent<CoroutineRunner>(inClassName.GameObject);
-            runner.Routine = inClassName.Coroutine;
-            runner.OnCompleteEvent = () =>
+            return AddComponent<CoroutineRunner>(inClassName.GameObject, runner =>
             {
-                inClassName.OnComplete?.Invoke();
-            };
-
-            return runner;
+                runner.Routine = inClassName.Coroutine;
+                runner.OnCompleteEvent = () =>
+                {
+                    inClassName.OnComplete?.Invoke();
+                };
+            });
         }
 
         protected static void StopAllCoroutineRunners()

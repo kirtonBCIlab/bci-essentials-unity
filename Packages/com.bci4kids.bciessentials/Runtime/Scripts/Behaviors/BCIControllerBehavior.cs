@@ -228,7 +228,10 @@ namespace BCIEssentials.ControllerBehaviors
             StimulusRunning = false;
 
             // Send the marker to end
-            marker.Write("Trial Ends");
+            if (marker != null)
+            {
+                marker.Write("Trial Ends");
+            }
         }
         
         protected IEnumerator RunStimulus()
@@ -320,7 +323,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         /// <param name="objectIndex">The index value of the object to select.</param>
         /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
-        public void SelectSPO(int objectIndex, bool stopStimulusRun = true)
+        public void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
             var objectCount = _selectableSPOs.Count;
             if (objectCount == 0)

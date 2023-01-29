@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace BCIEssentials.Tests.TestResources
             public bool? setupRequired;
         }
 
-        public static T AssignInspectorProperties<T>(this T component, Properties properties) where T : Component
+        public static T AssignInspectorProperties<T>(this T component, Properties properties) where T : BCIControllerBehavior
         {
             if (properties == null)
             {

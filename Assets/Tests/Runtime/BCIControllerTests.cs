@@ -74,7 +74,7 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenDontDestroyInstanceIsTrue_ThenInstanceNotDestroyed()
         {
-            _testController.SetInspectorProperties(new BCIControllerExtensions.Properties
+            _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
                 _dontDestroyActiveInstance = true
             }).gameObject.SetActive(true);
@@ -87,7 +87,7 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenDontDestroyInstanceIsFalse_ThenInstanceDestroyed()
         {
-            _testController.SetInspectorProperties(new BCIControllerExtensions.Properties
+            _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
                 _dontDestroyActiveInstance = false
             }).gameObject.SetActive(true);
@@ -100,7 +100,7 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenDestroyedAndInstance_ThenInstanceNull()
         {
-            _testController.SetInspectorProperties(new BCIControllerExtensions.Properties
+            _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
                 _dontDestroyActiveInstance = false
             }).gameObject.SetActive(true);

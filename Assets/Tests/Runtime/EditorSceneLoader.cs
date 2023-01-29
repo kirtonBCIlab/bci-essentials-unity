@@ -8,7 +8,7 @@ namespace BCIEssentials.Tests
 {
     public static class EditorSceneLoader
     {
-        private const string k_AssetPath = "Packages/com.bci4kids.bciessentials/Tests/Resources/ResourceLibrary.asset";
+        private const string k_AssetPath = "Packages/com.bci4kids.bciessentials/Tests/Resources/Runtime/ResourceLibrary.asset";
         
         private static ResourceLibraryAsset _resourceLibrary;
         
