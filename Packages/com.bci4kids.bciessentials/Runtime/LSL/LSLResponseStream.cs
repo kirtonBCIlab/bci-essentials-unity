@@ -21,18 +21,18 @@ namespace BCIEssentials.LSL
         [SerializeField]
         [Tooltip("The duration in seconds between requests to the target stream for responses.")]
         [Min(0)]
-        private float _pollFrequency;
+        private float _pullFrequency;
         
         /// <summary>
         /// The duration in seconds between requests to the target stream for responses.
         /// <para>Minimum value is 0.</para>
         /// </summary>
-        public float PollFrequency
+        public float PullFrequency
         {
-            get => _pollFrequency;
+            get => _pullFrequency;
             set
             {
-                _pollFrequency = Mathf.Max(0, value);
+                _pullFrequency = Mathf.Max(0, value);
             }
         }
         
@@ -42,18 +42,18 @@ namespace BCIEssentials.LSL
         public bool Connected => _streamInlet is { IsClosed: false };
         
         /// <summary>
-        /// If the target stream is being polled for responses.
+        /// If the target stream is being pulled for responses.
         /// </summary>
-        public bool Polling => _polling != null;
+        public bool Pulling => _pulling != null;
 
         /// <summary>
-        /// If responses have been received and stored during polling.
+        /// If responses have been received and stored during pulling.
         /// <see cref="GetResponses"/> does not reset this. 
         /// </summary>
         public bool HasStoredResponses => _responsesStore.Count > 0;
         
         private StreamInlet _streamInlet;
-        private Coroutine _polling;
+        private Coroutine _pulling;
         private readonly List<string> _responsesStore = new();
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace BCIEssentials.LSL
         /// </summary>
         public void Disconnect()
         {
-            if (Polling)
+            if (Pulling)
             {
-                StopPolling();
+                StopPulling();
             }
             
             if (Connected)
@@ -102,14 +102,14 @@ namespace BCIEssentials.LSL
         }
 
         /// <summary>
-        /// Begin polling the target stream for responses.
+        /// Begin pulling the target stream for responses.
         /// <para>
-        /// Responses are stored until polling stops, are requested or provided
+        /// Responses are stored until pulling stops, are requested or provided
         /// to the response callback.
         /// </para>
         /// </summary>
         /// <param name="onResponseCallback">An action to invoke when responses are received.</param>
-        public void StartPolling(Action<string[]> onResponseCallback = null)
+        public void StartPulling(Action<string[]> onResponseCallback = null)
         {
             if (!Connected)
             {
@@ -117,31 +117,31 @@ namespace BCIEssentials.LSL
                 return;
             }
 
-            StopPolling();
+            StopPulling();
 
             foreach (var response in GetResponses())
             {
                 _responsesStore.Add(response);
             }
             
-            _polling = StartCoroutine(PollForSamples(onResponseCallback));
+            _pulling = StartCoroutine(PullForSamples(onResponseCallback));
         }
 
         /// <summary>
-        /// Stop polling the target stream for responses.
+        /// Stop pulling the target stream for responses.
         /// </summary>
-        public void StopPolling()
+        public void StopPulling()
         {
             _responsesStore.Clear();
-            if (_polling != null)
+            if (_pulling != null)
             {
-                StopCoroutine(_polling);
-                _polling = null;
+                StopCoroutine(_pulling);
+                _pulling = null;
             }
         }
         
         /// <summary>
-        /// Retrieves all available responses either from the polled
+        /// Retrieves all available responses either from the pulled
         /// collection or from the stream directly.
         /// </summary>
         /// <returns>Returns an array of stream responses.</returns>
@@ -165,7 +165,7 @@ namespace BCIEssentials.LSL
                 _responsesStore.Clear();
             }
             
-            if (!Polling)
+            if (!Pulling)
             {
                 var availableSamples = _streamInlet.samples_available();
                 var sample = new[] { "" };
@@ -183,16 +183,16 @@ namespace BCIEssentials.LSL
         }
 
         /// <summary>
-        /// Clear the list of any responses received during polling.
+        /// Clear the list of any responses received during pulling.
         /// </summary>
-        public void ClearPolledResponses()
+        public void ClearPulledResponses()
         {
             _responsesStore.Clear();
         }
         
-        private IEnumerator PollForSamples(Action<string[]> onResponse = null)
+        private IEnumerator PullForSamples(Action<string[]> onResponse = null)
         {
-            Debug.Log($"Started polling stream for samples");
+            Debug.Log($"Started pulling stream for samples");
             while (true)
             {
                 var responses = new []{""};
@@ -211,7 +211,7 @@ namespace BCIEssentials.LSL
                     }
                 }
                 
-                yield return new WaitForSeconds(PollFrequency);
+                yield return new WaitForSeconds(PullFrequency);
             }
         }
     }
@@ -225,10 +225,10 @@ namespace BCIEssentials.LSL
         public void Connect(string targetStringName);
         public void Disconnect();
         
-        public void StartPolling(Action<string[]> onResponse = null);
-        public void StopPolling();
+        public void StartPulling(Action<string[]> onResponse = null);
+        public void StopPulling();
 
         public string[] GetResponses();
-        public void ClearPolledResponses();
+        public void ClearPulledResponses();
     }
 }
