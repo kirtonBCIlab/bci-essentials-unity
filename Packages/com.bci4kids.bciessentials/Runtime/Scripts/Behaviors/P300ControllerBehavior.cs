@@ -46,7 +46,7 @@ namespace BCIEssentials.ControllerBehaviors
         public float trainBufferTime = 0f;
 
 
-        public override IEnumerator DoTraining()
+        protected override IEnumerator WhileDoAutomatedTraining()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -127,7 +127,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        public override IEnumerator DoUserTraining()
+        protected override IEnumerator WhileDoUserTraining()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -765,7 +765,7 @@ namespace BCIEssentials.ControllerBehaviors
             StopStimulusRun();
         }
 
-        public override IEnumerator SendMarkers(int trainTarget = 99)
+        protected override IEnumerator SendMarkers(int trainTarget = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
             yield return null;

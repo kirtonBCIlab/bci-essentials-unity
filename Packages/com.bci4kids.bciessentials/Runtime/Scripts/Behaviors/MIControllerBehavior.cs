@@ -28,7 +28,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        public override IEnumerator DoIterativeTraining()
+        protected override IEnumerator WhileDoIterativeTraining()
         {
             // Generate the target list
             PopulateObjectList();
@@ -114,7 +114,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        public override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)

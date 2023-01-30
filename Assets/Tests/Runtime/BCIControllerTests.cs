@@ -6,6 +6,7 @@ using BCIEssentials.LSL;
 using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.TestTools;
 using LogAssert = BCIEssentials.Tests.TestResources.LogAssert;
@@ -133,7 +134,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
             var behavior = _testControllerObject.AddComponent(behaviorType);
 
-            var registered = _testController.RegisterBehavior((BCIControllerBehavior)behavior);
+            var registered = BCIController.RegisterBehavior((BCIControllerBehavior)behavior);
 
             Assert.IsTrue(registered);
         }
@@ -143,7 +144,7 @@ namespace BCIEssentials.Tests
         {
             UnityEngine.TestTools.LogAssert.Expect(LogType.Error, "Controller Behavior is null");
 
-            var registered = _testController.RegisterBehavior(null);
+            var registered = BCIController.RegisterBehavior(null);
 
             Assert.IsFalse(registered);
         }
@@ -155,8 +156,8 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
             var behavior = AddComponent<EmptyBCIControllerBehavior>(b => b.gameObject.SetActive(false));
 
-            var firstResult = _testController.RegisterBehavior(behavior);
-            var secondResult = _testController.RegisterBehavior(behavior);
+            var firstResult = BCIController.RegisterBehavior(behavior);
+            var secondResult = BCIController.RegisterBehavior(behavior);
 
             Assert.IsTrue(firstResult);
             Assert.IsFalse(secondResult);
@@ -168,7 +169,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
             var behavior = AddComponent<EmptyBCIControllerBehavior>();
 
-            _testController.RegisterBehavior(behavior, true);
+            BCIController.RegisterBehavior(behavior, true);
 
             Assert.AreEqual(behavior, _testController.ActiveBehavior);
         }
@@ -179,7 +180,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
             var behavior = AddComponent<EmptyBCIControllerBehavior>();
 
-            _testController.RegisterBehavior(behavior, false);
+            BCIController.RegisterBehavior(behavior, false);
 
             Assert.IsNull(_testController.ActiveBehavior);
         }
@@ -188,10 +189,10 @@ namespace BCIEssentials.Tests
         public void WhenUnregisterBehavior_ThenBehaviorUnregistered()
         {
             _testController.Initialize();
-            var behavior = AddComponent<EmptyBCIControllerBehavior>(b => _testController.RegisterBehavior(b));
+            var behavior = AddComponent<EmptyBCIControllerBehavior>(b => BCIController.RegisterBehavior(b));
 
-            _testController.UnregisterBehavior(behavior);
-            var wasRegistered = _testController.RegisterBehavior(behavior);
+            BCIController.UnregisterBehavior(behavior);
+            var wasRegistered = BCIController.RegisterBehavior(behavior);
 
             Assert.IsTrue(wasRegistered);
         }
@@ -200,10 +201,10 @@ namespace BCIEssentials.Tests
         public void WhenUnregisterBehaviorAndBehaviorIsNull_ThenNoBehaviorUnregistered()
         {
             _testController.Initialize();
-            var behavior = AddComponent<EmptyBCIControllerBehavior>(b => _testController.RegisterBehavior(b));
+            var behavior = AddComponent<EmptyBCIControllerBehavior>(b => BCIController.RegisterBehavior(b));
 
-            _testController.UnregisterBehavior(null);
-            var wasRegistered = _testController.RegisterBehavior(behavior);
+            BCIController.UnregisterBehavior(null);
+            var wasRegistered = BCIController.RegisterBehavior(behavior);
 
             Assert.IsFalse(wasRegistered);
         }
@@ -212,15 +213,15 @@ namespace BCIEssentials.Tests
         public void WhenUnregisterBehaviorAndIsNotRegistered_ThenNoBehaviorUnregistered()
         {
             _testController.Initialize();
-            var miBehavior = AddComponent<EmptyBCIControllerBehavior>(b => b.MockBehaviorType =  BCIBehaviorType.MI);
+            var miBehavior = AddComponent<EmptyBCIControllerBehavior>(b => b.MockBehaviorType = BCIBehaviorType.MI);
             var p300Behavior = AddComponent<EmptyBCIControllerBehavior>(b =>
             {
                 b.MockBehaviorType = BCIBehaviorType.P300;
-                _testController.RegisterBehavior(b);
+                BCIController.RegisterBehavior(b);
             });
 
-            _testController.UnregisterBehavior(miBehavior);
-            var wasRegistered = _testController.RegisterBehavior(p300Behavior);
+            BCIController.UnregisterBehavior(miBehavior);
+            var wasRegistered = BCIController.RegisterBehavior(p300Behavior);
 
             Assert.IsFalse(wasRegistered);
         }
@@ -232,16 +233,16 @@ namespace BCIEssentials.Tests
             var p300Behavior = AddComponent<EmptyBCIControllerBehavior>(b =>
             {
                 b.MockBehaviorType = BCIBehaviorType.P300;
-                _testController.RegisterBehavior(b, true);
+                BCIController.RegisterBehavior(b, true);
             });
-            
+
             var miBehavior = AddComponent<EmptyBCIControllerBehavior>(b =>
             {
                 b.MockBehaviorType = BCIBehaviorType.MI;
-                _testController.RegisterBehavior(b, false);
+                BCIController.RegisterBehavior(b, false);
             });
 
-            _testController.UnregisterBehavior(miBehavior);
+            BCIController.UnregisterBehavior(miBehavior);
 
             Assert.AreEqual(p300Behavior, _testController.ActiveBehavior);
         }
@@ -250,9 +251,9 @@ namespace BCIEssentials.Tests
         public void WhenUnregisterBehaviorAndIsActiveBehavior_ThenActiveBehaviorRemoved()
         {
             var behavior = AddComponent<EmptyBCIControllerBehavior>();
-            _testController.RegisterBehavior(behavior, true);
+            BCIController.RegisterBehavior(behavior, true);
 
-            _testController.UnregisterBehavior(behavior);
+            BCIController.UnregisterBehavior(behavior);
 
             UnityEngine.Assertions.Assert.IsNull(_testController.ActiveBehavior);
         }
@@ -264,12 +265,30 @@ namespace BCIEssentials.Tests
             var behavior = AddComponent<EmptyBCIControllerBehavior>(b =>
             {
                 b.MockBehaviorType = BCIBehaviorType.P300;
-                _testController.RegisterBehavior(b);
+                BCIController.RegisterBehavior(b);
             });
 
-            _testController.ChangeBehavior(BCIBehaviorType.P300);
+            BCIController.ChangeBehavior(BCIBehaviorType.P300);
 
             Assert.AreEqual(_testController.ActiveBehavior, behavior);
+        }
+
+        [Test]
+        public void WhenChangeBehaviorAndBehaviorIsNull_ThenUnregisterBehaviorType()
+        {
+            LogAssert.ExpectAnyContains(LogType.Error, "Unable to find");
+            _testController.Initialize();
+            var behavior = AddComponent<EmptyBCIControllerBehavior>(b =>
+            {
+                b.MockBehaviorType = BCIBehaviorType.P300;
+                BCIController.RegisterBehavior(b);
+            });
+            Object.DestroyImmediate(behavior);
+            
+            BCIController.ChangeBehavior(BCIBehaviorType.P300);
+
+            Assert.IsNull(BCIController.Instance.ActiveBehavior);
+            Assert.IsFalse(BCIController.HasBehaviorForType(BCIBehaviorType.P300));
         }
     }
 }

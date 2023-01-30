@@ -58,19 +58,19 @@ namespace BCIEssentials.Controllers
             // Press T to do automated training
             if (Input.GetKeyDown(KeyCode.T))
             {
-                StartAutomatedTraining();
+                StartTraining(BCITrainingType.Automated);
             }
 
             // Press I to do Iterative training (MI only)
             if (Input.GetKeyDown(KeyCode.I))
             {
-                StartIterativeTraining();
+                StartTraining(BCITrainingType.Iterative);
             }
 
             // Press U to do User training, stimulus without BCI
             if (Input.GetKeyDown(KeyCode.U))
             {
-                StartUserTraining();
+                StartTraining(BCITrainingType.User);
             }
 
 

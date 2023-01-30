@@ -76,6 +76,16 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public SPO LastSelectedSPO { get; private set; }
 
+        /// <summary>
+        /// If the behavior is currently running a training session.
+        /// </summary>
+        public bool TrainingRunning => CurrentTrainingType != BCITrainingType.None;
+        
+        /// <summary>
+        /// The type of training behavior being run.
+        /// </summary>
+        public BCITrainingType CurrentTrainingType { get; private set; }
+        
         
         protected LSLMarkerStream marker;
         protected LSLResponseStream response;
@@ -85,6 +95,8 @@ namespace BCIEssentials.ControllerBehaviors
         
         protected Coroutine _runStimulus;
         protected Coroutine _waitToSelect;
+
+        protected Coroutine _training;
 
 
         #region Life Cycle Methods
@@ -152,10 +164,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void RegisterWithControllerInstance(bool setAsActive = false)
         {
-            if (BCIController.Instance != null)
-            {
-                BCIController.Instance.RegisterBehavior(this, setAsActive);
-            }
+            BCIController.RegisterBehavior(this, setAsActive);
         }
 
         /// <summary>
@@ -163,10 +172,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void UnregisterFromControllerInstance()
         {
-            if (BCIController.Instance != null)
-            {
-                BCIController.Instance.UnregisterBehavior(this);
-            }
+            BCIController.UnregisterBehavior(this);
         }
 
         #endregion
@@ -388,8 +394,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         #region Markers
 
-        // Send markers
-        public virtual IEnumerator SendMarkers(int trainingIndex = 99)
+        protected virtual IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
@@ -478,25 +483,69 @@ namespace BCIEssentials.ControllerBehaviors
 
         #region Training
 
-        public void StartAutomatedTraining()
+        /// <summary>
+        /// Start the training behavior for the requested type.
+        /// </summary>
+        /// <param name="trainingType">
+        /// The training behavior type.
+        /// Not all behaviors may be implemented by a controller behavior type
+        /// </param>
+        public void StartTraining(BCITrainingType trainingType)
         {
-            ReceiveMarkers();
-            StartCoroutine(DoTraining());
+            if (StimulusRunning)
+            {
+                StopStimulusRun();
+            }
+
+            IEnumerator trainingBehavior = null;
+            switch (trainingType)
+            {
+                case BCITrainingType.Automated:
+                    ReceiveMarkers();
+                    trainingBehavior = WhileDoAutomatedTraining();
+                    break;
+                case BCITrainingType.Iterative:
+                    ReceiveMarkers();
+                    trainingBehavior = WhileDoIterativeTraining();
+                    break;
+                case BCITrainingType.User:
+                    trainingBehavior = WhileDoUserTraining();
+                    break;
+                default:
+                case BCITrainingType.None:
+                    StopTraining();
+                    break;
+            }
+
+            if (trainingBehavior != null)
+            {
+                StopStartCoroutine(ref _training, RunControllerTraining(trainingType, trainingBehavior));
+            }
         }
 
-        public void StartIterativeTraining()
+        /// <summary>
+        /// Stops the current training run.
+        /// </summary>
+        public void StopTraining()
         {
-            ReceiveMarkers();
-            StartCoroutine(DoIterativeTraining());
+            CurrentTrainingType = BCITrainingType.None;
+            StopCoroutineReference(ref _training);
         }
 
-        public void StartUserTraining()
+        private IEnumerator RunControllerTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)
         {
-            StartCoroutine(DoUserTraining());
-        }
+            CurrentTrainingType = trainingType;
 
+            while (TrainingRunning)
+            {
+                yield return trainingBehavior;
+            }
+
+            StopTraining();
+        }
+        
         // Do training
-        public virtual IEnumerator DoTraining()
+        protected virtual IEnumerator WhileDoAutomatedTraining()
         {
             // Generate the target list
             PopulateObjectList();
@@ -561,14 +610,14 @@ namespace BCIEssentials.ControllerBehaviors
             marker.Write("Training Complete");
         }
 
-        public virtual IEnumerator DoUserTraining()
+        protected virtual IEnumerator WhileDoUserTraining()
         {
             Debug.Log("No user training available for this paradigm");
 
             yield return null;
         }
 
-        public virtual IEnumerator DoIterativeTraining()
+        protected virtual IEnumerator WhileDoIterativeTraining()
         {
             Debug.Log("No iterative training available for this controller");
 

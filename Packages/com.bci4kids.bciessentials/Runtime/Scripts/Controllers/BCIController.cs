@@ -78,27 +78,27 @@ namespace BCIEssentials.Controllers
 
         private void RegisterKeyBindings()
         {
-            _keyBindings.TryAdd(KeyCode.S, Instance.StartStopStimulus);
+            _keyBindings.TryAdd(KeyCode.S, StartStopStimulus);
 
             //TODO: Refactor out training
-            _keyBindings.TryAdd(KeyCode.T, Instance.StartAutomatedTraining);
-            _keyBindings.TryAdd(KeyCode.I, Instance.StartIterativeTraining);
-            _keyBindings.TryAdd(KeyCode.U, Instance.StartUserTraining);
+            _keyBindings.TryAdd(KeyCode.T, () => { StartTraining(BCITrainingType.Automated);});
+            _keyBindings.TryAdd(KeyCode.I, () => { StartTraining(BCITrainingType.Iterative);});
+            _keyBindings.TryAdd(KeyCode.U, () => { StartTraining(BCITrainingType.User);});
 
             //Register Object Selection
-            _keyBindings.TryAdd(KeyCode.Alpha0, () => { Instance.SelectObject(0); });
-            _keyBindings.TryAdd(KeyCode.Alpha1, () => { Instance.SelectObject(1); });
-            _keyBindings.TryAdd(KeyCode.Alpha2, () => { Instance.SelectObject(2); });
-            _keyBindings.TryAdd(KeyCode.Alpha3, () => { Instance.SelectObject(3); });
-            _keyBindings.TryAdd(KeyCode.Alpha4, () => { Instance.SelectObject(4); });
-            _keyBindings.TryAdd(KeyCode.Alpha5, () => { Instance.SelectObject(5); });
-            _keyBindings.TryAdd(KeyCode.Alpha6, () => { Instance.SelectObject(6); });
-            _keyBindings.TryAdd(KeyCode.Alpha7, () => { Instance.SelectObject(7); });
-            _keyBindings.TryAdd(KeyCode.Alpha8, () => { Instance.SelectObject(8); });
-            _keyBindings.TryAdd(KeyCode.Alpha9, () => { Instance.SelectObject(9); });
+            _keyBindings.TryAdd(KeyCode.Alpha0, () => { SelectSPOAtEndOfRun(0); });
+            _keyBindings.TryAdd(KeyCode.Alpha1, () => { SelectSPOAtEndOfRun(1); });
+            _keyBindings.TryAdd(KeyCode.Alpha2, () => { SelectSPOAtEndOfRun(2); });
+            _keyBindings.TryAdd(KeyCode.Alpha3, () => { SelectSPOAtEndOfRun(3); });
+            _keyBindings.TryAdd(KeyCode.Alpha4, () => { SelectSPOAtEndOfRun(4); });
+            _keyBindings.TryAdd(KeyCode.Alpha5, () => { SelectSPOAtEndOfRun(5); });
+            _keyBindings.TryAdd(KeyCode.Alpha6, () => { SelectSPOAtEndOfRun(6); });
+            _keyBindings.TryAdd(KeyCode.Alpha7, () => { SelectSPOAtEndOfRun(7); });
+            _keyBindings.TryAdd(KeyCode.Alpha8, () => { SelectSPOAtEndOfRun(8); });
+            _keyBindings.TryAdd(KeyCode.Alpha9, () => { SelectSPOAtEndOfRun(9); });
         }
 
-        public void ChangeBehavior(BCIBehaviorType behaviorType)
+        public static void ChangeBehavior(BCIBehaviorType behaviorType)
         {
             if (Instance.ActiveBehavior != null)
             {
@@ -108,7 +108,7 @@ namespace BCIEssentials.Controllers
             if (Instance._registeredBehaviors.TryGetValue(behaviorType, out var requestedBehavior))
             {
                 Instance.ActiveBehavior = requestedBehavior;
-                Instance.ActiveBehavior.Initialize(_lslMarkerStream, _lslResponseStream);
+                Instance.ActiveBehavior.Initialize(Instance._lslMarkerStream, Instance._lslResponseStream);
                 Debug.Log($"New BCI Controller active of type {behaviorType}");
             }
             else
@@ -117,7 +117,7 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public bool RegisterBehavior(BCIControllerBehavior behavior, bool setAsActive = false)
+        public static bool RegisterBehavior(BCIControllerBehavior behavior, bool setAsActive = false)
         {
             if (behavior == null)
             {
@@ -125,11 +125,17 @@ namespace BCIEssentials.Controllers
                 return false;
             }
 
+            if (Instance == null)
+            {
+                Debug.LogError("No BCI Controller instance set.");
+                return false;
+            }
+
             if (Instance._registeredBehaviors.TryAdd(behavior.BehaviorType, behavior))
             {
                 if (setAsActive)
                 {
-                    Instance.ChangeBehavior(behavior.BehaviorType);
+                    ChangeBehavior(behavior.BehaviorType);
                 }
 
                 return true;
@@ -139,10 +145,16 @@ namespace BCIEssentials.Controllers
             return false;
         }
 
-        public void UnregisterBehavior(BCIControllerBehavior behavior)
+        public static void UnregisterBehavior(BCIControllerBehavior behavior)
         {
             if (behavior == null)
             {
+                return;
+            }
+            
+            if (Instance == null)
+            {
+                Debug.Log("No BCI Controller instance set.");
                 return;
             }
 
@@ -162,14 +174,26 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public bool HasBehaviorForType(BCIBehaviorType type)
+        public static bool HasBehaviorForType(BCIBehaviorType type)
         {
-            return _registeredBehaviors.ContainsKey(type);
+            if (Instance == null)
+            {
+                Debug.Log("No BCI Controller instance set.");
+                return false;
+            }
+            
+            return Instance._registeredBehaviors.ContainsKey(type);
         }
         
-        public bool HasBehaviorOfType<T>() where T : BCIControllerBehavior
+        public static bool HasBehaviorOfType<T>() where T : BCIControllerBehavior
         {
-            foreach (var value in _registeredBehaviors.Values)
+            if (Instance == null)
+            {
+                Debug.Log("No BCI Controller instance set.");
+                return false;
+            }
+            
+            foreach (var value in Instance._registeredBehaviors.Values)
             {
                 if (value is T)
                 {
@@ -183,7 +207,28 @@ namespace BCIEssentials.Controllers
 
         #region Behavior Passthroughs
 
-        public void StimulusOn(bool sendConstantMarkers = true)
+        /// <summary>
+        /// <para>Invokes <see cref="StartStimulusRun"/> if <see cref="ActiveBehavior.StimulusRunning"/> is false.</para>
+        /// <para>Invokes <see cref="StopStimulusRun"/> if <see cref="ActiveBehavior.StimulusRunning"/> is true.</para>
+        /// </summary>
+        public static void StartStopStimulus()
+        {
+            if (Instance.ActiveBehavior == null)
+            {
+                return;
+            }
+
+            Instance.ActiveBehavior.StartStopStimulusRun();
+        }
+        
+        /// <summary>
+        /// Start a new stimulus run. Will end an active stimulus run if present.
+        /// </summary>
+        /// <param name="sendConstantMarkers">
+        /// If true will also write to the marker stream until
+        /// the stimulus run ends or the number of markers sent equals <see cref="ActiveBehavior.trainTarget"/>.
+        /// </param>
+        public static void StartStimulusRun(bool sendConstantMarkers = true)
         {
             if (Instance.ActiveBehavior != null)
             {
@@ -191,7 +236,10 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public void StimulusOff()
+        /// <summary>
+        /// Stops the current stimulus run.
+        /// </summary>
+        public static void StopStimulusRun()
         {
             if (Instance.ActiveBehavior == null)
             {
@@ -201,49 +249,56 @@ namespace BCIEssentials.Controllers
             Instance.ActiveBehavior.StopStimulusRun();
         }
 
-        public void StartStopStimulus()
-        {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
-
-            Instance.ActiveBehavior.StartStopStimulusRun();
-        }
-
-        public void SelectObject(int objectIndex)
+        /// <summary>
+        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/>.
+        /// </summary>
+        /// <param name="objectIndex">The index value of the object to select.</param>
+        /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
+        public static void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.ActiveBehavior.SelectSPO(objectIndex);
+                Instance.ActiveBehavior.SelectSPO(objectIndex, stopStimulusRun);
             }
         }
-
-        public void StartAutomatedTraining()
+        
+        /// <summary>
+        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/> if no objects were
+        /// selected during a stimulus run.
+        /// </summary>
+        /// <param name="objectIndex"></param>
+        public static void SelectSPOAtEndOfRun(int objectIndex)
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.ActiveBehavior.StartAutomatedTraining();
+                Instance.ActiveBehavior.SelectSPOAtEndOfRun(objectIndex);
             }
         }
 
-
-        public void StartIterativeTraining()
+        /// <summary>
+        /// Start the training behavior for the requested type.
+        /// </summary>
+        /// <param name="trainingType">
+        /// The training behavior type.
+        /// Not all behaviors may be implemented by a controller behavior type
+        /// </param>
+        public static void StartTraining(BCITrainingType trainingType)
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.ActiveBehavior.StartIterativeTraining();
+                Instance.ActiveBehavior.StartTraining(trainingType);
             }
         }
 
-        public void StartUserTraining()
+        /// <summary>
+        /// Stops the current training run.
+        /// </summary>
+        public static void StopTraining()
         {
-            if (Instance.ActiveBehavior == null)
+            if (Instance.ActiveBehavior != null)
             {
-                return;
+                Instance.ActiveBehavior.StopTraining();
             }
-
-            Instance.ActiveBehavior.StartUserTraining();
         }
 
         #endregion
