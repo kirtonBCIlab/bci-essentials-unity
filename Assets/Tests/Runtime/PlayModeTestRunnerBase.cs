@@ -4,6 +4,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.TestResources;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
@@ -29,11 +30,17 @@ namespace BCIEssentials.Tests.Utilities
         [UnitySetUp]
         public virtual IEnumerator TestSetup()
         {
-            Debug.Log("<color=green>Test Started</color>");
+            LogTestName();
             yield return LoadEmptySceneAsync();
         }
 
-        protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null, bool setActive = false)
+        protected void LogTestName()
+        {
+            Debug.Log($"<color=green>Test Started: '{TestContext.CurrentContext.Test.Name}'</color>");
+        }
+
+        protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null,
+            bool setActive = false)
         {
             var gameObject = new GameObject();
             gameObject.SetActive(false);
@@ -56,7 +63,7 @@ namespace BCIEssentials.Tests.Utilities
         {
             return AddSPOToScene<SPO>(tag, includeMe);
         }
-        
+
         protected static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
         {
             var spo = new GameObject { tag = string.IsNullOrEmpty(tag) ? "Untagged" : tag }.AddComponent<T>();
@@ -97,10 +104,7 @@ namespace BCIEssentials.Tests.Utilities
             return AddComponent<CoroutineRunner>(inClassName.GameObject, runner =>
             {
                 runner.Routine = inClassName.Coroutine;
-                runner.OnCompleteEvent = () =>
-                {
-                    inClassName.OnComplete?.Invoke();
-                };
+                runner.OnCompleteEvent = () => { inClassName.OnComplete?.Invoke(); };
             });
         }
 
@@ -125,7 +129,7 @@ namespace BCIEssentials.Tests.Utilities
                 Debug.Log(framesRan);
                 yield return null;
             }
-            
+
             onContinue?.Invoke();
         }
 
