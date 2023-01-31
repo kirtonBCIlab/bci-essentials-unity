@@ -158,7 +158,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartStopStimulus()
         {
             // Receive incoming markers
-            if (!responseStream.Pulling)
+            if (!responseStream.Polling)
             {
                 ReceiveMarkers();
             }
@@ -225,7 +225,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartAutomatedTraining()
         {
             // Receive incoming markers
-            if (!responseStream.Pulling)
+            if (!responseStream.Polling)
             {
                 ReceiveMarkers();
             }
@@ -236,7 +236,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartIterativeTraining()
         {
             // Receive incoming markers
-            if (!responseStream.Pulling)
+            if (!responseStream.Polling)
             {
                 ReceiveMarkers();
             }
@@ -436,14 +436,14 @@ namespace BCIEssentials.ControllerBehaviors
                 responseStream.Connect();
             }
 
-            if (responseStream.Pulling)
+            if (responseStream.Polling)
             {
-                responseStream.StopPulling();
+                responseStream.StopPolling();
             }
 
             //Ping count
             int pingCount = 0;
-            responseStream.StartPulling(responses =>
+            responseStream.StartPolling(responses =>
             {
                 foreach (var response in responses)
                 {
@@ -475,7 +475,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void StopReceivingMarkers()
         {
-            responseStream.StopPulling();
+            responseStream.StopPolling();
         }
     }
 }
