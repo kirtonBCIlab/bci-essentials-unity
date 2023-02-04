@@ -765,7 +765,7 @@ namespace BCIEssentials.ControllerBehaviors
             StopStimulusRun();
         }
 
-        protected override IEnumerator SendMarkers(int trainTarget = 99)
+        protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
             yield return null;
@@ -775,27 +775,24 @@ namespace BCIEssentials.ControllerBehaviors
         public override void StartStimulusRun(bool sendConstantMarkers = true)
         {
             StimulusRunning = true;
-
+            
+            StimulusRunning = true;
+            LastSelectedSPO = null;
+            
             // Send the marker to start
             if (blockOutGoingLSL == false)
             {
                 marker.Write("Trial Started");
             }
 
-            // Start the stimulus Coroutine
-            try
-            {
-                StartCoroutine(RunStimulus());
+            ReceiveMarkers();
+            PopulateObjectList();
+            StopStartCoroutine(ref _runStimulus, RunStimulus());
 
-                // Not required for P300
-                if (sendConstantMarkers)
-                {
-                    StartCoroutine(SendMarkers(trainTarget));
-                }
-            }
-            catch
+            // Not required for P300
+            if (sendConstantMarkers)
             {
-                Debug.Log("start stimulus coroutine error");
+                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
             }
         }
 

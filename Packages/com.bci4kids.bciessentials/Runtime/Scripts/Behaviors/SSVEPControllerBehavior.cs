@@ -24,17 +24,15 @@ namespace BCIEssentials.ControllerBehaviors
 
             realFreqFlash = new float[_selectableSPOs.Count];
 
-            var refreshRate = Application.targetFrameRate;
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
-
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = refreshRate / setFreqFlash[i];
+                period = targetFrameRate / setFreqFlash[i];
                 // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (refreshRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
 
                 Debug.Log($"frequency {i + 1} : {realFreqFlash[i]}");
             }

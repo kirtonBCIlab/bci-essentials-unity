@@ -31,7 +31,7 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField]
         [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         [Min(-1)]
-        private int targetFrameRate = 60;
+        protected int targetFrameRate = 60;
 
         [SerializeField]
         [Tooltip("Provide an initial set of SPO.")]
@@ -74,7 +74,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// The 
         /// </summary>
-        public SPO LastSelectedSPO { get; private set; }
+        public SPO LastSelectedSPO { get; protected set; }
 
         /// <summary>
         /// If the behavior is currently running a training session.
