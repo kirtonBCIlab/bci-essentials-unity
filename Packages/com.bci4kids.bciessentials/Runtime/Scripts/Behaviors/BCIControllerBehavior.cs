@@ -54,14 +54,11 @@ namespace BCIEssentials.ControllerBehaviors
             set { _myTag = value; }
         }
 
-        // Receive markers
-        protected bool receivingMarkers = false;
-
         // Scripts
         [SerializeField] protected MatrixSetup setup;
 
         protected LSLMarkerStream marker;
-        protected LSLResponseStream response;
+        protected LSLResponseStream responseStream;
 
         protected virtual void Start()
         {
@@ -84,7 +81,7 @@ namespace BCIEssentials.ControllerBehaviors
             Application.targetFrameRate = targetFrameRate;
 
             marker = lslMarkerStream;
-            response = lslResponseStream;
+            responseStream = lslResponseStream;
 
             //Setup if required
             if (setupRequired)
@@ -104,6 +101,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void CleanUp()
         {
             setup.DestroyMatrix();
+            responseStream.Disconnect();
             StopAllCoroutines();
         }
 
@@ -160,9 +158,9 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartStopStimulus()
         {
             // Receive incoming markers
-            if (receivingMarkers == false)
+            if (!responseStream.Polling)
             {
-                StartCoroutine(ReceiveMarkers());
+                ReceiveMarkers();
             }
 
             // Turn off if on
@@ -227,9 +225,9 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartAutomatedTraining()
         {
             // Receive incoming markers
-            if (receivingMarkers == false)
+            if (!responseStream.Polling)
             {
-                StartCoroutine(ReceiveMarkers());
+                ReceiveMarkers();
             }
 
             StartCoroutine(DoTraining());
@@ -238,9 +236,9 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartIterativeTraining()
         {
             // Receive incoming markers
-            if (receivingMarkers == false)
+            if (!responseStream.Polling)
             {
-                StartCoroutine(ReceiveMarkers());
+                ReceiveMarkers();
             }
 
             StartCoroutine(DoIterativeTraining());
@@ -431,60 +429,53 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         // Coroutine to continuously receive markers
-        public IEnumerator ReceiveMarkers()
+        public void ReceiveMarkers()
         {
-            if (receivingMarkers == false)
+            if (!responseStream.Connected)
             {
-                //Get response stream from Python
-                print("Looking for a response stream");
-                int diditwork = response.ResolveResponse();
-                print(diditwork.ToString());
-                receivingMarkers = true;
+                responseStream.Connect();
             }
 
-            //Set interval at which to receive markers
-            float receiveInterval = 1 / Application.targetFrameRate;
-            float responseTimeout = 0f;
+            if (responseStream.Polling)
+            {
+                responseStream.StopPolling();
+            }
 
             //Ping count
             int pingCount = 0;
-
-            // Receive markers continuously
-            while (receivingMarkers) //TODO: Nothing sets this to false, relies on stopping coroutine instead
+            responseStream.StartPolling(responses =>
             {
-                // Receive markers
-                // Pull the python response and add it to the responseStrings array
-                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
-                var responseString = responseStrings[0];
-
-                if (responseString.Equals("ping"))
+                foreach (var response in responses)
                 {
-                    pingCount++;
-                    if (pingCount % 100 == 0)
+                    if (response.Equals("ping"))
                     {
-                        Debug.Log($"Ping Count: {pingCount}");
-                    }
-                }
-                else if (!responseString.Equals(""))
-                {
-                    //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                    //Question: Do we get more than once response string?
-                    for (int i = 0; i < responseStrings.Length; i++)
-                    {
-                        Debug.Log($"response : {responseString}");
-                        if (int.TryParse(responseString, out var index) && index < objectList.Count)
+                        pingCount++;
+                        if (pingCount % 100 == 0)
                         {
-                            //Run on selection
-                            objectList[index].GetComponent<SPO>().Select();
+                            Debug.Log($"Ping Count: {pingCount}");
+                        }
+                    }
+                    else if (!response.Equals(""))
+                    {
+                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+                        //Question: Do we get more than once response string?
+                        for (int i = 0; i < responses.Length; i++)
+                        {
+                            Debug.Log($"response : {response}");
+                            if (int.TryParse(response, out var index) && index < objectList.Count)
+                            {
+                                //Run on selection
+                                objectList[index].GetComponent<SPO>().Select();
+                            }
                         }
                     }
                 }
+            });
+        }
 
-                // Wait for the next receive interval
-                yield return new WaitForSecondsRealtime(receiveInterval);
-            }
-
-            Debug.Log("Done receiving markers");
+        public void StopReceivingMarkers()
+        {
+            responseStream.StopPolling();
         }
     }
 }

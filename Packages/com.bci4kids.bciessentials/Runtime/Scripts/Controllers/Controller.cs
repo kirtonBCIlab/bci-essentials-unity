@@ -548,25 +548,19 @@ public class Controller : MonoBehaviour
     // Coroutine to continuously receive markers
     public IEnumerator ReceiveMarkers()
     {
-        if (receivingMarkers == false)
+        if (!response.Connected)
         {
-            //Get response stream from Python
-            print("Looking for a response stream");
-            response = GetComponent<LSLResponseStream>();
-            int diditwork = response.ResolveResponse();
-            print(diditwork.ToString());
-            receivingMarkers = true;
+            response.Connect();
         }
 
         //Set interval at which to receive markers
         float receiveInterval = 1 / refreshRate;
-        float responseTimeout = 0f;
 
         //Ping count
         int pingCount = 0;
 
         // Receive markers continuously
-        while (receivingMarkers)
+        while (true)
         {
             // Receive markers
             // Initialize the default response string
@@ -574,12 +568,15 @@ public class Controller : MonoBehaviour
             string[] responseStrings = defaultResponseStrings;
 
             // Pull the python response and add it to the responseStrings array
-            responseStrings = response.PullResponse(defaultResponseStrings, responseTimeout);
+            responseStrings = response.GetResponses();
 
-            // Check if there is 
-            bool newResponse = !responseStrings[0].Equals(defaultResponseStrings[0]);
-
-
+            if (responseStrings.Length == 0)
+            {
+                // Wait for the next receive interval
+                yield return new WaitForSecondsRealtime(receiveInterval);
+                continue;
+            }
+            
             if (responseStrings[0] == "ping")
             {
                 pingCount++;

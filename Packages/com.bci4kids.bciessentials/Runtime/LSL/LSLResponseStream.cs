@@ -1,112 +1,234 @@
 using System;
-using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace BCIEssentials.LSL
 {
     public class LSLResponseStream : MonoBehaviour, IResponseStream
     {
-        //The predicate by which to recognize the python response stream
-        public string responsePredicate = "name='PythonResponse'";
-        //private string[] responseStrings = {""};
-
-        public StreamInfo[] responseInfo;
-
-        public StreamInlet responseInlet;
-        //public responseInlet  liblsl.StreamInlet(responseInfo[0]);
-        //public liblsl.StreamInlet(responseInfo) responseInlet;
-
-        // responseInlet.open_stream();
-        //TODO: Not make this hardcoded+
-        public string value = "PythonResponse";
-        public int pyRespIndex;
-
-
-        public int ResolveResponse()
+        [SerializeField]
+        [Tooltip("The name of the open stream to pull responses from.")]
+        private string _targetStreamName = "PythonResponse";
+        
+        [SerializeField]
+        [Tooltip("The duration in seconds to reattempt to resolve the target stream.")]
+        [UnityEngine.Range(1, 30)]
+        private double _resolveTimeout;
+        
+        [SerializeField]
+        [Tooltip("The duration in seconds between requests to the target stream for responses.")]
+        [Min(0)]
+        private float _pollFrequency;
+        
+        /// <summary>
+        /// The duration in seconds between requests to the target stream for responses.
+        /// <para>Minimum value is 0.</para>
+        /// </summary>
+        public float PollFrequency
         {
-            // Resolve stream not working, crashes unity, use resolve streams instead and then find a way to pick the right one
-            responseInfo = LSL.resolve_streams();
-            if (responseInfo.Length == 0)
+            get => _pollFrequency;
+            set
             {
-                return -1;
+                _pollFrequency = Mathf.Max(0, value);
             }
+        }
+        
+        /// <summary>
+        /// If the target stream was discovered and available.
+        /// </summary>
+        public bool Connected => _streamInlet is { IsClosed: false };
+        
+        /// <summary>
+        /// If the target stream is being polled for responses.
+        /// </summary>
+        public bool Polling => _polling != null;
 
-            for (int i = 0; i < responseInfo.Length; i++)
-            {
-                var responseName = responseInfo[i].name();
-                Debug.Log($"Response info: {responseName} ({i})");
+        /// <summary>
+        /// If responses have been received and stored during polling.
+        /// <see cref="GetResponses"/> does not reset this. 
+        /// </summary>
+        public bool HasStoredResponses => _responsesStore.Count > 0;
+        
+        private StreamInlet _streamInlet;
+        private Coroutine _polling;
+        private readonly List<string> _responsesStore = new();
 
-                if (!responseName.Equals(value)) continue;
-                
-                pyRespIndex = i;
-                Debug.Log("Got Python Response");
-                responseInlet = new StreamInlet(responseInfo[i]);
-                Debug.Log("Created the inlet");
+        /// <summary>
+        /// Attempt to resolve the target stream using <see cref="_targetStreamName"/>.
+        /// </summary>
+        /// <returns>Returns true if the target stream was resolved.</returns>
+        public void Connect()
+        {
+            Connect(_targetStreamName);
+        }
+        
+        /// <summary>
+        /// Attempt to resolve the target stream using provided stream name.
+        /// </summary>
+        /// <param name="targetStreamName">The name of the stream to resolve.</param>
+        /// <returns>Returns true if the target stream was resolved.</returns>
+        public void Connect(string targetStreamName)
+        {
+            Disconnect();
 
-                //responseInlet.open_stream();
-                //print("Opened the stream");
-
-                // Try to open the stream, timeout after 2 seconds
-                try
-                {
-                    double timeout = 2.0;
-                    responseInlet.open_stream(timeout);
-                    Debug.Log("Opened the stream successfully");
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e.Message);
-                }
-            }
-
-            // Tried moving it down here so that it only opens the last Python Response stream, and it still crashes
-            // Aparently this is unnecessary anyway because if the stream is not opened it will be opened implicitly 
-            //double timeout = 2.0;
-            //responseInlet.open_stream(timeout);
-            //print("Opened the stream");
-
-            return 1;
-
+            var streamInfos = LSL.resolve_stream("name", targetStreamName, 0, _resolveTimeout);
+            if (streamInfos.Length <= 0) return;
+            
+            _streamInlet = new StreamInlet(streamInfos[0]);
+            _streamInlet.open_stream();
+            
+            Debug.Log($"Connected to stream: {_streamInlet}");
         }
 
-        //void Start()
-        //{
-        //    StreamInfo streamInfo = new StreamInfo(StreamName, StreamType, 1, liblsl.IRREGULAR_RATE, LSL.channel_format_t.cf_float32);
-
-        //    intlet = new StreamOutlet(streamInfo);
-        //}
-
-        public string[] PullResponse(string[] responseStrings, double timeout)
+        /// <summary>
+        /// Dispose the open stream and clear responses.
+        /// </summary>
+        public void Disconnect()
         {
-            // Try to pull sample
-            try
+            if (Polling)
             {
-                //double timeout = 0.1;
-                double result = responseInlet.pull_sample(responseStrings, timeout);
+                StopPolling();
+            }
+            
+            if (Connected)
+            {
+                _streamInlet?.close_stream();
+                _streamInlet?.Dispose();
+                _streamInlet = null;
+            }
+        }
+
+        /// <summary>
+        /// Begin polling the target stream for responses.
+        /// <para>
+        /// Responses are stored until polling stops, are requested or provided
+        /// to the response callback.
+        /// </para>
+        /// </summary>
+        /// <param name="onResponseCallback">An action to invoke when responses are received.</param>
+        public void StartPolling(Action<string[]> onResponseCallback = null)
+        {
+            if (!Connected)
+            {
+                Debug.LogWarning($"The target stream is unavailable. Try calling the '{nameof(Connect)}' method.");
+                return;
+            }
+
+            StopPolling();
+
+            foreach (var response in GetResponses())
+            {
+                _responsesStore.Add(response);
+            }
+            
+            _polling = StartCoroutine(PollForSamples(onResponseCallback));
+        }
+
+        /// <summary>
+        /// Stop polling the target stream for responses.
+        /// </summary>
+        public void StopPolling()
+        {
+            _responsesStore.Clear();
+            if (_polling != null)
+            {
+                StopCoroutine(_polling);
+                _polling = null;
+            }
+        }
+        
+        /// <summary>
+        /// Retrieves all available responses either from the polled
+        /// collection or from the stream directly.
+        /// </summary>
+        /// <returns>Returns an array of stream responses.</returns>
+        public string[] GetResponses()
+        {
+            if (!Connected)
+            {
+                Debug.LogWarning($"The target stream is unavailable. Try calling the '{nameof(Connect)}' method.");
+                return Array.Empty<string>();
+            }
+
+            var responses = new List<string>();
+            
+            if (HasStoredResponses)
+            {
+                foreach (var response in _responsesStore)
+                {
+                    responses.Add(response);
+                }
+                
+                _responsesStore.Clear();
+            }
+            
+            if (!Polling)
+            {
+                var availableSamples = _streamInlet.samples_available();
+                var sample = new[] { "" };
+
+                for (int i = 0; i < availableSamples; i++)
+                {
+                    _streamInlet.pull_sample(sample);
+                    responses.Add(sample[0]);
+                }
+
+                return responses.ToArray();
+            }
+            
+            return responses.ToArray();
+        }
+
+        /// <summary>
+        /// Clear the list of any responses received during polling.
+        /// </summary>
+        public void ClearPolledResponses()
+        {
+            _responsesStore.Clear();
+        }
+        
+        private IEnumerator PollForSamples(Action<string[]> onResponse = null)
+        {
+            Debug.Log($"Started polling stream for samples");
+            while (true)
+            {
+                var responses = new []{""};
+                double result = _streamInlet.pull_sample(responses, 0);
                 if (result != 0)
                 {
-                    //print(result);
-                    for (int i = 0; i < responseStrings.Length; i++)
+                    foreach (var response in responses)
                     {
-                        //print(responseStrings[i]);
+                        _responsesStore.Add(response);
+                    }
+
+                    if (onResponse != null)
+                    {
+                        onResponse.Invoke(responses);
+                        _responsesStore.Clear();
                     }
                 }
-
+                
+                yield return new WaitForSeconds(PollFrequency);
             }
-            catch //(Exception e)
-            {
-                //print(e.Message);
-
-            }
-
-            return responseStrings;
         }
-
     }
 
     public interface IResponseStream
     {
+        public bool Connected { get; }
+        public bool HasStoredResponses { get; }
         
+        public void Connect();
+        public void Connect(string targetStringName);
+        public void Disconnect();
+        
+        public void StartPolling(Action<string[]> onResponse = null);
+        public void StopPolling();
+
+        public string[] GetResponses();
+        public void ClearPolledResponses();
     }
 }
