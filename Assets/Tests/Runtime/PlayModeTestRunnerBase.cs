@@ -93,6 +93,25 @@ namespace BCIEssentials.Tests.Utilities
             setup?.Invoke(t);
             return t;
         }
+        
+        protected static CoroutineRunner RepeatForSeconds(Action onRepeat, int repeatCount, float repeatDelay = 0, Action onComplete = null)
+        {
+            repeatCount = repeatCount > 0 ? repeatCount : 1;
+            repeatDelay = repeatDelay >= 0 ? repeatDelay : 0;
+            
+            IEnumerator Repeater()
+            {
+                int count = 0;
+                while (count < repeatCount)
+                {
+                    onRepeat?.Invoke();
+                    ++count;
+                    yield return new WaitForSeconds(repeatDelay);
+                }
+            }
+            
+            return AddCoroutineRunner(new InClassName(new GameObject(), Repeater(), onComplete));
+        }
 
         protected static CoroutineRunner AddCoroutineRunner(IEnumerator coroutine, Action onComplete = null)
         {

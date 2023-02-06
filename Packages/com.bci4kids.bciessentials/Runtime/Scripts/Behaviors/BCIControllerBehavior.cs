@@ -151,6 +151,11 @@ namespace BCIEssentials.ControllerBehaviors
                 setup.DestroyMatrix();
             }
 
+            if (response != null)
+            {
+                response.Disconnect();
+            }
+
             StimulusRunning = false;
             StopCoroutineReference(ref _receiveMarkers);
             StopCoroutineReference(ref _sendMarkers);
@@ -414,70 +419,52 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected void ReceiveMarkers()
+        public void ReceiveMarkers()
         {
-            StopStartCoroutine(ref _receiveMarkers, PollForMarkers());
-        }
-
-        protected IEnumerator PollForMarkers()
-        {
-            if (response.responseInlet == null || response.responseInlet.IsClosed)
+            if (!response.Connected)
             {
-                Debug.Log("Looking for a response stream");
-                int resolveCode = response.ResolveResponse();
-
-                if (resolveCode > 0)
-                {
-                    Debug.Log($"Resolved Stream with code: '{resolveCode}'");
-                }
-                else
-                {
-                    Debug.LogError("Failed to open response");
-                    _receiveMarkers = null;
-                    yield break;
-                }
+                response.Connect();
             }
 
-            //Set interval at which to receive markers
-            float receiveInterval = 1 / Application.targetFrameRate;
-            float responseTimeout = 0f;
+            if (response.Polling)
+            {
+                response.StopPolling();
+            }
 
             //Ping count
             int pingCount = 0;
-
-            // Receive markers continuously
-            while (true) //TODO: Nothing sets this to false, relies on stopping coroutine instead
+            response.StartPolling(responses =>
             {
-                // Receive markers
-                // Pull the python response and add it to the responseStrings array
-                var responseStrings = response.PullResponse(new[] { "" }, responseTimeout);
-                var responseString = responseStrings[0];
-
-                if (responseString.Equals("ping"))
+                foreach (var response in responses)
                 {
-                    pingCount++;
-                    if (pingCount % 100 == 0)
+                    if (response.Equals("ping"))
                     {
-                        Debug.Log($"Ping Count: {pingCount}");
-                    }
-                }
-                else if (!responseString.Equals(""))
-                {
-                    //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                    //Question: Do we get more than once response string?
-                    for (int i = 0; i < responseStrings.Length; i++)
-                    {
-                        Debug.Log($"response : {responseString}");
-                        if (int.TryParse(responseString, out var index))
+                        pingCount++;
+                        if (pingCount % 100 == 0)
                         {
-                            SelectSPO(index);
+                            Debug.Log($"Ping Count: {pingCount}");
+                        }
+                    }
+                    else if (!response.Equals(""))
+                    {
+                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+                        //Question: Do we get more than once response string?
+                        for (int i = 0; i < responses.Length; i++)
+                        {
+                            Debug.Log($"response : {response}");
+                            if (int.TryParse(response, out var index) && index < SelectableSPOs.Count)
+                            {
+                                SelectableSPOs[index].Select();
+                            }
                         }
                     }
                 }
+            });
+        }
 
-                // Wait for the next receive interval
-                yield return new WaitForSecondsRealtime(receiveInterval);
-            }
+        public void StopReceivingMarkers()
+        {
+            response.StopPolling();
         }
         #endregion
 
