@@ -308,39 +308,33 @@ namespace BCIEssentials.Tests
         public IEnumerator WhenStartStimulusRunAndSendConstantMarkers_ThenMarkerSentDuringRun()
         {
             var markerCount = (_behavior.windowLength + _behavior.interWindowInterval) * 3;
-
-
-            var responses = new List<string>();
             var markerListener = AddComponent<LSLResponseStream>(rs =>
             {
-                rs.value = _testMarkerStream.StreamName;
-                rs.ResolveResponse();
+                rs.Connect(_testMarkerStream.StreamName);
             });
 
             _behavior.StartStimulusRun(true);
             yield return new WaitForSecondsRealtime(markerCount);
 
-            PullAllResponses(markerListener, responses);
+            var responses = markerListener.GetResponses();
 
-            Assert.AreEqual(markerCount + 1, responses.Count);
+            Assert.AreEqual(markerCount + 1, responses.Length);
         }
 
         [UnityTest]
         public IEnumerator WhenStimulusRunningAndStartStimulusRun_ThenStimulusStoppedThenStarted()
         {
-            var responses = new List<string>();
             var markerListener = AddComponent<LSLResponseStream>(rs =>
             {
-                rs.value = _testMarkerStream.StreamName;
-                rs.ResolveResponse();
+                rs.Connect(_testMarkerStream.StreamName);
             });
 
             _behavior.StartStimulusRun(false);
             _behavior.StartStimulusRun(false);
             yield return null;
-            PullAllResponses(markerListener, responses);
+            var responses = markerListener.GetResponses();
 
-            Assert.AreEqual(3, responses.Count);
+            Assert.AreEqual(3, responses.Length);
             Assert.AreEqual("Trial Started", responses[0]);
             Assert.AreEqual("Trial Ends", responses[1]);
             Assert.AreEqual("Trial Started", responses[2]);
@@ -355,20 +349,6 @@ namespace BCIEssentials.Tests
             _behavior.StopStimulusRun();
 
             Assert.False(_behavior.StimulusRunning);
-        }
-
-        private void PullAllResponses(LSLResponseStream responseStream, List<string> responses)
-        {
-            responses ??= new List<string>();
-            var response = new[] { "" };
-
-            var responseCount = responseStream.responseInlet.samples_available();
-            Debug.Log($"Pulling all {responseCount} available responses");
-            for (int i = 0; i < responseCount; i++)
-            {
-                response = responseStream.PullResponse(response, 0);
-                responses.Add(response[0]);
-            }
         }
     }
 

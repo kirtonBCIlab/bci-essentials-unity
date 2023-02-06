@@ -250,6 +250,7 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenUnregisterBehaviorAndIsActiveBehavior_ThenActiveBehaviorRemoved()
         {
+            _testController.Initialize();
             var behavior = AddComponent<EmptyBCIControllerBehavior>();
             BCIController.RegisterBehavior(behavior, true);
 
