@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LSL;
 using NUnit.Framework;
 using UnityEngine;
 
 namespace BCIEssentials.LSL
 {
+    [Obsolete]
     public class LSLResponseStream : MonoBehaviour, IResponseStream
     {
         [SerializeField]

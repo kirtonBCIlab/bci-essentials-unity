@@ -1,4 +1,4 @@
-﻿using System;
+﻿using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSL
@@ -35,7 +35,7 @@ namespace BCIEssentials.LSL
                 return;
             }
             
-            var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string);
+            var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string, StreamId);
             _outlet = new StreamOutlet(streamInfo);
         }
 
