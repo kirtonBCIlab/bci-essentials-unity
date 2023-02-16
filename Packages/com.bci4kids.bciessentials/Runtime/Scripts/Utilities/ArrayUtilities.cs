@@ -21,7 +21,7 @@ namespace BCIEssentials.Utilities
                 throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
             }
             
-            if (arrayLength <= 0 || minRangeValue == maxRangeValue)
+            if (arrayLength <= 0)
             {
                 return Array.Empty<int>();
             }

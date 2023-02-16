@@ -4,6 +4,10 @@ using BCIEssentials.ControllerBehaviors;
 
 namespace BCIEssentials.Controllers
 {
+    /// <summary>
+    /// Standalone version of <see cref="BCIController"/> that inherits
+    /// from <see cref="SSVEPControllerBehavior"/>.
+    /// </summary>
     public class SSVEPController : SSVEPControllerBehavior
     {
         //Display
@@ -23,8 +27,7 @@ namespace BCIEssentials.Controllers
             Application.targetFrameRate = refreshRate;
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
             // Check the average framerate every second
             currentRefreshRate = 1 / Time.deltaTime;
@@ -35,7 +38,7 @@ namespace BCIEssentials.Controllers
                 avgRefreshRate = sumRefreshRate / (float)refreshCounter;
                 if (avgRefreshRate < 0.95 * (float)refreshRate)
                 {
-                    Debug.Log("Refresh rate is below 95% of target, avg refresh rate " + avgRefreshRate.ToString());
+                    Debug.Log($"Refresh rate is below 95% of target, avg refresh rate {avgRefreshRate}");
                 }
 
                 sumRefreshRate = 0;
@@ -49,79 +52,79 @@ namespace BCIEssentials.Controllers
             // Press S to start/stop stimulus
             if (Input.GetKeyDown(KeyCode.S))
             {
-                StartStopStimulus();
+                StartStopStimulusRun();
             }
 
             // Press T to do automated training
             if (Input.GetKeyDown(KeyCode.T))
             {
-                StartAutomatedTraining();
+                StartTraining(BCITrainingType.Automated);
             }
 
             // Press I to do Iterative training (MI only)
             if (Input.GetKeyDown(KeyCode.I))
             {
-                StartIterativeTraining();
+                StartTraining(BCITrainingType.Iterative);
             }
 
             // Press U to do User training, stimulus without BCI
             if (Input.GetKeyDown(KeyCode.U))
             {
-                StartUserTraining();
+                StartTraining(BCITrainingType.User);
             }
 
 
             // Check for a selection if stim is on
-            if (stimOn)
+            if (StimulusRunning)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha0))
                 {
-                    StartCoroutine(SelectObjectAfterRun(0));
+                    SelectSPOAtEndOfRun(0);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha1))
                 {
-                    StartCoroutine(SelectObjectAfterRun(1));
+                    SelectSPOAtEndOfRun(1);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
                 {
-                    StartCoroutine(SelectObjectAfterRun(2));
+                    SelectSPOAtEndOfRun(2);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha3))
                 {
-                    StartCoroutine(SelectObjectAfterRun(3));
+                    SelectSPOAtEndOfRun(3);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha4))
                 {
-                    StartCoroutine(SelectObjectAfterRun(4));
+                    SelectSPOAtEndOfRun(4);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha5))
                 {
-                    StartCoroutine(SelectObjectAfterRun(5));
+                    SelectSPOAtEndOfRun(5);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha6))
                 {
-                    StartCoroutine(SelectObjectAfterRun(6));
+                    SelectSPOAtEndOfRun(6);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha7))
                 {
-                    StartCoroutine(SelectObjectAfterRun(7));
+                    SelectSPOAtEndOfRun(7);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha8))
                 {
-                    StartCoroutine(SelectObjectAfterRun(8));
+                    SelectSPOAtEndOfRun(8);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha9))
                 {
-                    StartCoroutine(SelectObjectAfterRun(9));
+                    SelectSPOAtEndOfRun(9);
                 }
             }
         }

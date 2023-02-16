@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using System;
 using BCIEssentials.Controllers;
-using BCIEssentials.StimulusObjects;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -23,28 +22,26 @@ namespace BCIEssentials.ControllerBehaviors
         {
             base.PopulateObjectList(populationMethod);
 
-            realFreqFlash = new float[objectList.Count];
+            realFreqFlash = new float[_selectableSPOs.Count];
 
-            var refreshRate = Application.targetFrameRate;
-            for (int i = 0; i < objectList.Count; i++)
+            for (int i = 0; i < _selectableSPOs.Count; i++)
             {
-
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = refreshRate / setFreqFlash[i];
+                period = targetFrameRate / setFreqFlash[i];
                 // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (refreshRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
 
                 Debug.Log($"frequency {i + 1} : {realFreqFlash[i]}");
             }
         }
 
-        public override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
-            while (stimOn)
+            while (StimulusRunning)
             {
                 // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
                 string freqString = "";
@@ -54,7 +51,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
 
                 string trainingString;
-                if (trainingIndex <= objectList.Count)
+                if (trainingIndex <= _selectableSPOs.Count)
                 {
                     trainingString = trainingIndex.ToString();
                 }
@@ -63,7 +60,7 @@ namespace BCIEssentials.ControllerBehaviors
                     trainingString = "-1";
                 }
 
-                string markerString = "ssvep," + objectList.Count.ToString() + "," + trainingString + "," +
+                string markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
                                       windowLength.ToString() + freqString;
 
                 // Send the marker
@@ -76,45 +73,51 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        public override IEnumerator Stimulus()
+        protected override IEnumerator OnStimulusRunBehavior()
         {
-            while (stimOn)
+            // Add duty cycle
+            // Generate the flashing
+            for (int i = 0; i < _selectableSPOs.Count; i++)
             {
-                // Add duty cycle
-                // Generate the flashing
-                for (int i = 0; i < objectList.Count; i++)
+                frame_count[i]++;
+                if (frames_on[i] == 1)
                 {
-                    frame_count[i]++;
-                    if (frames_on[i] == 1)
+                    if (frame_count[i] >= frame_on_count[i])
                     {
-                        if (frame_count[i] >= frame_on_count[i])
-                        {
-                            // turn the cube off
-                            objectList[i].GetComponent<SPO>().StopStimulus();
-                            frames_on[i] = 0;
-                            frame_count[i] = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (frame_count[i] >= frame_off_count[i])
-                        {
-                            // turn the cube on
-                            objectList[i].GetComponent<SPO>().StartStimulus();
-                            frames_on[i] = 1;
-                            frame_count[i] = 0;
-                        }
+                        // turn the cube off
+                        _selectableSPOs[i].StopStimulus();
+                        frames_on[i] = 0;
+                        frame_count[i] = 0;
                     }
                 }
-
-                yield return 0;
+                else
+                {
+                    if (frame_count[i] >= frame_off_count[i])
+                    {
+                        // turn the cube on
+                        _selectableSPOs[i].StartStimulus();
+                        frames_on[i] = 1;
+                        frame_count[i] = 0;
+                    }
+                }
             }
 
-            for (int i = 0; i < objectList.Count; i++)
+            yield return null;
+
+            
+        }
+
+        protected override IEnumerator OnStimulusRunComplete()
+        {
+            foreach (var spo in _selectableSPOs)
             {
-                // turn the cube off
-                objectList[i].GetComponent<SPO>().StopStimulus();
+                if (spo != null)
+                {
+                    spo.StopStimulus();
+                }
             }
+
+            yield return null;
         }
     }
 }

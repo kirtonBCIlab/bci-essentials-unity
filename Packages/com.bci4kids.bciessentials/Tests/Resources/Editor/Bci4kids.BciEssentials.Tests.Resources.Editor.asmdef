@@ -1,5 +1,5 @@
 {
-    "name": "Bci4kids.BciEssentials.Tests.Resources",
+    "name": "Bci4kids.BciEssentials.Tests.Resources.Editor",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",

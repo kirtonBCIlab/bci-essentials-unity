@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.TestResources
 {
     public static class LogAssert
     {

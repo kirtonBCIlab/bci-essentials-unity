@@ -46,7 +46,7 @@ namespace BCIEssentials.ControllerBehaviors
         public float trainBufferTime = 0f;
 
 
-        public override IEnumerator DoTraining()
+        protected override IEnumerator WhileDoAutomatedTraining()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -55,7 +55,7 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList();
 
             // Get number of selectable objects by counting the objects in the objectList
-            int numOptions = objectList.Count;
+            int numOptions = _selectableSPOs.Count;
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
@@ -80,25 +80,25 @@ namespace BCIEssentials.ControllerBehaviors
 
                 // Turn on train target
 
-                objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
                 // Go through the training sequence
                 yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
 
                 if (trainTargetPersistent == false)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
                 }
 
                 yield return new WaitForSecondsRealtime(0.5f);
 
                 // Calculate the length of the trial
                 float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                                  (float)numFlashesPerObjectPerSelection * (float)objectList.Count;
+                                  (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
 
                 Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
 
-                StimulusOn(false);
+                StartStimulusRun(false);
                 yield return new WaitForSecondsRealtime(trialTime);
                 yield return new WaitForSecondsRealtime(trainBufferTime);
                 //stimulusOff();
@@ -106,7 +106,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // If sham feedback is true, then show it
                 if (shamFeedback)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().Select();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
                 }
 
                 // Turn off train target
@@ -114,7 +114,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 if (trainTargetPersistent == true)
                 {
-                    objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
                 }
 
                 // Take a break
@@ -127,7 +127,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        public override IEnumerator DoUserTraining()
+        protected override IEnumerator WhileDoUserTraining()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -139,18 +139,18 @@ namespace BCIEssentials.ControllerBehaviors
             Debug.Log("User Training");
 
             // Get a random training target
-            trainTarget = randNumFlashes.Next(0, objectList.Count - 1);
+            trainTarget = randNumFlashes.Next(0, _selectableSPOs.Count - 1);
 
             // Turn on train target
 
-            objectList[trainTarget].GetComponent<SPO>().OnTrainTarget();
+            _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
 
             // Go through the training sequence
             yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
 
             if (trainTargetPersistent == false)
             {
-                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
             }
 
             yield return new WaitForSecondsRealtime(0.5f);
@@ -158,11 +158,11 @@ namespace BCIEssentials.ControllerBehaviors
             // Calculate the length of the trial
 
             float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                              (float)numFlashesPerObjectPerSelection * (float)objectList.Count;
+                              (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
 
             Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
 
-            StimulusOn(false);
+            StartStimulusRun(false);
 
             yield return new WaitForSecondsRealtime(trialTime);
             yield return new WaitForSecondsRealtime(trainBufferTime);
@@ -171,7 +171,7 @@ namespace BCIEssentials.ControllerBehaviors
             // If sham feedback is true, then show it
             if (shamFeedback)
             {
-                objectList[trainTarget].GetComponent<SPO>().Select();
+                _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
             }
 
             // Turn off train target
@@ -179,7 +179,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             if (trainTargetPersistent == true)
             {
-                objectList[trainTarget].GetComponent<SPO>().OffTrainTarget();
+                _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
             }
 
             // Take a break
@@ -194,7 +194,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        public override IEnumerator Stimulus()
+        protected override IEnumerator OnStimulusRunBehavior()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -203,19 +203,19 @@ namespace BCIEssentials.ControllerBehaviors
 
             if (singleFlash)
             {
-                int totalFlashes = numFlashesPerObjectPerSelection * objectList.Count;
-                int[] stimOrder = ArrayUtilities.GenerateRNRA(totalFlashes, 0, objectList.Count - 1);
+                int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
+                int[] stimOrder = ArrayUtilities.GenerateRNRA(totalFlashes, 0, _selectableSPOs.Count - 1);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
                     // 
-                    GameObject currentObject = objectList[stimOrder[i]]?.gameObject;
+                    GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
 
                     /////
                     //This block keeps taking longer and longer... maybe.... try timing it?
-                    string markerString = "p300,s," + objectList.Count.ToString();
+                    string markerString = "p300,s," + _selectableSPOs.Count.ToString();
 
-                    if (trainTarget <= objectList.Count)
+                    if (trainTarget <= _selectableSPOs.Count)
                     {
                         markerString = markerString + "," + trainTarget.ToString();
                     }
@@ -267,7 +267,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (multiFlash)
             {
                 // For multi flash selection, create virtual rows and columns
-                int numSelections = objectList.Count;
+                int numSelections = _selectableSPOs.Count;
                 int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
                 int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
 
@@ -301,10 +301,10 @@ namespace BCIEssentials.ControllerBehaviors
                     for (int i = 0; i < totalColumnFlashes; i++)
                     {
                         //Initialize marker string
-                        string markerString = "p300,m," + objectList.Count.ToString();
+                        string markerString = "p300,m," + _selectableSPOs.Count.ToString();
 
                         //Add training target
-                        if (trainTarget <= objectList.Count)
+                        if (trainTarget <= _selectableSPOs.Count)
                         {
                             markerString = markerString + "," + trainTarget.ToString();
                         }
@@ -317,7 +317,7 @@ namespace BCIEssentials.ControllerBehaviors
                         int columnIndex = columnStimOrder[i];
                         for (int n = 0; n < numRows; n++)
                         {
-                            objectList[rcMatrix[n, columnIndex]]?.StartStimulus();
+                            _selectableSPOs[rcMatrix[n, columnIndex]]?.StartStimulus();
                             markerString = markerString + "," + rcMatrix[n, columnIndex];
                         }
 
@@ -339,7 +339,7 @@ namespace BCIEssentials.ControllerBehaviors
                         //Turn off column
                         for (int n = 0; n < numRows; n++)
                         {
-                            objectList[rcMatrix[n, columnIndex]]?.StopStimulus();
+                            _selectableSPOs[rcMatrix[n, columnIndex]]?.StopStimulus();
                         }
 
                         //Wait
@@ -349,11 +349,11 @@ namespace BCIEssentials.ControllerBehaviors
                         if (i <= totalRowFlashes)
                         {
                             //Initialize marker string
-                            string markerString1 = "p300,m," + objectList.Count.ToString();
+                            string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
 
 
                             // Add training target
-                            if (trainTarget <= objectList.Count)
+                            if (trainTarget <= _selectableSPOs.Count)
                             {
                                 markerString1 = markerString1 + "," + trainTarget.ToString();
                             }
@@ -367,7 +367,7 @@ namespace BCIEssentials.ControllerBehaviors
                             for (int m = 0; m < numColumns; m++)
                             {
                                 //Turn on row
-                                objectList[rcMatrix[rowIndex, m]]?.StartStimulus();
+                                _selectableSPOs[rcMatrix[rowIndex, m]]?.StartStimulus();
 
                                 //Add to marker
                                 markerString1 = markerString1 + "," + rcMatrix[rowIndex, m];
@@ -391,7 +391,7 @@ namespace BCIEssentials.ControllerBehaviors
                             //Turn off Row
                             for (int m = 0; m < numColumns; m++)
                             {
-                                objectList[rcMatrix[rowIndex, m]].StopStimulus();
+                                _selectableSPOs[rcMatrix[rowIndex, m]].StopStimulus();
                             }
 
 
@@ -427,10 +427,10 @@ namespace BCIEssentials.ControllerBehaviors
                               " columns in the BW matrices");
 
                     Random rnd = new Random();
-                    int[] shuffledArray = Enumerable.Range(0, objectList.Count).OrderBy(c => rnd.Next()).ToArray();
+                    int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
 
                     // assign from CB to BW
-                    for (int i = 0; i < objectList.Count; i++)
+                    for (int i = 0; i < _selectableSPOs.Count; i++)
                     {
 
                         // if there is an odd number of columns
@@ -528,10 +528,10 @@ namespace BCIEssentials.ControllerBehaviors
                             LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
-                            string markerString1 = "p300,m," + objectList.Count.ToString();
+                            string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
 
                             // Add training target
-                            if (trainTarget <= objectList.Count)
+                            if (trainTarget <= _selectableSPOs.Count)
                             {
                                 markerString1 = markerString1 + "," + trainTarget.ToString();
                             }
@@ -546,7 +546,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StartStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -568,7 +568,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StopStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -588,10 +588,10 @@ namespace BCIEssentials.ControllerBehaviors
                             LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
-                            string markerString1 = "p300,m," + objectList.Count.ToString();
+                            string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
 
                             // Add training target
-                            if (trainTarget <= objectList.Count)
+                            if (trainTarget <= _selectableSPOs.Count)
                             {
                                 markerString1 = markerString1 + "," + trainTarget.ToString();
                             }
@@ -606,7 +606,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StartStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -628,7 +628,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StopStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -647,10 +647,10 @@ namespace BCIEssentials.ControllerBehaviors
                             LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
-                            string markerString1 = "p300,m," + objectList.Count.ToString();
+                            string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
 
                             // Add training target
-                            if (trainTarget <= objectList.Count)
+                            if (trainTarget <= _selectableSPOs.Count)
                             {
                                 markerString1 = markerString1 + "," + trainTarget.ToString();
                             }
@@ -665,7 +665,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StartStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -687,7 +687,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StopStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -706,10 +706,10 @@ namespace BCIEssentials.ControllerBehaviors
                             LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
-                            string markerString1 = "p300,m," + objectList.Count.ToString();
+                            string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
 
                             // Add training target
-                            if (trainTarget <= objectList.Count)
+                            if (trainTarget <= _selectableSPOs.Count)
                             {
                                 markerString1 = markerString1 + "," + trainTarget.ToString();
                             }
@@ -724,7 +724,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StartStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StartStimulus();
 
                                     //Add to marker
                                     markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
@@ -746,7 +746,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 if (objectsToFlash[fi] != 99)
                                 {
                                     //Turn on row
-                                    objectList[objectsToFlash[fi]].StopStimulus();
+                                    _selectableSPOs[objectsToFlash[fi]].StopStimulus();
                                 }
                             }
 
@@ -762,47 +762,44 @@ namespace BCIEssentials.ControllerBehaviors
 
             }
 
-            StimulusOff();
+            StopStimulusRun();
         }
 
-        public override IEnumerator SendMarkers(int trainTarget = 99)
+        protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
             yield return null;
         }
 
         // Turn the stimulus on
-        public override void StimulusOn(bool sendConstantMarkers = true)
+        public override void StartStimulusRun(bool sendConstantMarkers = true)
         {
-            stimOn = true;
-
+            StimulusRunning = true;
+            
+            StimulusRunning = true;
+            LastSelectedSPO = null;
+            
             // Send the marker to start
             if (blockOutGoingLSL == false)
             {
                 marker.Write("Trial Started");
             }
 
-            // Start the stimulus Coroutine
-            try
-            {
-                StartCoroutine(Stimulus());
+            ReceiveMarkers();
+            PopulateObjectList();
+            StopStartCoroutine(ref _runStimulus, RunStimulus());
 
-                // Not required for P300
-                if (sendConstantMarkers)
-                {
-                    StartCoroutine(SendMarkers(trainTarget));
-                }
-            }
-            catch
+            // Not required for P300
+            if (sendConstantMarkers)
             {
-                Debug.Log("start stimulus coroutine error");
+                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
             }
         }
 
-        public override void StimulusOff()
+        public override void StopStimulusRun()
         {
             // End thhe stimulus Coroutine
-            stimOn = false;
+            StimulusRunning = false;
 
             // Send the marker to end
             if (blockOutGoingLSL == false)

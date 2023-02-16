@@ -20,11 +20,14 @@ namespace BCIEssentials.Tests.Editor
         }
 
         [Test]
-        public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsEmptyArray()
+        public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
-            var result = ArrayUtilities.GenerateRNRA(55, 5, 5);
+            var result = ArrayUtilities.GenerateRNRA(3, 5, 5);
 
-            Assert.AreEqual(0, result.Length);
+            foreach (var element in result)
+            {
+                Assert.AreEqual(3, element);
+            }
         }
 
         [Test]

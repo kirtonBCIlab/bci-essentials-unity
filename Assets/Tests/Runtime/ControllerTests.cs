@@ -116,10 +116,10 @@ namespace BCIEssentials.Tests
             _testController.objectList = new List<GameObject> { mockSpo.gameObject };
 
             int turnedOnCount = 0;
-            mockSpo.TurnOnAction = () => { ++turnedOnCount; };
+            mockSpo.StartStimulusEvent.AddListener(() => { ++turnedOnCount; });
 
             int turnedOffCount = 0;
-            mockSpo.TurnOffAction = () => { ++turnedOffCount; };
+            mockSpo.StopStimulusEvent.AddListener(() => { ++turnedOffCount; });
 
 
             //Run Test
@@ -139,7 +139,7 @@ namespace BCIEssentials.Tests
             var runStimulus = AddCoroutineRunner(_testController.SelectObject(0));
             var mockSpo = new GameObject().AddComponent<MockSPO>();
             bool wasSelected = false;
-            mockSpo.OnSelectionAction = () => { wasSelected = true; };
+            mockSpo.OnSelectedEvent.AddListener(() => { wasSelected = true; });
             _testController.objectList = new List<GameObject> { mockSpo.gameObject };
             
             //Run Test
@@ -156,7 +156,7 @@ namespace BCIEssentials.Tests
             var runStimulus = AddCoroutineRunner(_testController.SelectObject(0));
             var mockSpo = new GameObject().AddComponent<MockSPO>();
             bool wasSelected = false;
-            mockSpo.OnSelectionAction = () => { wasSelected = true; };
+            mockSpo.OnSelectedEvent.AddListener(() => { wasSelected = true; });
             _testController.objectList = new List<GameObject> { mockSpo.gameObject };
             _testController.stimOn = true;
             
@@ -272,7 +272,7 @@ namespace BCIEssentials.Tests
             for (var i = 0; i < 6; i++)
             {
                 var spo = AddSPOToScene<MockSPO>();
-                spo.OnSelectionAction = () => selectedIndex = spo.SelectablePoolIndex;
+                spo.OnSelectedEvent.AddListener(() => selectedIndex = spo.SelectablePoolIndex);
             }
             
             _testController.PopulateObjectList("tag");
@@ -365,7 +365,7 @@ namespace BCIEssentials.Tests
             _testController.shamFeedback = true;
 
             bool onSelectedCalled = false;
-            AddSPOToScene<MockSPO>().OnSelectionAction = () => onSelectedCalled = true;
+            AddSPOToScene<MockSPO>().OnSelectedEvent.AddListener(() => onSelectedCalled = true);
 
             behaviorRunner.StartRun();
             yield return new WaitWhile(() => behaviorRunner.IsRunning);
