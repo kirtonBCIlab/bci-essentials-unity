@@ -8,9 +8,6 @@ namespace BCIEssentials.LSL
 {
     public class LSLMarkerReceiver : MonoBehaviour, ILSLMarkerReceiver
     {
-        /// <summary>
-        /// The Id assigned by the <see cref="LSLServiceProvider"/> when created. 
-        /// </summary>
         public string Id { get; private set; }
         
         public StreamInfo StreamInfo { get; private set; }
@@ -51,7 +48,7 @@ namespace BCIEssentials.LSL
         public int SubscriberCount => _subscribers.Count;
 
         
-        private StreamInlet _streamInlet;
+        public StreamInlet _streamInlet;
         private int _channelCount;
         private LSLMarkerReceiverSettings _settings = new();
         
@@ -61,18 +58,15 @@ namespace BCIEssentials.LSL
 
         private readonly List<ILSLMarkerSubscriber> _subscribers = new();
 
-        public LSLMarkerReceiver Initialize(string id, StreamInlet streamInlet, LSLMarkerReceiverSettings settings)
+        public LSLMarkerReceiver Initialize(string id, StreamInfo streamInfo, LSLMarkerReceiverSettings settings = null)
         {
-            Id = id;
-            _streamInlet = streamInlet;
+            Id = !string.IsNullOrEmpty(id) ? id : throw new ArgumentNullException(nameof(id));
+            StreamInfo = streamInfo ?? throw new ArgumentNullException(nameof(streamInfo));
+            _settings = settings ?? new LSLMarkerReceiverSettings();
             
-            StreamInfo = _streamInlet.info();
-            _channelCount = StreamInfo?.channel_count() ?? 1;
+            _streamInlet = new StreamInlet(streamInfo);
+            _channelCount = StreamInfo.channel_count();
 
-            _settings = settings;
-
-            _streamInlet?.open_stream();
-            
             return this;
         }
 

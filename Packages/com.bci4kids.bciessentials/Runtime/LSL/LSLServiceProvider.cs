@@ -7,57 +7,7 @@ namespace BCIEssentials.LSL
 {
     public class LSLServiceProvider : MonoBehaviour, ILSLService
     {
-        #region Internal Objects
-        
-        private class MultiValueKey
-        {
-            public readonly int HashCode;
-            public readonly string UniqueKey;
-            public readonly SortedSet<string> SecondaryKeys;
 
-            public MultiValueKey(string primaryKey, string[] secondaryKeys)
-            {
-                if (primaryKey == null)
-                {
-                    throw new ArgumentNullException(nameof(primaryKey));
-                }
-
-                UniqueKey = primaryKey;
-                HashCode = primaryKey.GetHashCode();
-
-                if (secondaryKeys != null)
-                {
-                    SecondaryKeys = new();
-                    foreach (var key in secondaryKeys)
-                    {
-                        if (string.IsNullOrEmpty(key))
-                        {
-                            continue;
-                        }
-                        
-                        SecondaryKeys.Add(key);
-                    }
-                }
-            }
-
-            public bool HasKey(string value)
-            {
-                if (UniqueKey == value)
-                {
-                    return true;
-                }
-
-                if (SecondaryKeys != null && SecondaryKeys.Contains(value))
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        }
-        
-        #endregion
-        
         #region Inspector Properties
 
         [Header("LSL Marker Receivers")]
@@ -69,7 +19,8 @@ namespace BCIEssentials.LSL
 
         #endregion
 
-        private static Dictionary<MultiValueKey, LSLMarkerReceiver> _markerReceivers = new(new MarkerReceiverKeyComparer());
+        private static Dictionary<MultiValueKey, LSLMarkerReceiver> _markerReceivers =
+            new(new MultiValueKeyHelpers.MultiValueKeyComparer());
 
         /// <summary>
         /// Register a <see cref="LSLMarkerReceiver"/> that wasn't created by
@@ -80,10 +31,15 @@ namespace BCIEssentials.LSL
         public bool RegisterMarkerReceiver(LSLMarkerReceiver receiver)
         {
             _markerReceivers ??= new Dictionary<MultiValueKey, LSLMarkerReceiver>();
-            
-            if (!string.IsNullOrEmpty(receiver.Id) && !SafeTryGetMarkerReceiver(receiver.Id, out _))
+
+            if (receiver == null)
             {
-                var key = GetKeyForStreamInfo(receiver.StreamInfo);
+                return false;
+            }
+
+            var key = MultiValueKeyHelpers.GetKeyFromStreamInfo(receiver.StreamInfo);
+            if (!SafeTryGetMarkerReceiver(key, MultiValueKeyHelpers.StrictKeyCompare, out _))
+            {
                 return _markerReceivers.TryAdd(key, receiver);
             }
 
@@ -93,16 +49,28 @@ namespace BCIEssentials.LSL
 
         /// <summary>
         /// Retrieve an already created <see cref="LSLMarkerReceiver"/> from the
-        /// service using its Id.
+        /// service using its <see cref="MultiValueKey.UniqueKey"/>.
         /// </summary>
-        /// <param name="markerReceiverId">The Id value</param>
+        /// <param name="uniqueKey">The <see cref="MultiValueKey.UniqueKey"/> value to use.</param>
         /// <returns>The matching <see cref="LSLMarkerReceiver"/> or null</returns>
-        public LSLMarkerReceiver GetMarkerReceiver(string markerReceiverId)
+        public LSLMarkerReceiver GetMarkerReceiver(string uniqueKey)
         {
-            SafeTryGetMarkerReceiver(markerReceiverId, out var markerReceiver);
+            SafeTryGetMarkerReceiver(new MultiValueKey(uniqueKey), MultiValueKeyCompareOptions.Hashcode, out var markerReceiver);
             return markerReceiver;
         }
-        
+
+        /// <summary>
+        /// Retrieve an already created <see cref="LSLMarkerReceiver"/> from the
+        /// service using its <see cref="MultiValueKey.UniqueKey"/>.
+        /// </summary>
+        /// <param name="key">The <see cref="MultiValueKey"/> value to use.</param>
+        /// <returns>The matching <see cref="LSLMarkerReceiver"/> or null</returns>
+        public LSLMarkerReceiver GetMarkerReceiver(MultiValueKey key)
+        {
+            SafeTryGetMarkerReceiver(key, MultiValueKeyCompareOptions.Hashcode, out var markerReceiver);
+            return markerReceiver;
+        }
+
         /// <summary>
         /// Requests a <see cref="LSLMarkerReceiver"/> by Stream Name.
         /// Creates one if one does not exist but the stream was found.
@@ -131,7 +99,25 @@ namespace BCIEssentials.LSL
         {
             _markerReceivers ??= new Dictionary<MultiValueKey, LSLMarkerReceiver>();
 
-            if (SafeTryGetMarkerReceiver(propValue, out receiver))
+            MultiValueKey searchKey = null;
+            switch (prop)
+            {
+                case "name":
+                    searchKey = MultiValueKeyHelpers.GetKeyFromStreamProperties(name: propValue);
+                    break;
+                case "source_id":
+                    searchKey = MultiValueKeyHelpers.GetKeyFromStreamProperties(sourceId: propValue);
+                    break;
+                case "type": 
+                    searchKey = MultiValueKeyHelpers.GetKeyFromStreamProperties(type: propValue);
+                    break;
+                case "uid":
+                default:
+                    searchKey = new MultiValueKey(propValue);
+                    break;
+            }
+
+            if (SafeTryGetMarkerReceiver(searchKey, MultiValueKeyHelpers.FlexibleKeyCompare, out receiver))
             {
                 return true;
             }
@@ -141,29 +127,38 @@ namespace BCIEssentials.LSL
             {
                 return false;
             }
-            
-            var streamInlet = new StreamInlet(streamInfo);
-            
+
+            var receiverKey = MultiValueKeyHelpers.GetKeyFromStreamInfo(streamInfo);
             receiver = new GameObject($"{nameof(LSLMarkerReceiver)}_{propValue}")
                 .AddComponent<LSLMarkerReceiver>()
-                .Initialize(streamInfo.uid(), streamInlet, _responseStreamSettings);
+                .Initialize(receiverKey.UniqueKey, streamInfo, _responseStreamSettings);
 
-            var key = GetKeyForStreamInfo(receiver.StreamInfo);
-            return _markerReceivers.TryAdd(key, receiver);
+            return _markerReceivers.TryAdd(receiverKey, receiver);
         }
 
         /// <summary>
         /// Gets a <see cref="LSLMarkerReceiver"/> from the collection.
         /// Removes entry from the collection if it is now null.
         /// </summary>
-        /// <param name="matchValue">Value to match against any of the key's.</param>
+        /// <param name="key">The key to use.</param>
+        /// <param name="compareAll">
+        /// If true, will compare the all keys in the <paramref name="key"/>
+        /// for against each other for a match.
+        /// </param>
         /// <param name="markerReceiver">The <see cref="LSLMarkerReceiver"/> found.</param>
         /// <returns>TRUE if a <see cref="LSLMarkerReceiver"/> was found.</returns>
-        private static bool SafeTryGetMarkerReceiver(string matchValue, out LSLMarkerReceiver markerReceiver)
+        private static bool SafeTryGetMarkerReceiver(MultiValueKey key, MultiValueKeyCompareOptions compareOptions,
+            out LSLMarkerReceiver markerReceiver)
         {
-            var deadReceivers = new List<MultiValueKey>();
             markerReceiver = null;
-            
+
+            if (key == null)
+            {
+                return false;
+            }
+
+            var deadReceivers = new List<MultiValueKey>();
+
             //FIND MATCH
             foreach (var (mvkey, receiver) in _markerReceivers)
             {
@@ -173,29 +168,20 @@ namespace BCIEssentials.LSL
                     continue;
                 }
 
-                if (mvkey.HasKey(matchValue))
+                if (MultiValueKeyHelpers.DoKeysMatch(mvkey, key, compareOptions))
                 {
                     markerReceiver = receiver;
                     break;
                 }
             }
-            
+
             //DELETE DEAD
-            foreach (var key in deadReceivers)
+            foreach (var dKey in deadReceivers)
             {
-                _markerReceivers.Remove(key);
+                _markerReceivers.Remove(dKey);
             }
 
             return markerReceiver != null;
-        }
-
-        private static MultiValueKey GetKeyForStreamInfo(StreamInfo streamInfo)
-        {
-            return new MultiValueKey(streamInfo.uid(), new[]
-            {
-                streamInfo.name(),
-                streamInfo.source_id(),
-            });
         }
 
         private StreamInfo LocateOpenStreamByProperty(string property, string value)
@@ -209,27 +195,10 @@ namespace BCIEssentials.LSL
                     predicateBuilder.Append(predValue);
                 }
             }
-            
+
             var resolvePredicate = predicateBuilder.ToString();
             var streamInfos = LSL.resolve_stream(resolvePredicate, 0, _resolveStreamTimeout);
             return streamInfos.Length <= 0 ? null : streamInfos[0];
-        }
-        
-        private class MarkerReceiverKeyComparer : IEqualityComparer<MultiValueKey>
-        {
-            public bool Equals(MultiValueKey x, MultiValueKey y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.HashCode == y.HashCode;
-            }
-
-            public int GetHashCode(MultiValueKey obj)
-            {
-                return obj.HashCode;
-            }
         }
     }
 }

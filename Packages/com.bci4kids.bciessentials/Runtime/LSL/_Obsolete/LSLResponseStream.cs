@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using LSL;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace BCIEssentials.LSL
@@ -17,7 +14,7 @@ namespace BCIEssentials.LSL
         
         [SerializeField]
         [Tooltip("The duration in seconds to reattempt to resolve the target stream.")]
-        [UnityEngine.Range(1, 30)]
+        [Range(1, 30)]
         private double _resolveTimeout;
         
         [SerializeField]
