@@ -148,16 +148,11 @@ namespace BCIEssentials.Tests
         [TestCase("contains(source_id,'longer')", "astream", "anidbutlonger")]
         //For a full list of predicate options see:
         //https://en.wikipedia.org/w/index.php?title=XPath_1.0&oldid=474981951#Node_set_functions
-        public void WhenTryFindStream_ThenSettingsPredicateAppended(string predicateValue, string streamName = "astream", string streamId = "anid", string streamType = "atype")
+        public void WhenTryFindStreamWithPredicateValues_ThenPredicateUsed(string predicateValue, string streamName = "astream", string streamId = "anid", string streamType = "atype")
         {
             InitializeTestStream("astream", "anid", "atype");
             var expectedReceiver = InitializeTestStream(streamName, streamId, streamType);
-            
-            var testSettings = new LSLMarkerReceiverSettings
-            {
-                AdditionalResolvePredicateValues = new[]{predicateValue}
-            };
-            SetField(_testProvider, "_responseStreamSettings", testSettings);
+            SetField(_testProvider, "_additionalResolvePredicateValues", new[]{predicateValue});
 
             var exists = _testProvider.TryGetMarkerReceiverByStreamName("astream", out var foundReceiver);
             

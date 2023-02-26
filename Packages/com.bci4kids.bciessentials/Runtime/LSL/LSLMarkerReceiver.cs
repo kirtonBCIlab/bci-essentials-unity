@@ -67,6 +67,8 @@ namespace BCIEssentials.LSL
             _streamInlet = new StreamInlet(streamInfo);
             _channelCount = StreamInfo.channel_count();
 
+            Connect();
+            
             return this;
         }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -16,6 +15,10 @@ namespace BCIEssentials.LSL
         private double _resolveStreamTimeout;
 
         [SerializeField] private LSLMarkerReceiverSettings _responseStreamSettings = new();
+
+        //See https://en.wikipedia.org/w/index.php?title=XPath_1.0&oldid=474981951#Node_set_functions for all options
+        [SerializeField, Tooltip("Additional values to append to the resolve predicate. e.g. type='EEG' or 'count(info/desc/channel)=32'")]
+        private string[] _additionalResolvePredicateValues;
 
         #endregion
 
@@ -187,9 +190,9 @@ namespace BCIEssentials.LSL
         private StreamInfo LocateOpenStreamByProperty(string property, string value)
         {
             var predicateBuilder = new StringBuilder().Append($"{property}='{value}'");
-            if (_responseStreamSettings.AdditionalResolvePredicateValues != null)
+            if (_additionalResolvePredicateValues != null)
             {
-                foreach (var predValue in _responseStreamSettings.AdditionalResolvePredicateValues)
+                foreach (var predValue in _additionalResolvePredicateValues)
                 {
                     predicateBuilder.Append($" and ");
                     predicateBuilder.Append(predValue);
