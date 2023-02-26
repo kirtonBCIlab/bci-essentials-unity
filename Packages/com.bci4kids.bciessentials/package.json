@@ -36,6 +36,11 @@
       "displayName": "Original SSVEP Controller",
       "description": "An example setup for the prepackage style SSVEP Controller.",
       "path": "Samples~/Original SSVEP Controller"
+    },
+    {
+      "displayName": "Basic Marker Receviers Example",
+      "description": "An example on how different types of can be used with the LSLServiceProvider.",
+      "path": "Samples~/BasicMarkerReceivers"
     }
   ]
 }

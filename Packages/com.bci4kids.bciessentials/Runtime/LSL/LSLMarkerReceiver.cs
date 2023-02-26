@@ -136,12 +136,6 @@ namespace BCIEssentials.LSL
         
         private void Connect()
         {
-            if (Connected)
-            {
-                Debug.LogWarning("Marker Receiver is already connected to a LSL Stream.");
-                return;
-            }
-            
             _streamInlet?.open_stream();
         }
 
