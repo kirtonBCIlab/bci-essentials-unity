@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LSL;
 using UnityEngine;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSL4Unity
 {
     [Obsolete]
     public class LSLResponseStream : MonoBehaviour, IResponseStream
@@ -73,7 +74,7 @@ namespace BCIEssentials.LSL
         {
             Disconnect();
 
-            var streamInfos = LSL.resolve_stream("name", targetStreamName, 0, _resolveTimeout);
+            var streamInfos = LSL.LSL.resolve_stream("name", targetStreamName, 0, _resolveTimeout);
             if (streamInfos.Length <= 0) return;
             
             _streamInlet = new StreamInlet(streamInfos[0]);

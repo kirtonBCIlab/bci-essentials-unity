@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.Utilities;
 using BCIEssentials.Utilities;

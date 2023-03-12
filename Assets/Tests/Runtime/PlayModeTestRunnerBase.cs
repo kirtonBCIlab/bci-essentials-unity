@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using BCIEssentials.Controllers;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.TestResources;
 using NUnit.Framework;

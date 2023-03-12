@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 
