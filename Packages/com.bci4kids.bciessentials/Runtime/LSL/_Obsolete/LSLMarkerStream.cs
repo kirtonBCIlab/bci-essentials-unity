@@ -27,16 +27,18 @@ namespace BCIEssentials.LSL
             _outlet?.Close();
         }
 
-        public void InitializeStream()
+        public bool InitializeStream()
         {
             if (_outlet != null)
             {
                 Debug.LogWarning($"Stream already initialized");
-                return;
+                return false;
             }
             
             var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string, StreamId);
             _outlet = new StreamOutlet(streamInfo);
+
+            return _outlet != null;
         }
 
         public void EndStream()
@@ -46,17 +48,23 @@ namespace BCIEssentials.LSL
 
         public void Write(string markerString)
         {
-            _sample[0] = markerString;
-            _outlet.push_sample(_sample);
+            if (_outlet != null || InitializeStream())
+            {
+                _sample[0] = markerString;
+                _outlet.push_sample(_sample);
 
-            Debug.Log($"Sent Marker : {markerString}");
+                Debug.Log($"Sent Marker : {markerString}");
+            }
+            else
+            {
+                Debug.LogError("No stream to write to.");
+            }
         }
-
     }
 
     public interface IMarkerStream
     {
-        public void InitializeStream();
+        public bool InitializeStream();
 
         public void Write(string markerString);
     }

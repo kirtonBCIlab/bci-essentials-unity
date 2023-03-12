@@ -17,8 +17,7 @@ namespace BCIEssentials.Controllers.Editor
             _requestedBehavior =  (BCIBehaviorType)EditorGUILayout.EnumPopup("Behavior Type:", _requestedBehavior);
             if (GUILayout.Button("Request Behavior"))
             {
-                var controller = (BCIController)target;
-                controller.ChangeBehavior(_requestedBehavior);
+                BCIController.ChangeBehavior(_requestedBehavior);
             }
         }
     }

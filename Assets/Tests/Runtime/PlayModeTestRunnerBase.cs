@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
-using System.Reflection;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSL;
 using BCIEssentials.StimulusObjects;
+using BCIEssentials.Tests.TestResources;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -30,11 +30,17 @@ namespace BCIEssentials.Tests.Utilities
         [UnitySetUp]
         public virtual IEnumerator TestSetup()
         {
-            Debug.Log("<color=green>Test Started</color>");
+            LogTestName();
             yield return LoadEmptySceneAsync();
         }
 
-        protected static BCIController CreateController(bool dontDestroyInstance = false, bool setActive = false)
+        protected void LogTestName()
+        {
+            Debug.Log($"<color=green>Test Started: '{TestContext.CurrentContext.Test.Name}'</color>");
+        }
+
+        protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null,
+            bool setActive = false)
         {
             var gameObject = new GameObject();
             gameObject.SetActive(false);
@@ -43,7 +49,7 @@ namespace BCIEssentials.Tests.Utilities
             gameObject.AddComponent<LSLResponseStream>();
 
             var controller = gameObject.AddComponent<BCIController>();
-            controller.TestInitializable(dontDestroyInstance);
+            controller.AssignInspectorProperties(inspectorProperties);
 
             if (setActive)
             {
@@ -57,7 +63,7 @@ namespace BCIEssentials.Tests.Utilities
         {
             return AddSPOToScene<SPO>(tag, includeMe);
         }
-        
+
         protected static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
         {
             var spo = new GameObject { tag = string.IsNullOrEmpty(tag) ? "Untagged" : tag }.AddComponent<T>();
@@ -76,27 +82,16 @@ namespace BCIEssentials.Tests.Utilities
             yield return EditorSceneLoader.LoadDefaultSceneAsync();
         }
 
-        protected static void SetField<T>(T component, string name, object value)
+        protected static T AddComponent<T>(Action<T> setup = null) where T : MonoBehaviour
         {
-            var info = component.GetType()
-                .GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (info == null)
-            {
-                Assert.Fail($"No field for name {name} on object");
-                return;
-            }
-
-            info.SetValue(component, value);
+            return AddComponent<T>(new GameObject(), setup);
         }
 
-        protected static T AddComponent<T>() where T : MonoBehaviour
+        protected static T AddComponent<T>(GameObject gameObject, Action<T> setup = null) where T : MonoBehaviour
         {
-            return AddComponent<T>(new GameObject());
-        }
-
-        protected static T AddComponent<T>(GameObject gameObject) where T : MonoBehaviour
-        {
-            return gameObject.AddComponent<T>();
+            var t = gameObject.AddComponent<T>();
+            setup?.Invoke(t);
+            return t;
         }
         
         protected static CoroutineRunner RepeatForSeconds(Action onRepeat, int repeatCount, float repeatDelay = 0, Action onComplete = null)
@@ -125,14 +120,11 @@ namespace BCIEssentials.Tests.Utilities
 
         protected static CoroutineRunner AddCoroutineRunner(InClassName inClassName)
         {
-            var runner = AddComponent<CoroutineRunner>(inClassName.GameObject);
-            runner.Routine = inClassName.Coroutine;
-            runner.OnCompleteEvent = () =>
+            return AddComponent<CoroutineRunner>(inClassName.GameObject, runner =>
             {
-                inClassName.OnComplete?.Invoke();
-            };
-
-            return runner;
+                runner.Routine = inClassName.Coroutine;
+                runner.OnCompleteEvent = () => { inClassName.OnComplete?.Invoke(); };
+            });
         }
 
         protected static void StopAllCoroutineRunners()
@@ -156,7 +148,7 @@ namespace BCIEssentials.Tests.Utilities
                 Debug.Log(framesRan);
                 yield return null;
             }
-            
+
             onContinue?.Invoke();
         }
 

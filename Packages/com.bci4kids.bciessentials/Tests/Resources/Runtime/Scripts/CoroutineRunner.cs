@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.TestResources
 {
     public class CoroutineRunner : MonoBehaviour
     {
