@@ -468,9 +468,9 @@ public class Controller : MonoBehaviour
 
     // Make a random non repeating array of shuffled subarrays
     // 
-    public int[] MakeRNRA(int arrayLength, int numOptions)
+    public int[] MakeRNRA(int arrayLength, int maxRangeValue)
     {
-        return ArrayUtilities.GenerateRNRA(arrayLength, 0, numOptions);
+        return ArrayUtilities.GenerateRNRA(arrayLength, 0, maxRangeValue);
     }
 
     public void PrintArray(int[] array)
