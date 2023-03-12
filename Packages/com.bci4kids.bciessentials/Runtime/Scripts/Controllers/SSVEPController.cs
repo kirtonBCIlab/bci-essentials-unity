@@ -1,4 +1,4 @@
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using UnityEngine;
 using BCIEssentials.ControllerBehaviors;
 

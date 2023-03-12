@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;

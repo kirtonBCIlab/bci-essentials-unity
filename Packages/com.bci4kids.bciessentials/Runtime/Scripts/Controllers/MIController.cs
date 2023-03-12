@@ -1,5 +1,5 @@
 using BCIEssentials.ControllerBehaviors;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 using UnityEngine;
 
 namespace BCIEssentials.Controllers

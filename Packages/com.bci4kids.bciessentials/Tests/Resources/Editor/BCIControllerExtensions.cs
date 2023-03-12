@@ -1,5 +1,5 @@
 using BCIEssentials.Controllers;
-using BCIEssentials.LSL;
+using BCIEssentials.LSL4Unity;
 
 namespace BCIEssentials.Tests.TestResources
 {
