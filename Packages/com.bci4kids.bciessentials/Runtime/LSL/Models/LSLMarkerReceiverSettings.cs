@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     [Serializable]
     public class LSLMarkerReceiverSettings

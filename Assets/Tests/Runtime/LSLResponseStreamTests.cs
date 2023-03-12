@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.LSL4Unity;
+using BCIEssentials.LSLFramework;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
 using UnityEngine;

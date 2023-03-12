@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using BCIEssentials.LSL;
+using BCIEssentials.LSLFramework;
 using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;

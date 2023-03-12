@@ -1,4 +1,4 @@
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     public class LSLMarkerResponse
     {

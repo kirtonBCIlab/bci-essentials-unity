@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LSL;
 using UnityEngine;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     public class LSLMarkerReceiver : MonoBehaviour, ILSLMarkerReceiver
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using LSL;
 using UnityEngine;
 
-namespace BCIEssentials.LSL4Unity
+namespace BCIEssentials.LSLFramework
 {
     [Obsolete]
     public class LSLResponseStream : MonoBehaviour, IResponseStream

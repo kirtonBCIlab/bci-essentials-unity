@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Text;
+using LSL;
 using UnityEngine;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     public class LSLServiceProvider : MonoBehaviour, ILSLService
     {
@@ -200,7 +201,7 @@ namespace BCIEssentials.LSL
             }
 
             var resolvePredicate = predicateBuilder.ToString();
-            var streamInfos = LSL.resolve_stream(resolvePredicate, 0, _resolveStreamTimeout);
+            var streamInfos = LSL.LSL.resolve_stream(resolvePredicate, 0, _resolveStreamTimeout);
             return streamInfos.Length <= 0 ? null : streamInfos[0];
         }
     }

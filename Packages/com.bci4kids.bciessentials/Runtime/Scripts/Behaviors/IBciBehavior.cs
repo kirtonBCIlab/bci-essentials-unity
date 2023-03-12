@@ -1,5 +1,5 @@
 using BCIEssentials.Controllers;
-using BCIEssentials.LSL4Unity;
+using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {

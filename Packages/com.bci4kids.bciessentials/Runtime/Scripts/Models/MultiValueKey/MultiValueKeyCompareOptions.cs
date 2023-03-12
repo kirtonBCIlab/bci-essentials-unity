@@ -1,6 +1,6 @@
 using System;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     [Flags]
     public enum MultiValueKeyCompareOptions

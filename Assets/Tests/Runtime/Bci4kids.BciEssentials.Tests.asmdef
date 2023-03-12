@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "Bci4Kids.BciEssentials.Runtime",
         "Bci4kids.BciEssentials.Tests.Resources",
-        "Bci4kids.BciEssentials.Tests.Resources.Editor"
+        "Bci4kids.BciEssentials.Tests.Resources.Editor",
+        "labstreaminglayer.LSL4Unity.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

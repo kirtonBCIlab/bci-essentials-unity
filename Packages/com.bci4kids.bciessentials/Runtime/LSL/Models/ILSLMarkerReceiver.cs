@@ -1,6 +1,6 @@
 using LSL;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     public interface ILSLMarkerReceiver
     {

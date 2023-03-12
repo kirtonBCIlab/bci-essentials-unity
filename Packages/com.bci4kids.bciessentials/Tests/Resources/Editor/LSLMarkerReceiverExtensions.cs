@@ -1,4 +1,4 @@
-using BCIEssentials.LSL;
+using BCIEssentials.LSLFramework;
 using NUnit.Framework;
 
 namespace Tests.Resources.Scripts
@@ -7,7 +7,7 @@ namespace Tests.Resources.Scripts
     {
         public static LSLMarkerReceiver InitializeWithStreamName(this LSLMarkerReceiver receiver, string streamName, LSLMarkerReceiverSettings settings = null)
         {
-            var resolvedSteams = LSL.resolve_stream($"name='{streamName}'", 0, 0);
+            var resolvedSteams = LSL.LSL.resolve_stream($"name='{streamName}'", 0, 0);
             if (resolvedSteams.Length == 0)
             {
                 Assert.Fail($"No stream found for name: {streamName}");

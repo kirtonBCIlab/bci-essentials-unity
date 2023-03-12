@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using LSL;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
     public static class MultiValueKeyHelpers
     {

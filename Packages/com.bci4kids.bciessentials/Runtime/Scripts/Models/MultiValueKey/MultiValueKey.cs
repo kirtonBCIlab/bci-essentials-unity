@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BCIEssentials.LSL
+namespace BCIEssentials.LSLFramework
 {
         public class MultiValueKey
         {
