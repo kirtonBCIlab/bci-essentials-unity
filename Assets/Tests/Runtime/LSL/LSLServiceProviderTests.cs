@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using BCIEssentials.LSL;
+using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
 using Tests.Resources.Scripts;
@@ -146,7 +147,7 @@ namespace BCIEssentials.Tests
             {
                 PollingFrequency = 555,
             };
-            SetField(_testProvider, "_responseStreamSettings", testSettings);
+            ReflectionHelpers.SetField(_testProvider, "_responseStreamSettings", testSettings);
 
             _testProvider.TryGetMarkerReceiverByStreamName("aname", out var markerReceiver);
             
@@ -164,7 +165,7 @@ namespace BCIEssentials.Tests
         {
             InitializeTestStream("astream", "anid", "atype");
             var expectedReceiver = InitializeTestStream(streamName, streamId, streamType);
-            SetField(_testProvider, "_additionalResolvePredicateValues", new[]{predicateValue});
+            ReflectionHelpers.SetField(_testProvider, "_additionalResolvePredicateValues", new[]{predicateValue});
 
             var exists = _testProvider.TryGetMarkerReceiverByStreamName("astream", out var foundReceiver);
             
