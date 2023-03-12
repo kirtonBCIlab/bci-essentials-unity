@@ -9,7 +9,7 @@ namespace BCIEssentials.LSL
             public readonly string UniqueKey;
             public readonly string[] SecondaryKeys;
 
-            private readonly SortedSet<string> _sortedKeys;
+            private readonly HashSet<string> _keyLookUp;
 
             public MultiValueKey(string primaryKey, string[] secondaryKeys = null)
             {
@@ -17,7 +17,9 @@ namespace BCIEssentials.LSL
                 HashCode = primaryKey.GetHashCode();
 
                 if (secondaryKeys == null) return;
-                _sortedKeys = new();
+                
+                SecondaryKeys = secondaryKeys;
+                _keyLookUp = new();
                 foreach (var key in secondaryKeys)
                 {
                     if (string.IsNullOrEmpty(key))
@@ -25,11 +27,8 @@ namespace BCIEssentials.LSL
                         continue;
                     }
 
-                    _sortedKeys.Add(key);
+                    _keyLookUp.Add(key);
                 }
-
-                SecondaryKeys = new string[_sortedKeys.Count];
-                _sortedKeys.CopyTo(SecondaryKeys);
             }
 
             public bool HasKey(string value)
@@ -39,7 +38,7 @@ namespace BCIEssentials.LSL
                     return true;
                 }
 
-                if (_sortedKeys != null && _sortedKeys.Contains(value))
+                if (_keyLookUp != null && _keyLookUp.Contains(value))
                 {
                     return true;
                 }
