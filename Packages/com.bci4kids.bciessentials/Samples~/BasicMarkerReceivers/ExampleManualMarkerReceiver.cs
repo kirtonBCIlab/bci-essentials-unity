@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace BCIEssentials.LSL.Samples
 {
-    public class ManualMarkerReceiver : MonoBehaviour
+    public class ExampleManualMarkerReceiver : MonoBehaviour
     {
         [Header("Configuration")]
         [SerializeField] private LSLServiceProvider _provider;

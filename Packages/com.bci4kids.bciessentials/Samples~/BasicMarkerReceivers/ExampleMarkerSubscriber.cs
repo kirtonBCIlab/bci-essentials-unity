@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace BCIEssentials.LSL.Samples
 {
-    public class MarkerSubscriber : MonoBehaviour, ILSLMarkerSubscriber
+    public class ExampleMarkerSubscriber : MonoBehaviour, ILSLMarkerSubscriber
     {
         [Header("Configuration")]
         [SerializeField] private LSLServiceProvider _provider;

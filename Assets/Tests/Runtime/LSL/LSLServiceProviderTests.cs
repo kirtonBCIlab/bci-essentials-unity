@@ -46,7 +46,6 @@ namespace BCIEssentials.Tests
             Assert.IsNull(registeredMarker); //object null vs Unity Object null
         }
 
-
         [Test]
         public void WhenTryGetMarkerByNameAndHasRegistered_ThenReturnsMarkerReceiver()
         {
@@ -58,6 +57,19 @@ namespace BCIEssentials.Tests
 
             Assert.True(markerFound);
             UnityEngine.Assertions.Assert.AreEqual(markerFound, registeredMarker);
+        }
+
+        [Test]
+        public void WhenHasRegisteredAndMultipleGetRequests_ThenReturnsSingleMarkerReceiver()
+        {
+            InitializeTestStream("astreamname");
+            var markerReceiver = AddComponent<LSLMarkerReceiver>().InitializeWithStreamName("astreamname");
+            _testProvider.RegisterMarkerReceiver(markerReceiver);
+
+            _testProvider.TryGetMarkerReceiverByStreamName("astreamname", out var markerRequestA);
+            _testProvider.TryGetMarkerReceiverByStreamName("astreamname", out var markerRequestB);
+
+            UnityEngine.Assertions.Assert.AreEqual(markerRequestA, markerRequestB);
         }
 
         [Test]

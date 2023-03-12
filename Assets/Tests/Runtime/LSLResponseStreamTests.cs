@@ -111,6 +111,28 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
+        public IEnumerator WhenMultipleSubscribedToSameStream_ThenMarkersPoached()
+        {
+            var writeMarkers = RepeatForSeconds(() => { _testMarkerStream.Write("amarkervalue"); }, 5);
+            _testResponseStream.Connect();
+            var secondResponseStream = AddComponent<LSLResponseStream>();
+
+            
+            writeMarkers.StartRun();
+            _testResponseStream.StartPolling();
+            secondResponseStream.StartPolling(_ =>
+            {
+                Assert.Fail("Second Response Stream received markers");
+            });
+            
+            yield return new WaitWhile(()=> writeMarkers.IsRunning);
+            
+            Assert.IsTrue(_testResponseStream.HasStoredResponses);
+            Assert.IsFalse(secondResponseStream.HasStoredResponses);
+        }
+
+        [UnityTest]
+        //FAILS IF RUN AS PART OF GROUP
         public IEnumerator WhenStartReceivingWithAction_ThenReceiveResponses()
         {
             var writeMarkers = RepeatForSeconds(() => { _testMarkerStream.Write("amarkervalue"); }, 5);
@@ -125,6 +147,7 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
+        //FAILS IF RUN AS PART OF GROUP
         public IEnumerator WhenStopReceiving_ThenStopReceivingResponses()
         {
             _testResponseStream.Connect();

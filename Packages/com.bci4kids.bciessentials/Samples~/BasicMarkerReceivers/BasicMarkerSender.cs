@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace BCIEssentials.LSL.Samples
 {
-    public class MarkerSender: MonoBehaviour
+    public class BasicMarkerSender: MonoBehaviour
     {
         [Header("Configuration")]
         [SerializeField] private string _streamName = "MyStream";
