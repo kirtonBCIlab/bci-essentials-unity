@@ -4,6 +4,7 @@ namespace BCIEssentials.LSLFramework
 {
     public interface ILSLMarkerReceiver
     {
+        public string UID { get; }
         public bool Initialized { get; }
         public bool Connected { get; }
         public StreamInfo StreamInfo { get; }
@@ -15,7 +16,7 @@ namespace BCIEssentials.LSLFramework
         public int ResponsesCount { get; }
         public int SubscriberCount { get; }
 
-        public LSLMarkerReceiver Initialize(string id, StreamInfo streamInfo, LSLMarkerReceiverSettings settings);
+        public LSLMarkerReceiver Initialize(StreamInfo streamInfo, LSLMarkerReceiverSettings settings);
         public void CleanUp();
         public void Subscribe(ILSLMarkerSubscriber subscriber);
         public void Unsubscribe(ILSLMarkerSubscriber subscriber);
