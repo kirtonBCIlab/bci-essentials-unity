@@ -1,4 +1,5 @@
 using System.Linq;
+using BCIEssentials.LSLFramework;
 using BCIEssentials.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +23,7 @@ namespace BCIEssentials.LSL.Samples
         private void Start()
         {
             _requestButton.onClick.AddListener(GetResponses);
-            _provider.TryGetMarkerReceiverByStreamName(_streamName, out LslMarkerReceiver);
+            LslMarkerReceiver = _provider.GetMarkerReceiverByName(_streamName);;
         }
 
         public void GetResponses()
