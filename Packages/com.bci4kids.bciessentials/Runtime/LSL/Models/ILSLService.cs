@@ -6,7 +6,7 @@ namespace BCIEssentials.LSLFramework
 
         public LSLMarkerReceiver GetMarkerReceiverByUID(string uid);
 
-        public LSLMarkerReceiver GetMarkerReceiverBySourceId(string sessionId);
+        public LSLMarkerReceiver GetMarkerReceiverByName(string sessionId);
 
         public LSLMarkerReceiver GetMarkerReceiverByPredicate(string predicate);
     }

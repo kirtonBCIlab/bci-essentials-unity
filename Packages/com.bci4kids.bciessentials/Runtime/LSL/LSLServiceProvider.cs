@@ -7,7 +7,7 @@ namespace BCIEssentials.LSLFramework
     public class LSLServiceProvider : MonoBehaviour, ILSLService
     {
         private const string k_StreamIdPredicateFormat = "uid='{0}'";
-        private const string k_StreamSourceIdPredicateFormat = "source_id='{0}'";
+        private const string k_StreamNamePredicateFormat = "name='{0}'";
         
         #region Inspector Properties
         
@@ -73,13 +73,13 @@ namespace BCIEssentials.LSLFramework
         }
 
         /// <summary>
-        /// Retrieve a Marker Receiver using its <see cref="StreamInfo.source_id()"/>.
+        /// Retrieve a Marker Receiver using its <see cref="StreamInfo.name()"/>.
         /// </summary>
-        /// <param name="sourceId">Session ID for the given stream.</param>
+        /// <param name="streamName">Name of the stream.</param>
         /// <returns>NULL if no receiver found.</returns>
-        public LSLMarkerReceiver GetMarkerReceiverBySourceId(string sourceId)
+        public LSLMarkerReceiver GetMarkerReceiverByName(string streamName)
         {
-            return GetMarkerReceiverByPredicate(string.Format(k_StreamSourceIdPredicateFormat, sourceId));
+            return GetMarkerReceiverByPredicate(string.Format(k_StreamNamePredicateFormat, streamName));
         }
 
         /// <summary>

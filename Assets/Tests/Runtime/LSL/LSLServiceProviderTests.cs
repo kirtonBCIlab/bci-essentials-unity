@@ -77,7 +77,7 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenGetMarkerReceiverByUIDAndHasStream_ThenReturnsCreatedMarker()
         {
-            var streamUID = CreateMarkerStream("astreamname").StreamOutlet.info().uid();
+            var streamUID = CreateMarkerStream("astreamname").StreamUID;
             
             var retrievedMarker = _testProvider.GetMarkerReceiverByUID(streamUID);
 
@@ -86,13 +86,13 @@ namespace BCIEssentials.Tests
         }
         
         [Test]
-        public void WhenGetMarkerReceiverBySourceId_ThenReturnsMarker()
+        public void WhenGetMarkerReceiverByName_ThenReturnsMarker()
         {
-            CreateMarkerStream(id:"asourceid");
-            var markerReceiver = CreateMarkerReceiver("source_id='asourceid'");
+            CreateMarkerStream("astreamname");
+            var markerReceiver = CreateMarkerReceiver("name='astreamname'");
             _testProvider.RegisterMarkerReceiver(markerReceiver);
 
-            var retrievedMarker = _testProvider.GetMarkerReceiverBySourceId("asourceid");
+            var retrievedMarker = _testProvider.GetMarkerReceiverByName("astreamname");
 
             UnityEngine.Assertions.Assert.AreEqual(retrievedMarker, markerReceiver);
         }
