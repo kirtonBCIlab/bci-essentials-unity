@@ -15,13 +15,13 @@ namespace BCIEssentials.LSLFramework
         
         [SerializeField]
         [Tooltip("The duration in seconds to reattempt to resolve the target stream.")]
-        [Range(1, 30)]
-        private double _resolveTimeout;
+        [UnityEngine.Range(1, 30)]
+        private double _resolveTimeout = 1;
         
         [SerializeField]
         [Tooltip("The duration in seconds between requests to the target stream for responses.")]
         [Min(0)]
-        private float _pollFrequency;
+        private float _pollFrequency = 0;
         
         /// <summary>
         /// The duration in seconds between requests to the target stream for responses.
