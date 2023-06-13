@@ -1,8 +1,7 @@
-﻿using System;
-using LSL;
+﻿using LSL;
 using UnityEngine;
 
-namespace BCIEssentials.LSL4Unity
+namespace BCIEssentials.LSLFramework
 {
     public class LSLMarkerStream : MonoBehaviour, IMarkerStream
     {
@@ -10,14 +9,15 @@ namespace BCIEssentials.LSL4Unity
         public string StreamType = "LSL_Marker_Strings";
         public string StreamId = "MyStreamID-Unity1234";
 
-        private StreamOutlet _outlet;
-        public StreamOutlet StreamOutlet => _outlet;
+        public StreamOutlet StreamOutlet { get; private set; }
+
+        public string StreamUID { get; private set; } = null;
         
         private readonly string[] _sample = new string[1];
 
         void Start()
         {
-            if (_outlet == null)
+            if (StreamOutlet == null)
             {
                 InitializeStream();
             }
@@ -25,34 +25,35 @@ namespace BCIEssentials.LSL4Unity
 
         private void OnDestroy()
         {
-            _outlet?.Close();
+            StreamOutlet?.Close();
         }
 
         public bool InitializeStream()
         {
-            if (_outlet != null)
+            if (StreamOutlet != null)
             {
                 Debug.LogWarning($"Stream already initialized");
                 return false;
             }
             
-            var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string);
-            _outlet = new StreamOutlet(streamInfo);
-
-            return _outlet != null;
+            var streamInfo = new StreamInfo(StreamName, StreamType, 1, 0.0, channel_format_t.cf_string, StreamId);
+            StreamOutlet = new StreamOutlet(streamInfo);
+            StreamUID = StreamOutlet.info().uid();
+            
+            return true;
         }
 
         public void EndStream()
         {
-            _outlet?.Close();
+            StreamOutlet?.Close();
         }
 
         public void Write(string markerString)
         {
-            if (_outlet != null || InitializeStream())
+            if (StreamOutlet != null || InitializeStream())
             {
                 _sample[0] = markerString;
-                _outlet.push_sample(_sample);
+                StreamOutlet.push_sample(_sample);
 
                 Debug.Log($"Sent Marker : {markerString}");
             }

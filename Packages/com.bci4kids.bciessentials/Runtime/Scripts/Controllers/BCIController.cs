@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BCIEssentials.LSL4Unity;
+using BCIEssentials.LSLFramework;
 using BCIEssentials.ControllerBehaviors;
 using UnityEngine;
 using UnityEngine.Events;

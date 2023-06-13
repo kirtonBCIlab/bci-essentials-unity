@@ -1,6 +1,6 @@
 using UnityEngine;
 using BCIEssentials.ControllerBehaviors;
-using BCIEssentials.LSL4Unity;
+using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.Controllers
 {
