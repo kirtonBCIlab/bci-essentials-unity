@@ -26,6 +26,8 @@ Assets > Samples > BCI Essentials > 1.0.0 > Original P300 Controller > Scenes > 
 11. You are now running a P300 BCI paradigm. You can use the keys detailed below to control the interface.
 
 
+<div align="center">
+
 | Key	| Action										|
 | -----	| ---------------------------------------------	|
 | T		| Begin training sequence						|
@@ -33,6 +35,8 @@ Assets > Samples > BCI Essentials > 1.0.0 > Original P300 Controller > Scenes > 
 | I		| Begin interactive training (MI paradigm only)	|
 | U		| Do user training, stimulus without BCI		|
 | 0-9	| Select objects from 0-9 when stimulus is on	|
+
+</div>
 
 ## Notes
 
