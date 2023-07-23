@@ -13,7 +13,7 @@ namespace BCIEssentials.Tests.LSLService
 {
     public class LSLServiceProviderTests : PlayModeTestRunnerBase
     {
-        private const string k_TestStreamName = "_astreamname";
+        private const string k_TestStreamName = "astreamname";
         
         private LSLServiceProvider _testServiceProvider;
 
