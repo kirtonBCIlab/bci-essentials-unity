@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLServiceProvider : MonoBehaviour, ILSLService
+    public class LSLServiceProvider : MonoBehaviour, ILSLService 
     {
         private const string k_StreamIdPredicateFormat = "uid='{0}'";
         private const string k_StreamNamePredicateFormat = "name='{0}'";
@@ -19,8 +20,7 @@ namespace BCIEssentials.LSLFramework
         [SerializeField] private LSLMarkerReceiverSettings _responseStreamSettings = new();
         #endregion
 
-        private static readonly Dictionary<string, LSLMarkerReceiver> _markerReceivers = new();
-
+        private static readonly Dictionary<string, ILSLMarkerReceiver> _markerReceivers = new();
         #region Marker Receivers
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace BCIEssentials.LSLFramework
         /// </summary>
         /// <param name="receiver">The <see cref="LSLMarkerReceiver"/> to register</param>
         /// <returns>Returns TRUE if the marker was registered.</returns>
-        public bool RegisterMarkerReceiver(LSLMarkerReceiver receiver)
+        public bool RegisterMarkerReceiver(ILSLMarkerReceiver receiver)
         {
             if (receiver == null)
             {
@@ -47,11 +47,26 @@ namespace BCIEssentials.LSLFramework
         }
 
         /// <summary>
+        /// Check if a Marker Receiver is currently registered with this Service Provider.
+        /// </summary>
+        /// <param name="receiver"></param>
+        /// <returns>TRUE if the receiver is registered</returns>
+        public bool HasRegisteredMarkerReceiver(ILSLMarkerReceiver receiver)
+        {
+            return _markerReceivers.ContainsValue(receiver);
+        }
+        
+        /// <summary>
         /// Retrieve a Marker Receiver using its <see cref="StreamInfo.uid()"/>.
+        /// <para>
+        /// If the service provider does not have a receiver for <param name="uid"></param>
+        /// it will try locate an open stream and create a marker receiver if a
+        /// stream is found.
+        /// </para>
         /// </summary>
         /// <param name="uid">UID for the given stream.</param>
         /// <returns>NULL if no receiver found.</returns>
-        public LSLMarkerReceiver GetMarkerReceiverByUID(string uid)
+        public ILSLMarkerReceiver GetMarkerReceiverByUID(string uid)
         {
             //Try find existing registered
             if (SafeTryGetMarkerReceiver(uid, out var receiver))
@@ -74,10 +89,15 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Retrieve a Marker Receiver using its <see cref="StreamInfo.name()"/>.
+        /// <para>
+        /// Will try locate using a predicate first and if an open stream is found
+        /// then the service provider will check if has a registered Marker Receiver
+        /// and otherwise register it as one.
+        /// </para>
         /// </summary>
         /// <param name="streamName">Name of the stream.</param>
         /// <returns>NULL if no receiver found.</returns>
-        public LSLMarkerReceiver GetMarkerReceiverByName(string streamName)
+        public ILSLMarkerReceiver GetMarkerReceiverByName(string streamName)
         {
             return GetMarkerReceiverByPredicate(string.Format(k_StreamNamePredicateFormat, streamName));
         }
@@ -87,11 +107,16 @@ namespace BCIEssentials.LSLFramework
         /// <para>
         /// See <a href="https://en.wikipedia.org/wiki/XPath">XPath 1.0</a> for predicate formatting.
         /// </para>
+        /// <para>
+        /// If the service provider does not have a receiver for <param name="uid"></param>
+        /// it will try locate an open stream and create a marker receiver if a
+        /// stream is found.
+        /// </para>
         /// </summary>
         /// <param name="predicate">The predicate value to search by.</param>
         /// <example>"source_id='id'"</example>
         /// <returns>NULL if no receiver found.</returns>
-        public LSLMarkerReceiver GetMarkerReceiverByPredicate(string predicate)
+        public ILSLMarkerReceiver GetMarkerReceiverByPredicate(string predicate)
         {
             //Just use LSL predicate searching
             var streamInfo = ResolveStream(predicate);
@@ -113,6 +138,19 @@ namespace BCIEssentials.LSLFramework
 
             return receiver;
         }
+
+        /// <summary>
+        /// Unregister a Marker Receiver from Service Provider.
+        /// </summary>
+        /// <param name="receiver">The Marker Receiver to unregister</param>
+        public void UnregisterMarkerReceiver(ILSLMarkerReceiver receiver)
+        {
+            if (_markerReceivers.ContainsValue(receiver))
+            {
+                _markerReceivers.Remove(receiver.UID);
+                receiver.CleanUp();
+            }
+        }
         
         /// <summary>
         /// Gets a <see cref="LSLMarkerReceiver"/> from the collection.
@@ -121,18 +159,30 @@ namespace BCIEssentials.LSLFramework
         /// <param name="id">The key to use.</param>
         /// <param name="markerReceiver">The <see cref="LSLMarkerReceiver"/> found.</param>
         /// <returns>TRUE if a <see cref="LSLMarkerReceiver"/> was found.</returns>
-        private static bool SafeTryGetMarkerReceiver(string id, out LSLMarkerReceiver markerReceiver)
+        private static bool SafeTryGetMarkerReceiver(string id, out ILSLMarkerReceiver markerReceiver)
         {
-            var hasExisting = _markerReceivers.TryGetValue(id, out markerReceiver);
-
-            if (hasExisting && markerReceiver == null)
+            if (!_markerReceivers.TryGetValue(id, out markerReceiver))
             {
-                _markerReceivers.Remove(id);
                 return false;
             }
 
-            return hasExisting;
+            if (markerReceiver is not MonoBehaviour monoReceiver || monoReceiver != null)
+            {
+                return true;
+            }
+            
+            _markerReceivers.Remove(id);
+            return false;
+
         }
+        
+        private ILSLMarkerReceiver NewMarkerReceiver(StreamInfo streamInfo, LSLMarkerReceiverSettings settings = null)
+        {
+            return new GameObject($"{nameof(LSLMarkerReceiver)}_{streamInfo.uid()}")
+                .AddComponent<LSLMarkerReceiver>()
+                .Initialize(streamInfo, settings);
+        }
+        #endregion
         
         private StreamInfo ResolveStream(string predicate)
         {
@@ -146,13 +196,5 @@ namespace BCIEssentials.LSLFramework
             
             return firstStream;
         }
-
-        private LSLMarkerReceiver NewMarkerReceiver(StreamInfo streamInfo, LSLMarkerReceiverSettings settings = null)
-        {
-            return new GameObject($"{nameof(LSLMarkerReceiver)}_{streamInfo.uid()}")
-                .AddComponent<LSLMarkerReceiver>()
-                .Initialize(streamInfo, settings);
-        }
-        #endregion
     }
 }
