@@ -39,7 +39,7 @@
     },
     {
       "displayName": "Basic Marker Receviers Example",
-      "description": "An example on how different types of can be used with the LSLServiceProvider.",
+      "description": "An example on how different types of Marker Receivers can be used with the LSLServiceProvider.",
       "path": "Samples~/BasicMarkerReceivers"
     }
   ]
