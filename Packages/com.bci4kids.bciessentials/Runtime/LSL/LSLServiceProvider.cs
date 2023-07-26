@@ -21,6 +21,7 @@ namespace BCIEssentials.LSLFramework
         #endregion
 
         private static readonly Dictionary<string, ILSLMarkerReceiver> _markerReceivers = new();
+
         #region Marker Receivers
 
         /// <summary>
