@@ -4,12 +4,12 @@ using BCIEssentials.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BCIEssentials.LSL.Samples
+namespace BCIEssentials.LSL.Samples.MarkerReceiverExample
 {
     public class ExampleManualMarkerReceiver : MonoBehaviour
     {
         [Header("Configuration")]
-        [SerializeField] private LSLServiceProvider _provider;
+        [SerializeField] private LSLServiceProvider _lslService;
         [SerializeField] private string _streamName = "MyStream";
         [SerializeField] private bool _getOnlyLatest;
         
@@ -18,12 +18,12 @@ namespace BCIEssentials.LSL.Samples
         [SerializeField] private Text _responseText;
 
         [Space(20), InspectorReadOnly]
-        public LSLMarkerReceiver LslMarkerReceiver;
+        public ILSLMarkerReceiver LslMarkerReceiver;
 
         private void Start()
         {
             _requestButton.onClick.AddListener(GetResponses);
-            LslMarkerReceiver = _provider.GetMarkerReceiverByName(_streamName);;
+            LslMarkerReceiver = _lslService.GetMarkerReceiverByName(_streamName);
         }
 
         public void GetResponses()

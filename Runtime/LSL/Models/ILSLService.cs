@@ -2,12 +2,14 @@ namespace BCIEssentials.LSLFramework
 {
     public interface ILSLService
     {
-        public bool RegisterMarkerReceiver(LSLMarkerReceiver receiver);
+        public bool RegisterMarkerReceiver(ILSLMarkerReceiver receiver);
+        public bool HasRegisteredMarkerReceiver(ILSLMarkerReceiver receiver);
+        
+        public ILSLMarkerReceiver GetMarkerReceiverByUID(string uid);
 
-        public LSLMarkerReceiver GetMarkerReceiverByUID(string uid);
+        public ILSLMarkerReceiver GetMarkerReceiverByName(string streamName);
 
-        public LSLMarkerReceiver GetMarkerReceiverByName(string sessionId);
-
-        public LSLMarkerReceiver GetMarkerReceiverByPredicate(string predicate);
+        public ILSLMarkerReceiver GetMarkerReceiverByPredicate(string predicate);
+        public void UnregisterMarkerReceiver(ILSLMarkerReceiver receiver);
     }
 }

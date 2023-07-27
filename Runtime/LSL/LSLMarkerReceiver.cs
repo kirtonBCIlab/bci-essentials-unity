@@ -7,6 +7,15 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    /// <summary>
+    /// <para>
+    /// A class that creates a <see cref="StreamInlet"/> and polls it for incoming samples.
+    /// </para>
+    /// <para>
+    /// Allows subscribers to subscribe to polled samples without stealing samples from
+    /// other subscribers.
+    /// </para>
+    /// </summary>
     public class LSLMarkerReceiver : MonoBehaviour, ILSLMarkerReceiver
     {
         public string UID { get; private set; }
@@ -59,17 +68,45 @@ namespace BCIEssentials.LSLFramework
 
         private readonly List<ILSLMarkerSubscriber> _subscribers = new();
 
+        /// <summary>
+        /// Initialize the Marker Receiver.
+        /// </summary>
+        /// <param name="streamInfo">The stream info to create a <see cref="StreamInlet"/> from.</param>
+        /// <param name="settings">Optional settings to initialize with.</param>
+        /// <returns>Initialized Marker Receiver</returns>
+        /// <exception cref="ArgumentNullException">Throws if no <param name="streamInfo"></param> provided.</exception>
+        /// <exception cref="TimeoutException">
+        /// Throws if interacting with the <see cref="StreamInfo"/> or <see cref="StreamInlet"/>times out.
+        /// </exception>
         public LSLMarkerReceiver Initialize(StreamInfo streamInfo, LSLMarkerReceiverSettings settings = null)
         {
-            StreamInfo = streamInfo ?? throw new ArgumentNullException(nameof(streamInfo));
-            UID = streamInfo.uid();
+            if (Initialized)
+            {
+                Debug.LogError("Cannot initialize an already initialized Marker Receiver.");
+                return this;
+            }
 
+            if (streamInfo == null)
+            {
+                throw new ArgumentNullException(nameof(streamInfo));
+            }
+            
             _settings = settings ?? new LSLMarkerReceiverSettings();
             
             _streamInlet = new StreamInlet(streamInfo);
+            StreamInfo = _streamInlet.info(_settings.GetInfoTimeout); //Throws if times out
+            
+            UID = StreamInfo.uid();
             _channelCount = StreamInfo.channel_count();
 
-            Connect();
+            try
+            {
+                _streamInlet.open_stream(_settings.OpenStreamTimeout);
+            }
+            catch (TimeoutException _)
+            {
+                Debug.LogWarning("Failed to open stream within the timeout period. Stream will try open when polling starts.");
+            }
             
             return this;
         }
@@ -77,7 +114,14 @@ namespace BCIEssentials.LSLFramework
         public void CleanUp()
         {
             StopPolling();
-            Disconnect();
+            
+            UID = string.Empty;
+            StreamInfo = null;
+            
+            _streamInlet?.Dispose();
+            _streamInlet = null;
+            
+            _subscribers.Clear();
         }
         
         private void OnDestroy()
@@ -112,11 +156,7 @@ namespace BCIEssentials.LSLFramework
         /// <returns>Array of <see cref="LSLMarkerResponse"/></returns>
         public LSLMarkerResponse[] GetResponses()
         {
-            if (Connected)
-            {
-                PullSample();
-            }
-
+            PullSample();
             return _allResponses.ToArray();
 
         }
@@ -136,28 +176,20 @@ namespace BCIEssentials.LSLFramework
             return _lastPulledResponses.ToArray();
         }
         
-        private void Connect()
-        {
-            _streamInlet?.open_stream();
-        }
-
-        private void Disconnect()
-        {
-            _streamInlet?.close_stream();
-        }
-        
         private void PullSample()
         {
             var pulledSamples = new List<LSLMarkerResponse>();
             var lastCaptureTime = double.MaxValue;
             var sample = new string[_channelCount];
+            
+            //Populate array with empty strings
             for(int i = 0 ; i < _channelCount ; i++) sample[i] = string.Empty;
             
             try
             {
                 while (lastCaptureTime > 0)
                 {
-                    lastCaptureTime = _streamInlet.pull_sample(sample, 0);
+                    lastCaptureTime = _streamInlet.pull_sample(sample, _settings.PullSampleTimeout);
                     if (lastCaptureTime == 0 || !HasValidValue(sample))
                     {
                         continue;

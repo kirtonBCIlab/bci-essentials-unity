@@ -4,7 +4,7 @@ using BCIEssentials.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BCIEssentials.LSL.Samples
+namespace BCIEssentials.LSL.Samples.MarkerReceiverExample
 {
     public class ExampleMarkerSubscriber : MonoBehaviour, ILSLMarkerSubscriber
     {
@@ -33,7 +33,7 @@ namespace BCIEssentials.LSL.Samples
                 return;
             }
 
-            LslMarkerReceiver = _provider.GetMarkerReceiverByName(_streamName);
+            LslMarkerReceiver = _provider.GetMarkerReceiverByName(_streamName) as LSLMarkerReceiver;
             if (LslMarkerReceiver != null && _subscribeOnStart)
             {
                 Subscribe();

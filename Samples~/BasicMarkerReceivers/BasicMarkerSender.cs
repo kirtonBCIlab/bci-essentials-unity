@@ -3,7 +3,7 @@ using LSL;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BCIEssentials.LSL.Samples
+namespace BCIEssentials.LSL.Samples.MarkerReceiverExample
 {
     public class BasicMarkerSender: MonoBehaviour
     {
