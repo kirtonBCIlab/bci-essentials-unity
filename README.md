@@ -22,6 +22,7 @@ Note - tested with Uniy version 2021.3.15.f1, other editor versions might work b
 1. You are now running a P300 BCI paradigm. You can use the keys detailed below to control the interface.
 
 <div align="center">
+  
 | Key	| Action					|
 | -----	| ---------------------------------------------	|
 | T	| Begin training sequence		|
@@ -29,4 +30,5 @@ Note - tested with Uniy version 2021.3.15.f1, other editor versions might work b
 | I	| Begin interactive training (MI paradigm only)	|
 | U	| Do user training, stimulus without BCI	|
 | 0-9	| Select objects from 0-9 when stimulus is on	|
+
 </div>
