@@ -5,8 +5,7 @@ name: Push code to APIdocs repo
 
 on:
   push:
-    # branches: ["main"]
-    branches: ["push-code-to-APIdocs"]
+    branches: ["main"]
 
 jobs:
   push_code:
