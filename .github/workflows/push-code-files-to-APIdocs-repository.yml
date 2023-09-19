@@ -1,0 +1,29 @@
+name: Push code to APIdocs repo
+# This Github action executes on push to `main`
+# and Pushes the code folder `Packages` to the
+# `APIdocs-for-bci-essentials-unity` repo.
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  push_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout SOURCE repository
+        uses: actions/checkout@v3
+
+      - name: Push code to the `APIdocs` repository
+        uses: nkoppel/push-files-to-another-repository@v1.1.1
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.APIDOCS_SYNC }}
+        with:
+          source-files: 'Packages/'
+          destination-username: 'kirtonBCIlab'
+          destination-repository: 'APIdocs-for-bci-essentials-unity'
+          destination-branch: 'main'
+          destination-directory: './'
+          commit-message: "Copy Packages code directory on push to UPSTREAM/main"
+          commit-email: 'n44412824+anup2ladder@users.noreply.github.com'
