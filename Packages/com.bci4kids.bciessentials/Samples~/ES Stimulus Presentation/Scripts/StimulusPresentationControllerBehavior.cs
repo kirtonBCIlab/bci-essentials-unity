@@ -202,11 +202,11 @@ namespace BCIEssentials.ControllerBehaviors
                 _restingState = true;
                 _open = true;
                 //1 minute eyes open Resting State 
-                yield return new WaitForSecondsRealtime(60f); //60
+                yield return new WaitForSecondsRealtime(6f); //60
                 _open = false;
                 _closed = true;
                 //1 minute eyes closed Resting State 
-                yield return new WaitForSecondsRealtime(60f); //60
+                yield return new WaitForSecondsRealtime(6f); //60
                 _restingState = false;
                 _closed = false;
                 mainCam.transform.Rotate(_rotateBack);
