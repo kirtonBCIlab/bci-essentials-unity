@@ -18,17 +18,8 @@ namespace BCIEssentials.StimulusEffects
         public Material[] materialList;
 
         [Header("Flash Settings")]
-        [SerializeField]
-        [Tooltip("Material Color to assign while flashing is on")]
         private Color _flashOnColor = Color.red;
-        
-        [SerializeField]
-        [Tooltip("Material Color to assign while flashing is off")]
-        private Color _flashOffColor = Color.white;
-
-        [SerializeField]
-        [Tooltip("If the flash on color is applied on start or the flash off color.")]
-        private bool _startOn;
+        private Color _flashOffColor = Color.black;
         
         private float _flashDurationSeconds = 0.2f;
 
@@ -38,49 +29,29 @@ namespace BCIEssentials.StimulusEffects
 
         private Coroutine _effectRoutine;
 
-        public bool _chooseColorAndContrast;
-
-        public enum FlashOnColor
-        {
-            Grey
-        }
-        public FlashOnColor _selectedColor;
-
         public enum ContrastLevel
         {
             Max,
             OneStepDown,
             TwoStepsDown,
-            Min,
-            Off
+            Min
         }
         public ContrastLevel _contrastLevel;
 
         //Texture options
-        public bool _chooseTexture;
+        public bool _textureOn;
         public enum TextureSelection 
         {
             Worms,
             Static,
             Wood,
             Voronoi, 
-            Checkerboard,
-            SqaureGrating
+            Checkerboard
         }
 
         public TextureSelection _textureChoice;
-
-        private float _textureOn1Float;
-        private float _textureOff1Float;
-        private float _textureOn2Float_1;
-        private float _textureOn2Float_2;
-        private float _textureOff2Float_1;
-        private float _textureOff2Float_2;
-        private Color _textureOnColor1;
-        private Color _textureOnColor2;
-        private Color _textureOffColor1;
-        private Color _textureOffColor2;
-
+        private float _textureOn1Float, _textureOff1Float, _textureOn2Float_1, _textureOn2Float_2, _textureOff2Float_1, _textureOff2Float_2;
+        private Color _textureOnColor1, _textureOnColor2, _textureOffColor1, _textureOffColor2;
         public Material[] setMaterials;
 
         private void Start()
@@ -95,15 +66,8 @@ namespace BCIEssentials.StimulusEffects
             {
                 Debug.LogWarning($"No material assigned to renderer component on {gameObject.name}.");
             }
-
-            if(_chooseColorAndContrast)
-            {
-                ContrastController();
-                _flashOffColor = Color.black;
-                AssignMaterialColor(_startOn ? _flashOnColor: _flashOffColor);
-            }
          
-            if(_chooseTexture)
+            if(_textureOn)
             {
                 TextureController();
 
@@ -132,25 +96,24 @@ namespace BCIEssentials.StimulusEffects
                     SetTexture2(_textureOn2Float_1, _textureOn2Float_2);
                 }
 
-                else if(_textureChoice == TextureSelection.Static || _textureChoice ==  TextureSelection.SqaureGrating)
+                else if(_textureChoice == TextureSelection.Static) 
                 {
-                    if(_textureChoice == TextureSelection.Static)
-                        _renderer.material = materialList[4];
-                    
-                    if(_textureChoice == TextureSelection.SqaureGrating)
-                        _renderer.material = materialList[5];
-
+                    setMaterials[0] = materialList[4];
+                    _renderer.materials = setMaterials;
                     SetTexture1(_textureOn1Float);
                 }
 
                 else 
                 {
-                    _renderer.material = materialList[6];
+                    _renderer.material = materialList[5];
                     SetTextureColors2(_textureOnColor1, _textureOnColor2);
                 }
+
             }
+
             else
-                AssignMaterialColor(_startOn ? _flashOnColor: _flashOffColor);
+                _renderer.material = materialList[6];
+                AssignMaterialColor(_flashOffColor);
         }
 
         public override void SetOn()
@@ -158,16 +121,15 @@ namespace BCIEssentials.StimulusEffects
             if (_renderer == null || _renderer.material == null)
                 return;
 
-            if(_chooseTexture)
+            if(_textureOn)
             {
                 if(_textureChoice == TextureSelection.Worms || _textureChoice == TextureSelection.Wood || _textureChoice == TextureSelection.Voronoi)
                     SetTexture2(_textureOn2Float_1, _textureOn2Float_2);
-                else if(_textureChoice == TextureSelection.Static || _textureChoice == TextureSelection.SqaureGrating)
+                else if(_textureChoice == TextureSelection.Static)
                     SetTexture1(_textureOn1Float);
                 else 
                     SetTextureColors2(_textureOnColor1, _textureOnColor2);   
             }
-
             else
                 AssignMaterialColor(_flashOnColor);
 
@@ -177,24 +139,22 @@ namespace BCIEssentials.StimulusEffects
         public override void SetOff()
         {
             if (_renderer == null || _renderer.material == null)
-            {
                 return;
-            }
             
-            if(_chooseTexture)
+            if(_textureOn)
             {
                 if(_textureChoice == TextureSelection.Worms || _textureChoice == TextureSelection.Wood || _textureChoice == TextureSelection.Voronoi)
                     SetTexture2(_textureOff2Float_1, _textureOff2Float_2);
-                else if(_textureChoice == TextureSelection.Static || _textureChoice == TextureSelection.SqaureGrating)
+                else if(_textureChoice == TextureSelection.Static)
                     SetTexture1(_textureOff1Float);
                 else 
                     SetTextureColors2(_textureOffColor1, _textureOffColor2);  
             }
-
             else
             {
                 AssignMaterialColor(_flashOffColor);
             }
+
             IsOn = false;
         }
 
@@ -202,15 +162,12 @@ namespace BCIEssentials.StimulusEffects
         {
             Stop();
             _effectRoutine = StartCoroutine(RunEffect());
-
         }
 
         public void Stop()
         {
             if (!IsPlaying)
-            {
                 return;
-            }
 
             SetOff();
             StopCoroutine(_effectRoutine);
@@ -225,28 +182,25 @@ namespace BCIEssentials.StimulusEffects
                 
                 for (var i = 0; i < _flashAmount; i++)
                 {
-                    //Deliberately not using SetOn and SetOff here
-                    //to avoid excessive null checking
-                    if(_chooseTexture)
+                    if(_textureOn)
                     {
                         if(_textureChoice == TextureSelection.Worms || _textureChoice == TextureSelection.Wood || _textureChoice == TextureSelection.Voronoi)
                             SetTexture2(_textureOn2Float_1, _textureOn2Float_2);
-                        else if(_textureChoice == TextureSelection.Static || _textureChoice == TextureSelection.SqaureGrating)
+                        else if(_textureChoice == TextureSelection.Static)
                             SetTexture1(_textureOn1Float);
                         else 
                             SetTextureColors2(_textureOnColor1, _textureOnColor2);   
                     }
-
                     else
                         AssignMaterialColor(_flashOnColor);
 
                     yield return new WaitForSecondsRealtime(_flashDurationSeconds);
 
-                    if(_chooseTexture)
+                    if(_textureOn)
                     {
                         if(_textureChoice == TextureSelection.Worms || _textureChoice == TextureSelection.Wood || _textureChoice == TextureSelection.Voronoi)
                             SetTexture2(_textureOff2Float_1, _textureOff2Float_2);
-                        else if(_textureChoice == TextureSelection.Static || _textureChoice == TextureSelection.SqaureGrating)
+                        else if(_textureChoice == TextureSelection.Static)
                             SetTexture1(_textureOff1Float);
                         else 
                             SetTextureColors2(_textureOffColor1, _textureOffColor2);   
@@ -257,24 +211,23 @@ namespace BCIEssentials.StimulusEffects
                     yield return new WaitForSecondsRealtime(_flashDurationSeconds);
                 }
             }
+
             SetOff();
             _effectRoutine = null;
         }
 
+/// <summary>
+/// //////////Helper methods
+/// </summary>
         private void ContrastController()
         {
-            _flashOffColor = Color.black;
+            //_flashOffColor = Color.black;
             ColorContrast colorContrast = GetComponent<ColorContrast>();
             int contrastIntValue = ConvertContrastLevel(_contrastLevel);
             colorContrast.SetContrast(contrastIntValue);
-
-            if (_selectedColor == FlashOnColor.Grey)
-                _flashOnColor = colorContrast.Grey();
-            else 
-                Debug.LogWarning("Selected Color not Available.");
+            _flashOnColor = colorContrast.Grey();
         }
 
-        //note that the int values are arbitrary
         public int ConvertContrastLevel(ContrastLevel _contrastLevel)
         {
             if(_contrastLevel == ContrastLevel.Max)
@@ -307,8 +260,8 @@ namespace BCIEssentials.StimulusEffects
             }
             else if(_textureChoice == TextureSelection.Static)
             {
-                _textureOn1Float = (1000f);
-                _textureOff1Float = (0f);
+                _textureOn1Float = 300f; //100
+                _textureOff1Float = 0f;
             }
             else if(_textureChoice == TextureSelection.Voronoi)
             {
@@ -323,15 +276,6 @@ namespace BCIEssentials.StimulusEffects
                 _textureOnColor2 = Color.white;
                 _textureOffColor1 = Color.white;
                 _textureOffColor2 = Color.black;
-            }
-            else if(_textureChoice == TextureSelection.SqaureGrating)
-            {
-                _textureOn1Float = (180f);
-                _textureOff1Float = (0f);
-            }
-            else 
-            {
-                Debug.LogWarning("NOT WORKING");
             }
         }
 
@@ -357,101 +301,63 @@ namespace BCIEssentials.StimulusEffects
             _renderer.material.SetColor("_Color2", c2);
         }
 
-        public void SetContrast(ContrastLevel x, FlashOnColor y)
+        public void SetContrast(ContrastLevel x)
         {
-            _selectedColor = y;
             _contrastLevel = x;
             ContrastController();
             if(setMaterials[0] != null)
             {
-                _chooseTexture = false;
-                setMaterials[0] = materialList[7]; 
+                _textureOn = false;
+                setMaterials[0] = materialList[6]; 
                 setMaterials[1] = null;
                 _renderer.materials = setMaterials;
                 _flashOffColor = Color.black;
             }
             else
-                _chooseTexture = false;
-        }
-
-
-        public void SetColor(FlashOnColor x)
-        {
-            _chooseTexture = false;
-            _selectedColor = x;
-            ContrastController();
-            if(setMaterials[0] != null )
-            {
-                if(_textureChoice == TextureSelection.Static)
-                    setMaterials[0] = materialList[4]; 
-                else
-                    setMaterials[0] = materialList[7];
-
-                setMaterials[1] = null;
-                _renderer.materials = setMaterials;
-                _flashOffColor = Color.black;
-            }
+                _textureOn = false;
         }
 
         public void SetTextureExternal(TextureSelection x)
         {
-            _chooseTexture = true;
+            _textureOn = true;
             _textureChoice = x;
             TextureController();
             
             if(_textureChoice == TextureSelection.Worms || _textureChoice == TextureSelection.Wood || _textureChoice == TextureSelection.Voronoi)
             {
                 setMaterials[1] = materialList[0];
-                    if(_textureChoice == TextureSelection.Worms)
-                    {
-                        setMaterials[0] = materialList[1];
-                        _renderer.materials = setMaterials;
-                    } 
-
-                    if(_textureChoice == TextureSelection.Wood)
-                    {
-                        setMaterials[0] = materialList[2];
-                        _renderer.materials = setMaterials;
-                    }    
-                    
-                    if(_textureChoice == TextureSelection.Voronoi)
-                    {
-                        setMaterials[0] = materialList[3];
-                        _renderer.materials = setMaterials;
-                    }
-
-                    SetTexture2(_textureOn2Float_1, _textureOn2Float_2);
-                }
-
-                else if(_textureChoice == TextureSelection.Static || _textureChoice ==  TextureSelection.SqaureGrating)
+                if(_textureChoice == TextureSelection.Worms)
                 {
-                    if(_textureChoice == TextureSelection.Static)
-                    {
-                        setMaterials[1] = materialList[4];
-                        setMaterials[0] = materialList[4];
-                        _renderer.materials = setMaterials;
-                    }
-
-                    
-                    if(_textureChoice == TextureSelection.SqaureGrating)
-                    {
-                        setMaterials[0] = materialList[5];
-                        setMaterials[1] = materialList[8];
-                        _renderer.materials = setMaterials;
-                    }
-
-                    SetTexture1(_textureOn1Float);
-                }
-
-                else 
-                {
-                    setMaterials[0] = materialList[6];
-                    setMaterials[1] = materialList[8];
+                    setMaterials[0] = materialList[1];
                     _renderer.materials = setMaterials;
-
-                    SetTextureColors2(_textureOnColor1, _textureOnColor2);
+                } 
+                if(_textureChoice == TextureSelection.Wood)
+                {
+                    setMaterials[0] = materialList[2];
+                    _renderer.materials = setMaterials;
+                }    
+                if(_textureChoice == TextureSelection.Voronoi)
+                {
+                    setMaterials[0] = materialList[3];
+                    _renderer.materials = setMaterials;
                 }
+                SetTexture2(_textureOn2Float_1, _textureOn2Float_2);
+            }
 
+            else if(_textureChoice == TextureSelection.Static)
+            {
+                setMaterials[1] = materialList[0];
+                setMaterials[0] = materialList[4];
+                _renderer.materials = setMaterials;
+                SetTexture1(_textureOn1Float);
+            }
+            
+            else 
+            {
+                setMaterials[0] = materialList[5];
+                _renderer.materials = setMaterials;
+                SetTextureColors2(_textureOnColor1, _textureOnColor2);
+            }
             }
         }
     }

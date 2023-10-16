@@ -23,18 +23,13 @@ namespace BCIEssentials.ControllerBehaviors
 
         //start of emily stuff
         public Camera mainCam;
-
         public Text _displayText;
-        public bool _recording;
         private bool _offMessages;
         private bool _restingState;
         private bool _open;
         private bool _closed;
-
         private string stimulusString = "";
-
         private Dictionary<int, string> orderDict = new Dictionary<int, string>();
-        private ColorFlashEffect2.FlashOnColor  _colorChoice;
 
 
         protected override void Start()
@@ -48,12 +43,16 @@ namespace BCIEssentials.ControllerBehaviors
 
             //randomize order of stimulus presentation 
             Randomize();
+
+            //set first frequency
+            setFreqFlash = 9.6f;
+            OnStimulusRunComplete();
+            PopulateObjectList();
         }
 
         public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             base.PopulateObjectList(populationMethod);
-
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;
@@ -61,7 +60,7 @@ namespace BCIEssentials.ControllerBehaviors
                 period = targetFrameRate / setFreqFlash;
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFreqFlash = targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]);
             }
         }
 
@@ -70,15 +69,14 @@ namespace BCIEssentials.ControllerBehaviors
             while (StimulusRunning)
             {
                 string freqString = "";
-                string trainingString= "";
                 string markerString=  "";
+                string trainingString;
                 
                 if(!_offMessages)
                 {
                     freqString = freqString + "," + realFreqFlash.ToString();
                     trainingString = (trainingIndex <= _selectableSPOs.Count) ? trainingIndex.ToString() : "-1";
                     
-
                     markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
                                         windowLength.ToString() + freqString + stimulusString;
                 }
@@ -99,8 +97,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 marker.Write(markerString);
 
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-                
+                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
             }
         }
         
@@ -129,7 +126,6 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                 }
             }
-
             yield return null;
         }
 
@@ -142,7 +138,6 @@ namespace BCIEssentials.ControllerBehaviors
                     spo.StopStimulus();
                 }
             }
-
             yield return null;
         }
 
@@ -164,7 +159,6 @@ namespace BCIEssentials.ControllerBehaviors
             else if (j == 6)
             {
                 setFreqFlash = 9.6f;
-                
                 ColorFlashEffect2 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect2>();
 
                 if (spoEffect != null)
@@ -198,147 +192,132 @@ namespace BCIEssentials.ControllerBehaviors
             var _rotateBack = Vector3.zero;
             _rotateBack.y = -90f;
             
-                mainCam.transform.Rotate(_rotateAway);
-                _restingState = true;
-                _open = true;
-                //1 minute eyes open Resting State 
-                yield return new WaitForSecondsRealtime(6f); //60
-                _open = false;
-                _closed = true;
-                //1 minute eyes closed Resting State 
-                yield return new WaitForSecondsRealtime(6f); //60
-                _restingState = false;
-                _closed = false;
-                mainCam.transform.Rotate(_rotateBack);
+            mainCam.transform.Rotate(_rotateAway);
+            _restingState = true;
+            _open = true;
+            //1 minute eyes open Resting State 
+            yield return new WaitForSecondsRealtime(6f); //60
+            _open = false;
+            _closed = true;
+            //1 minute eyes closed Resting State 
+            yield return new WaitForSecondsRealtime(6f); //60
+            _restingState = false;
+            _closed = false;
+            mainCam.transform.Rotate(_rotateBack);
 
-                //first object set to 9.6Hz
-                setFreqFlash = 9.6f;
-                OnStimulusRunComplete();
-                PopulateObjectList();
+            //set initial color and contrast
+            ColorFlashEffect2 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect2>();
+            SetMaterial(0);
+            stimulusString = ", "  + orderDict[0];
 
-                //set initial color and contrast
-                ColorFlashEffect2 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect2>();
+            //5 seconds count down before starting
+            _offMessages = true;                    
+            mainCam.transform.Rotate(_rotateBack);
+            StartCoroutine(DisplayTextOnScreen("5"));
+            yield return new WaitForSecondsRealtime(5f);
+            mainCam.transform.Rotate(_rotateAway);
+            _offMessages = false;
 
-                SetMaterial(0);
-                stimulusString = ", "  + orderDict[0];
-
-                //5 seconds count down before starting
-                _offMessages = true;                    
-                mainCam.transform.Rotate(_rotateBack);
-                StartCoroutine(DisplayTextOnScreen("fromFive"));
-                yield return new WaitForSecondsRealtime(5f);
-                mainCam.transform.Rotate(_rotateAway);
-                _offMessages = false;
-
-                for(var l = 0 ; l < 7; l++)
-                //this loops through all 7 stimuli  
+            for(var l = 0 ; l < 7; l++)
+            //this loops through all 7 stimuli  
+            {
+                for(var k = 0; k < 3; k++)
                 {
-                    for(var k = 0; k < 3; k++)
+                //do this 3 times so each stimulus is played at all 3 frequencies 
+                    for(var j = 0; j < 3; j++)
+                    //do this for loop 3 times (12 seconds on 8 seconds off * 3)
                     {
-                        //do this 3 times so each stimulus is played at all 3 frequencies 
-                        //a full run through of this loop is one 'set'
-                        for(var j = 0; j < 3; j++)
-                        //do this for loop 3 times (12 seconds on 8 seconds off * 3)
-                        //one full run through of the j for loop = all flashes/offs for one frequency
+                        for(var i = 0; i <144*12; i++) //(StimulusRunning)
+                        //the number that i is less than is the amount of seconds to flash for 
+                        //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
                         {
-                            for(var i = 0; i < 144*12; i++) //(StimulusRunning)
-                            //the number that i is less than is the amount of seconds to flash for 
-                            //144 = 1 seconds (frame rate is 144 Hz) so 12 seconds = i < 144*12
-                            {
-                                yield return OnStimulusRunBehavior();
-                            }
-                                
-                            //rotate the camera away from the stimuli objects when they are "off"
-                            //this is primarily for the textured stimuli because their "off state" is the grey background square 
-                            //and I don't want that on the screen during the pauses.
-                            mainCam.transform.Rotate(_rotateAway);
-                            _offMessages = true;
-
-                            //control the 3 second countdown during every 8 seconds "off" 
-                            //want it to play in every case except the very last stimulus of the set
-                            //at this one, want to display the survey message and have a 20 second rest
-                            //(controlled outside of the k,j,i loops)
-                            yield return new WaitForSecondsRealtime(5f); //5
-                            StartCoroutine(DisplayTextOnScreen("fromThree"));
-                            yield return new WaitForSecondsRealtime(3f);     
-
-                            //rotate the camera back to facing the stimulus objects 
-                            mainCam.transform.Rotate(_rotateBack);
-                            _offMessages = false;
-
-                            if(k == 0)
-                            //k == 0 means the frequency is currently 9.6 Hz, want to change it if j == 2
-                            {
-                                if(j == 2)
-                                //j = 2 means this is the 3rd time the (on/off) loop is running 
-                                //need to change the frequency
-                                {
-                                //when StopStimulusRun is called with j = 2, the frequency is set to 16 Hz
-                                StopStimulusRun(j, 0);
-                                }
-                            }
-                        
-                            if(k == 1)
-                            //k == 1 means the frequency is currently 16 Hz, want to change it to 36 Hz when j == 2
-                            {
-                                if(j == 2)
-                                {
-                                    //when StopStimulusRun is called with j = 3, the frequency is set to 36 Hz
-                                    StopStimulusRun(j+1, 0);
-                                }
-                            }
+                            yield return OnStimulusRunBehavior();
                         }
-                    }
 
-                    mainCam.transform.Rotate(_rotateAway);
-
-                    //wait 20 seconds between sets and display the countdown 
-                    //the first call to StartCountDown displays a message to respond to the survey
-                    //(immediately after the flashing stops). And then wait 15 seconds before starting 
-                    //the 5 second countdown. The number supplied to the first StartCountDown call can be anything other than 3f and 5f 
-                    _offMessages = true;
-                    StartCoroutine(DisplayTextOnScreen("survey"));
-                    yield return new WaitForSecondsRealtime(15f);  //15
-
-                    if(l != 6)
-                    {
-                        StartCoroutine(DisplayTextOnScreen("fromFive"));
-                        yield return new WaitForSecondsRealtime(4f);
-                    }
-
-                    //when StopStimulusRun is called with 6, the frequency is set to 9.6 and depending on the value of l,
-                    //the stimulus contrast/texture is changed
-                    StopStimulusRun(6, l); 
-                    yield return new WaitForSecondsRealtime(1f);
-                    mainCam.transform.Rotate(_rotateBack); 
-                    _offMessages = false;
-                        
-                    if(l == 6)
-                    {
+                        //rotate the camera away from the stimuli objects when they are off
                         mainCam.transform.Rotate(_rotateAway);
                         _offMessages = true;
-                        yield return new WaitForSecondsRealtime(8f);
-                        StartCoroutine(DisplayTextOnScreen("endOfStimuli"));
-                        yield return new WaitForSecondsRealtime(2f);
+
+                        //control the 3 second countdown during every 8 seconds off
+                        if (k <= 2)
+                        {
+                            if(k < 2 || (k ==2 && j < 2))
+                            {   
+                                yield return new WaitForSecondsRealtime(5f); //5
+                                StartCoroutine(DisplayTextOnScreen("3"));
+                                yield return new WaitForSecondsRealtime(3f); 
+                            }
+                        }
+
+                        //rotate the camera back to facing the stimulus objects 
+                        mainCam.transform.Rotate(_rotateBack);
                         _offMessages = false;
 
-                        _restingState = true;
-                        _open = true;
-                        //1 minute eyes open Resting State 
-                        yield return new WaitForSecondsRealtime(60f); //60
-                        _open = false;
-                        _closed = true;
-                        //1 minutes eye closed Resting State 
-                        yield return new WaitForSecondsRealtime(60f); //60
-                        _restingState = false;
-                        _closed = false;
+                        //change the frequency of the stimulus object
+                        if (j == 2)
+                        {
+                            if (k == 0)
+                            {
+                                StopStimulusRun(j, 0);
+                            }
+                            if (k == 1)
+                            {
+                                StopStimulusRun(j+1, 0);
+                            }
+                        }
 
-                        StartCoroutine(DisplayTextOnScreen("endOfSession"));
-                        StopCoroutineReference(ref _runStimulus);
                     }
                 }
+
+                mainCam.transform.Rotate(_rotateAway);
+
+                //wait 20 seconds between sets and display the countdown 
+                //the first call to StartCountDown displays a message to respond to the survey
+                //(immediately after the flashing stops). And then wait 15 seconds before starting the 5 second countdown. 
+                _offMessages = true;
+                StartCoroutine(DisplayTextOnScreen("Survey"));
+                yield return new WaitForSecondsRealtime(15f);  //15
+
+                if(l != 6)
+                {
+                    StartCoroutine(DisplayTextOnScreen("5"));
+                    yield return new WaitForSecondsRealtime(4f);
+                }
+
+                //when StopStimulusRun is called with 6, the frequency is set to 9.6 and the stimulus contrast/texture is changed
+                StopStimulusRun(6, l); 
+                yield return new WaitForSecondsRealtime(1f);
+                mainCam.transform.Rotate(_rotateBack); 
+                _offMessages = false;
+                        
+                if(l == 6)
+                {
+                    mainCam.transform.Rotate(_rotateAway);
+                    _offMessages = true;
+                    yield return new WaitForSecondsRealtime(8f);
+                    StartCoroutine(DisplayTextOnScreen("End"));
+                    yield return new WaitForSecondsRealtime(2f);
+                    _offMessages = false;
+
+                    _restingState = true;
+                    _open = true;
+
+                    //1 minute eyes open Resting State 
+                    yield return new WaitForSecondsRealtime(60f); //60
+                    _open = false;
+                    _closed = true;
+
+                    //1 minutes eye closed Resting State 
+                    yield return new WaitForSecondsRealtime(60f); //60
+                    _restingState = false;
+                    _closed = false;
+
+                    StartCoroutine(DisplayTextOnScreen("EndOfSession"));
                     StopCoroutineReference(ref _runStimulus);
-                    StopCoroutineReference(ref _sendMarkers);
+                }
+            }
+                StopCoroutineReference(ref _runStimulus);
+                StopCoroutineReference(ref _sendMarkers);
         }
 
 
@@ -346,7 +325,7 @@ namespace BCIEssentials.ControllerBehaviors
 //////Helper Methods
         public IEnumerator DisplayTextOnScreen(string textOption)
         {
-            if(textOption == "fromThree")
+            if(textOption == "3")
             {
                 _displayText.text = "3";
                 yield return new WaitForSecondsRealtime(1.0f);
@@ -356,9 +335,9 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                 _displayText.text = "";
             }
-            else if(textOption == "fromFive")
+            else if(textOption == "5")
             {
-                _displayText.text = "Stimulus presentation in...";
+                _displayText.text = "Starting in...";
                 yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "3 seconds";
                 yield return new WaitForSecondsRealtime(1.0f);
@@ -368,18 +347,18 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                _displayText.text = "";
             }
-            else if(textOption == "end")
+            else if(textOption == "End")
             {
                 _displayText. text = "End of stimuli";
                 yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "";
             }
-            else if(textOption == "endOfSession")
+            else if(textOption == "EndOfSession")
             {
                 _displayText. text = "End";
                 yield return new WaitForSecondsRealtime(2.0f);
             }
-            else if(textOption == "survey")
+            else if(textOption == "Survey")
             {
                 _displayText.text = "Survey";
                 yield return new WaitForSecondsRealtime(5.0f);
@@ -390,17 +369,15 @@ namespace BCIEssentials.ControllerBehaviors
         {
             ColorFlashEffect2 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect2>();
             if (orderDict.TryGetValue(key, out string material))
-            {
-                _colorChoice = ColorFlashEffect2.FlashOnColor.Grey;
-                    
+            {       
                 if (material == "MinContrast")
                 {
-                    spoEffect.SetContrast(ColorFlashEffect2.ContrastLevel.Min,  _colorChoice);
+                    spoEffect.SetContrast(ColorFlashEffect2.ContrastLevel.Min);
                     stimulusString = ", MinContrast";
                 }
                 else if (material == "MaxContrast")
                 {
-                    spoEffect.SetContrast(ColorFlashEffect2.ContrastLevel.Max,  _colorChoice);
+                    spoEffect.SetContrast(ColorFlashEffect2.ContrastLevel.Max);
                     stimulusString = ", MaxContrast";
                 }
                 else if (material == "Worms")
