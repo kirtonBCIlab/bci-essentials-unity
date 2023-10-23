@@ -5,6 +5,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
+        "com.unity.shadergraph": "12.1.8",
         "com.labstreaminglayer.lsl4unity": "1.16.0"
       }
     },
