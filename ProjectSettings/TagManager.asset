@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - BCI
+  - TextTag
   layers:
   - Default
   - TransparentFX

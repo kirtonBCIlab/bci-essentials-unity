@@ -5,6 +5,7 @@ namespace BCIEssentials.Controllers
         Unset,
         P300,
         MI,
-        SSVEP
+        SSVEP,
+        TVEP
     }
 }

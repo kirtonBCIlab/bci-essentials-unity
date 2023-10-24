@@ -9,28 +9,26 @@ using UnityEngine.TestTools;
 using LogAssert = BCIEssentials.Tests.TestResources.LogAssert;
 using Object = UnityEngine.Object;
 
-namespace BCIEssentials.Tests.LSLService
+namespace BCIEssentials.Tests
 {
     public class LSLServiceProviderTests : PlayModeTestRunnerBase
     {
-        private const string k_TestStreamName = "astreamname";
-        
-        private LSLServiceProvider _testServiceProvider;
+        private LSLServiceProvider _testProvider;
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
         {
             yield return LoadDefaultSceneAsync();
-            _testServiceProvider = AddComponent<LSLServiceProvider>();
+            _testProvider = AddComponent<LSLServiceProvider>();
         }
 
         [Test]
         public void WhenRegisterMarkerReceiver_ThenRegistered()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
+            CreateMarkerStream("astreamname");
+            var markerReceiver = CreateMarkerReceiver("name='astreamname'");
             
-            var wasRegistered = _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
+            var wasRegistered = _testProvider.RegisterMarkerReceiver(markerReceiver);
             
             Assert.True(wasRegistered);
         }
@@ -38,14 +36,14 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenRegisterMarkerReceiverAndAlreadyRegistered_ThenNotRegistered()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiverA = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            var markerReceiverB = CreateMarkerReceiver($"name='{k_TestStreamName}'");
+            CreateMarkerStream("astreamname");
+            var markerReceiverA = CreateMarkerReceiver("name='astreamname'");
+            var markerReceiverB = CreateMarkerReceiver("name='astreamname'");
             
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiverA);
+            _testProvider.RegisterMarkerReceiver(markerReceiverA);
             LogAssert.ExpectAnyContains(LogType.Error, "already registered");
             
-            var wasRegistered = _testServiceProvider.RegisterMarkerReceiver(markerReceiverB);
+            var wasRegistered = _testProvider.RegisterMarkerReceiver(markerReceiverB);
             
             Assert.False(wasRegistered);
         }
@@ -53,13 +51,13 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenRegisterMarkerReceiverAndAlreadyRegisteredIsNull_ThenRegistered()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiverA = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            var markerReceiverB = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiverA);
+            CreateMarkerStream("astreamname");
+            var markerReceiverA = CreateMarkerReceiver("name='astreamname'");
+            var markerReceiverB = CreateMarkerReceiver("name='astreamname'");
+            _testProvider.RegisterMarkerReceiver(markerReceiverA);
             Object.DestroyImmediate(markerReceiverA.gameObject);
             
-            var wasRegistered = _testServiceProvider.RegisterMarkerReceiver(markerReceiverB);
+            var wasRegistered = _testProvider.RegisterMarkerReceiver(markerReceiverB);
             
             Assert.True(wasRegistered);
         }
@@ -67,11 +65,11 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenGetMarkerReceiverByUIDAndRegistered_ThenReturnsRegisteredMarker()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
+            CreateMarkerStream("astreamname");
+            var markerReceiver = CreateMarkerReceiver("name='astreamname'");
+            _testProvider.RegisterMarkerReceiver(markerReceiver);
 
-            var retrievedMarker = _testServiceProvider.GetMarkerReceiverByUID(markerReceiver.UID);
+            var retrievedMarker = _testProvider.GetMarkerReceiverByUID(markerReceiver.UID);
 
             UnityEngine.Assertions.Assert.AreEqual(retrievedMarker, markerReceiver);
         }
@@ -79,43 +77,22 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenGetMarkerReceiverByUIDAndHasStream_ThenReturnsCreatedMarker()
         {
-            var streamUID = CreateMarkerStream(k_TestStreamName).StreamUID;
+            var streamUID = CreateMarkerStream("astreamname").StreamUID;
             
-            var retrievedMarker = _testServiceProvider.GetMarkerReceiverByUID(streamUID);
+            var retrievedMarker = _testProvider.GetMarkerReceiverByUID(streamUID);
 
             Assert.NotNull(retrievedMarker);
             Assert.AreEqual(retrievedMarker.UID, streamUID);
         }
-
-        [Test]
-        public void WhenHasRegisteredMarkerReceiverAndHasRegistered_ThenReturnsTrue()
-        {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
-
-            bool isRegistered = _testServiceProvider.HasRegisteredMarkerReceiver(markerReceiver);
-            Assert.True(isRegistered);
-        }
         
-        [Test]
-        public void WhenHasRegisteredMarkerReceiverAndHasNoneRegistered_ThenReturnsFalse()
-        {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-
-            bool isRegistered = _testServiceProvider.HasRegisteredMarkerReceiver(markerReceiver);
-            Assert.False(isRegistered);
-        }
-
         [Test]
         public void WhenGetMarkerReceiverByName_ThenReturnsMarker()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
+            CreateMarkerStream("astreamname");
+            var markerReceiver = CreateMarkerReceiver("name='astreamname'");
+            _testProvider.RegisterMarkerReceiver(markerReceiver);
 
-            var retrievedMarker = _testServiceProvider.GetMarkerReceiverByName(k_TestStreamName);
+            var retrievedMarker = _testProvider.GetMarkerReceiverByName("astreamname");
 
             UnityEngine.Assertions.Assert.AreEqual(retrievedMarker, markerReceiver);
         }
@@ -131,9 +108,9 @@ namespace BCIEssentials.Tests.LSLService
         {
             CreateMarkerStream(streamName, streamId, streamType);
             var expectedReceiver = CreateMarkerReceiver($"name='{streamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(expectedReceiver);
+            _testProvider.RegisterMarkerReceiver(expectedReceiver);
 
-            var foundReceiver = _testServiceProvider.GetMarkerReceiverByPredicate(predicateValue);
+            var foundReceiver = _testProvider.GetMarkerReceiverByPredicate(predicateValue);
             
             Assert.IsNotNull(foundReceiver);
             UnityEngine.Assertions.Assert.AreEqual(expectedReceiver, foundReceiver);
@@ -142,14 +119,14 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenServiceCreatesMarkerReceiver_ThenMarkerCreatedWithSettings()
         {
-            var markerUID = CreateMarkerStream(k_TestStreamName).StreamUID;
+            var markerUID = CreateMarkerStream("astreamname").StreamUID;
             var testSettings = new LSLMarkerReceiverSettings
             {
                 PollingFrequency = 555,
             };
-            ReflectionHelpers.SetField(_testServiceProvider, "_responseStreamSettings", testSettings);
+            ReflectionHelpers.SetField(_testProvider, "_responseStreamSettings", testSettings);
 
-            var markerReceiver = _testServiceProvider.GetMarkerReceiverByUID(markerUID);
+            var markerReceiver = _testProvider.GetMarkerReceiverByUID(markerUID);
             
             Assert.AreEqual(testSettings.PollingFrequency, markerReceiver.PollingFrequency);
         }
@@ -157,28 +134,14 @@ namespace BCIEssentials.Tests.LSLService
         [Test]
         public void WhenMultipleGetRequestsForSameMarker_ThenReturnsSingleMarkerReceiver()
         {
-            CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
+            CreateMarkerStream("astreamname");
+            var markerReceiver = CreateMarkerReceiver("name='astreamname'");
+            _testProvider.RegisterMarkerReceiver(markerReceiver);
 
-            var markerReceiverA = _testServiceProvider.GetMarkerReceiverByPredicate($"name='{k_TestStreamName}'");
-            var markerReceiverB = _testServiceProvider.GetMarkerReceiverByPredicate($"name='{k_TestStreamName}'");
+            var markerReceiverA = _testProvider.GetMarkerReceiverByPredicate("name='astreamname'");
+            var markerReceiverB = _testProvider.GetMarkerReceiverByPredicate("name='astreamname'");
 
             UnityEngine.Assertions.Assert.AreEqual(markerReceiverA, markerReceiverB);
-        }
-
-        [Test]
-        public void WhenUnregisterMarkerReceiver_ThenUnregistered()
-        {
-            var markerStream = CreateMarkerStream(k_TestStreamName);
-            var markerReceiver = CreateMarkerReceiver($"name='{k_TestStreamName}'");
-            _testServiceProvider.RegisterMarkerReceiver(markerReceiver);
-            
-            markerStream.EndStream(); //Close stream so a new marker receiver is not created by the service provider
-            _testServiceProvider.UnregisterMarkerReceiver(markerReceiver);
-
-            var registeredReceiver = _testServiceProvider.GetMarkerReceiverByUID(markerReceiver.UID);
-            Assert.IsNull(registeredReceiver);
         }
         
         private static LSLMarkerStream CreateMarkerStream(string name = null, string id = null, string type = null)

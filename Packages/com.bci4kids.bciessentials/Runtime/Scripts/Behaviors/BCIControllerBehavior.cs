@@ -245,7 +245,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
         
-        protected IEnumerator RunStimulus()
+        protected virtual IEnumerator RunStimulus()
         {
             while (StimulusRunning)
             {
