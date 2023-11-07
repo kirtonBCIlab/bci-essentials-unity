@@ -129,6 +129,7 @@ namespace BCIEssentials.Tests
         [TestCase(typeof(P300ControllerBehavior))]
         [TestCase(typeof(MIControllerBehavior))]
         [TestCase(typeof(SSVEPControllerBehavior))]
+        [TestCase(typeof(TVEPControllerBehavior))]
         public void WhenRegisterBehavior_ThenBehaviorRegistered(Type behaviorType)
         {
             _testController.Initialize();
