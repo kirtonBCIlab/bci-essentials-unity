@@ -72,25 +72,32 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenOnTrainTarget_ThenLocalScaleIncreased()
+        public void WhenOnTrainTarget_ThenEventInvoked()
         {
-            _testSpo.transform.localScale = new Vector3(5, 5, 5);
-            var expectedScale = Vector3.one * 5 * 1.4f; //1.4 is a magic number used by the SPO
+            var eventCalled = false;
+            _testSpo.StartTrainingStimulusEvent.AddListener(()=>
+            {
+                eventCalled = true;
+            });
 
             _testSpo.OnTrainTarget();
 
-            Assert.AreEqual(expectedScale, _testSpo.transform.localScale);
+            Assert.IsTrue(eventCalled);
         }
 
         [Test]
-        public void WhenOnTrainTarget_ThenLocalScaleDecreased()
+        public void WhenOffTrainTarget_ThenEventInvoked()
         {
-            _testSpo.transform.localScale = new Vector3(5, 5, 5);
-            var expectedScale = Vector3.one * 5 / 1.4f; //1.4 is a magic number used by the SPO
+            var eventCalled = false;
+            _testSpo.StopTrainingStimulusEvent.AddListener(()=>
+            {
+                eventCalled = true;
+            });
 
             _testSpo.OffTrainTarget();
 
-            Assert.AreEqual(expectedScale, _testSpo.transform.localScale);
+            Assert.IsTrue(eventCalled);
         }
+
     }
 }

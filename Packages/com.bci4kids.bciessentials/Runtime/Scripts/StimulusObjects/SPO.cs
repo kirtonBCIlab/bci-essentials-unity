@@ -21,6 +21,11 @@ namespace BCIEssentials.StimulusObjects
         [Tooltip("Invoked when the SPO Controller selects this SPO")]
         public UnityEvent OnSelectedEvent = new();
 
+        [Tooltip("Invoked when the SPO Controller requests training to start")]
+        public UnityEvent StartTrainingStimulusEvent = new();
+
+        [Tooltip("Invoked when the SPO Controller requests training to stop.")]
+        public UnityEvent StopTrainingStimulusEvent = new();
 
         /// <summary>
         /// Determines if this object is available to be selected
@@ -66,19 +71,49 @@ namespace BCIEssentials.StimulusObjects
         // What to do when targeted for training selection
         public virtual void OnTrainTarget()
         {
+            try
+            {
+                //TODO - If it evaluates as null, try to invoke the default StartStimulus option.
+                StartTrainingStimulusEvent?.Invoke();
+            }
+            catch(UnassignedReferenceException e)
+            {
+                Debug.Log(e.Message);
+            }
+
+        }
+
+        // What to do when untargeted
+        public virtual void OffTrainTarget()
+        {
+            try
+            {
+                //TODO - If evaluates as null, try to invoke the default StopStimulus option
+                StopTrainingStimulusEvent?.Invoke();
+            }
+            catch(UnassignedReferenceException e)
+            {
+                Debug.Log(e.Message);
+            }
+
+        }
+
+        public virtual void DefaultScaleEffectOn()
+        {
             float scaleValue = 1.4f;
             Vector3 objectScale = transform.localScale;
             transform.localScale = new Vector3(objectScale.x * scaleValue, objectScale.y * scaleValue,
                 objectScale.z * scaleValue);
         }
 
-        // What to do when untargeted
-        public virtual void OffTrainTarget()
+        public virtual void DefaultScaleEffectOff()
         {
             float scaleValue = 1.4f;
             Vector3 objectScale = transform.localScale;
             transform.localScale = new Vector3(objectScale.x / scaleValue, objectScale.y / scaleValue,
-                objectScale.z / scaleValue);
+                    objectScale.z / scaleValue);
         }
+
+
     }
 }
