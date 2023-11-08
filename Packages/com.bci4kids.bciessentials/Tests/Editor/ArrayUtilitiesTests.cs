@@ -22,12 +22,13 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
-            var result = ArrayUtilities.GenerateRNRA(3, 5, 5);
+            var result = ArrayUtilities.GenerateRNRA(3, 2, 2);
 
             foreach (var element in result)
             {
-                Assert.AreEqual(3, element);
+                Assert.AreEqual(2, element);
             }
+
         }
 
         [Test]
@@ -69,8 +70,13 @@ namespace BCIEssentials.Tests.Editor
             var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
 
             Array.Sort(result);
+            
             for (int i = 0; i < entries.Length; i++)
             {
+                var output = result[i];
+                var expout = entries[i];
+                TestContext.WriteLine($"My Array: {output}");
+                TestContext.WriteLine($"Expected Array: {expout}");
                 Assert.AreEqual(entries[i], result[i]);
             }
         }
@@ -105,6 +111,7 @@ namespace BCIEssentials.Tests.Editor
             //Count entries
             foreach (var entry in result)
             {
+                TestContext.WriteLine($"The entry is: {entry}");
                 ++entryTable[entry];
             }
 
