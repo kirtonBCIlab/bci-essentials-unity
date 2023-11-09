@@ -60,7 +60,7 @@ namespace BCIEssentials.Utilities
 
             (int, int) DrawValue()
             {
-                var randomIndex = random.Next(0, availableOptions.Count - 1);
+                var randomIndex = random.Next(0, availableOptions.Count-1);
                 return (randomIndex, availableOptions[randomIndex]);
             }
             
@@ -70,14 +70,29 @@ namespace BCIEssentials.Utilities
 
                 var option = minRangeValue;
                 availableOptions.Add(option);
-                while (option < maxRangeValue-1)
+                while (option < maxRangeValue)
                 {
-                    ++option;
+                    // ++option;
+                    option = option+1;
                     availableOptions.Add(option);
                 }
             }
             
             return randomizedOptions;
+        }
+
+        /// <summary>
+        /// Generates an array with the given length populated randomly
+        /// with values including and between of the range values.
+        /// </summary>
+        /// <param name="arrayLength">Number of values to include in the range.</param>
+        /// <param name="maxRangeValue">The largest value possible to include.</param>
+        /// <param name="minRangeValue">The lowest value possible to include.</param>
+        /// <returns>An int array</returns>
+        /// <exception cref="ArgumentException">Throws if max value is less than min value</exception>
+        public static int[] GenerateRNRA_FisherYates(int arrayLength, int minRangeValue, int maxRangeValue)
+        {
+
         }
     }
 }

@@ -70,7 +70,7 @@ namespace BCIEssentials.Tests.Editor
             var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
 
             Array.Sort(result);
-            
+            Assert.AreEqual(entries.Length,result.Length);
             for (int i = 0; i < entries.Length; i++)
             {
                 var output = result[i];
@@ -79,6 +79,8 @@ namespace BCIEssentials.Tests.Editor
                 TestContext.WriteLine($"Expected Array: {expout}");
                 Assert.AreEqual(entries[i], result[i]);
             }
+
+
         }
 
         [Test]
