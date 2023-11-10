@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using PlasticPipe.PlasticProtocol.Messages;
 
 namespace BCIEssentials.Utilities
 {
@@ -83,7 +85,8 @@ namespace BCIEssentials.Utilities
 
         /// <summary>
         /// Generates an array with the given length populated randomly
-        /// with values including and between of the range values.
+        /// with values including and between of the range values usting
+        /// the FisherYates shuffle algorithm.
         /// </summary>
         /// <param name="arrayLength">Number of values to include in the range.</param>
         /// <param name="maxRangeValue">The largest value possible to include.</param>
@@ -92,8 +95,19 @@ namespace BCIEssentials.Utilities
         /// <exception cref="ArgumentException">Throws if max value is less than min value</exception>
         public static int[] GenerateRNRA_FisherYates(int arrayLength, int minRangeValue, int maxRangeValue)
         {
+
+            if (maxRangeValue < minRangeValue)
+            {
+                throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
+            }
+            
+            if (arrayLength <= 0)
+            {
+                return Array.Empty<int>();
+            }
+            
             //Generate new Random value
-            Random r = new Random();
+            Random random = new Random();
 
             //prealocate the final options
             var myOptions = new List<int>();
@@ -101,50 +115,44 @@ namespace BCIEssentials.Utilities
             //Find the difference value between max and min range. 
             var diffVal = maxRangeValue-minRangeValue+1;
 
-            //Set the other two values
-            int disVal = 0;
-            int modVal = 0;
+            //Get the divison to tell us how many loops we need to do with the full array length.
+            int disVal = arrayLength / diffVal;
+            //Get the modulo to tell us how long our second array out to be which will be added to the end of the full set of loops.
+            int modVal = arrayLength % diffVal;
 
-            //Figure out how many repeats of "shuffles are needed" are needed, in repeated chunks based on array length and min/max rang value.
-            if(arrayLength > (maxRangeValue - minRangeValue)+1)
-            {
-                //Get the divison to tell us how many loops we need to do with the full array length.
-                disVal = arrayLength / diffVal;
-                //Get the modulo to tell us how long our second array out to be which will be added to the end of the full set of loops.
-                modVal = arrayLength % diffVal;
-            }
-            else
-            {
-                disVal = 1;
-                modVal = 0;
-            }
-
-            //build out our array main array
             for(int i=0; i < disVal; i++)
             {
-                int[] temp = Shuffle(diffVal,minRangeValue,maxRangeValue);
-                myOptions.Add(temp);
+                var temp = ShuffleYates(diffVal,minRangeValue,maxRangeValue,random);
+                myOptions.AddRange(temp);
             }
 
             //bould out the remainder array
-            int[] tempArray = Shuffle(diffVal,minRangeValue,maxRangeValue);
+            int[] tempArray = ShuffleYates(diffVal,minRangeValue,maxRangeValue,random);
             for(int i=0; i < modVal; i++)
             {
                 myOptions.Add(tempArray[i]);
             }
-
+    
             return myOptions.ToArray();
-
         }
 
-        public int[] Shuffle(int length, int minValue, int maxValue)
+        /// <summary>
+        /// The actual Fisher-Yates Shuffle algorithm, with an input for ther Random parameter.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="minValue"></param>
+        /// <param name="maxValue"></param>
+        /// <param name="random"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static int[] ShuffleYates(int length, int minValue, int maxValue, Random random)
         {
-            if (maxRangeValue < minRangeValue)
+            if (maxValue < minValue)
             {
                 throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
             }
             
-            if (arrayLength <= 0)
+            if (length <= 0)
             {
                 return Array.Empty<int>();
             }
@@ -158,7 +166,6 @@ namespace BCIEssentials.Utilities
 
             var range = Enumerable.Range(minValue, maxValue - minValue + 1).ToArray();
             var shuffledArray = new int[length];
-            var random = new Random();
 
             for (int i = 0; i < length; i++)
             {
