@@ -72,7 +72,7 @@ namespace BCIEssentials.Utilities
 
                 var option = minRangeValue;
                 availableOptions.Add(option);
-                while (option < maxRangeValue)
+                while (option < maxRangeValue-1)
                 {
                     // ++option;
                     option = option+1;
