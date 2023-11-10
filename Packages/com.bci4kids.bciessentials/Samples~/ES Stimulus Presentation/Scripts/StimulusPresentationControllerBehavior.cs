@@ -182,7 +182,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
             
-
         protected override IEnumerator RunStimulus()
         {
             //setup variables for camera rotation 
@@ -193,14 +192,17 @@ namespace BCIEssentials.ControllerBehaviors
             _rotateBack.y = -90f;
             
             mainCam.transform.Rotate(_rotateAway);
+             StartCoroutine(DisplayTextOnScreen("+"));
             _restingState = true;
             _open = true;
             //1 minute eyes open Resting State 
-            yield return new WaitForSecondsRealtime(6f); //60
+            yield return new WaitForSecondsRealtime(60f); //60
             _open = false;
             _closed = true;
+        
+            StartCoroutine(DisplayTextOnScreen("Close"));
             //1 minute eyes closed Resting State 
-            yield return new WaitForSecondsRealtime(6f); //60
+            yield return new WaitForSecondsRealtime(60f); //60
             _restingState = false;
             _closed = false;
             mainCam.transform.Rotate(_rotateBack);
@@ -301,11 +303,14 @@ namespace BCIEssentials.ControllerBehaviors
 
                     _restingState = true;
                     _open = true;
+                    StartCoroutine(DisplayTextOnScreen("+"));
 
                     //1 minute eyes open Resting State 
                     yield return new WaitForSecondsRealtime(60f); //60
                     _open = false;
                     _closed = true;
+
+                    StartCoroutine(DisplayTextOnScreen("Close"));
 
                     //1 minutes eye closed Resting State 
                     yield return new WaitForSecondsRealtime(60f); //60
@@ -349,7 +354,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             else if(textOption == "End")
             {
-                _displayText. text = "End of stimuli";
+                _displayText. text = "Look at the plus sign";
                 yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "";
             }
@@ -362,6 +367,18 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 _displayText.text = "Survey";
                 yield return new WaitForSecondsRealtime(5.0f);
+                _displayText.text = "";
+            }
+              else if(textOption == "+")
+            {
+                _displayText.text = "+";
+                yield return new WaitForSecondsRealtime(60.0f);
+                _displayText.text = "";
+            }
+            else if(textOption == "Close")
+            {
+                _displayText.text = "Close your eyes";
+                yield return new WaitForSecondsRealtime(60.0f);
                 _displayText.text = "";
             }
         } 
