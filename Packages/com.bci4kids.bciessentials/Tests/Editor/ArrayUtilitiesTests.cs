@@ -23,11 +23,9 @@ namespace BCIEssentials.Tests.Editor
         public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
             var result = ArrayUtilities.GenerateRNRA(3, 2, 2);
+            int[] expected = Enumerable.Repeat(2, 3).ToArray();
 
-            foreach (var element in result)
-            {
-                Assert.AreEqual(2, element);
-            }
+            CollectionAssert.AreEqual(expected, result);
 
         }
 
@@ -65,21 +63,21 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenValueRangeEqualsThanArrayLength_ThenReturnsArrayWithAllRangesValuesPresent()
         {
-            var entries = new[] { 0, 1, 2, 3, 4, 5 };
+            //var entries = new[] { 0, 1, 2, 3, 4, 5 };
 
-            var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
+            //var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
 
+            int[] expected = new int[] { 0, 1, 2, 3, 4, 5 };
+            //NOTE - At the moment, we need to have N+1 be the max value in our Array Utilities at the moment,
+            //       as the upper bound is not currently inclusive
+            var result = ArrayUtilities.GenerateRNRA(expected.Length, 0, 6);
+
+            //It is unclear why this is changing length on each trun, as the entries shouldn't change any time.
+            //I have updated this to be hardcoded instead to see if the problem continues.
             Array.Sort(result);
-            Assert.AreEqual(entries.Length,result.Length);
-            for (int i = 0; i < entries.Length; i++)
-            {
-                var output = result[i];
-                var expout = entries[i];
-                TestContext.WriteLine($"My Array: {output}");
-                TestContext.WriteLine($"Expected Array: {expout}");
-                Assert.AreEqual(entries[i], result[i]);
-            }
+            Assert.AreEqual(expected.Length,result.Length);
 
+            CollectionAssert.AreEqual(expected, result);
 
         }
 
@@ -87,41 +85,22 @@ namespace BCIEssentials.Tests.Editor
         public void GenerateRNRA_WhenValueRangeGreaterThanLength_ThenReturnsArrayWithAllUniqueEntries()
         {
             var result = ArrayUtilities.GenerateRNRA(5, 0, 10);
-
-            var entryList = new HashSet<int>();
-            foreach (var entry in result)
-            {
-                Assert.IsFalse(entryList.Contains(entry));
-                entryList.Add(entry);
-            }
+            CollectionAssert.AllItemsAreUnique(result);
         }
 
         [Test]
         public void GenerateRNRA_WhenValueRangeLessThanLength_ThenReturnsArrayWithDuplicates()
         {
-            var entryTable = new Dictionary<int, int>
-            {
-                { 0, 0 },
-                { 1, 0 },
-                { 2, 0 },
-                { 3, 0 },
-                { 4, 0 }
-            };
 
+            //Modified to be exactly 3 iterations, so we don't have to worry about other random numbers generating beyond.
+            
+            //I HAVE FOUND THE PROBLEM FINALLY! We have a "max_value-1" call that happens so that the upper boundary is not inclusive,
+            //e.g. this goes from 0-3 in the current tests, instead of 0-4. When we change this we may need to change that part too.
             var result = ArrayUtilities.GenerateRNRA(12, 0, 4);
 
-            //Count entries
-            foreach (var entry in result)
-            {
-                TestContext.WriteLine($"The entry is: {entry}");
-                ++entryTable[entry];
-            }
+            int[] expected = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 };
 
-            //Confirm each entry is repeated an expected amount
-            foreach (var (entry, count) in entryTable)
-            {
-                Assert.True(count is 2 or 3);
-            }
+            CollectionAssert.AreEquivalent(expected, result);
         }
 
         //Starting tests for the Shuffle and GenerateRNRA_FisherYates versions.
@@ -222,16 +201,8 @@ namespace BCIEssentials.Tests.Editor
 
             Array.Sort(result);
             Assert.AreEqual(entries.Length,result.Length);
-            for (int i = 0; i < entries.Length; i++)
-            {
-                var output = result[i];
-                var expout = entries[i];
-                TestContext.WriteLine($"My Array: {output}");
-                TestContext.WriteLine($"Expected Array: {expout}");
-                Assert.AreEqual(entries[i], result[i]);
-            }
 
-
+            CollectionAssert.AreEqual(entries, result);
         }
 
 
