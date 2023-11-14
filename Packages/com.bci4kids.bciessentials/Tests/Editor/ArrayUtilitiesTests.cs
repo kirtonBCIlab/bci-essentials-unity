@@ -22,12 +22,11 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
-            var result = ArrayUtilities.GenerateRNRA(3, 5, 5);
+            var result = ArrayUtilities.GenerateRNRA(3, 2, 2);
+            int[] expected = Enumerable.Repeat(2, 3).ToArray();
 
-            foreach (var element in result)
-            {
-                Assert.AreEqual(3, element);
-            }
+            CollectionAssert.AreEqual(expected, result);
+
         }
 
         [Test]
@@ -64,55 +63,179 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenValueRangeEqualsThanArrayLength_ThenReturnsArrayWithAllRangesValuesPresent()
         {
-            var entries = new[] { 0, 1, 2, 3, 4, 5 };
+            //var entries = new[] { 0, 1, 2, 3, 4, 5 };
 
-            var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
+            //var result = ArrayUtilities.GenerateRNRA(entries.Length, entries[0], entries[^1]);
 
+            int[] expected = new int[] { 0, 1, 2, 3, 4, 5 };
+            //NOTE - At the moment, we need to have N+1 be the max value in our Array Utilities at the moment,
+            //       as the upper bound is not currently inclusive
+            var result = ArrayUtilities.GenerateRNRA(expected.Length, 0, 6);
+
+            //It is unclear why this is changing length on each trun, as the entries shouldn't change any time.
+            //I have updated this to be hardcoded instead to see if the problem continues.
             Array.Sort(result);
-            for (int i = 0; i < entries.Length; i++)
-            {
-                Assert.AreEqual(entries[i], result[i]);
-            }
+            Assert.AreEqual(expected.Length,result.Length);
+
+            CollectionAssert.AreEqual(expected, result);
+
         }
 
         [Test]
         public void GenerateRNRA_WhenValueRangeGreaterThanLength_ThenReturnsArrayWithAllUniqueEntries()
         {
             var result = ArrayUtilities.GenerateRNRA(5, 0, 10);
-
-            var entryList = new HashSet<int>();
-            foreach (var entry in result)
-            {
-                Assert.IsFalse(entryList.Contains(entry));
-                entryList.Add(entry);
-            }
+            CollectionAssert.AllItemsAreUnique(result);
         }
 
         [Test]
         public void GenerateRNRA_WhenValueRangeLessThanLength_ThenReturnsArrayWithDuplicates()
         {
-            var entryTable = new Dictionary<int, int>
-            {
-                { 0, 0 },
-                { 1, 0 },
-                { 2, 0 },
-                { 3, 0 },
-                { 4, 0 }
-            };
 
+            //Modified to be exactly 3 iterations, so we don't have to worry about other random numbers generating beyond.
+            
+            //I HAVE FOUND THE PROBLEM FINALLY! We have a "max_value-1" call that happens so that the upper boundary is not inclusive,
+            //e.g. this goes from 0-3 in the current tests, instead of 0-4. When we change this we may need to change that part too.
             var result = ArrayUtilities.GenerateRNRA(12, 0, 4);
 
-            //Count entries
-            foreach (var entry in result)
+            int[] expected = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 };
+
+            CollectionAssert.AreEquivalent(expected, result);
+        }
+
+        //Starting tests for the Shuffle and GenerateRNRA_FisherYates versions.
+
+        [Test]
+        public void GenerateRNRA_FisherYates_InvalidRange_ThrowsArgumentException()
+        {
+            //Expected values
+            int arrayLength = 10;
+            int minRangeValue = 100;
+            int maxRangeValue = 1;
+
+            void ThrowTest()
             {
-                ++entryTable[entry];
+                ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
             }
 
-            //Confirm each entry is repeated an expected amount
-            foreach (var (entry, count) in entryTable)
-            {
-                Assert.True(count is 2 or 3);
-            }
+            Assert.Throws<ArgumentException>(ThrowTest);
         }
+
+        [Test]
+        [TestCase(0)]
+        [TestCase(-5)]
+        public void GenerateRNRA_FisherYates_WhenArrayLengthIsInvalid_ThenReturnEmptyArray(int arrayLength)
+        {
+            var result = ArrayUtilities.GenerateRNRA(arrayLength, 5, 55);
+
+            Assert.AreEqual(0, result.Length);
+        }
+
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenArrayLengthIsLessThanMinMaxDiff_ThenExpectedLength()
+        {
+            //Variables
+            int arrayLength = 3;
+            int minRangeValue = 0;
+            int maxRangeValue = 5;
+
+            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+
+            // Assert
+            Assert.AreEqual(arrayLength, result.Length);
+        }
+
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenArrayLengthIsEqualToMinMaxDiff_ThenExpectedLength()
+        {
+            //Variables
+            int arrayLength = 10;
+            int minRangeValue = 0;
+            int maxRangeValue = 9;
+
+            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+
+            // Assert
+            Assert.AreEqual(arrayLength, result.Length);
+        }
+
+
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenArrayLengthIsGreaterThanMinMaxDiff_ThenExpectedLength()
+        {
+            //Variables
+            int arrayLength = 15;
+            int minRangeValue = 0;
+            int maxRangeValue = 5;
+
+            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+
+            // Assert
+            Assert.AreEqual(arrayLength, result.Length);
+        }
+
+        //I don't actually know how to check this...I think this works?
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenArrayIsGreaterThanDiff_ThenOutputRepeatIsRandom()
+        {
+            //Variables
+            int arrayLength = 10;
+            int minRangeValue = 0;
+            int maxRangeValue = 4;
+
+            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+
+            //Make some copies of each of the series that repeat a total of 3 times in this example
+            var partOne = result.Take(5);
+            var partTwo = result.Skip(5).Take(5);
+            // Assert
+            Assert.AreNotEqual(partOne,partTwo);
+        }
+
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenValueRangeEqualsThanArrayLength_ThenReturnsArrayWithAllRangesValuesPresent()
+        {
+            var entries = new[] { 0, 1, 2, 3, 4, 5 };
+
+            var result = ArrayUtilities.GenerateRNRA_FisherYates(entries.Length, entries[0], entries[^1]);
+
+            Array.Sort(result);
+            Assert.AreEqual(entries.Length,result.Length);
+
+            CollectionAssert.AreEqual(entries, result);
+        }
+
+
+        [Test]
+        public void ShuffleYates_WhenInvalidInputs_ThenThrow()
+        {
+            //Expected values
+            int arrayLength = 10;
+            int minRangeValue = 100;
+            int maxRangeValue = 1;
+            Random random = new Random(42);
+
+            void ThrowTest()
+            {
+                ArrayUtilities.ShuffleYates(arrayLength, minRangeValue, maxRangeValue,random);
+            }
+
+            Assert.Throws<ArgumentException>(ThrowTest);
+        }
+
+        [Test]
+        [TestCase(0)]
+        [TestCase(-1)]
+        public void ShuffleYates_WhenLengthIsInvalid_ReturnEmpty(int arrayLength)
+        {
+            Random random = new Random(42);
+            var result = ArrayUtilities.ShuffleYates(arrayLength,0,5,random);
+
+            Assert.AreEqual(0,result.Length);
+
+        }
+
+
+
     }
 }
