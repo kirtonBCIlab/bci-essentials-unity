@@ -19,6 +19,7 @@ namespace BCIEssentials.Controllers
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
+        [SerializeField] public bool _readyToStart = false;
 
         private void Awake()
         {
@@ -74,6 +75,11 @@ namespace BCIEssentials.Controllers
                     action?.Invoke();
                 }
             }
+        }
+
+        public void AcceptKeyBoardInput()
+        {
+            _readyToStart = true;
         }
 
         private void RegisterKeyBindings()
