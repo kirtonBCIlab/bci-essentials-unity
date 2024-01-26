@@ -19,7 +19,7 @@ namespace BCIEssentials.Controllers
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
-        [SerializeField] public bool _readyToStart = false;
+        public bool _hotkeysEnabled {get; private set;}
 
         private void Awake()
         {
@@ -77,9 +77,14 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public void AcceptKeyBoardInput()
+        public void EnableHotKeys()
         {
-            _readyToStart = true;
+            _hotkeysEnabled = true;
+        }
+
+        public void DisableHotKeys()
+        {
+            _hotkeysEnabled = false;
         }
 
         private void RegisterKeyBindings()
