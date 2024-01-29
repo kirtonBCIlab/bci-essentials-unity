@@ -17,7 +17,7 @@ namespace BCIEssentials.Controllers
         public static BCIController Instance { get; private set; }
         public BCIControllerBehavior ActiveBehavior { get; private set; }
 
-        private Dictionary<KeyCode, UnityAction> _keyBindings = new();
+        public Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
        //public bool _hotkeysEnabled {get; private set;}
 

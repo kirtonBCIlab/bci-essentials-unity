@@ -292,5 +292,30 @@ namespace BCIEssentials.Tests
             Assert.IsNull(BCIController.Instance.ActiveBehavior);
             Assert.IsFalse(BCIController.HasBehaviorForType(BCIBehaviorType.P300));
         }
+
+        [Test]
+        public void WhenHotKeysEnabled_ThenKeyBindingsRegistered()
+        {
+            _testController.Initialize();
+            var enable = true;
+            BCIController.EnableDisableHotkeys(enable);
+            Assert.IsTrue(_testController._keyBindings.Count != 0);
+        }
+
+        [Test]
+        public void WhenHotKeysDisabled_ThenKeyBindingsCleared()
+        {
+            _testController.Initialize();
+            var enable = false;
+            BCIController.EnableDisableHotkeys(enable);
+            Assert.IsTrue(_testController._keyBindings.Count == 0);
+        }
+
+
+
+         //   if (enable == false)
+        // {
+          //      Assert.IsFalse(_testController._keyBindings.length != 0);
+            //}
+        }
     }
-}
