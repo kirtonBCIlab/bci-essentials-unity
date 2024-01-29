@@ -174,6 +174,13 @@ namespace BCIEssentials.Tests
             Assert.AreEqual(5, Object.FindObjectsOfType<SPO>().Length);
         }
 
+        [Test]
+        public void WhenInitialized_HotKeysEnabled()
+        {
+            _testController.Initialize();
+            Assert.IsTrue(_behavior._hotkeysEnabled);
+        }
+
         [UnityTest]
         public IEnumerator WhenCleanUp_ThenMatrixDestroyed()
         {
