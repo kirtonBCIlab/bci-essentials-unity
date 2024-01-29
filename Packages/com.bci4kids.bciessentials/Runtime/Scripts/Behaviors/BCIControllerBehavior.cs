@@ -37,6 +37,10 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
 
+        [SerializeField]
+        [Tooltip("Enable BCIController Hotkeys")]
+        public bool _hotkeysEnabled = true;
+
 
         #region Refactorable Properties
 
@@ -166,10 +170,12 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Register this behavior with the active <see cref="BCIController.Instance"/>.
         /// <param name="setAsActive">If true will attempt to set itself as active behavior.</param>
+
         /// </summary>
         public void RegisterWithControllerInstance(bool setAsActive = false)
         {
             BCIController.RegisterBehavior(this, setAsActive);
+            BCIController.EnableDisableHotkeys(_hotkeysEnabled);
         }
 
         /// <summary>

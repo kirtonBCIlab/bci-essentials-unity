@@ -19,7 +19,7 @@ namespace BCIEssentials.Controllers
 
         private Dictionary<KeyCode, UnityAction> _keyBindings = new();
         private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
-        public bool _hotkeysEnabled {get; private set;}
+       //public bool _hotkeysEnabled {get; private set;}
 
         private void Awake()
         {
@@ -49,7 +49,6 @@ namespace BCIEssentials.Controllers
             }
 
             Instance = this;
-            RegisterKeyBindings();
 
             if (_dontDestroyActiveInstance)
             {
@@ -77,16 +76,6 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public void EnableHotKeys()
-        {
-            _hotkeysEnabled = true;
-        }
-
-        public void DisableHotKeys()
-        {
-            _hotkeysEnabled = false;
-        }
-
         private void RegisterKeyBindings()
         {
             _keyBindings.TryAdd(KeyCode.S, StartStopStimulus);
@@ -109,6 +98,24 @@ namespace BCIEssentials.Controllers
             _keyBindings.TryAdd(KeyCode.Alpha9, () => { SelectSPOAtEndOfRun(9); });
         }
 
+        public static void EnableDisableHotkeys(bool _registerKeyBindings)
+        {
+             if (Instance == null)
+            {
+                Debug.Log("No BCI Controller instance set.");
+                return;
+            }
+
+            if(_registerKeyBindings == true)
+            {
+                Instance.RegisterKeyBindings();
+            }
+            else
+            {
+                Instance._keyBindings.Clear();
+            }
+        }
+        
         public static void ChangeBehavior(BCIBehaviorType behaviorType)
         {
             if (Instance.ActiveBehavior != null)
