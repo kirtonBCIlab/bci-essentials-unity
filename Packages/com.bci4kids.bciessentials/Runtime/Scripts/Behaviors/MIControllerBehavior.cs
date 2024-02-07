@@ -1,6 +1,7 @@
 using System.Collections;
 using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
+using BCIEssentials.StimulusObjects;
 using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
@@ -12,7 +13,6 @@ namespace BCIEssentials.ControllerBehaviors
         // Variables related to Iterative training
         public int numSelectionsBeforeTraining = 3; // How many selections to make before creating the classifier
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier
-
 
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
@@ -112,6 +112,52 @@ namespace BCIEssentials.ControllerBehaviors
 
             yield return 0;
 
+        }
+
+        public override IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        {
+            print("Starting single training");
+            // For a single, specified SPO, run a single training trial
+            if (targetObject != null)
+            {
+                // Turn on train target
+                targetObject.GetComponent<SPO>().OnTrainTarget();
+                print($"Running single training on option {targetObject.name}");
+
+                // Get the index of the target object
+                int targetIndex = targetObject.GetComponent<SPO>().SelectablePoolIndex;
+                print($"Running single training on option {targetIndex}");
+
+                // For each window in the trial
+                for (int j = 0; j < (windowCount); j++)
+                {
+                    // Send the marker for the window
+                    marker.Write($"mi, 99, {targetIndex}, {windowLength}");
+
+                    yield return new WaitForSecondsRealtime(windowLength);
+
+                    if (shamFeedback)
+                    {
+                        targetObject.GetComponent<SPO>().Select();
+                    }
+                }
+
+                // Turn off train target
+                targetObject.GetComponent<SPO>().OffTrainTarget();
+            }
+            else
+            {
+                Debug.LogError("No target object specified for single training");
+            }
+
+            marker.Write("Trial Ends");
+
+            yield return null;
+        }
+
+        public override void UpdateClassifier()
+        {
+            marker.Write("Training Complete");
         }
 
         protected override IEnumerator SendMarkers(int trainingIndex = 99)

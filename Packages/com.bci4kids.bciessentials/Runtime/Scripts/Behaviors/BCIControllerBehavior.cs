@@ -617,6 +617,18 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        public virtual IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        {
+            Debug.Log("No single training available for this controller");
+
+            yield return null;
+        }
+
+        public virtual void UpdateClassifier()
+        {
+            Debug.Log("No classifier update available for this controller");
+        }
+
         #endregion
 
         #region Helper Methods

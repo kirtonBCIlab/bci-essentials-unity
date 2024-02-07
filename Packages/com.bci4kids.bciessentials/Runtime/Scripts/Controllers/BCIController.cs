@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Collections;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.ControllerBehaviors;
+using BCIEssentials.StimulusObjects;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -316,6 +318,22 @@ namespace BCIEssentials.Controllers
             if (Instance.ActiveBehavior != null)
             {
                 Instance.ActiveBehavior.StopTraining();
+            }
+        }
+
+        public static void WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        {
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.StartCoroutine(Instance.ActiveBehavior.WhileDoSingleTraining(targetObject, windowLength, windowCount));
+            }
+        }
+
+        public static void UpdateClassifier()
+        {
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.UpdateClassifier();
             }
         }
 
