@@ -15,8 +15,8 @@ namespace BCIEssentials.ControllerBehaviors
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier
 
         // Variables related to Single training
-        public float windowLength = 4.0f; // Length of the window in seconds
-        public int windowCount = 4; // Number of windows in the trial
+        public float windowLengthSingleTrial = 4.0f; // Length of the window in seconds
+        public int windowCountSingleTrial = 4; // Number of windows in the trial
 
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
@@ -144,12 +144,12 @@ namespace BCIEssentials.ControllerBehaviors
                 print($"Running single training on option {targetIndex}");
 
                 // For each window in the trial
-                for (int j = 0; j < (windowCount); j++)
+                for (int j = 0; j < (windowCountSingleTrial); j++)
                 {
                     // Send the marker for the window
-                    marker.Write($"mi, 99, {targetIndex}, {windowLength}");
+                    marker.Write($"mi, 99, {targetIndex}, {windowLengthSingleTrial}");
 
-                    yield return new WaitForSecondsRealtime(windowLength);
+                    yield return new WaitForSecondsRealtime(windowLengthSingleTrial);
 
                     if (shamFeedback)
                     {

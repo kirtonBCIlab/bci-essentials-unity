@@ -337,6 +337,14 @@ namespace BCIEssentials.Controllers
             }
         }
 
+        public static void PassBessyPythonMessage(string message)
+        {
+            if (Instance.ActiveBehavior != null)
+            {
+                Instance.ActiveBehavior.PassBessyPythonMessage(message);
+            }
+        }
+
         #endregion
     }
 }

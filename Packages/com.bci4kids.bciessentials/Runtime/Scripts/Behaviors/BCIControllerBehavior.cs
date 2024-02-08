@@ -665,6 +665,11 @@ namespace BCIEssentials.ControllerBehaviors
             reference = null;
         }
 
+        protected void PassBessyPythonMessage(string message)
+        {
+            marker.Write(message);
+        }
+
         #endregion
     }
 }
