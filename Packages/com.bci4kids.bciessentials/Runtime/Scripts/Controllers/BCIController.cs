@@ -321,11 +321,11 @@ namespace BCIEssentials.Controllers
             }
         }
 
-        public static void WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        public static void WhileDoSingleTraining()
         {
             if (Instance.ActiveBehavior != null)
             {
-                Instance.StartCoroutine(Instance.ActiveBehavior.WhileDoSingleTraining(targetObject, windowLength, windowCount));
+                Instance.StartCoroutine(Instance.ActiveBehavior.WhileDoSingleTraining());
             }
         }
 

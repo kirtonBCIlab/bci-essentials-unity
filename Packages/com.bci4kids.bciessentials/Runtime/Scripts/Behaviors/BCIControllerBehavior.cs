@@ -504,6 +504,10 @@ namespace BCIEssentials.ControllerBehaviors
                 case BCITrainingType.User:
                     trainingBehavior = WhileDoUserTraining();
                     break;
+                case BCITrainingType.Single:
+                    ReceiveMarkers();
+                    trainingBehavior = WhileDoSingleTraining();
+                    break;
                 default:
                 case BCITrainingType.None:
                     StopTraining();
@@ -619,7 +623,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         //TODO: Figure out why protected here isn't working, but is for other training types
-        public virtual IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        public virtual IEnumerator WhileDoSingleTraining()
         {
             //TODO: Implement a way to handle default null targetObject
             Debug.Log("No single training available for this controller");

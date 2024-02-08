@@ -461,6 +461,7 @@ namespace BCIEssentials.Tests
         [TestCase(BCITrainingType.Automated)]
         [TestCase(BCITrainingType.User)]
         [TestCase(BCITrainingType.Iterative)]
+        [TestCase(BCITrainingType.SingleTrial)]
         public void WhenStartTraining_ThenTrainingRun(BCITrainingType trainingType)
         {
             _behavior.StartTraining(trainingType);

@@ -14,6 +14,10 @@ namespace BCIEssentials.ControllerBehaviors
         public int numSelectionsBeforeTraining = 3; // How many selections to make before creating the classifier
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier
 
+        // Variables related to Single training
+        public float windowLength = 4.0f; // Length of the window in seconds
+        public int windowCount = 4; // Number of windows in the trial
+
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
 
@@ -116,8 +120,17 @@ namespace BCIEssentials.ControllerBehaviors
 
         // Why is this public when the other training overrides are protected?
         //TODO: Figure out why protected here isn't working, but is for other training types
-        public override IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
+        public override IEnumerator WhileDoSingleTraining()
         {
+            // For the time being, only allow single training on a single object
+            if (_selectableSPOs.Count > 1)
+            {
+                Debug.LogError("Single training only allowed on a single object");
+                yield break;
+            }
+
+            targetObject = _selectableSPOs[0];
+
             print("Starting single training");
             // For a single, specified SPO, run a single training trial
             if (targetObject != null)
