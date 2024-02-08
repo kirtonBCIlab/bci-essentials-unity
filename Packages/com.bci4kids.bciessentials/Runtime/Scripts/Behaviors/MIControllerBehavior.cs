@@ -129,7 +129,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield break;
             }
 
-            targetObject = _selectableSPOs[0];
+            SPO targetObject = _selectableSPOs[0];
 
             print("Starting single training");
             // For a single, specified SPO, run a single training trial
