@@ -1,6 +1,7 @@
 using System.Collections;
 using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
+using BCIEssentials.StimulusObjects;
 using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
@@ -13,6 +14,9 @@ namespace BCIEssentials.ControllerBehaviors
         public int numSelectionsBeforeTraining = 3; // How many selections to make before creating the classifier
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier
 
+        // Variables related to Single training
+        public float windowLengthSingleTrial = 4.0f; // Length of the window in seconds
+        public int windowCountSingleTrial = 4; // Number of windows in the trial
 
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
@@ -112,6 +116,63 @@ namespace BCIEssentials.ControllerBehaviors
 
             yield return 0;
 
+        }
+
+        // Why is this public when the other training overrides are protected?
+        //TODO: Figure out why protected here isn't working, but is for other training types
+        public override IEnumerator WhileDoSingleTraining()
+        {
+            // For the time being, only allow single training on a single object
+            if (_selectableSPOs.Count > 1)
+            {
+                Debug.LogError("Single training only allowed on a single object");
+                yield break;
+            }
+
+            SPO targetObject = _selectableSPOs[0];
+
+            print("Starting single training");
+            // For a single, specified SPO, run a single training trial
+            if (targetObject != null)
+            {
+                // Turn on train target - 
+                targetObject.OnTrainTarget();
+                print($"Running single training on option {targetObject.name}");
+
+                // Get the index of the target object
+                int targetIndex = targetObject.SelectablePoolIndex;
+                print($"Running single training on option {targetIndex}");
+
+                // For each window in the trial
+                for (int j = 0; j < (windowCountSingleTrial); j++)
+                {
+                    // Send the marker for the window
+                    marker.Write($"mi, 99, {targetIndex}, {windowLengthSingleTrial}");
+
+                    yield return new WaitForSecondsRealtime(windowLengthSingleTrial);
+
+                    if (shamFeedback)
+                    {
+                        targetObject.Select();
+                    }
+                }
+
+                // Turn off train target
+                targetObject.OffTrainTarget();
+            }
+            else
+            {
+                Debug.LogError("No target object specified for single training");
+            }
+
+            marker.Write("Trial Ends");
+
+            yield return null;
+        }
+
+        public override void UpdateClassifier()
+        {
+            marker.Write("Training Complete");
         }
 
         protected override IEnumerator SendMarkers(int trainingIndex = 99)

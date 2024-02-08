@@ -72,6 +72,11 @@ namespace BCIEssentials.Controllers
                 StartTraining(BCITrainingType.User);
             }
 
+            if (Input.GetKeyDown(KeyCode.Semicolon))
+            {
+                StartTraining(BCITrainingType.Single);
+            }
+
 
             // Check for a selection if stim is on
             if (StimulusRunning)

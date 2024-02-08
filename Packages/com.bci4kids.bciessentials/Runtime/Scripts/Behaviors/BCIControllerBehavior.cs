@@ -504,6 +504,10 @@ namespace BCIEssentials.ControllerBehaviors
                 case BCITrainingType.User:
                     trainingBehavior = WhileDoUserTraining();
                     break;
+                case BCITrainingType.Single:
+                    ReceiveMarkers();
+                    trainingBehavior = WhileDoSingleTraining();
+                    break;
                 default:
                 case BCITrainingType.None:
                     StopTraining();
@@ -610,11 +614,26 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        //TODO: Figure out why protected IS working, but isn't for other training types
         protected virtual IEnumerator WhileDoIterativeTraining()
         {
             Debug.Log("No iterative training available for this controller");
 
             yield return null;
+        }
+
+        //TODO: Figure out why protected here isn't working, but is for other training types
+        public virtual IEnumerator WhileDoSingleTraining()
+        {
+            //TODO: Implement a way to handle default null targetObject
+            Debug.Log("No single training available for this controller");
+
+            yield return null;
+        }
+
+        public virtual void UpdateClassifier()
+        {
+            Debug.Log("No classifier update available for this controller");
         }
 
         #endregion
@@ -644,6 +663,11 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             reference = null;
+        }
+
+        protected void PassBessyPythonMessage(string message)
+        {
+            marker.Write(message);
         }
 
         #endregion

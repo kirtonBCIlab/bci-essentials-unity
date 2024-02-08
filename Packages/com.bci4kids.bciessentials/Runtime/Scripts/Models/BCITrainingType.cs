@@ -5,6 +5,7 @@ namespace BCIEssentials.Controllers
         None,
         Automated,
         User,
-        Iterative
+        Iterative,
+        Single
     }
 }

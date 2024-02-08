@@ -24,5 +24,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void StartAutomatedTraining();
 
         public void StartIterativeTraining();
+
+        public void StartSingleTraining();
     }
 }
