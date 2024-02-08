@@ -610,6 +610,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        //TODO: Figure out why protected IS working, but isn't for other training types
         protected virtual IEnumerator WhileDoIterativeTraining()
         {
             Debug.Log("No iterative training available for this controller");
@@ -617,8 +618,10 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        //TODO: Figure out why protected here isn't working, but is for other training types
         public virtual IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
         {
+            //TODO: Implement a way to handle default null targetObject
             Debug.Log("No single training available for this controller");
 
             yield return null;

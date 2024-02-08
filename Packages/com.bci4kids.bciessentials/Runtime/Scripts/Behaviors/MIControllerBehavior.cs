@@ -114,18 +114,20 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
+        // Why is this public when the other training overrides are protected?
+        //TODO: Figure out why protected here isn't working, but is for other training types
         public override IEnumerator WhileDoSingleTraining(SPO targetObject = null, float windowLength = 4.0f, int windowCount = 1)
         {
             print("Starting single training");
             // For a single, specified SPO, run a single training trial
             if (targetObject != null)
             {
-                // Turn on train target
-                targetObject.GetComponent<SPO>().OnTrainTarget();
+                // Turn on train target - 
+                targetObject.OnTrainTarget();
                 print($"Running single training on option {targetObject.name}");
 
                 // Get the index of the target object
-                int targetIndex = targetObject.GetComponent<SPO>().SelectablePoolIndex;
+                int targetIndex = targetObject.SelectablePoolIndex;
                 print($"Running single training on option {targetIndex}");
 
                 // For each window in the trial
@@ -138,12 +140,12 @@ namespace BCIEssentials.ControllerBehaviors
 
                     if (shamFeedback)
                     {
-                        targetObject.GetComponent<SPO>().Select();
+                        targetObject.Select();
                     }
                 }
 
                 // Turn off train target
-                targetObject.GetComponent<SPO>().OffTrainTarget();
+                targetObject.OffTrainTarget();
             }
             else
             {
