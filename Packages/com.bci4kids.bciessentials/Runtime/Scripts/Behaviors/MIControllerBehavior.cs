@@ -145,7 +145,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    marker.Write($"mi, 99, {targetID}, {windowLength}");
+                    marker.Write($"mi, 1, {targetID}, {windowLength}");
 
                     yield return new WaitForSecondsRealtime(windowLength);
 
