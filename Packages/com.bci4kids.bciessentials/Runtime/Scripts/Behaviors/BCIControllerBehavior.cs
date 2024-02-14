@@ -37,6 +37,8 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
 
+        private int __uniqueID = 1;
+
         [SerializeField]
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
@@ -309,6 +311,14 @@ namespace BCIEssentials.ControllerBehaviors
                         if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
                         {
                             continue;
+                        }
+
+                        // Check if the object has a unique ObjectID, 
+                        // if not assign it a unique ID
+                        if (taggedGO.GetComponent<SPO>().ObjectID == 0)
+                        {
+                            taggedGO.GetComponent<SPO>().ObjectID = __uniqueID;
+                            __uniqueID++;
                         }
 
                         _selectableSPOs.Add(spo);
