@@ -402,6 +402,20 @@ namespace BCIEssentials.Tests
             Assert.AreEqual(_spos[spoIndex], _behavior.LastSelectedSPO);
         }
 
+        //Setup test to check if the SPO Object ID is correctly unique for objects when PopulateObject method is used
+        [UnityTest]
+        public IEnumerator WhenPopulateObjectList_PopulateUniqueSPOIDs()
+        {
+            //Assert that the SPOs have same ID before Populating Object LIst
+            Assert.AreEqual(_spos[0].ObjectID, _spos[1].ObjectID);
+
+            _behavior.PopulateObjectList();
+            yield return null;
+            //Assert now that the SPO IDs are unique
+            Assert.AreNotEqual(_spos[0].ObjectID, _spos[1].ObjectID);
+
+        }
+
         [UnityTest]
         public IEnumerator WhenSelectSPOAndStopStimulusRun_ThenSPOSelectedAndStimulusRunEnded()
         {
