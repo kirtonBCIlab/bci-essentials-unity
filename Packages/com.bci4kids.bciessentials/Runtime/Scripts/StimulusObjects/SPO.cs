@@ -40,6 +40,12 @@ namespace BCIEssentials.StimulusObjects
         public int SelectablePoolIndex;
 
         /// <summary>
+        /// Assigned in editor or by the PopulateObjectIDList method, this 
+        /// is a unique identifier for this SPO.
+        /// </summary>
+        public int ObjectID = 0;
+
+        /// <summary>
         /// Request this SPO stimulus to begin.
         /// </summary>
         /// <returns>The time at the beginning of this frame using <see cref="Time.time"/></returns>

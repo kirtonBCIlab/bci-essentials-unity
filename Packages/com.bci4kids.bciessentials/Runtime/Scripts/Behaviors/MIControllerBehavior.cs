@@ -14,10 +14,6 @@ namespace BCIEssentials.ControllerBehaviors
         public int numSelectionsBeforeTraining = 3; // How many selections to make before creating the classifier
         public int numSelectionsBetweenTraining = 3; // How many selections to make before updating the classifier
 
-        // Variables related to Single training
-        public float windowLengthSingleTrial = 4.0f; // Length of the window in seconds
-        public int windowCountSingleTrial = 4; // Number of windows in the trial
-
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
 
@@ -122,6 +118,8 @@ namespace BCIEssentials.ControllerBehaviors
         //TODO: Figure out why protected here isn't working, but is for other training types
         public override IEnumerator WhileDoSingleTraining()
         {
+            PopulateObjectList();
+
             // For the time being, only allow single training on a single object
             if (_selectableSPOs.Count > 1)
             {
@@ -140,16 +138,16 @@ namespace BCIEssentials.ControllerBehaviors
                 print($"Running single training on option {targetObject.name}");
 
                 // Get the index of the target object
-                int targetIndex = targetObject.SelectablePoolIndex;
-                print($"Running single training on option {targetIndex}");
+                int targetID = targetObject.ObjectID;
+                print($"Running single training on option {targetID}");
 
                 // For each window in the trial
-                for (int j = 0; j < (windowCountSingleTrial); j++)
+                for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    marker.Write($"mi, 99, {targetIndex}, {windowLengthSingleTrial}");
+                    marker.Write($"mi, 1, {targetID}, {windowLength}");
 
-                    yield return new WaitForSecondsRealtime(windowLengthSingleTrial);
+                    yield return new WaitForSecondsRealtime(windowLength);
 
                     if (shamFeedback)
                     {
