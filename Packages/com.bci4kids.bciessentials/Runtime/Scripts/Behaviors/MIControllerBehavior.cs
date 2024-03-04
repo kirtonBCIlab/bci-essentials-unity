@@ -168,6 +168,54 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        /// <summary>
+        /// Select an object from <see cref="SelectableSPOs"/> based on the SPO ObjectID,
+        /// not the index in the list.
+        /// </summary>
+        /// <param name="objectIndex"></param>
+        /// <param name="stopStimulusRun"></param>
+        public override void SelectSPO(int objectIndex, bool stopStimulusRun = false)
+        {
+            //If the current training type is not single, then run the base method
+            if (CurrentTrainingType != BCITrainingType.Single)
+            {
+                base.SelectSPO(objectIndex, stopStimulusRun);
+                return;
+            }
+            
+            // If the current training type is single, then make sure the SPO selection is
+            // based on the object ID
+            var objectCount = _selectableSPOs.Count;
+            if (objectCount == 0)
+            {
+                Debug.Log("No Objects to select");
+                return;
+            }
+            //Handle the case where the passed in objectID is not in the list
+            foreach (var spo in _selectableSPOs)
+            {
+                if (spo.ObjectID == objectIndex)
+                {
+                    spo.Select();
+                    LastSelectedSPO = spo;
+                    if (stopStimulusRun)
+                    {
+                        StopStimulusRun();
+                    }
+                    return;
+                }
+            }
+
+
+        }
+
+        public override void SelectSPOAtEndOfRun(int objectIndex)
+        {
+            base.SelectSPOAtEndOfRun(objectIndex);
+        }
+
+
+
         public override void UpdateClassifier()
         {
             marker.Write("Training Complete");
