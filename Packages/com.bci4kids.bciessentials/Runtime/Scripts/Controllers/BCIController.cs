@@ -87,6 +87,7 @@ namespace BCIEssentials.Controllers
             _keyBindings.TryAdd(KeyCode.I, () => { StartTraining(BCITrainingType.Iterative);});
             _keyBindings.TryAdd(KeyCode.U, () => { StartTraining(BCITrainingType.User);});
             _keyBindings.TryAdd(KeyCode.Semicolon, () => { StartTraining(BCITrainingType.Single);});
+            _keyBindings.TryAdd(KeyCode.Backspace, () => {UpdateClassifier();});
 
             //Register Object Selection
             _keyBindings.TryAdd(KeyCode.Alpha0, () => { SelectSPOAtEndOfRun(0); });
