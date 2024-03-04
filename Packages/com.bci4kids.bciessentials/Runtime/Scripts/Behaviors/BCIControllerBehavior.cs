@@ -350,7 +350,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         /// <param name="objectIndex">The index value of the object to select.</param>
         /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
-        public void SelectSPO(int objectIndex, bool stopStimulusRun = false)
+        public virtual void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
             var objectCount = _selectableSPOs.Count;
             if (objectCount == 0)
@@ -387,7 +387,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// selected during a stimulus run.
         /// </summary>
         /// <param name="objectIndex"></param>
-        public void SelectSPOAtEndOfRun(int objectIndex)
+        public virtual void SelectSPOAtEndOfRun(int objectIndex)
         {
             StopStartCoroutine(ref _waitToSelect, InvokeAfterStimulusRun(() =>
             {
@@ -435,7 +435,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        public void ReceiveMarkers()
+        public virtual void ReceiveMarkers()
         {
             if (!response.Connected)
             {
