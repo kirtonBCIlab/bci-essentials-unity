@@ -24,7 +24,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Warn about the number of objects to be selected from, if greater than 2
             if (_selectableSPOs.Count > 2)
             {
-                print("Warning: Selecting between more than 2 objects!");
+                Debug.LogWarning("Warning: Selecting between more than 2 objects!");
             }
         }
 
@@ -129,17 +129,17 @@ namespace BCIEssentials.ControllerBehaviors
 
             SPO targetObject = _selectableSPOs[0];
 
-            print("Starting single training");
+            Debug.Log("Starting single training");
             // For a single, specified SPO, run a single training trial
             if (targetObject != null)
             {
                 // Turn on train target - 
                 targetObject.OnTrainTarget();
-                print($"Running single training on option {targetObject.name}");
+                Debug.Log($"Running single training on option {targetObject.name}");
 
                 // Get the index of the target object
                 int targetID = targetObject.ObjectID;
-                print($"Running single training on option {targetID}");
+                Debug.Log($"Running single training on option {targetID}");
 
                 // For each window in the trial
                 for (int j = 0; j < (numTrainWindows); j++)
@@ -168,8 +168,141 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        /// <summary>
+        /// Select an object from <see cref="SelectableSPOs"/> based on the SPO ObjectID,
+        /// not the index in the list.
+        /// </summary>
+        /// <param name="objectIndex"></param>
+        /// <param name="stopStimulusRun"></param>
+        public override void SelectSPO(int objectID, bool stopStimulusRun = false)
+        {
+            //If the current training type is not single, then run the base method
+            if (CurrentTrainingType != BCITrainingType.Single)
+            {
+                base.SelectSPO(objectID, stopStimulusRun);
+                return;
+            }
+            
+            // If the current training type is single, then make sure the SPO selection is
+            // based on the object ID
+            var objectCount = _selectableSPOs.Count;
+            if (objectCount == 0)
+            {
+                Debug.LogWarning("No Objects to select");
+                return;
+            }
+
+            //Not sure if I want to include this or not - leaving out for now, but can be added back in
+            //If the SPO objects only have ObjectID == 0 then return
+            // if (_selectableSPOs.TrueForAll(spo => spo.ObjectID == 0) && _selectableSPOs.Count > 1)
+            // {
+            //     Debug.LogWarning("All SPOs have ObjectID == 0");
+            //     return;
+            // }
+
+            if(_selectableSPOs.TrueForAll(spo => spo.ObjectID != objectID))
+            {
+                Debug.LogWarning($"ObjectID {objectID} not found in the list of SPOs");
+                return;       
+            }
+
+            // Select the SPO(s) with the matching ObjectID. Doesn't currently break so has to check all
+            foreach (var spo in _selectableSPOs)
+            {
+                if (spo.ObjectID == objectID)
+                {
+                    spo.Select();
+                    LastSelectedSPO = spo;
+                    Debug.Log($"SPO '{spo.gameObject.name}' selected.");
+                }
+            }
+            //I'm unsure if this is needed, but I'm mimicking how the base method handles this
+            if (stopStimulusRun)
+            {
+                StopStimulusRun();
+            }
+
+        }
+
+        public override void SelectSPOAtEndOfRun(int objectIndex)
+        {
+            base.SelectSPOAtEndOfRun(objectIndex);
+        }
+
+        public override void ReceiveMarkers()
+        {
+             //If the current training type is not single, then run the base method
+            if (CurrentTrainingType != BCITrainingType.Single)
+            {
+                Debug.Log("Using base method for receive markers as single training was not done");
+                base.ReceiveMarkers();
+                return;
+            }
+
+            if (!response.Connected)
+            {
+                response.Connect();
+            }
+
+            if (response.Polling)
+            {
+                response.StopPolling();
+            }
+
+            //Ping count
+            int pingCount = 0;
+            response.StartPolling(responses =>
+            {
+                foreach (var response in responses)
+                {
+                    if (response.Equals("ping"))
+                    {
+                        pingCount++;
+                        if (pingCount % 100 == 0)
+                        {
+                            Debug.Log($"Ping Count: {pingCount}");
+                        }
+                    }
+                    else if (!response.Equals(""))
+                    {
+                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+                        //Question: Do we get more than once response string?
+
+                        //Trying to handle if the response is square brackets and other outputs from bessy python.
+                        string myResponse = response.Replace("[", "").Replace("]", "").Trim();
+                        string[] responseParts = myResponse.Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+                        int[] responseValueNumbers = new int[responseParts.Length];
+                        Debug.Log("response : {response}");
+                        for (int i = 0; i < responseParts.Length; i++)
+                        {
+                        if (int.TryParse(responseParts[i], out var objectID))
+                            {
+                                Debug.Log("Selecting SPO with ID: " + objectID);
+                                SelectSPO(objectID, false);
+                                responseValueNumbers[i] = objectID;
+                            }
+                        }
+
+                        // for (int i = 0; i < responses.Length; i++)
+                        // {
+                        //     Debug.Log($"response : {response}");
+                        //     // Deal with the weird response coming from python for the single training
+                        //     string[] myResponses = response.Replace("[", "").Replace("]", "").Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+                            
+                        //     if (int.TryParse(response, out var objectID))
+                        //     {
+                        //         Debug.Log("Selecting the SPO!");
+                        //         SelectSPO(objectID, false);
+                        //     }
+                        // }
+                    }
+                }
+            });
+        }
+
         public override void UpdateClassifier()
         {
+            Debug.Log("Updating the classifier");
             marker.Write("Training Complete");
         }
 
