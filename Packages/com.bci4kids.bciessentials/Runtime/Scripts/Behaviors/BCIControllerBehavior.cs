@@ -461,6 +461,70 @@ namespace BCIEssentials.ControllerBehaviors
                             Debug.Log($"Ping Count: {pingCount}");
                         }
                     }
+
+                    else if (response != "")
+                    {
+                        string responseString = response;
+                        //print("WE GOT A RESPONSE");
+                        print("response : " + responseString);
+
+                        // If there are square brackets then remove them
+                        responseString.Replace("[", "").Replace("]","").Replace(".", "");
+
+                        // If it is a single value then select that value
+                        int n;
+                        bool isNumeric = int.TryParse(responseString, out n);
+                        if (isNumeric && n < objectList.Count)
+                        {
+                            //Run on selection
+                            objectList[n].GetComponent<SPO>().Select();
+                        }
+
+                        else
+                        {
+                            continue;
+                        }
+
+                        // if (voteOnWindows == true)
+                        // {
+                        //     // Otherwise split 
+                        //     string[] responses = responseString.Split(" ");
+
+                        //     int[] objectVotes = new int[objectList.Count];
+
+                        //     foreach(string response in responses)
+                        //     {
+                        //         isNumeric = int.TryParse(response, out n);
+                        //         if (isNumeric == true)
+                        //         {
+                        //             //Run the vote
+                        //             objectVotes[n] = objectVotes[n] + 1;
+                        //         }
+                        //         else
+                        //         {
+                        //             break;
+                        //         }
+                        //     }
+                        //     if (isNumeric == false)
+                        //     {
+                        //         continue;
+                        //     }
+
+                        //     // make a selection based on the vote
+                        //     int voteSelection = 0;
+                        //     for (int v=1; v<objectList.Count; v++)
+                        //     {
+                        //         if (objectVotes[v] > objectVotes[voteSelection])
+                        //         {
+                        //             voteSelection = v;
+                        //         }
+                        //     }
+
+                        //     //Run on selection
+                        //     UnityEngine.Debug.Log("Voting selected object " + voteSelection.ToString());
+                        //     objectList[voteSelection].GetComponent<SPO>().Select();
+                        // }
+                    }
                     else if (!response.Equals(""))
                     {
                         //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
