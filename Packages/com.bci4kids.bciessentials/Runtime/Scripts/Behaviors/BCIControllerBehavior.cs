@@ -469,73 +469,26 @@ namespace BCIEssentials.ControllerBehaviors
                         print("response : " + responseString);
 
                         // If there are square brackets then remove them
-                        responseString.Replace("[", "").Replace("]","").Replace(".", "");
+                        responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
+
+                        Debug.Log("alterered response : " + responseString);
 
                         // If it is a single value then select that value
                         int n;
                         bool isNumeric = int.TryParse(responseString, out n);
-                        if (isNumeric && n < objectList.Count)
+                        if (isNumeric)
                         {
-                            //Run on selection
-                            objectList[n].GetComponent<SPO>().Select();
+                            //Run on selection based on index
+                            if (n < SelectableSPOs.Count)
+                            {
+                                Debug.Log("Selected object " + n.ToString() + " from response " + responseString);
+                                SelectableSPOs[n].Select();
+                            }
                         }
 
                         else
                         {
                             continue;
-                        }
-
-                        // if (voteOnWindows == true)
-                        // {
-                        //     // Otherwise split 
-                        //     string[] responses = responseString.Split(" ");
-
-                        //     int[] objectVotes = new int[objectList.Count];
-
-                        //     foreach(string response in responses)
-                        //     {
-                        //         isNumeric = int.TryParse(response, out n);
-                        //         if (isNumeric == true)
-                        //         {
-                        //             //Run the vote
-                        //             objectVotes[n] = objectVotes[n] + 1;
-                        //         }
-                        //         else
-                        //         {
-                        //             break;
-                        //         }
-                        //     }
-                        //     if (isNumeric == false)
-                        //     {
-                        //         continue;
-                        //     }
-
-                        //     // make a selection based on the vote
-                        //     int voteSelection = 0;
-                        //     for (int v=1; v<objectList.Count; v++)
-                        //     {
-                        //         if (objectVotes[v] > objectVotes[voteSelection])
-                        //         {
-                        //             voteSelection = v;
-                        //         }
-                        //     }
-
-                        //     //Run on selection
-                        //     UnityEngine.Debug.Log("Voting selected object " + voteSelection.ToString());
-                        //     objectList[voteSelection].GetComponent<SPO>().Select();
-                        // }
-                    }
-                    else if (!response.Equals(""))
-                    {
-                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                        //Question: Do we get more than once response string?
-                        for (int i = 0; i < responses.Length; i++)
-                        {
-                            Debug.Log($"response : {response}");
-                            if (int.TryParse(response, out var index) && index < SelectableSPOs.Count)
-                            {
-                                SelectableSPOs[index].Select();
-                            }
                         }
                     }
                 }

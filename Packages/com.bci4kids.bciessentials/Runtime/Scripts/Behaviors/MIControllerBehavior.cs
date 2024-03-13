@@ -28,6 +28,43 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
+        public override void StartStimulusRun(bool sendConstantMarkers = true)
+        {
+            if (StimulusRunning)
+            {
+                StopStimulusRun();
+            }
+            
+            StimulusRunning = true;
+            LastSelectedSPO = null;
+            
+            // Send the marker to start
+            marker.Write("Trial Started");
+
+            ReceiveMarkers();
+            PopulateObjectList();
+            StopStartCoroutine(ref _runStimulus, RunStimulus());
+
+
+
+
+            // Not required for P300
+            if (sendConstantMarkers)
+            {
+                Debug.Log("Train target is " + trainTarget);
+                // If trainTarget == -1, then we are trying to classify, pass -1 along
+                if (trainTarget == 99)
+                {
+                    StopStartCoroutine(ref _sendMarkers, SendMarkers(-1));
+                }
+                // Otherwise, pass the objectID of the target
+                else
+                {
+                    StopStartCoroutine(ref _sendMarkers, SendMarkers(_selectableSPOs[trainTarget].ObjectID));
+                }
+            }
+        }
+
         protected override IEnumerator WhileDoIterativeTraining()
         {
             // Generate the target list
@@ -229,16 +266,88 @@ namespace BCIEssentials.ControllerBehaviors
             base.SelectSPOAtEndOfRun(objectIndex);
         }
 
+        // public override void ReceiveMarkers()
+        // {
+        //      //If the current training type is not single, then run the base method
+        //     if (CurrentTrainingType != BCITrainingType.Single)
+        //     {
+        //         Debug.Log("Using base method for receive markers as single training was not done");
+        //         base.ReceiveMarkers();
+        //         return;
+        //     }
+
+        //     if (!response.Connected)
+        //     {
+        //         response.Connect();
+        //     }
+
+        //     if (response.Polling)
+        //     {
+        //         response.StopPolling();
+        //     }
+
+        //     //Ping count
+        //     int pingCount = 0;
+        //     response.StartPolling(responses =>
+        //     {
+        //         foreach (var response in responses)
+        //         {
+        //             if (response.Equals("ping"))
+        //             {
+        //                 pingCount++;
+        //                 if (pingCount % 100 == 0)
+        //                 {
+        //                     Debug.Log($"Ping Count: {pingCount}");
+        //                 }
+        //             }
+        //             else if (!response.Equals(""))
+        //             {
+        //                 //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
+        //                 //Question: Do we get more than once response string?
+
+        //                 //Trying to handle if the response is square brackets and other outputs from bessy python.
+        //                 string myResponse = response.Replace("[", "").Replace("]", "").Trim();
+        //                 string[] responseParts = myResponse.Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+        //                 int[] responseValueNumbers = new int[responseParts.Length];
+        //                 Debug.Log("response : {response}");
+        //                 for (int i = 0; i < responseParts.Length; i++)
+        //                 {
+        //                 if (int.TryParse(responseParts[i], out var objectID))
+        //                     {
+        //                         Debug.Log("Selecting SPO with ID: " + objectID);
+        //                         SelectSPO(objectID, false);
+        //                         responseValueNumbers[i] = objectID;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     });
+        // }
+
+        public override void UpdateClassifier()
+        {
+            Debug.Log("Updating the classifier");
+            marker.Write("Training Complete");
+        }
+
+        protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        {
+            // Make the marker string, this will change based on the paradigm
+            while (StimulusRunning)
+            {
+                // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
+                string trainingString = trainingIndex <= _selectableSPOs.Count ? trainingIndex.ToString() : "-1";
+
+                // Send the marker
+                marker.Write($"mi, {_selectableSPOs.Count}, {trainingString}, {windowLength}");
+
+                // Wait the window length + the inter-window interval
+                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+            }
+        }
+
         public override void ReceiveMarkers()
         {
-             //If the current training type is not single, then run the base method
-            if (CurrentTrainingType != BCITrainingType.Single)
-            {
-                Debug.Log("Using base method for receive markers as single training was not done");
-                base.ReceiveMarkers();
-                return;
-            }
-
             if (!response.Connected)
             {
                 response.Connect();
@@ -263,65 +372,44 @@ namespace BCIEssentials.ControllerBehaviors
                             Debug.Log($"Ping Count: {pingCount}");
                         }
                     }
-                    else if (!response.Equals(""))
-                    {
-                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                        //Question: Do we get more than once response string?
 
-                        //Trying to handle if the response is square brackets and other outputs from bessy python.
-                        string myResponse = response.Replace("[", "").Replace("]", "").Trim();
-                        string[] responseParts = myResponse.Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
-                        int[] responseValueNumbers = new int[responseParts.Length];
-                        Debug.Log("response : {response}");
-                        for (int i = 0; i < responseParts.Length; i++)
+                    else if (response != "")
+                    {
+                        string responseString = response;
+                        //print("WE GOT A RESPONSE");
+                        print("response : " + responseString);
+
+                        // If there are square brackets then remove them
+                        responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
+
+                        Debug.Log("alterered response : " + responseString);
+
+                        // If it is a single value then select that value
+                        int n;
+                        bool isNumeric = int.TryParse(responseString, out n);
+                        if (isNumeric)
                         {
-                        if (int.TryParse(responseParts[i], out var objectID))
+                            //Run on selection based on ObjectID
+
+                            //Check if n is the objectID of any of the SPOs and if so, select it
+                            foreach (var spo in _selectableSPOs)
                             {
-                                Debug.Log("Selecting SPO with ID: " + objectID);
-                                SelectSPO(objectID, false);
-                                responseValueNumbers[i] = objectID;
+                                if (spo.ObjectID == n)
+                                {
+                                    spo.Select();
+                                    LastSelectedSPO = spo;
+                                    Debug.Log("Selected object with objectID " + n.ToString() + " from response " + responseString);
+                                }
                             }
                         }
 
-                        // for (int i = 0; i < responses.Length; i++)
-                        // {
-                        //     Debug.Log($"response : {response}");
-                        //     // Deal with the weird response coming from python for the single training
-                        //     string[] myResponses = response.Replace("[", "").Replace("]", "").Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
-                            
-                        //     if (int.TryParse(response, out var objectID))
-                        //     {
-                        //         Debug.Log("Selecting the SPO!");
-                        //         SelectSPO(objectID, false);
-                        //     }
-                        // }
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
             });
-        }
-
-        public override void UpdateClassifier()
-        {
-            Debug.Log("Updating the classifier");
-            marker.Write("Training Complete");
-        }
-
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            // Make the marker string, this will change based on the paradigm
-            while (StimulusRunning)
-            {
-                // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
-                string trainingString = trainingIndex <= _selectableSPOs.Count ? trainingIndex.ToString() : "-1";
-
-                // Send the marker
-                marker.Write($"mi, {_selectableSPOs.Count}, {trainingString}, {windowLength}");
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-
-            }
         }
     }
 }
