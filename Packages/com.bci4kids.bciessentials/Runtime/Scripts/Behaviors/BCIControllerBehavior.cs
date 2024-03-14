@@ -461,17 +461,38 @@ namespace BCIEssentials.ControllerBehaviors
                             Debug.Log($"Ping Count: {pingCount}");
                         }
                     }
-                    else if (!response.Equals(""))
+
+                    // Else if response contains "received" then skip it
+                    else if (response.Contains("received"))
                     {
-                        //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-                        //Question: Do we get more than once response string?
-                        for (int i = 0; i < responses.Length; i++)
+                        continue;
+                    }
+
+                    else if (response != "")
+                    {
+                        string responseString = response;
+                        //print("WE GOT A RESPONSE");
+                        print("response : " + responseString);
+
+                        // If there are square brackets then remove them
+                        responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
+
+                        // If it is a single value then select that value
+                        int n;
+                        bool isNumeric = int.TryParse(responseString, out n);
+                        if (isNumeric)
                         {
-                            Debug.Log($"response : {response}");
-                            if (int.TryParse(response, out var index) && index < SelectableSPOs.Count)
+                            //Run on selection based on index
+                            if (n < SelectableSPOs.Count)
                             {
-                                SelectableSPOs[index].Select();
+                                Debug.Log("Selected object " + n.ToString());
+                                SelectableSPOs[n].Select();
                             }
+                        }
+
+                        else
+                        {
+                            continue;
                         }
                     }
                 }
