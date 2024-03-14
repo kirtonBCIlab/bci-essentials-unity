@@ -45,9 +45,6 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList();
             StopStartCoroutine(ref _runStimulus, RunStimulus());
 
-
-
-
             // Not required for P300
             if (sendConstantMarkers)
             {
@@ -229,14 +226,6 @@ namespace BCIEssentials.ControllerBehaviors
                 return;
             }
 
-            //Not sure if I want to include this or not - leaving out for now, but can be added back in
-            //If the SPO objects only have ObjectID == 0 then return
-            // if (_selectableSPOs.TrueForAll(spo => spo.ObjectID == 0) && _selectableSPOs.Count > 1)
-            // {
-            //     Debug.LogWarning("All SPOs have ObjectID == 0");
-            //     return;
-            // }
-
             if(_selectableSPOs.TrueForAll(spo => spo.ObjectID != objectID))
             {
                 Debug.LogWarning($"ObjectID {objectID} not found in the list of SPOs");
@@ -265,64 +254,6 @@ namespace BCIEssentials.ControllerBehaviors
         {
             base.SelectSPOAtEndOfRun(objectIndex);
         }
-
-        // public override void ReceiveMarkers()
-        // {
-        //      //If the current training type is not single, then run the base method
-        //     if (CurrentTrainingType != BCITrainingType.Single)
-        //     {
-        //         Debug.Log("Using base method for receive markers as single training was not done");
-        //         base.ReceiveMarkers();
-        //         return;
-        //     }
-
-        //     if (!response.Connected)
-        //     {
-        //         response.Connect();
-        //     }
-
-        //     if (response.Polling)
-        //     {
-        //         response.StopPolling();
-        //     }
-
-        //     //Ping count
-        //     int pingCount = 0;
-        //     response.StartPolling(responses =>
-        //     {
-        //         foreach (var response in responses)
-        //         {
-        //             if (response.Equals("ping"))
-        //             {
-        //                 pingCount++;
-        //                 if (pingCount % 100 == 0)
-        //                 {
-        //                     Debug.Log($"Ping Count: {pingCount}");
-        //                 }
-        //             }
-        //             else if (!response.Equals(""))
-        //             {
-        //                 //Question: Why do we only get here if the first value is good, but are then concerned about all other values?
-        //                 //Question: Do we get more than once response string?
-
-        //                 //Trying to handle if the response is square brackets and other outputs from bessy python.
-        //                 string myResponse = response.Replace("[", "").Replace("]", "").Trim();
-        //                 string[] responseParts = myResponse.Split(new char[] { ' ', '.' }, System.StringSplitOptions.RemoveEmptyEntries);
-        //                 int[] responseValueNumbers = new int[responseParts.Length];
-        //                 Debug.Log("response : {response}");
-        //                 for (int i = 0; i < responseParts.Length; i++)
-        //                 {
-        //                 if (int.TryParse(responseParts[i], out var objectID))
-        //                     {
-        //                         Debug.Log("Selecting SPO with ID: " + objectID);
-        //                         SelectSPO(objectID, false);
-        //                         responseValueNumbers[i] = objectID;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
 
         public override void UpdateClassifier()
         {
@@ -373,6 +304,12 @@ namespace BCIEssentials.ControllerBehaviors
                         }
                     }
 
+                    // Else if response contains "received" then skip it
+                    else if (response.Contains("received"))
+                    {
+                        continue;
+                    }
+
                     else if (response != "")
                     {
                         string responseString = response;
@@ -381,8 +318,6 @@ namespace BCIEssentials.ControllerBehaviors
 
                         // If there are square brackets then remove them
                         responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
-
-                        Debug.Log("alterered response : " + responseString);
 
                         // If it is a single value then select that value
                         int n;
@@ -398,7 +333,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 {
                                     spo.Select();
                                     LastSelectedSPO = spo;
-                                    Debug.Log("Selected object with objectID " + n.ToString() + " from response " + responseString);
+                                    Debug.Log("Selected object with objectID " + n.ToString());
                                 }
                             }
                         }

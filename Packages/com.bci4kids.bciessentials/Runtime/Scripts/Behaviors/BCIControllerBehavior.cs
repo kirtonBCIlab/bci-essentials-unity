@@ -462,6 +462,12 @@ namespace BCIEssentials.ControllerBehaviors
                         }
                     }
 
+                    // Else if response contains "received" then skip it
+                    else if (response.Contains("received"))
+                    {
+                        continue;
+                    }
+
                     else if (response != "")
                     {
                         string responseString = response;
@@ -471,8 +477,6 @@ namespace BCIEssentials.ControllerBehaviors
                         // If there are square brackets then remove them
                         responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
 
-                        Debug.Log("alterered response : " + responseString);
-
                         // If it is a single value then select that value
                         int n;
                         bool isNumeric = int.TryParse(responseString, out n);
@@ -481,7 +485,7 @@ namespace BCIEssentials.ControllerBehaviors
                             //Run on selection based on index
                             if (n < SelectableSPOs.Count)
                             {
-                                Debug.Log("Selected object " + n.ToString() + " from response " + responseString);
+                                Debug.Log("Selected object " + n.ToString());
                                 SelectableSPOs[n].Select();
                             }
                         }
