@@ -59,7 +59,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions - 1);
-            LogArrayValues(trainArray);
+            // LogArrayValues(trainArray);
 
             yield return null;
 
@@ -490,10 +490,10 @@ namespace BCIEssentials.ControllerBehaviors
                     }
 
                     // Print the white and black indices
-                    Debug.Log("blacks");
-                    LogArrayValues(blackList);
-                    Debug.Log("whites");
-                    LogArrayValues(whiteList);
+                    // Debug.Log("blacks");
+                    // LogArrayValues(blackList);
+                    // Debug.Log("whites");
+                    // LogArrayValues(whiteList);
 
                     // reshape the black and white arrays to 2D
                     int[,] blackMat = new int[bwRows, bwCols];
@@ -525,7 +525,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[c] = blackMat[br, c];
                             }
 
-                            LogArrayValues(objectsToFlash);
+                            // LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
@@ -585,7 +585,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[c] = whiteMat[wr, c];
                             }
 
-                            LogArrayValues(objectsToFlash);
+                            // LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
@@ -644,7 +644,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[r] = blackMat[r, bc];
                             }
 
-                            LogArrayValues(objectsToFlash);
+                            // LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
@@ -703,7 +703,7 @@ namespace BCIEssentials.ControllerBehaviors
                                 objectsToFlash[r] = whiteMat[r, wc];
                             }
 
-                            LogArrayValues(objectsToFlash);
+                            // LogArrayValues(objectsToFlash);
 
                             //Initialize marker string
                             string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();

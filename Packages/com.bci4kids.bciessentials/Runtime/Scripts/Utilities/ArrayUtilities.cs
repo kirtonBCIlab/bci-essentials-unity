@@ -97,14 +97,6 @@ namespace BCIEssentials.Utilities
                 array[i] += minRangeValue;
             }
 
-            // Print the array
-            string[] strings = new string[array.Length];
-            for (int i = 0; i < array.Length; i++)
-            {
-                strings[i] = array[i].ToString();
-            }
-            Debug.Log(string.Join(" ",strings));
-
             return array;
         }
 
