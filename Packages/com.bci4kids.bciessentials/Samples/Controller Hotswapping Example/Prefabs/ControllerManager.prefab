@@ -45,13 +45,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0070b41ff2de85e4ba4b273315f74265, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
   targetFrameRate: 60
-  setupRequired: 0
-  listExists: 0
-  objectList: []
+  _selectableSPOs: []
+  _hotkeysEnabled: 1
   windowLength: 2
   interWindowInterval: 0
-  stimOn: 0
+  setup: {fileID: 6644194211345973512}
+  setupRequired: 1
   numTrainingSelections: 9
   numTrainWindows: 3
   pauseBeforeTraining: 2
@@ -60,8 +62,7 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 6644194211345973512}
+  myTag: BCI
   numSelectionsBeforeTraining: 2
   numSelectionsBetweenTraining: 2
 --- !u!114 &6644194211345973512
@@ -76,7 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: cab09b3a630374445bab686a4c119dfa, type: 3}
   _numColumns: 2
   _numRows: 1
   _spacing: {x: 4, y: 0}
@@ -125,13 +126,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce01ae687a6194a48adf9dab50c3130f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
   targetFrameRate: 165
-  setupRequired: 1
-  listExists: 0
-  objectList: []
+  _selectableSPOs: []
+  _hotkeysEnabled: 1
   windowLength: 1
   interWindowInterval: 0
-  stimOn: 0
+  setup: {fileID: 5532972414438851522}
+  setupRequired: 1
   numTrainingSelections: 12
   numTrainWindows: 6
   pauseBeforeTraining: 2
@@ -140,8 +143,7 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 5532972414438851522}
+  myTag: BCI
   setFreqFlash:
   - 8
   - 10
@@ -162,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: cab09b3a630374445bab686a4c119dfa, type: 3}
   _numColumns: 3
   _numRows: 2
   _spacing: {x: 2, y: 2}
@@ -245,9 +247,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 725310e9dbbc07a40960a87df5dd5764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  responsePredicate: name='PythonResponse'
-  value: PythonResponse
-  pyRespIndex: 0
+  _targetStreamName: PythonResponse
+  _resolveTimeout: 1
+  _pollFrequency: 0
 --- !u!1 &1649985293060537292
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,13 +295,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fc542aefa44840bb3889f25d6e245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
   targetFrameRate: 60
-  setupRequired: 0
-  listExists: 0
-  objectList: []
+  _selectableSPOs: []
+  _hotkeysEnabled: 1
   windowLength: 1
   interWindowInterval: 0
-  stimOn: 0
+  setup: {fileID: 5532972415639130385}
+  setupRequired: 1
   numTrainingSelections: 5
   numTrainWindows: 0
   pauseBeforeTraining: 2
@@ -308,8 +312,7 @@ MonoBehaviour:
   trainBreak: 1
   shamFeedback: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 5532972415639130385}
+  myTag: BCI
   numFlashesLowerLimit: 9
   numFlashesUpperLimit: 12
   onTime: 0.1
@@ -319,7 +322,7 @@ MonoBehaviour:
   rowColumn: 0
   checkerboard: 0
   checkerBoardRows: 3
-  checkerBoardCols: 4
+  checkerBoardCols: 3
   timeDebug: 0
   trainBufferTime: 0
 --- !u!114 &5532972415639130385
@@ -334,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: cab09b3a630374445bab686a4c119dfa, type: 3}
   _numColumns: 3
   _numRows: 3
   _spacing: {x: 2, y: 2}
