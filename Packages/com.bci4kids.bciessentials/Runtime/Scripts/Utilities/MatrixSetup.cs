@@ -14,8 +14,8 @@ namespace BCIEssentials.Utilities
         [SerializeField] private SPO _spoPrefab;
 
         [Space]
-        [SerializeField] private int _numColumns = 1;
         [SerializeField] private int _numRows = 1;
+        [SerializeField] private int _numColumns = 1;
         [SerializeField] private Vector2 _spacing = Vector2.one;
 
         public readonly List<SPO> MatrixObjects = new();

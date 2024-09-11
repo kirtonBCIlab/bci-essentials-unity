@@ -18,16 +18,16 @@ namespace BCIEssentials.ControllerBehaviors
         public Random randNumFlashes = new Random();
         private int numFlashesPerObjectPerSelection = 3;
 
-        public float onTime = 0.2f;
-        public float offTime = 0.3f;
+        public float onTime = 0.1f;
+        public float offTime = 0.75f;
 
         public bool singleFlash = true;
         public bool multiFlash = false;
 
         public bool rowColumn = false;
         public bool checkerboard = true;
-        public int checkerBoardRows = 5;
-        public int checkerBoardCols = 6;
+        public int numFlashRows = 5;
+        public int numFlashColumns = 6;
 
         public enum multiFlashMethod
         {
@@ -268,10 +268,10 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 // For multi flash selection, create virtual rows and columns
                 int numSelections = _selectableSPOs.Count;
-                int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-                int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
+                int numColumns = numFlashColumns;
+                int numRows = numFlashRows;
 
-                int[,] rcMatrix = new int[numColumns, numRows];
+                int[,] rcMatrix = new int[numRows, numColumns];
 
                 // Assign object indices to places in the virtual row/column matrix
                 //if (rcMethod.ToString() == "Ordered")
@@ -279,9 +279,9 @@ namespace BCIEssentials.ControllerBehaviors
                 if (rowColumn)
                 {
                     int count = 0;
-                    for (int i = 0; i < numColumns; i++)
+                    for (int i = 0; i < numRows; i++)
                     {
-                        for (int j = 0; j < numRows; j++)
+                        for (int j = 0; j < numColumns; j++)
                         {
                             if (count <= numSelections)
                                 rcMatrix[i, j] = count;
@@ -404,7 +404,7 @@ namespace BCIEssentials.ControllerBehaviors
                 if (checkerboard)
                 {
                     // get the size of the black/white matrices
-                    double maxBWsize = Math.Ceiling(((float)checkerBoardRows * (float)checkerBoardCols) / 2f);
+                    double maxBWsize = Math.Ceiling(((float)numFlashRows * (float)numFlashColumns) / 2f);
 
                     // get the number of rows and columns
                     int bwCols = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
@@ -434,7 +434,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
 
                         // if there is an odd number of columns
-                        if (checkerBoardCols % 2 == 1)
+                        if (numFlashColumns % 2 == 1)
                         {
                             //evens assigned to black
                             if (shuffledArray[i] % 2 == 0)
@@ -451,10 +451,10 @@ namespace BCIEssentials.ControllerBehaviors
                         }
 
                         // if there is an even number of columns
-                        if (checkerBoardCols % 2 == 0)
+                        if (numFlashColumns % 2 == 0)
                         {
                             //assigned to black
-                            int numR = shuffledArray[i] / checkerBoardCols;
+                            int numR = shuffledArray[i] / numFlashColumns;
                             // print("to place" + shuffledArray[i].ToString());
                             // print("row number" + numR.ToString());
 
