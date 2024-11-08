@@ -58,8 +58,12 @@ namespace BCIEssentials.ControllerBehaviors
             int numOptions = _selectableSPOs.Count;
 
             // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
+            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
             LogArrayValues(trainArray);
+            // int[] weightedTrainArray = ArrayUtilities.GenerateWeightedArray(numTrainingSelections, 0, numOptions-1);
+            // LogArrayValues(weightedTrainArray);
+            // int[] fisherArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
+            // LogArrayValues(fisherArray);
 
             yield return null;
 
@@ -204,7 +208,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (singleFlash)
             {
                 int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
-                int[] stimOrder = ArrayUtilities.GenerateRNRA(totalFlashes, 0, _selectableSPOs.Count);
+                int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count-1);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
@@ -295,8 +299,8 @@ namespace BCIEssentials.ControllerBehaviors
                     int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
 
                     // Create a random order to flash rows and columns
-                    int[] columnStimOrder = ArrayUtilities.GenerateRNRA(totalColumnFlashes, 0, numColumns);
-                    int[] rowStimOrder = ArrayUtilities.GenerateRNRA(totalRowFlashes, 0, numRows);
+                    int[] columnStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalColumnFlashes, 0, numColumns-1);
+                    int[] rowStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalRowFlashes, 0, numRows-1);
 
                     for (int i = 0; i < totalColumnFlashes; i++)
                     {

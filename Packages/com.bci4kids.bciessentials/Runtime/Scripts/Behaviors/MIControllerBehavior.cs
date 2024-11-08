@@ -71,7 +71,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             // Create a random non repeating array 
             int[] trainArray = new int[numTrainingSelections];
-            trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
+            trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
             LogArrayValues(trainArray);
 
             yield return 0;
