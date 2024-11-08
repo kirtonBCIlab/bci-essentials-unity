@@ -150,6 +150,16 @@ namespace BCIEssentials.Tests.Editor
         }
 
         [Test]
+        public void GenerateRNRA_FisherYates_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
+        {
+            var result = ArrayUtilities.GenerateRNRA_FisherYates(3, 2, 2);
+            int[] expected = Enumerable.Repeat(2, 3).ToArray();
+
+            CollectionAssert.AreEqual(expected, result);
+
+        }
+
+        [Test]
         public void GenerateRNRA_FisherYates_WhenArrayLengthIsLessThanMinMaxDiff_ThenExpectedLength()
         {
             //Variables

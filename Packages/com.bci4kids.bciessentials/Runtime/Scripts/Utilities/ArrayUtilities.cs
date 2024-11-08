@@ -85,9 +85,9 @@ namespace BCIEssentials.Utilities
         }
         #endregion
 
-        #region RNRA for Flashing Targets
+        #region RNRA for Low Number of Targets and flashing
         /// <summary>
-        /// This is an array to generate randomly flashing targets during the stimulus run.
+        /// This is an array to generate randomly flashing targets during the stimulus run for low number of targets.
         /// This is NOT to be used for training targets. It will take the whole list and shuffle
         /// only guaranteeing that the values will not repeat. It won't guarantee that all values
         /// are presented first before repeating.
@@ -183,6 +183,12 @@ namespace BCIEssentials.Utilities
             if (arrayLength <= 0)
             {
                 return Array.Empty<int>();
+            }
+
+             // Handle the special case where minRangeValue and maxRangeValue are the same
+            if (minRangeValue == maxRangeValue)
+            {
+                return Enumerable.Repeat(minRangeValue, arrayLength).ToArray();
             }
             
             //Generate new Random value
