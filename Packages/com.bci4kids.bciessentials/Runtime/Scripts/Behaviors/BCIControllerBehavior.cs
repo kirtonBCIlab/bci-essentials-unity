@@ -19,7 +19,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
-
+        [Header("BCI Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
@@ -27,46 +27,64 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField]
         [Tooltip("Whether to set as active behavior when self registering.")]
         private bool _selfRegisterAsActive;
+
+        [Header("Default SPO Setup")]
+        [Tooltip("Component used to set-up default SPO objects")]
+        [SerializeField] protected MatrixSetup setup;
+        [Tooltip("Indicate whether or not to use the setup component")]
+        public bool setupRequired;
         
+        [Header("System Properties and Targets")]
         [SerializeField]
         [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         [Min(-1)]
         protected int targetFrameRate = 60;
 
         [SerializeField]
+        [Tooltip("Enable BCIController Hotkeys")]
+        public bool _hotkeysEnabled = true;
+
+        [Header("SPO Objects")]
+        [SerializeField]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
 
         private int __uniqueID = 1;
 
-        [SerializeField]
-        [Tooltip("Enable BCIController Hotkeys")]
-        public bool _hotkeysEnabled = true;
-
-
         #region Refactorable Properties
 
+        [Header("BCI Signal Properties")]
         //StimulusOn/Off + sending Markers
+        [Tooltip("The length of the processing window")]
+        //TODO: Rename this more appropriately to our Epoch/scheme
         public float windowLength = 1.0f;
+        [Tooltip("The interval between processing windows")]
         public float interWindowInterval = 0f;
 
         //Training
-        [SerializeField] protected MatrixSetup setup;
-        public bool setupRequired;
+        [Header("BCI Training Properties")]
+        [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
+        [Tooltip("The number of windows used in each training iteration")]
         public int numTrainWindows = 3;
+        [Tooltip("Before training starts, pause for this amount of time")]
         public float pauseBeforeTraining = 2;
-        public bool trainTargetPersistent = false;
+        [Tooltip("The time the target is displayed for, before the sequence begins")]
         public float trainTargetPresentationTime = 3f;
         public float trainBreak = 1f;
+        [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
+        [Tooltip("If true, the train target will remain in the 'target displayed' state")]
+        public bool trainTargetPersistent = false;
+        [Tooltip("The target object to train on, defaulted to a random high number")]
         public int trainTarget = 99;
 
+        [Header("BCI Training Tag")]
         [FormerlySerializedAs("_myTag")]
         public string myTag = "BCI";
 
         #endregion
-
+        
         /// <summary>
         /// If a stimulus run is currently taking place.
         /// </summary>

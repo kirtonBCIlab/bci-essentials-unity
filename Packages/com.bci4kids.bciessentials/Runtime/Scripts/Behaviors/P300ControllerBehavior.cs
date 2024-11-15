@@ -12,7 +12,11 @@ namespace BCIEssentials.ControllerBehaviors
     public class P300ControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.P300;
+
+        [Header("P300 Training Properties")]
+        public float trainBufferTime = 0f;
         
+        [Header("P300 Pattern Flashing Properties")]
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
         public Random randNumFlashes = new Random();
@@ -21,29 +25,42 @@ namespace BCIEssentials.ControllerBehaviors
         public float onTime = 0.2f;
         public float offTime = 0.3f;
 
+        [Header("Stimulus Flash Paradigm")]
+        [Tooltip("If true, only one SPO will flash at a time")]
         public bool singleFlash = true;
+        [Tooltip("If true, enables multiple SPOs to flash at the same time." +
+        "Needs to be true for rowColumn and checkerboard to work")]
         public bool multiFlash = false;
-
+        [Tooltip("If true, flashes objects in rows and columns. Requires Multiflash to be true")]
         public bool rowColumn = false;
+        [Tooltip("If true, flashes objects in a checkerboard pattern. Requires Multiflash to be true")]
         public bool checkerboard = true;
-        public int checkerBoardRows = 5;
+
+        [Header("Checkerboard Properties")]
+        [Tooltip("Number of columns in the checkerboard")]
         public int checkerBoardCols = 6;
+        [Tooltip("Number of rows in the checkerboard")]
+        public int checkerBoardRows = 5;
+
 
         public enum multiFlashMethod
         {
             Random
         };
 
+
+
         private float timeOfFlash = 0;
         private float timeOfWrite = 0;
         private float oldTimeOfWrite = 0;
         private float timeLag = 0;
 
+        [Header("Debugging Parameters")]
         public bool timeDebug = false;
 
         private bool blockOutGoingLSL = false;
 
-        public float trainBufferTime = 0f;
+
 
 
         protected override IEnumerator WhileDoAutomatedTraining()
@@ -57,9 +74,13 @@ namespace BCIEssentials.ControllerBehaviors
             // Get number of selectable objects by counting the objects in the objectList
             int numOptions = _selectableSPOs.Count;
 
+            // See how performant the Fisher-Yates shuffle is
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
             LogArrayValues(trainArray);
+            watch.Stop();
+            Debug.Log("Fisher-Yates shuffle took " + watch.ElapsedMilliseconds.ToString() + " milliseconds");
             // int[] weightedTrainArray = ArrayUtilities.GenerateWeightedArray(numTrainingSelections, 0, numOptions-1);
             // LogArrayValues(weightedTrainArray);
             // int[] fisherArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
