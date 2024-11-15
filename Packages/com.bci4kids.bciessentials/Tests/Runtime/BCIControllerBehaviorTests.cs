@@ -387,7 +387,9 @@ namespace BCIEssentials.Tests
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
                 _selectableSPOs = _spos
+                
             });
+            Debug.Log("Number of SPOs: " + _spos.Count);
             yield return null;
         }
 
@@ -456,6 +458,7 @@ namespace BCIEssentials.Tests
     {
         private BCIController _testController;
         private BCIControllerBehavior _behavior;
+        private List<SPO> _spos;
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
@@ -469,6 +472,21 @@ namespace BCIEssentials.Tests
             yield return null;
             
             BCIController.ChangeBehavior(_behavior.BehaviorType);
+            
+            _spos = new List<SPO>
+            {
+                AddSPOToScene(),
+                AddSPOToScene(),
+                AddSPOToScene(),
+            };
+
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = _spos
+                
+            });
+            Debug.Log("Number of SPOs: " + _spos.Count);
+            yield return null;
         }
 
         [Test]
