@@ -22,8 +22,8 @@ namespace BCIEssentials.ControllerBehaviors
         public Random randNumFlashes = new Random();
         private int numFlashesPerObjectPerSelection = 3;
 
-        public float onTime = 0.2f;
-        public float offTime = 0.3f;
+        public float onTime = 0.1f;
+        public float offTime = 0.075f;
 
         [Header("Stimulus Flash Paradigm")]
         [Tooltip("If true, only one SPO will flash at a time")]

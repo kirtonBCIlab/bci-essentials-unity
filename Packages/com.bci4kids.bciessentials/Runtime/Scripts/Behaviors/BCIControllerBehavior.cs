@@ -65,7 +65,7 @@ namespace BCIEssentials.ControllerBehaviors
         [Header("BCI Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
-        [Tooltip("The number of windows used in each training iteration")]
+        [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
         public int numTrainWindows = 3;
         [Tooltip("Before training starts, pause for this amount of time")]
         public float pauseBeforeTraining = 2;
