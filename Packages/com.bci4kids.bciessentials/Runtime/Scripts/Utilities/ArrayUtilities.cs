@@ -6,9 +6,11 @@ namespace BCIEssentials.Utilities
 {
     public static class ArrayUtilities
     {
+        #region Random Non-Repeating Array (RNRA) for Target Selection
         /// <summary>
         /// Generates an array with the given length populated randomly
         /// with values including and between of the range values.
+        /// This is intended for use in setting up the training targets.
         /// </summary>
         /// <param name="arrayLength">Number of values to include in the range.</param>
         /// <param name="maxRangeValue">The largest value possible to include.</param>
@@ -48,7 +50,7 @@ namespace BCIEssentials.Utilities
                 }
 
                 var (drawIndex, draw) = DrawValue();
-                while (draw == lastDraw && redrawCount < 10)
+                while (draw == lastDraw && redrawCount < 100)
                 {
                     ++redrawCount; //Lets not get stuck in a loop
                     (drawIndex, draw) = DrawValue();
@@ -81,10 +83,88 @@ namespace BCIEssentials.Utilities
             
             return randomizedOptions;
         }
+        #endregion
 
+        #region RNRA for Low Number of Targets and flashing
+        /// <summary>
+        /// This is an array to generate randomly flashing targets during the stimulus run for low number of targets.
+        /// This is NOT to be used for training targets. It will take the whole list and shuffle
+        /// only guaranteeing that the values will not repeat. It won't guarantee that all values
+        /// are presented first before repeating.
+        /// </summary>
+        /// 
+        /// <summary>
+        /// Generates an array with the given length populated using a MinHeap
+        /// to ensure weighted random selection and optimization.
+        /// </summary>
+        /// <param name="arrayLength">Number of values to include in the range.</param>
+        /// <param name="minRangeValue">The lowest value possible to include.</param>
+        /// <param name="maxRangeValue">The largest value possible to include.</param>
+        /// <returns>An int array</returns>
+        // public static int[] GenerateWeightedArray(int arrayLength, int minRangeValue, int maxRangeValue)
+        // {
+        //     if (maxRangeValue < minRangeValue)
+        //     {
+        //         throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
+        //     }
+            
+        //     if (arrayLength <= 0)
+        //     {
+        //         return Array.Empty<int>();
+        //     }
+
+        //     var range = new List<int>();
+        //     for (int i = minRangeValue; i <= maxRangeValue; i++) range.Add(i);
+
+        //     // Track each value's frequency
+        //     var frequency = new Dictionary<int, int>();
+        //     foreach (var value in range) frequency[value] = 0;
+
+        //     // Min-heap to prioritize least-picked values
+        //     var minHeap = new SortedSet<(int frequency, int value)>();
+        //     foreach (var value in range)
+        //         minHeap.Add((0, value));
+
+        //     var result = new int[arrayLength];
+        //     int lastPicked = -1;
+        //     var random = new Random();
+
+        //     for (int i = 0; i < arrayLength; i++)
+        //     {
+        //         // Select the least-picked values, avoiding the last picked
+        //         var selectedCandidates = new List<(int frequency, int value)>();
+
+        //         foreach (var entry in minHeap)
+        //         {
+        //             if (entry.value != lastPicked)
+        //             {
+        //                 selectedCandidates.Add(entry);
+        //             }
+        //         }
+
+        //         // Pick randomly among least-picked candidates
+        //         var choice = selectedCandidates[random.Next(selectedCandidates.Count)];
+                
+        //         // Update frequency in the dictionary and heap
+        //         minHeap.Remove(choice);
+        //         frequency[choice.value]++;
+        //         minHeap.Add((frequency[choice.value], choice.value));
+
+        //         // Add choice to result and update last picked
+        //         result[i] = choice.value;
+        //         lastPicked = choice.value;
+        //     }
+
+        //     return result;
+        // }
+
+
+        #endregion
+
+        #region FisherYates RNRA
         /// <summary>
         /// Generates an array with the given length populated randomly
-        /// with values including and between of the range values usting
+        /// with values including and between the range values using
         /// the FisherYates shuffle algorithm.
         /// </summary>
         /// <param name="arrayLength">Number of values to include in the range.</param>
@@ -104,6 +184,12 @@ namespace BCIEssentials.Utilities
             {
                 return Array.Empty<int>();
             }
+
+             // Handle the special case where minRangeValue and maxRangeValue are the same
+            if (minRangeValue == maxRangeValue)
+            {
+                return Enumerable.Repeat(minRangeValue, arrayLength).ToArray();
+            }
             
             //Generate new Random value
             Random random = new Random();
@@ -119,13 +205,32 @@ namespace BCIEssentials.Utilities
             //Get the modulo to tell us how long our second array out to be which will be added to the end of the full set of loops.
             int modVal = arrayLength % diffVal;
 
-            for(int i=0; i < disVal; i++)
+            // for(int i=0; i < disVal; i++)
+            // {
+            //     var temp = ShuffleYates(diffVal,minRangeValue,maxRangeValue,random);
+            //     myOptions.AddRange(temp);
+            // }
+            int[] previousArray = null;
+
+            for (int i = 0; i < disVal; i++)
             {
-                var temp = ShuffleYates(diffVal,minRangeValue,maxRangeValue,random);
+                var temp = ShuffleYates(diffVal, minRangeValue, maxRangeValue, random);
+
+                // Ensure no consecutive repeats between arrays
+                if (previousArray != null && previousArray[previousArray.Length - 1] == temp[0])
+                {
+                    // Swap the first element of temp with another element
+                    int swapIndex = random.Next(1, temp.Length);
+                    int tempValue = temp[0];
+                    temp[0] = temp[swapIndex];
+                    temp[swapIndex] = tempValue;
+                }
+
                 myOptions.AddRange(temp);
+                previousArray = temp;
             }
 
-            //bould out the remainder array
+            //build out the remainder array
             int[] tempArray = ShuffleYates(diffVal,minRangeValue,maxRangeValue,random);
             for(int i=0; i < modVal; i++)
             {
@@ -175,5 +280,6 @@ namespace BCIEssentials.Utilities
 
             return shuffledArray;
         }
+        #endregion
     }
 }

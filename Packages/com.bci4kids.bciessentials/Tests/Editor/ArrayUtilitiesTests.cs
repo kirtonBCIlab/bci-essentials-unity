@@ -103,7 +103,25 @@ namespace BCIEssentials.Tests.Editor
             CollectionAssert.AreEquivalent(expected, result);
         }
 
-        //Starting tests for the Shuffle and GenerateRNRA_FisherYates versions.
+        [Test]
+        public void GenerateRNRA_LastValueInArray_IsNotLastValueInShuffledArray()
+        {
+            int[] expected = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
+
+            var result = ArrayUtilities.GenerateRNRA(expected.Length, 0, 4);
+
+            Assert.AreNotEqual(4, result[^1]);
+            // int minRangeValue = 0;
+            // int maxRangeValue = 4;
+            // int arrayLength = 12;
+
+            // var result = ArrayUtilities.GenerateRNRA(arrayLength, minRangeValue, maxRangeValue);
+
+            // Assert.AreNotEqual(maxRangeValue, result[^1], "The last value in the shuffled array should not be the same as the last value in the original range.");
+        }
+
+        #region ShuffleYates Tests
+        // //Starting tests for the Shuffle and GenerateRNRA_FisherYates versions.
 
         [Test]
         public void GenerateRNRA_FisherYates_InvalidRange_ThrowsArgumentException()
@@ -129,6 +147,16 @@ namespace BCIEssentials.Tests.Editor
             var result = ArrayUtilities.GenerateRNRA(arrayLength, 5, 55);
 
             Assert.AreEqual(0, result.Length);
+        }
+
+        [Test]
+        public void GenerateRNRA_FisherYates_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
+        {
+            var result = ArrayUtilities.GenerateRNRA_FisherYates(3, 2, 2);
+            int[] expected = Enumerable.Repeat(2, 3).ToArray();
+
+            CollectionAssert.AreEqual(expected, result);
+
         }
 
         [Test]
@@ -235,7 +263,7 @@ namespace BCIEssentials.Tests.Editor
 
         }
 
-
+        #endregion
 
     }
 }

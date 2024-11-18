@@ -41,7 +41,7 @@ namespace BCIEssentials.ControllerBehaviors
             int numOptions = _selectableSPOs.Count;
 
             // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA(numTrainingSelections, 0, numOptions);
+            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
             LogArrayValues(trainArray);
 
             yield return 0;

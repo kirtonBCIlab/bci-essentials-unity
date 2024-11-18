@@ -470,7 +470,7 @@ public class Controller : MonoBehaviour
     // 
     public int[] MakeRNRA(int arrayLength, int maxRangeValue)
     {
-        return ArrayUtilities.GenerateRNRA(arrayLength, 0, maxRangeValue);
+        return ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, 0, maxRangeValue);
     }
 
     public void PrintArray(int[] array)
