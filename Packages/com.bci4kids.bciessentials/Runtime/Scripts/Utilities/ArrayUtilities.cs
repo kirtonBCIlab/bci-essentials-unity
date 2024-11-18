@@ -101,62 +101,62 @@ namespace BCIEssentials.Utilities
         /// <param name="minRangeValue">The lowest value possible to include.</param>
         /// <param name="maxRangeValue">The largest value possible to include.</param>
         /// <returns>An int array</returns>
-        public static int[] GenerateWeightedArray(int arrayLength, int minRangeValue, int maxRangeValue)
-        {
-            if (maxRangeValue < minRangeValue)
-            {
-                throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
-            }
+        // public static int[] GenerateWeightedArray(int arrayLength, int minRangeValue, int maxRangeValue)
+        // {
+        //     if (maxRangeValue < minRangeValue)
+        //     {
+        //         throw new ArgumentException("MaxRangeValue must be greater than the MinRangeValue");
+        //     }
             
-            if (arrayLength <= 0)
-            {
-                return Array.Empty<int>();
-            }
+        //     if (arrayLength <= 0)
+        //     {
+        //         return Array.Empty<int>();
+        //     }
 
-            var range = new List<int>();
-            for (int i = minRangeValue; i <= maxRangeValue; i++) range.Add(i);
+        //     var range = new List<int>();
+        //     for (int i = minRangeValue; i <= maxRangeValue; i++) range.Add(i);
 
-            // Track each value's frequency
-            var frequency = new Dictionary<int, int>();
-            foreach (var value in range) frequency[value] = 0;
+        //     // Track each value's frequency
+        //     var frequency = new Dictionary<int, int>();
+        //     foreach (var value in range) frequency[value] = 0;
 
-            // Min-heap to prioritize least-picked values
-            var minHeap = new SortedSet<(int frequency, int value)>();
-            foreach (var value in range)
-                minHeap.Add((0, value));
+        //     // Min-heap to prioritize least-picked values
+        //     var minHeap = new SortedSet<(int frequency, int value)>();
+        //     foreach (var value in range)
+        //         minHeap.Add((0, value));
 
-            var result = new int[arrayLength];
-            int lastPicked = -1;
-            var random = new Random();
+        //     var result = new int[arrayLength];
+        //     int lastPicked = -1;
+        //     var random = new Random();
 
-            for (int i = 0; i < arrayLength; i++)
-            {
-                // Select the least-picked values, avoiding the last picked
-                var selectedCandidates = new List<(int frequency, int value)>();
+        //     for (int i = 0; i < arrayLength; i++)
+        //     {
+        //         // Select the least-picked values, avoiding the last picked
+        //         var selectedCandidates = new List<(int frequency, int value)>();
 
-                foreach (var entry in minHeap)
-                {
-                    if (entry.value != lastPicked)
-                    {
-                        selectedCandidates.Add(entry);
-                    }
-                }
+        //         foreach (var entry in minHeap)
+        //         {
+        //             if (entry.value != lastPicked)
+        //             {
+        //                 selectedCandidates.Add(entry);
+        //             }
+        //         }
 
-                // Pick randomly among least-picked candidates
-                var choice = selectedCandidates[random.Next(selectedCandidates.Count)];
+        //         // Pick randomly among least-picked candidates
+        //         var choice = selectedCandidates[random.Next(selectedCandidates.Count)];
                 
-                // Update frequency in the dictionary and heap
-                minHeap.Remove(choice);
-                frequency[choice.value]++;
-                minHeap.Add((frequency[choice.value], choice.value));
+        //         // Update frequency in the dictionary and heap
+        //         minHeap.Remove(choice);
+        //         frequency[choice.value]++;
+        //         minHeap.Add((frequency[choice.value], choice.value));
 
-                // Add choice to result and update last picked
-                result[i] = choice.value;
-                lastPicked = choice.value;
-            }
+        //         // Add choice to result and update last picked
+        //         result[i] = choice.value;
+        //         lastPicked = choice.value;
+        //     }
 
-            return result;
-        }
+        //     return result;
+        // }
 
 
         #endregion
