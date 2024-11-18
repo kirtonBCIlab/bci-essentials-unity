@@ -464,6 +464,7 @@ namespace BCIEssentials.ControllerBehaviors
             Debug.Log("There are " + bwRows.ToString() + " rows and " + bwCols.ToString() +
                         " columns in the BW matrices");
 
+            //This isn't actually shuffling between each target. Need to include it in the loop.
             Random rnd = new Random();
             int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
 
