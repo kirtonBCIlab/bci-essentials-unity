@@ -1,6 +1,6 @@
 {
   "name": "com.bci4kids.bciessentials",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "displayName": "BCI Essentials",
   "description": "A Unity base environment for streamlined development of BCI applications",
   "unity": "2021.3",
@@ -10,7 +10,7 @@
   "license": "MIT",
   "author": {
     "name": "BCI Games",
-    "email": "contact@bci.games\n",
+    "email": "contact@bci.games",
     "url": "https://bci.games/"
   },
   "dependencies": {
