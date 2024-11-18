@@ -37,10 +37,10 @@ namespace BCIEssentials.ControllerBehaviors
         public bool checkerboard = true;
 
         [Header("Row/Column & Checkerboard Properties")]
-        [Tooltip("Number of columns in the multi-flash RowColumn or Checkerboard")]
-        public int numFlashColumns = 6;
         [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
         public int numFlashRows = 5;
+        [Tooltip("Number of columns in the multi-flash RowColumn or Checkerboard")]
+        public int numFlashColumns = 6;
 
 
         public enum multiFlashMethod
