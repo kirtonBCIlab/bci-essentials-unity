@@ -796,6 +796,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
+        
         private int[,] Initialize2DMultiFlash()
         {
                 // For multi flash selection, create virtual rows and columns
