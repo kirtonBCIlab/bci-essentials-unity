@@ -63,6 +63,9 @@ namespace BCIEssentials.ControllerBehaviors
 
         private int __uniqueP300ID = 1;
 
+        public SpoPopulationMethod myPopMethod = SpoPopulationMethod.GraphBP;
+
+
 
 
 
@@ -819,7 +822,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// aware" selection of SPOs.
         /// </summary>
         /// <param name="populationMethod">Method of population to use</param>
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.GraphBP)
         {
             switch (populationMethod)
             {
