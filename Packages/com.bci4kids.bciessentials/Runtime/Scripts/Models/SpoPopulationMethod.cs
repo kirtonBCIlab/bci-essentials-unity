@@ -4,6 +4,7 @@ namespace BCIEssentials.Controllers
     {
         Tag,
         Predefined,
-        Children
+        Children,
+        GraphBP
     }
 }

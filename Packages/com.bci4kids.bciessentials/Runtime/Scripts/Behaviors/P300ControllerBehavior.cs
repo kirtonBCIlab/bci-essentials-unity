@@ -6,6 +6,7 @@ using System.Linq;
 using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
 using Random = System.Random;
+using System.Collections.Generic;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -59,6 +60,8 @@ namespace BCIEssentials.ControllerBehaviors
         public bool timeDebug = false;
 
         private bool blockOutGoingLSL = false;
+
+        private int __uniqueP300ID = 1;
 
 
 
@@ -796,8 +799,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        
-        private int[,] Initialize2DMultiFlash()
+                private int[,] Initialize2DMultiFlash()
         {
                 // For multi flash selection, create virtual rows and columns
                 //There is some bug with setting this for the row column flashing, but it works for checkerboard. 
@@ -810,6 +812,106 @@ namespace BCIEssentials.ControllerBehaviors
                 int[,] rcMatrix = new int[numRows, numColumns];
                 return rcMatrix;
         }
+
+        /// <summary>
+        /// Populate the <see cref="SelectableSPOs"/> using a particular method.
+        /// This extends the typical BCI Controller Behavior to enable "context
+        /// aware" selection of SPOs.
+        /// </summary>
+        /// <param name="populationMethod">Method of population to use</param>
+        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        {
+            switch (populationMethod)
+            {
+                case SpoPopulationMethod.Predefined:
+                    //Use the current contents of object list
+                    break;
+                case SpoPopulationMethod.Children:
+                    Debug.LogWarning("Populating by children is not yet implemented");
+                    break;
+                default:
+                case SpoPopulationMethod.Tag:
+                    _selectableSPOs.Clear();
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    foreach (var taggedGO in taggedGOs)
+                    {
+                        if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
+                        {
+                            continue;
+                        }
+
+                        // Check if the object has a unique ObjectID, 
+                        // if not assign it a unique ID
+                        if (taggedGO.GetComponent<SPO>().ObjectID == 0)
+                        {
+                            taggedGO.GetComponent<SPO>().ObjectID = __uniqueP300ID;
+                            __uniqueP300ID++;
+                        }
+
+                        _selectableSPOs.Add(spo);
+                        spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
+                    }
+                    break;
+                case SpoPopulationMethod.GraphBP:
+                    _selectableSPOs.Clear();
+
+                    //First, get all game objects in the world visible by the camera
+                    GetGameSPOsInCameraView();
+                    //Then, get all the UI objects that are tagged in the scene as a BCI selectable object
+                    GetUISPOsWithTag();
+                    //Then, populate the object list with the objects that are visible by the camera
+
+                    Debug.LogWarning("Populating by graph is underconstruction");
+                    break;
+            }
+        }
+
+        public void GetGameSPOsInCameraView()
+        {
+            Camera[] cameras = Camera.allCameras;
+            var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+
+            foreach (var obj in taggedGOs)
+            {
+                if (!obj.TryGetComponent<SPO>(out var spo) || !spo.Selectable )
+                {
+                    continue;
+                }
+
+                //Reset the isVisible flag
+                bool isVisible = false;
+
+                //Check if the object is visible in any of the cameras
+                foreach (Camera cam in cameras)
+                {
+                    if(obj.GetComponent<Renderer>().IsVisibleFrom(cam))
+                    {
+                        isVisible = true;
+                        break;
+                    }
+                }
+
+                if(isVisible)
+                {
+                    // Check if the object has a unique ObjectID, 
+                    // if not assign it a unique ID
+                    if (obj.GetComponent<SPO>().ObjectID == 0)
+                    {
+                        obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
+                        __uniqueP300ID++;
+                    }
+
+                    _selectableSPOs.Add(spo);
+                    spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
+                }
+            }
+        }
+        
+        public List<GameObject> GetUISPOsWithTag()
+        {
+            return null;
+        }
+
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
