@@ -866,44 +866,29 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
+        //This is the non-multi-camera version of the function
         public void GetGameSPOsInCameraView()
         {
-            Camera[] cameras = Camera.allCameras;
+            Camera mainCamera = Camera.main;
             var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
 
             foreach (var obj in taggedGOs)
             {
-                if (!obj.TryGetComponent<SPO>(out var spo) || !spo.Selectable )
+                if (!obj.TryGetComponent<SPO>(out var spo) || !spo.Selectable || !obj.GetComponent<Renderer>().IsVisibleFrom(mainCamera))
                 {
                     continue;
                 }
-
-                //Reset the isVisible flag
-                bool isVisible = false;
-
-                //Check if the object is visible in any of the cameras
-                foreach (Camera cam in cameras)
+                // Check if the object has a unique ObjectID, 
+                // if not assign it a unique ID
+                if (obj.GetComponent<SPO>().ObjectID == 0)
                 {
-                    if(obj.GetComponent<Renderer>().IsVisibleFrom(cam))
-                    {
-                        isVisible = true;
-                        break;
-                    }
+                    obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
+                    __uniqueP300ID++;
                 }
 
-                if(isVisible)
-                {
-                    // Check if the object has a unique ObjectID, 
-                    // if not assign it a unique ID
-                    if (obj.GetComponent<SPO>().ObjectID == 0)
-                    {
-                        obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
-                        __uniqueP300ID++;
-                    }
+                _selectableSPOs.Add(spo);
+                spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
 
-                    _selectableSPOs.Add(spo);
-                    spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
-                }
             }
         }
         
