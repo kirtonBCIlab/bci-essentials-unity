@@ -870,10 +870,11 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         //This is the non-multi-camera version of the function
-        public void GetGameSPOsInCameraView()
+        public List<GameObject> GetGameSPOsInCameraView()
         {
             Camera mainCamera = Camera.main;
             var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+            List<GameObject> visibleGOs = new List<GameObject>();
 
             foreach (var obj in taggedGOs)
             {
@@ -888,11 +889,11 @@ namespace BCIEssentials.ControllerBehaviors
                     obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
                     __uniqueP300ID++;
                 }
-
+                visibleGOs.Add(obj);
                 _selectableSPOs.Add(spo);
                 spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
-
             }
+            return visibleGOs;
         }
         
         public List<GameObject> GetUISPOsWithTag()

@@ -531,4 +531,76 @@ namespace BCIEssentials.Tests
             Assert.AreEqual(BCITrainingType.Iterative, _behavior.CurrentTrainingType);
         }
     }
+
+    public class BCIP300ControllerBehavior_SpoGraphTests : PlayModeTestRunnerBase
+     {
+        private BCIController _testController;
+        private GameObject _testControllerObject;
+        private P300ControllerBehavior _behavior;
+        private const string MyTag = "BCI";
+
+        [UnitySetUp]
+        public override IEnumerator TestSetup()
+        {
+            LogTestName();
+            yield return LoadDefaultSceneAsync();
+
+            _testController = CreateController();
+            _testControllerObject = _testController.gameObject;
+            _behavior = _testControllerObject.AddComponent<P300ControllerBehavior>();
+
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator WhenGetGameSPOsInCameraView_ThenReturnsVisibleTaggedObjects()
+        {
+            // Arrange
+            var visibleSPOs = new List<SPO>
+            {
+                CreateSPO(new Vector3(0, 0, 0)),
+                CreateSPO(new Vector3(1, 0, 0)),
+                CreateSPO(new Vector3(0, 1, 0))
+            };
+
+            var invisibleSPO = CreateSPO(new Vector3(0, 1000, 0));
+
+            // Ensure a camera is available and tagged as "MainCamera"
+            var mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                mainCamera = new GameObject("MainCamera").AddComponent<Camera>();
+                mainCamera.tag = "MainCamera";
+            }
+
+            // Place camera so all SPOs are in view
+            mainCamera.transform.position = new Vector3(0, 0, -10);
+
+            // Act
+            var result = _behavior.GetGameSPOsInCameraView();
+
+            // Assert
+            Assert.AreEqual(visibleSPOs.Count, result.Count, "The number of visible SPOs should match the expected count.");
+
+            foreach (var spo in visibleSPOs)
+            {
+                Assert.Contains(spo.gameObject, result, $"SPO {spo.name} should be included in the visible SPOs list.");
+            }
+
+            Assert.IsFalse(result.Contains(invisibleSPO.gameObject), $"SPO {invisibleSPO.name} should not be included in the visible SPOs list.");
+
+            yield return null;
+        }
+
+        private SPO CreateSPO(Vector3 position)
+        {
+            var spoGameObject = new GameObject("SPO");
+            spoGameObject.tag = MyTag;
+            spoGameObject.transform.position = position;
+            var spo = spoGameObject.AddComponent<SPO>();
+            spo.Selectable = true;
+            spoGameObject.AddComponent<MeshRenderer>(); // Add a renderer to make it visible
+            return spo;
+        }
+    }
 }
