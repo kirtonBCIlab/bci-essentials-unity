@@ -917,14 +917,6 @@ namespace BCIEssentials.ControllerBehaviors
             var allValidGOs = uiGOs.Concat(visibleGOs).ToList();
             return allValidGOs;
         }
-        
-        //Probably can mix these together more smartly, but I'm just going to keep them separate for the moment.
-        public List<GameObject> GetUISPOsWithTag()
-        {
-            Camera mainCamera = Camera.main;
-            var taggedGOs_in_UI = GameObject.FindGameObjectsWithTag(myTag);
-            return null;
-        }
 
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
