@@ -29,11 +29,17 @@ namespace BCIEssentials.ControllerBehaviors
         [Header("Stimulus Flash Paradigm")]
         [Tooltip("If true, only one SPO will flash at a time")]
         public bool singleFlash = true;
+
+        [Tooltip("If true, enables context-aware SPO single flashing")]
+        public bool contextAwareSingleFlash = false;
+
         [Tooltip("If true, enables multiple SPOs to flash at the same time." +
         "Needs to be true for rowColumn and checkerboard to work")]
         public bool multiFlash = false;
+        
         [Tooltip("If true, flashes objects in rows and columns. Requires Multiflash to be true")]
         public bool rowColumn = false;
+        
         [Tooltip("If true, flashes objects in a checkerboard pattern. Requires Multiflash to be true")]
         public bool checkerboard = true;
 
@@ -239,6 +245,13 @@ namespace BCIEssentials.ControllerBehaviors
                 // yield return SingleFlashRoutine();
             }
 
+            if (contextAwareSingleFlash)
+            {
+                //This may not be the right way to do this.
+                StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
+                // yield return SingleFlashRoutine();
+            }
+
             if (multiFlash)
             {
 
@@ -301,6 +314,13 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(offTime);
             }
         }
+        
+        private IEnumerator ContextAwareSingleFlashRoutine()
+        {
+
+            yield return null;
+        }
+        
         
         private IEnumerator RowColFlashRoutine()
         {
@@ -802,7 +822,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-                private int[,] Initialize2DMultiFlash()
+        private int[,] Initialize2DMultiFlash()
         {
                 // For multi flash selection, create virtual rows and columns
                 //There is some bug with setting this for the row column flashing, but it works for checkerboard. 
@@ -857,10 +877,12 @@ namespace BCIEssentials.ControllerBehaviors
                     break;
                 case SpoPopulationMethod.GraphBP:
                     _selectableSPOs.Clear();
-
+                    
                     //First, get all game objects in the world visible by the camera, including the UI
-                    GetGameSPOsInCameraView();
-                    //Then, populate the object list with the objects that are visible by the camera
+                    var validGOs = GetGameSPOsInCameraView();
+                   
+                    //Now get the properties of the validGOs for graph bipartite problem
+                    CalculateGraphBPBounds(validGOs);
 
                     Debug.LogWarning("Populating by graph is underconstruction");
                     break;
@@ -918,6 +940,11 @@ namespace BCIEssentials.ControllerBehaviors
             return allValidGOs;
         }
 
+        //This will probably go into the Utilities Folder and Namespace later.
+        public void CalculateGraphBPBounds(List<GameObject> goList)
+        {
+
+        }
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
