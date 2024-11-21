@@ -318,7 +318,45 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator ContextAwareSingleFlashRoutine()
         {
 
-            yield return null;
+            int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
+            int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
+
+            for (int i = 0; i < stimOrder.Length; i++)
+            {
+                GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+
+                string markerString = "p300,s," + _selectableSPOs.Count.ToString();
+
+                if (trainTarget <= _selectableSPOs.Count)
+                {
+                    markerString = markerString + "," + trainTarget.ToString();
+                }
+                else
+                {
+                    markerString = markerString + "," + "-1";
+                }
+
+                markerString = markerString + "," + stimOrder[i].ToString();
+
+                // Turn on
+                currentObject.GetComponent<SPO>().StartStimulus();
+
+                // Send marker
+                if (!blockOutGoingLSL)
+                {
+                    marker.Write(markerString);
+                }
+
+                // Wait
+                yield return new WaitForSecondsRealtime(onTime);
+
+                // Turn off
+                currentObject.GetComponent<SPO>().StopStimulus();
+
+                // Wait
+                yield return new WaitForSecondsRealtime(offTime);
+            }
+  
         }
         
         
@@ -943,7 +981,14 @@ namespace BCIEssentials.ControllerBehaviors
         //This will probably go into the Utilities Folder and Namespace later.
         public void CalculateGraphBPBounds(List<GameObject> goList)
         {
-
+            foreach(GameObject go in goList)
+            {
+                if(go.layer==5)
+                {
+                    Debug.Log("UI Element found");
+                }
+            }
+            //Get the length of
         }
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
