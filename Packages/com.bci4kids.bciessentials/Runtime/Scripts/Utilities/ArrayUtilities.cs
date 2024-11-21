@@ -281,5 +281,19 @@ namespace BCIEssentials.Utilities
             return shuffledArray;
         }
         #endregion
+    
+        #region Graph Based Bipartition Array Generation
+        /// <summary>
+        /// Summary will go here
+        /// </summary>
+        /// <param name="arrayLength"></param>
+        
+        public static int[] GenerateGraphBipartitionArray()
+        {
+
+            return null;
+        }
+
+        #endregion
     }
 }

@@ -7,6 +7,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
 using Random = System.Random;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -920,7 +921,8 @@ namespace BCIEssentials.ControllerBehaviors
                     var validGOs = GetGameSPOsInCameraView();
                    
                     //Now get the properties of the validGOs for graph bipartite problem
-                    CalculateGraphBPBounds(validGOs);
+                    Debug.Log("Getting the GraphBP Bounds");
+                    CalculateGraphBP(validGOs);
 
                     Debug.LogWarning("Populating by graph is underconstruction");
                     break;
@@ -941,7 +943,6 @@ namespace BCIEssentials.ControllerBehaviors
                 //Right now, can't get the CanvasRenderer to understand when objects in the UI might be off screen. It's a niche problem, but worth noting.
                 if (obj.layer == 5)
                 {
-                    Debug.Log("UI Element found");
                     if (!obj.TryGetComponent<SPO>(out var uiSpo) || !uiSpo.Selectable || !obj.GetComponent<CanvasRenderer>().IsVisibleFromCanvas(mainCamera))
                     {
                         continue;
@@ -978,18 +979,53 @@ namespace BCIEssentials.ControllerBehaviors
             return allValidGOs;
         }
 
-        //This will probably go into the Utilities Folder and Namespace later.
-        public void CalculateGraphBPBounds(List<GameObject> goList)
+        public void CalculateGraphBP(List<GameObject> nodes)
         {
-            foreach(GameObject go in goList)
+            //Get the world points of each item with respect to the camera
+            var cameraTranfsorm = Camera.main.transform;
+            List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
+            int numNodes = nodes.Count;
+            float[,] objectWeights = new float[numNodes, numNodes];
+        
+            foreach (var node in nodes)
             {
-                if(go.layer==5)
+         
+            }
+
+            //use Vector3.Angle to get the angle between every object in the scene. Store this as weights in a graph
+
+        }
+
+        public List<Vector3> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
+        {
+
+            var cameraTranfsorm = myCamera.transform;
+            List<Vector3> correctedGOPositions = new List<Vector3>();
+            foreach (var obj in goList)
+            {
+                if (obj.layer==5 || obj.TryGetComponent<RectTransform>(out var rectT))
                 {
-                    Debug.Log("UI Element found");
+                    Debug.Log("Found a UI Element, dealing with it");
+                    //Get the world position of the object
+
+                    RectTransform tempRT = obj.GetComponent<RectTransform>();
+                    Vector3 screenPosition = tempRT.TransformPoint(tempRT.rect.center);
+                    Ray ray = RectTransformUtility.ScreenPointToRay(myCamera, screenPosition);
+                    Vector3 worldPosition = ray.direction;
+                    Debug.Log("The world position of the object is " + worldPosition.ToString());
+                    correctedGOPositions.Add(worldPosition);
+                }
+                else
+                {
+                    //Now subtract the camera position from the object position
+                    Vector3 objectDirection = obj.transform.position - cameraTranfsorm.position;
+                    Debug.Log("The direction of the real world object is " + objectDirection.ToString());
+                    correctedGOPositions.Add(objectDirection);
                 }
             }
-            //Get the length of
+            return correctedGOPositions;
         }
+        
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
