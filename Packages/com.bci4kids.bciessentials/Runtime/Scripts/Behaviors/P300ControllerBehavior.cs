@@ -858,10 +858,8 @@ namespace BCIEssentials.ControllerBehaviors
                 case SpoPopulationMethod.GraphBP:
                     _selectableSPOs.Clear();
 
-                    //First, get all game objects in the world visible by the camera
+                    //First, get all game objects in the world visible by the camera, including the UI
                     GetGameSPOsInCameraView();
-                    //Then, get all the UI objects that are tagged in the scene as a BCI selectable object
-                    GetUISPOsWithTag();
                     //Then, populate the object list with the objects that are visible by the camera
 
                     Debug.LogWarning("Populating by graph is underconstruction");
@@ -875,9 +873,32 @@ namespace BCIEssentials.ControllerBehaviors
             Camera mainCamera = Camera.main;
             var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
             List<GameObject> visibleGOs = new List<GameObject>();
+            List<GameObject> uiGOs = new List<GameObject>();
 
             foreach (var obj in taggedGOs)
             {
+                // Handle the UI objects separately.
+                //Right now, can't get the CanvasRenderer to understand when objects in the UI might be off screen. It's a niche problem, but worth noting.
+                if (obj.layer == 5)
+                {
+                    Debug.Log("UI Element found");
+                    if (!obj.TryGetComponent<SPO>(out var uiSpo) || !uiSpo.Selectable || !obj.GetComponent<CanvasRenderer>().IsVisibleFromCanvas(mainCamera))
+                    {
+                        continue;
+                    }
+                    // Check if the object has a unique ObjectID, 
+                    // if not assign it a unique ID
+                    if (obj.GetComponent<SPO>().ObjectID == 0)
+                    {
+                        obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
+                        __uniqueP300ID++;
+                    }
+                    uiGOs.Add(obj);
+                    _selectableSPOs.Add(uiSpo);
+                    uiSpo.SelectablePoolIndex = _selectableSPOs.Count - 1;
+                    continue;
+                }
+
                 if (!obj.TryGetComponent<SPO>(out var spo) || !spo.Selectable || !obj.GetComponent<Renderer>().IsVisibleFrom(mainCamera))
                 {
                     continue;
@@ -893,11 +914,15 @@ namespace BCIEssentials.ControllerBehaviors
                 _selectableSPOs.Add(spo);
                 spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
             }
-            return visibleGOs;
+            var allValidGOs = uiGOs.Concat(visibleGOs).ToList();
+            return allValidGOs;
         }
         
+        //Probably can mix these together more smartly, but I'm just going to keep them separate for the moment.
         public List<GameObject> GetUISPOsWithTag()
         {
+            Camera mainCamera = Camera.main;
+            var taggedGOs_in_UI = GameObject.FindGameObjectsWithTag(myTag);
             return null;
         }
 
