@@ -982,17 +982,39 @@ namespace BCIEssentials.ControllerBehaviors
         public void CalculateGraphBP(List<GameObject> nodes)
         {
             //Get the world points of each item with respect to the camera
-            var cameraTranfsorm = Camera.main.transform;
+            // var cameraTranfsorm = Camera.main.transform;
             List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
             int numNodes = nodes.Count;
             float[,] objectWeights = new float[numNodes, numNodes];
         
             foreach (var node in nodes)
             {
-         
+                //use Vector3.Angle to get the angle between every object in the scene. Store this as weights in a graph
+                //This is a symmetric matrix, so we only need to calculate the upper triangle
+                for (int i = 0; i < numNodes; i++)
+                {
+                    if (i == nodes.IndexOf(node))
+                    {
+                        objectWeights[nodes.IndexOf(node), i] = 0;
+                    }
+                    else
+                    {
+                        objectWeights[nodes.IndexOf(node), i] = Vector3.Angle(correctedNodePositions[nodes.IndexOf(node)], correctedNodePositions[i]);
+                    }
+                }
             }
 
-            //use Vector3.Angle to get the angle between every object in the scene. Store this as weights in a graph
+            //Print the weights in the upper triangle matrix
+            for (int i = 0; i < numNodes; i++)
+            {
+                for (int j = 0; j < numNodes; j++)
+                {
+                    if (j >= i && objectWeights[i, j] != 0)
+                    {
+                        Debug.Log("The weight between " + i.ToString() + " and " + j.ToString() + " is " + objectWeights[i, j].ToString());
+                    }
+                }
+            }       
 
         }
 
