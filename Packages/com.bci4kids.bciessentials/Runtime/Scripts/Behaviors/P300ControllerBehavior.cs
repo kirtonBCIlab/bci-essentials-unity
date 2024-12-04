@@ -1014,7 +1014,9 @@ namespace BCIEssentials.ControllerBehaviors
                         Debug.Log("The weight between " + i.ToString() + " and " + j.ToString() + " is " + objectWeights[i, j].ToString());
                     }
                 }
-            }       
+            }
+
+            //Use the graph utilities to do the modified TSP.      
 
         }
 

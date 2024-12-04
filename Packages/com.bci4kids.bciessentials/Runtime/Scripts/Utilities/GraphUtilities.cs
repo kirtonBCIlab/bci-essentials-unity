@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BCIEssentials.Utilities
 {
-    public class ModifiedTSP
+    public static class GraphUtilitiesTSP
     {
         private int[,] adjacencyMatrix;
         private int nodeCount;
@@ -30,7 +30,7 @@ namespace BCIEssentials.Utilities
             return fullMatrix;
         }
 
-        public SolveModifiedTSP()
+        public List<int> SolveModifiedTSP()
         {
             List<int> tour = new List<int> { 0 };
             HashSet<int> unvisitedNodes = new HashSet<int>(Enumerable.Range(1, nodeCount - 1));
