@@ -510,6 +510,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                         else
                         {
+                            Debug.Log("Response not numeric, here is the response: " + responseString);
                             continue;
                         }
                     }
