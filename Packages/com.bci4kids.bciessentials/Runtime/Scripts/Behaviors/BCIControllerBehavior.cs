@@ -495,6 +495,18 @@ namespace BCIEssentials.ControllerBehaviors
                         // If there are square brackets then remove them
                         responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
 
+                        //try to parse the rest of the response as an integer. Handle if it is the formate np.int64().
+                        //This grabs the value out of the parenthesis
+                        if (responseString.Contains("(") && responseString.Contains(")"))
+                        {
+                            int startIndex = responseString.IndexOf('(') + 1;
+                            int endIndex = responseString.IndexOf(')');
+                            if (startIndex < endIndex)
+                            {
+                                responseString = responseString.Substring(startIndex, endIndex - startIndex);
+                            }
+                        }
+
                         // If it is a single value then select that value
                         int n;
                         bool isNumeric = int.TryParse(responseString, out n);
@@ -510,6 +522,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                         else
                         {
+                            Debug.Log("Response not numeric. Here is the response: " + responseString);
                             continue;
                         }
                     }

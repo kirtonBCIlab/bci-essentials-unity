@@ -1,24 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace BCIEssentials.Utilities
 {
-    public static class GraphUtilitiesTSP
+    public class GraphUtilitiesTSP
     {
-        private int[,] adjacencyMatrix;
+        private float[,] adjacencyMatrix;
         private int nodeCount;
 
-        public SetUpModifiedTSP(int[,] upperTriangularMatrix)
-        {
-            nodeCount = upperTriangularMatrix.GetLength(0);
-            //I don't think I need this
-            adjacencyMatrix = ConvertToFullMatrix(upperTriangularMatrix);
-        }
+        // public int SetUpModifiedTSP(float[,] upperTriangularMatrix)
+        // {
+        //     nodeCount = upperTriangularMatrix.GetLength(0);
+        //     return nodeCount;
+        //     //I don't think I need this
+        //     // adjacencyMatrix = ConvertToFullMatrix(upperTriangularMatrix);
+        // }
 
-        private int[,] ConvertToFullMatrix(int[,] upperTriangularMatrix)
+        private float[,] ConvertToFullMatrix(float[,] upperTriangularMatrix)
         {
-            int[,] fullMatrix = new int[nodeCount, nodeCount];
+            float[,] fullMatrix = new float[nodeCount, nodeCount];
             for (int i = 0; i < nodeCount; i++)
             {
                 for (int j = i; j < nodeCount; j++)
@@ -30,8 +32,10 @@ namespace BCIEssentials.Utilities
             return fullMatrix;
         }
 
-        public List<int> SolveModifiedTSP()
+        public List<int> SolveModifiedTSP(float[,] upperTriangularMatrix)
         {
+            nodeCount = upperTriangularMatrix.GetLength(0);
+            adjacencyMatrix = ConvertToFullMatrix(upperTriangularMatrix);
             List<int> tour = new List<int> { 0 };
             HashSet<int> unvisitedNodes = new HashSet<int>(Enumerable.Range(1, nodeCount - 1));
 
@@ -49,12 +53,13 @@ namespace BCIEssentials.Utilities
 
          private int FindFurthestUnvisitedNode(int currentNode, HashSet<int> unvisitedNodes)
         {
-            int maxDistance = int.MinValue;
+            float maxDistance = float.MinValue;
             int furthestNode = -1;
 
             foreach (int node in unvisitedNodes)
             {
-                int distance = adjacencyMatrix[currentNode, node];
+                float distance = adjacencyMatrix[currentNode, node];
+                // UnityEngine.Debug.Log("IN TSP!!! Distance between " + currentNode + " and " + node + " is " + distance);
                 if (distance > maxDistance || (distance == maxDistance && node < furthestNode))
                 {
                     maxDistance = distance;
@@ -65,9 +70,9 @@ namespace BCIEssentials.Utilities
             return furthestNode;
         }
 
-        public int CalculateTourLength(List<int> tour)
+        public float CalculateTourLength(List<int> tour)
         {
-            int totalLength = 0;
+            float totalLength = 0;
             for (int i = 0; i < tour.Count - 1; i++)
             {
                 totalLength += adjacencyMatrix[tour[i], tour[i + 1]];

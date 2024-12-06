@@ -56,8 +56,6 @@ namespace BCIEssentials.ControllerBehaviors
             Random
         };
 
-
-
         private float timeOfFlash = 0;
         private float timeOfWrite = 0;
         private float oldTimeOfWrite = 0;
@@ -72,7 +70,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public SpoPopulationMethod myPopMethod = SpoPopulationMethod.GraphBP;
 
-
+        private List<GameObject> _validGOs = new List<GameObject>();
 
 
 
@@ -274,6 +272,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        //TODO There is a bug where this is sending "Trial Ended" before the last flash is sent.
         private IEnumerator SingleFlashRoutine()
         {
             int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
@@ -320,7 +319,12 @@ namespace BCIEssentials.ControllerBehaviors
         {
 
             int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
-            int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
+                               
+            //Now get the properties of the validGOs for graph bipartite problem
+            Debug.Log("Getting the GraphBP For Context Aware Single Flash");
+            int[] stimOrder = CalculateGraphBP(_validGOs);
+
+            // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
 
             for (int i = 0; i < stimOrder.Length; i++)
             {
@@ -495,6 +499,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
         
+        //TODO: Need to fix Checkerboard Flashing while I'm here
         private IEnumerator CheckerboardFlashRoutine()
         {
             // For multi flash selection, create virtual rows and columns
@@ -917,14 +922,10 @@ namespace BCIEssentials.ControllerBehaviors
                 case SpoPopulationMethod.GraphBP:
                     _selectableSPOs.Clear();
                     
-                    //First, get all game objects in the world visible by the camera, including the UI
-                    var validGOs = GetGameSPOsInCameraView();
-                   
-                    //Now get the properties of the validGOs for graph bipartite problem
-                    Debug.Log("Getting the GraphBP Bounds");
-                    CalculateGraphBP(validGOs);
-
-                    Debug.LogWarning("Populating by graph is underconstruction");
+                    //First, get all game objects in the world visible by the camera, including the UI.
+                    // This will populate the _selectableSPOs list
+                    _validGOs = GetGameSPOsInCameraView();                   
+                    
                     break;
             }
         }
@@ -979,7 +980,7 @@ namespace BCIEssentials.ControllerBehaviors
             return allValidGOs;
         }
 
-        public void CalculateGraphBP(List<GameObject> nodes)
+        public int[] CalculateGraphBP(List<GameObject> nodes)
         {
             //Get the world points of each item with respect to the camera
             // var cameraTranfsorm = Camera.main.transform;
@@ -1003,7 +1004,6 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                 }
             }
-
             //Print the weights in the upper triangle matrix
             for (int i = 0; i < numNodes; i++)
             {
@@ -1012,9 +1012,24 @@ namespace BCIEssentials.ControllerBehaviors
                     if (j >= i && objectWeights[i, j] != 0)
                     {
                         Debug.Log("The weight between " + i.ToString() + " and " + j.ToString() + " is " + objectWeights[i, j].ToString());
+                        Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
+
                     }
                 }
             }
+
+
+            GraphUtilitiesTSP tsp = new GraphUtilitiesTSP();
+            var tour = tsp.SolveModifiedTSP(objectWeights);
+            //Print out the tour
+            for (int i = 0; i < tour.Count; i++)
+            {
+                Debug.Log("The tour is " + tour[i].ToString());
+            }
+            Debug.Log("Tour length is: " + tsp.CalculateTourLength(tour));
+            int[] tourArray = tour.ToArray();
+            return tourArray;
+  
 
             //Use the graph utilities to do the modified TSP.      
 
@@ -1036,14 +1051,14 @@ namespace BCIEssentials.ControllerBehaviors
                     Vector3 screenPosition = tempRT.TransformPoint(tempRT.rect.center);
                     Ray ray = RectTransformUtility.ScreenPointToRay(myCamera, screenPosition);
                     Vector3 worldPosition = ray.direction;
-                    Debug.Log("The world position of the object is " + worldPosition.ToString());
+                    // Debug.Log("The world position of the object is " + worldPosition.ToString());
                     correctedGOPositions.Add(worldPosition);
                 }
                 else
                 {
                     //Now subtract the camera position from the object position
                     Vector3 objectDirection = obj.transform.position - cameraTranfsorm.position;
-                    Debug.Log("The direction of the real world object is " + objectDirection.ToString());
+                    // Debug.Log("The direction of the real world object is " + objectDirection.ToString());
                     correctedGOPositions.Add(objectDirection);
                 }
             }
@@ -1092,5 +1107,68 @@ namespace BCIEssentials.ControllerBehaviors
                 marker.Write("Trial Ends");
             }
         }
+
+
+
+        #region Experimental Calculations
+        // public List<Vector3> CalculateOffsetFromCamera2(List<GameObject> goList, Camera myCamera)
+        // {
+        //     var cameraTransform = myCamera.transform;
+        //     List<Vector3> correctedGOPositions = new List<Vector3>();
+
+        //     foreach (var obj in goList)
+        //     {
+        //         Vector3 worldPosition;
+
+        //         if (obj.layer == 5 && obj.TryGetComponent<RectTransform>(out var rectT))
+        //         {
+        //             Debug.Log("Found a UI Element, dealing with it");
+
+        //             // Get the world position of the RectTransform
+        //             Vector3[] corners = new Vector3[4];
+        //             rectT.GetWorldCorners(corners);
+        //             worldPosition = rectT.position; // Use the center of the RectTransform as the world position
+        //         }
+        //         else
+        //         {
+        //             // Get the world position of the 3D object
+        //             worldPosition = obj.transform.position;
+        //         }
+
+        //         // Calculate the direction vector from the camera to the object
+        //         Vector3 objectDirection = worldPosition - cameraTransform.position;
+        //         correctedGOPositions.Add(objectDirection);
+        //     }
+
+        //     return correctedGOPositions;
+        // }
+        // public void CalculateAnglesBetweenObjects(List<GameObject> nodes, Camera myCamera)
+        // {
+        //     List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, myCamera);
+        //     int numNodes = nodes.Count;
+        //     float[,] objectWeights = new float[numNodes, numNodes];
+
+        //     for (int i = 0; i < numNodes; i++)
+        //     {
+        //         for (int j = i + 1; j < numNodes; j++)
+        //         {
+        //             float angle = Vector3.Angle(correctedNodePositions[i], correctedNodePositions[j]);
+        //             objectWeights[i, j] = angle;
+        //             objectWeights[j, i] = angle; // Symmetric matrix
+        //         }
+        //     }
+
+        //     // Debugging: Print the angles
+        //     for (int i = 0; i < numNodes; i++)
+        //     {
+        //         for (int j = 0; j < numNodes; j++)
+        //         {
+        //             Debug.Log($"Angle between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]} degrees");
+        //         }
+        //     }
+        // }
+
+        #endregion
+
     }
 }
