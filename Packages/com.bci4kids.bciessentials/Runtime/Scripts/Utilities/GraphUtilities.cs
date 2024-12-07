@@ -47,7 +47,7 @@ namespace BCIEssentials.Utilities
                 unvisitedNodes.Remove(nextNode);
             }
 
-            tour.Add(0); // Return to the starting node
+            //tour.Add(0); // Return to the starting node
             return tour;
         }
 
