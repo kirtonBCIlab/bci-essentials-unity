@@ -122,6 +122,8 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected Coroutine _training;
 
+        private Dictionary<int, SPO> _objectIDtoSPODict = new();
+
 
         #region Life Cycle Methods
 
@@ -323,6 +325,7 @@ namespace BCIEssentials.ControllerBehaviors
                 default:
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
+                    _objectIDtoSPODict.Clear(); 
                     var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
                     foreach (var taggedGO in taggedGOs)
                     {
@@ -340,6 +343,7 @@ namespace BCIEssentials.ControllerBehaviors
                         }
 
                         _selectableSPOs.Add(spo);
+                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
                         spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
                     }
                     break;
@@ -516,6 +520,7 @@ namespace BCIEssentials.ControllerBehaviors
                             if (n < SelectableSPOs.Count)
                             {
                                 Debug.Log("Selected object " + n.ToString());
+                                //Select the correct unique ObjectID
                                 SelectableSPOs[n].Select();
                             }
                         }

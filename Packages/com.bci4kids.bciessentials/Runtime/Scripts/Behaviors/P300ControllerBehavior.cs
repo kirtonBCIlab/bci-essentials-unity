@@ -294,7 +294,9 @@ namespace BCIEssentials.ControllerBehaviors
                     markerString = markerString + "," + "-1";
                 }
 
-                markerString = markerString + "," + stimOrder[i].ToString();
+                // markerString = markerString + "," + stimOrder[i].ToString();
+                markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+
 
                 // Turn on
                 currentObject.GetComponent<SPO>().StartStimulus();
@@ -325,8 +327,14 @@ namespace BCIEssentials.ControllerBehaviors
             //int[] stimOrder = CalculateGraphBP(_validGOs);
 
             // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
+
+            //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
+            
             for (int jj = 0; jj < totalFlashes; jj++)
             {
+                //Refresh the List of available SPO Objects. This will update the _validGOs list.
+                PopulateObjectList();
+                //Now get the
                 Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
                 int[] stimOrder = CalculateGraphBP(_validGOs);
 
@@ -345,7 +353,7 @@ namespace BCIEssentials.ControllerBehaviors
                         markerString = markerString + "," + "-1";
                     }
 
-                    markerString = markerString + "," + stimOrder[i].ToString();
+                    markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
 
                     // Turn on
                     currentObject.GetComponent<SPO>().StartStimulus();
@@ -397,7 +405,8 @@ namespace BCIEssentials.ControllerBehaviors
                         markerString = markerString + "," + "-1";
                     }
 
-                    markerString = markerString + "," + stimOrder[i].ToString();
+                    markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+
 
                     // Turn on
                     currentObject.GetComponent<SPO>().StartStimulus();
@@ -1176,62 +1185,7 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         #region Experimental Calculations
-        // public List<Vector3> CalculateOffsetFromCamera2(List<GameObject> goList, Camera myCamera)
-        // {
-        //     var cameraTransform = myCamera.transform;
-        //     List<Vector3> correctedGOPositions = new List<Vector3>();
-
-        //     foreach (var obj in goList)
-        //     {
-        //         Vector3 worldPosition;
-
-        //         if (obj.layer == 5 && obj.TryGetComponent<RectTransform>(out var rectT))
-        //         {
-        //             Debug.Log("Found a UI Element, dealing with it");
-
-        //             // Get the world position of the RectTransform
-        //             Vector3[] corners = new Vector3[4];
-        //             rectT.GetWorldCorners(corners);
-        //             worldPosition = rectT.position; // Use the center of the RectTransform as the world position
-        //         }
-        //         else
-        //         {
-        //             // Get the world position of the 3D object
-        //             worldPosition = obj.transform.position;
-        //         }
-
-        //         // Calculate the direction vector from the camera to the object
-        //         Vector3 objectDirection = worldPosition - cameraTransform.position;
-        //         correctedGOPositions.Add(objectDirection);
-        //     }
-
-        //     return correctedGOPositions;
-        // }
-        // public void CalculateAnglesBetweenObjects(List<GameObject> nodes, Camera myCamera)
-        // {
-        //     List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, myCamera);
-        //     int numNodes = nodes.Count;
-        //     float[,] objectWeights = new float[numNodes, numNodes];
-
-        //     for (int i = 0; i < numNodes; i++)
-        //     {
-        //         for (int j = i + 1; j < numNodes; j++)
-        //         {
-        //             float angle = Vector3.Angle(correctedNodePositions[i], correctedNodePositions[j]);
-        //             objectWeights[i, j] = angle;
-        //             objectWeights[j, i] = angle; // Symmetric matrix
-        //         }
-        //     }
-
-        //     // Debugging: Print the angles
-        //     for (int i = 0; i < numNodes; i++)
-        //     {
-        //         for (int j = 0; j < numNodes; j++)
-        //         {
-        //             Debug.Log($"Angle between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]} degrees");
-        //         }
-        //     }
-        // }
+ 
 
         #endregion
 
