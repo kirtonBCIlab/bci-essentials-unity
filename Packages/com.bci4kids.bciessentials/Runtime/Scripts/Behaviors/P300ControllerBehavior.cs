@@ -71,6 +71,7 @@ namespace BCIEssentials.ControllerBehaviors
         public SpoPopulationMethod myPopMethod = SpoPopulationMethod.GraphBP;
 
         private List<GameObject> _validGOs = new List<GameObject>();
+        private int lastTourEndNode = -100;
 
 
 
@@ -318,52 +319,107 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator ContextAwareSingleFlashRoutine()
         {
 
-            int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
-                               
+            //int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
+            int totalFlashes = numFlashesPerObjectPerSelection;          
             //Now get the properties of the validGOs for graph bipartite problem
-            Debug.Log("Getting the GraphBP For Context Aware Single Flash");
-            int[] stimOrder = CalculateGraphBP(_validGOs);
+            //int[] stimOrder = CalculateGraphBP(_validGOs);
 
             // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
-
-            for (int i = 0; i < stimOrder.Length; i++)
+            for (int jj = 0; jj < totalFlashes; jj++)
             {
-                GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+                Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
+                int[] stimOrder = CalculateGraphBP(_validGOs);
 
-                string markerString = "p300,s," + _selectableSPOs.Count.ToString();
-
-                if (trainTarget <= _selectableSPOs.Count)
+                for (int i = 0; i < stimOrder.Length; i++)
                 {
-                    markerString = markerString + "," + trainTarget.ToString();
+                    GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+
+                    string markerString = "p300,s," + _selectableSPOs.Count.ToString();
+
+                    if (trainTarget <= _selectableSPOs.Count)
+                    {
+                        markerString = markerString + "," + trainTarget.ToString();
+                    }
+                    else
+                    {
+                        markerString = markerString + "," + "-1";
+                    }
+
+                    markerString = markerString + "," + stimOrder[i].ToString();
+
+                    // Turn on
+                    currentObject.GetComponent<SPO>().StartStimulus();
+
+                    // Send marker
+                    if (!blockOutGoingLSL)
+                    {
+                        marker.Write(markerString);
+                    }
+
+                    // Wait
+                    yield return new WaitForSecondsRealtime(onTime);
+
+                    // Turn off
+                    currentObject.GetComponent<SPO>().StopStimulus();
+
+                    // Wait
+                    yield return new WaitForSecondsRealtime(offTime);
                 }
-                else
-                {
-                    markerString = markerString + "," + "-1";
-                }
-
-                markerString = markerString + "," + stimOrder[i].ToString();
-
-                // Turn on
-                currentObject.GetComponent<SPO>().StartStimulus();
-
-                // Send marker
-                if (!blockOutGoingLSL)
-                {
-                    marker.Write(markerString);
-                }
-
-                // Wait
-                yield return new WaitForSecondsRealtime(onTime);
-
-                // Turn off
-                currentObject.GetComponent<SPO>().StopStimulus();
-
-                // Wait
-                yield return new WaitForSecondsRealtime(offTime);
             }
-  
         }
+
         
+        private IEnumerator ContextAwareMultiFlashRoutine()
+        {
+            //Total number of flashes for each grouping of objects.
+            int totalFlashes = numFlashesPerObjectPerSelection;          
+            //Now get the properties of the validGOs for graph bipartite problem
+            //int[] stimOrder = CalculateGraphBP(_validGOs);
+
+            // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
+            for (int jj = 0; jj < totalFlashes; jj++)
+            {
+                Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
+                int[] stimOrder = CalculateGraphBP(_validGOs);
+
+                for (int i = 0; i < stimOrder.Length; i++)
+                {
+                    GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+
+                    string markerString = "p300,s," + _selectableSPOs.Count.ToString();
+
+                    if (trainTarget <= _selectableSPOs.Count)
+                    {
+                        markerString = markerString + "," + trainTarget.ToString();
+                    }
+                    else
+                    {
+                        markerString = markerString + "," + "-1";
+                    }
+
+                    markerString = markerString + "," + stimOrder[i].ToString();
+
+                    // Turn on
+                    currentObject.GetComponent<SPO>().StartStimulus();
+
+                    // Send marker
+                    if (!blockOutGoingLSL)
+                    {
+                        marker.Write(markerString);
+                    }
+
+                    // Wait
+                    yield return new WaitForSecondsRealtime(onTime);
+
+                    // Turn off
+                    currentObject.GetComponent<SPO>().StopStimulus();
+
+                    // Wait
+                    yield return new WaitForSecondsRealtime(offTime);
+                }
+            }
+
+        }
         
         private IEnumerator RowColFlashRoutine()
         {
@@ -1011,16 +1067,25 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     if (j >= i && objectWeights[i, j] != 0)
                     {
-                        Debug.Log("The weight between " + i.ToString() + " and " + j.ToString() + " is " + objectWeights[i, j].ToString());
                         Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
-
                     }
                 }
             }
 
 
             GraphUtilitiesTSP tsp = new GraphUtilitiesTSP();
-            var tour = tsp.SolveModifiedTSP(objectWeights);
+            
+            var startNode = UnityEngine.Random.Range(0, numNodes);
+            //Make sure the start node and last node of the tour are not the same
+            if(startNode == lastTourEndNode)
+            {
+                //chose a different start node
+                startNode = (startNode+1) % numNodes;
+            }
+
+            Debug.Log("The start node is " + startNode.ToString());
+            var tour = tsp.SolveModifiedTSP(objectWeights, startNode);
+            lastTourEndNode = tour[tour.Count - 1];
             //Print out the tour
             for (int i = 0; i < tour.Count; i++)
             {

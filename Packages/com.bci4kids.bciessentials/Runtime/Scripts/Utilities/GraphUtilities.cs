@@ -32,12 +32,13 @@ namespace BCIEssentials.Utilities
             return fullMatrix;
         }
 
-        public List<int> SolveModifiedTSP(float[,] upperTriangularMatrix)
+        public List<int> SolveModifiedTSP(float[,] upperTriangularMatrix, int startNode)
         {
             nodeCount = upperTriangularMatrix.GetLength(0);
             adjacencyMatrix = ConvertToFullMatrix(upperTriangularMatrix);
-            List<int> tour = new List<int> { 0 };
-            HashSet<int> unvisitedNodes = new HashSet<int>(Enumerable.Range(1, nodeCount - 1));
+            List<int> tour = new List<int> { startNode };
+            HashSet<int> unvisitedNodes = new HashSet<int>(Enumerable.Range(0, nodeCount));
+            unvisitedNodes.Remove(startNode);
 
             while (unvisitedNodes.Count > 0)
             {
