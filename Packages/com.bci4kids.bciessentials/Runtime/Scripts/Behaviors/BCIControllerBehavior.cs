@@ -7,6 +7,7 @@ using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine.Serialization;
+using UnityEngine.Android;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -344,6 +345,8 @@ namespace BCIEssentials.ControllerBehaviors
 
                         _selectableSPOs.Add(spo);
                         _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
+                        //Print out the Dictionary Pairs
+                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
                         spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
                     }
                     break;
@@ -388,6 +391,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             var spo = _selectableSPOs[objectIndex];
+            // var spo = _objectIDtoSPODict[objectIndex]; //TODO: Implement this for ObjectID selection
             if (spo == null)
             {
                 Debug.LogWarning("SPO is now null and can't be selected");
@@ -521,6 +525,7 @@ namespace BCIEssentials.ControllerBehaviors
                             {
                                 Debug.Log("Selected object " + n.ToString());
                                 //Select the correct unique ObjectID
+                                //TODO START HERE FOR SELECTING BASED ON OBJECTID
                                 SelectableSPOs[n].Select();
                             }
                         }
