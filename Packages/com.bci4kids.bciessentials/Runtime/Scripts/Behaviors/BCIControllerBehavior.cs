@@ -123,7 +123,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected Coroutine _training;
 
-        private Dictionary<int, SPO> _objectIDtoSPODict = new();
+        protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
 
         #region Life Cycle Methods

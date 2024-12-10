@@ -294,8 +294,8 @@ namespace BCIEssentials.ControllerBehaviors
                     markerString = markerString + "," + "-1";
                 }
 
-                // markerString = markerString + "," + stimOrder[i].ToString();
-                markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+                markerString = markerString + "," + stimOrder[i].ToString();
+                // markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
 
 
                 // Turn on
@@ -352,7 +352,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         markerString = markerString + "," + "-1";
                     }
-
+                    Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
                     markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
 
                     // Turn on
@@ -1185,7 +1185,39 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         #region Experimental Calculations
- 
+        public override void SelectSPO(int objectID, bool stopStimulusRun = false)
+        {
+            var objectCount = _selectableSPOs.Count;
+            if (objectCount == 0)
+            {
+                Debug.Log("No Objects to select");
+                return;
+            }
+
+            if (_objectIDtoSPODict.ContainsKey(objectID))
+            {
+                var spo = _objectIDtoSPODict[objectID];
+                if (spo == null)
+                {
+                    Debug.LogWarning("SPO is now null and can't be selected");
+                    return;
+                }
+
+                spo.Select();
+                LastSelectedSPO = spo;
+                Debug.Log($"SPO '{spo.gameObject.name}' selected.");
+
+                if (stopStimulusRun)
+                {
+                    StopStimulusRun();
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid Selection. Must be in the objectID dictionary");
+                return;
+            }
+        }
 
         #endregion
 
