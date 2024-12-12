@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 using UnityEngine;
 
 namespace BCIEssentials.Utilities
@@ -31,6 +33,8 @@ namespace BCIEssentials.Utilities
             }
             return fullMatrix;
         }
+
+        #region Travelling Salesman Problem (Max)
 
         public List<int> SolveModifiedTSP(float[,] upperTriangularMatrix, int startNode)
         {
@@ -80,6 +84,14 @@ namespace BCIEssentials.Utilities
             }
             return totalLength;
         }
+
+        #endregion
+
+
+        #region Laplacian Graph Partitioning
+        
+
+        #endregion
 
     }
 
