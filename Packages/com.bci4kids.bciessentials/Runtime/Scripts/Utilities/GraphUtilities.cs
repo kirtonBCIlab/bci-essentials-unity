@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
+// using MathNet.Numerics.LinearAlgebra;
+// using MathNet.Numerics.LinearAlgebra.Double;
 using UnityEngine;
 
 namespace BCIEssentials.Utilities
@@ -90,6 +90,57 @@ namespace BCIEssentials.Utilities
 
         #region Laplacian Graph Partitioning
         
+        //Placeholder code
+        // public static (List<int> subset1, List<int> subset2) PartitionGraph(double[,] adjacencyMatrix)
+        // {
+        //     int n = adjacencyMatrix.GetLength(0);
+
+        //     // Step 1: Compute the Laplacian matrix
+        //     var laplacianMatrix = ComputeLaplacianMatrix(adjacencyMatrix);
+
+        //     // Step 2: Compute eigenvalues and eigenvectors
+        //     var eigen = laplacianMatrix.Evd();
+
+        //     // Step 3: Use the Fiedler vector to partition the graph
+        //     var fiedlerVector = eigen.EigenVectors.Column(1); // Second smallest eigenvalue
+
+        //     var subset1 = new List<int>();
+        //     var subset2 = new List<int>();
+
+        //     for (int i = 0; i < n; i++)
+        //     {
+        //         if (fiedlerVector[i] < 0)
+        //         {
+        //             subset1.Add(i);
+        //         }
+        //         else
+        //         {
+        //             subset2.Add(i);
+        //         }
+        //     }
+
+        //     return (subset1, subset2);
+        // }
+
+        // private static Matrix<double> ComputeLaplacianMatrix(double[,] adjacencyMatrix)
+        // {
+        //     int n = adjacencyMatrix.GetLength(0);
+        //     var laplacianMatrix = DenseMatrix.OfArray(adjacencyMatrix);
+        //     var degreeMatrix = DenseMatrix.Create(n, n, 0);
+
+        //     for (int i = 0; i < n; i++)
+        //     {
+        //         double degree = 0;
+        //         for (int j = 0; j < n; j++)
+        //         {
+        //             degree += adjacencyMatrix[i, j];
+        //         }
+        //         degreeMatrix[i, i] = degree;
+        //     }
+
+        //     laplacianMatrix = degreeMatrix - laplacianMatrix;
+        //     return laplacianMatrix;
+        // }
 
         #endregion
 
