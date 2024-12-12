@@ -24,6 +24,11 @@
       "path": "Samples~/Controller Hotswapping Example"
     },
     {
+      "displayName": "Environment Aware P300 Example",
+      "description": "Demonstrates a use case where the P300ControllerBehavior flashing updates targets based on other relative BCI objects.",
+      "path": "Samples~/Environment Aware P300"
+    },
+    {
       "displayName": "Original MI Controller",
       "description": "An example setup for the prepackage style MI Controller.",
       "path": "Samples~/Original MI Controller"
