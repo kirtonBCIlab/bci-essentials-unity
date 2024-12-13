@@ -89,39 +89,6 @@ namespace BCIEssentials.Utilities
 
 
         #region Laplacian Graph Partitioning
-        
-        //Placeholder code
-        public (List<int> subset1, List<int> subset2) LaplaceGraphPartition(float[,] adjacencyMatrix)
-        {
-            int n = adjacencyMatrix.GetLength(0);
-
-            // Step 1: Compute the Laplacian matrix
-            var laplacianMatrix = ComputeLaplacianMatrix(adjacencyMatrix);
-
-            // Step 2: Compute eigenvalues and eigenvectors
-            var eigen = laplacianMatrix.Evd();
-
-            // Step 3: Use the Fiedler vector to partition the graph
-            var fiedlerVector = eigen.EigenVectors.Column(1); // Second smallest eigenvalue
-
-            var subset1 = new List<int>();
-            var subset2 = new List<int>();
-
-            for (int i = 0; i < n; i++)
-            {
-                if (fiedlerVector[i] < 0)
-                {
-                    subset1.Add(i);
-                }
-                else
-                {
-                    subset2.Add(i);
-                }
-            }
-
-            return (subset1, subset2);
-        }
-
         public (int[] subset1, int[] subset2) LaplaceGP(float[,] adjacencyMatrix)
         {
             int n = adjacencyMatrix.GetLength(0);
@@ -143,15 +110,30 @@ namespace BCIEssentials.Utilities
                                      .OrderBy(node => node.Value)
                                      .ToList();
 
-            for (int i = 0; i < n / 2; i++)
+            //Grabs the first half of the nodes, then the second half for subsets.
+            // for (int i = 0; i < n / 2; i++)
+            // {
+            //     subset1.Add(nodes[i].Index);
+            // }
+
+            // for (int i = n / 2; i < n; i++)
+            // {
+            //     subset2.Add(nodes[i].Index);
+            // }
+
+            //Puts every other node into subset1, then the rest into subset2
+            for (int i = 0; i < n; i++)
             {
-                subset1.Add(nodes[i].Index);
+                if (i % 2 == 0)
+                {
+                    subset1.Add(nodes[i].Index);
+                }
+                else
+                {
+                    subset2.Add(nodes[i].Index);
+                }
             }
 
-            for (int i = n / 2; i < n; i++)
-            {
-                subset2.Add(nodes[i].Index);
-            }
 
             return (subset1.ToArray(), subset2.ToArray());
         }

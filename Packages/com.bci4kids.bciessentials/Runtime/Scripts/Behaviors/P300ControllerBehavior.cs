@@ -395,6 +395,14 @@ namespace BCIEssentials.ControllerBehaviors
                 int[,] randMat1 = SubsetToRandomMatrix(subset1);
                 int[,] randMat2 = SubsetToRandomMatrix(subset2);
                 
+                //Flash through the rows of randMat1 first, then randMat2.
+                //Off time is included in these coroutines.
+                yield return StartCoroutine(FlashRowsSubsets(randMat1));
+                yield return StartCoroutine(FlashRowsSubsets(randMat2));
+                yield return StartCoroutine(FlashColsSubsets(randMat1));
+                yield return StartCoroutine(FlashColsSubsets(randMat2));
+
+                //Now shuffle!
             }
 
 
@@ -438,7 +446,57 @@ namespace BCIEssentials.ControllerBehaviors
             return newMatrix;
         }
 
-        
+        private IEnumerator FlashRowsSubsets(int[,] subset1)
+        {
+            for (int i = 0; i < subset1.GetLength(0); i++)
+            {
+                for (int j = 0; j < subset1.GetLength(1); j++)
+                {
+                    if (subset1[i,j] != -100)
+                    {
+                        _selectableSPOs[subset1[i,j]]?.StartStimulus();
+                    }
+                }
+                yield return new WaitForSecondsRealtime(onTime);
+                for (int j = 0; j < subset1.GetLength(1); j++)
+                {
+                    if (subset1[i,j] != -100)
+                    {
+                        _selectableSPOs[subset1[i,j]]?.StopStimulus();
+                    }
+                }
+                yield return new WaitForSecondsRealtime(offTime);
+            }
+        }
+
+        private IEnumerator FlashColsSubsets(int[,] subset1)
+        {
+            for (int i = 0; i < subset1.GetLength(1); i++)
+            {
+                for (int j = 0; j < subset1.GetLength(0); j++)
+                {
+                    if (subset1[j,i] != -100)
+                    {
+                        _selectableSPOs[subset1[j,i]]?.StartStimulus();
+                    }
+                }
+                yield return new WaitForSecondsRealtime(onTime);
+                for (int j = 0; j < subset1.GetLength(0); j++)
+                {
+                    if (subset1[j,i] != -100)
+                    {
+                        _selectableSPOs[subset1[j,i]]?.StopStimulus();
+                    }
+                }
+                yield return new WaitForSecondsRealtime(offTime);
+            }
+        }
+
+        private void WriteMultiFlashMarker()
+        {
+
+        }
+
         private IEnumerator RowColFlashRoutine()
         {
             // // For multi flash selection, create virtual rows and columns
