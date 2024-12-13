@@ -8,6 +8,7 @@ using BCIEssentials.Utilities;
 using Random = System.Random;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using NSubstitute;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -27,13 +28,15 @@ namespace BCIEssentials.ControllerBehaviors
         public float onTime = 0.2f;
         public float offTime = 0.3f;
 
-        [Header("Stimulus Flash Paradigm")]
+        [Header("Stimulus Flash Paradigms")]
+        [Header("Single Flash Properties")]
         [Tooltip("If true, only one SPO will flash at a time")]
         public bool singleFlash = true;
 
         [Tooltip("If true, enables context-aware SPO single flashing")]
         public bool contextAwareSingleFlash = false;
 
+        [Header("Multi Flash Properties")]
         [Tooltip("If true, enables multiple SPOs to flash at the same time." +
         "Needs to be true for rowColumn and checkerboard to work")]
         public bool multiFlash = false;
@@ -43,6 +46,8 @@ namespace BCIEssentials.ControllerBehaviors
         
         [Tooltip("If true, flashes objects in a checkerboard pattern. Requires Multiflash to be true")]
         public bool checkerboard = true;
+        [Tooltip("If true, enables context-aware SPO multi flashing")]
+        public bool contextAwareMultiFlash = false;
 
         [Header("Row/Column & Checkerboard Properties")]
         [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
@@ -265,6 +270,11 @@ namespace BCIEssentials.ControllerBehaviors
                     StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
                 }
 
+                if(contextAwareMultiFlash)
+                {
+                    StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+                }
+
 
             }
 
@@ -321,22 +331,16 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator ContextAwareSingleFlashRoutine()
         {
 
-            //int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
             int totalFlashes = numFlashesPerObjectPerSelection;          
-            //Now get the properties of the validGOs for graph bipartite problem
-            //int[] stimOrder = CalculateGraphBP(_validGOs);
-
-            // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
 
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
-            
             for (int jj = 0; jj < totalFlashes; jj++)
             {
                 //Refresh the List of available SPO Objects. This will update the _validGOs list.
                 PopulateObjectList();
-                //Now get the
+                //Now get the Graph set for the TSP
                 Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
-                int[] stimOrder = CalculateGraphBP(_validGOs);
+                int[] stimOrder = CalculateGraphTSP(_validGOs);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
@@ -387,48 +391,46 @@ namespace BCIEssentials.ControllerBehaviors
             // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
-                int[] stimOrder = CalculateGraphBP(_validGOs);
+                Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
+                var (subset1,subset2) = CalculateGraphPartition(_validGOs);
 
-                for (int i = 0; i < stimOrder.Length; i++)
-                {
-                    GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
-
-                    string markerString = "p300,s," + _selectableSPOs.Count.ToString();
-
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString = markerString + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString = markerString + "," + "-1";
-                    }
-
-                    markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
-
-
-                    // Turn on
-                    currentObject.GetComponent<SPO>().StartStimulus();
-
-                    // Send marker
-                    if (!blockOutGoingLSL)
-                    {
-                        marker.Write(markerString);
-                    }
-
-                    // Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    // Turn off
-                    currentObject.GetComponent<SPO>().StopStimulus();
-
-                    // Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-                }
+                //Turn the subsets into randomized matrices,
+                SubsetToRandomMatrix(subset1);
+                
             }
 
+
+            yield return null;
+
         }
+
+        private int[,] SubsetToRandomMatrix(int[] subset)
+        {
+            Debug.Log("Original Subset" + string.Join(",",subset));
+            int[] permutationArray = ArrayUtilities.GenerateRNRA_FisherYates(subset.Length,0,subset.Length-1);
+            int[] subsetPermutated = new int[subset.Length];
+            //Apply the permutation to the subset
+            for (int i = 0; i < subset.Length; i++)
+            {
+                subsetPermutated[i] = subset[permutationArray[i]];
+            }
+            Debug.Log("Shuffled Subset" + string.Join(",",subsetPermutated));
+            var numRows = (int)Mathf.Floor(Mathf.Sqrt(subset.Length));
+            var numCols = (int)Mathf.Ceil(subset.Length / numRows);
+            var newMatrx = new int[numRows, numCols];
+
+            for (int i = 0; i < numRows; i++)
+            {
+                for (int j = 0; j < numCols; j++)
+                {
+                    //Assign an element to the matrix
+
+                }
+            } 
+
+            return null;
+        }
+
         
         private IEnumerator RowColFlashRoutine()
         {
@@ -931,6 +933,23 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         private int[,] Initialize2DMultiFlash()
         {
                 // For multi flash selection, create virtual rows and columns
@@ -1045,7 +1064,7 @@ namespace BCIEssentials.ControllerBehaviors
             return allValidGOs;
         }
 
-        public int[] CalculateGraphBP(List<GameObject> nodes)
+        public int[] CalculateGraphTSP(List<GameObject> nodes)
         {
             //Get the world points of each item with respect to the camera
             // var cameraTranfsorm = Camera.main.transform;
@@ -1082,7 +1101,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
 
-            GraphUtilitiesTSP tsp = new GraphUtilitiesTSP();
+            GraphUtilities tsp = new GraphUtilities();
             
             var startNode = UnityEngine.Random.Range(0, numNodes);
             //Make sure the start node and last node of the tour are not the same
@@ -1107,6 +1126,54 @@ namespace BCIEssentials.ControllerBehaviors
 
             //Use the graph utilities to do the modified TSP.      
 
+        }
+
+        public (int[] subset1, int[] subset2) CalculateGraphPartition(List<GameObject> nodes)
+        {
+            //Get the world points of each item with respect to the camera
+            // var cameraTranfsorm = Camera.main.transform;
+            List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
+            int numNodes = nodes.Count;
+            float[,] objectWeights = new float[numNodes, numNodes];
+        
+            foreach (var node in nodes)
+            {
+                //use Vector3.Angle to get the angle between every object in the scene. Store this as weights in a graph
+                //This is a symmetric matrix, so we only need to calculate the upper triangle
+                for (int i = 0; i < numNodes; i++)
+                {
+                    if (i == nodes.IndexOf(node))
+                    {
+                        objectWeights[nodes.IndexOf(node), i] = 0;
+                    }
+                    else
+                    {
+                        objectWeights[nodes.IndexOf(node), i] = Vector3.Angle(correctedNodePositions[nodes.IndexOf(node)], correctedNodePositions[i]);
+                    }
+                }
+            }
+            // //Print the weights in the upper triangle matrix
+            // for (int i = 0; i < numNodes; i++)
+            // {
+            //     for (int j = 0; j < numNodes; j++)
+            //     {
+            //         if (j >= i && objectWeights[i, j] != 0)
+            //         {
+            //             Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
+            //         }
+            //     }
+            // }
+
+            var lpPart = new GraphUtilities();
+            var (subset1, subset2) = lpPart.LaplaceGP(objectWeights);
+            //Print out the partition
+            Debug.Log("Partition 1: " + string.Join(",", subset1));
+            var subset1Weight = lpPart.GetLPSubsetWeight(objectWeights, subset1.ToList());
+            Debug.Log("Partition 1 Weight: " + subset1Weight);
+            Debug.Log("Partition 2: " + string.Join(",", subset2));
+            var subset2Weight = lpPart.GetLPSubsetWeight(objectWeights, subset2.ToList());
+            Debug.Log("Partition 2 Weight: " + subset2Weight);
+            return (subset1, subset2);
         }
 
         public List<Vector3> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
