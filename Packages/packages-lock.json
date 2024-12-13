@@ -9,6 +9,13 @@
         "com.labstreaminglayer.lsl4unity": "1.16.0"
       }
     },
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "7c80e98d3b56ecbcf854a9336458b6b0dedf1b8f"
+    },
     "com.labstreaminglayer.lsl4unity": {
       "version": "https://github.com/labstreaminglayer/LSL4Unity.git",
       "depth": 0,
