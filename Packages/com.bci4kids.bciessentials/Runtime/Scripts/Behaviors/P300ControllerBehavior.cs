@@ -384,18 +384,16 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator ContextAwareMultiFlashRoutine()
         {
             //Total number of flashes for each grouping of objects.
-            int totalFlashes = numFlashesPerObjectPerSelection;          
-            //Now get the properties of the validGOs for graph bipartite problem
-            //int[] stimOrder = CalculateGraphBP(_validGOs);
-
-            // int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
+            int totalFlashes = numFlashesPerObjectPerSelection;
+                      
             for (int jj = 0; jj < totalFlashes; jj++)
             {
                 Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
                 var (subset1,subset2) = CalculateGraphPartition(_validGOs);
 
                 //Turn the subsets into randomized matrices,
-                SubsetToRandomMatrix(subset1);
+                int[,] randMat1 = SubsetToRandomMatrix(subset1);
+                int[,] randMat2 = SubsetToRandomMatrix(subset2);
                 
             }
 
@@ -406,7 +404,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         private int[,] SubsetToRandomMatrix(int[] subset)
         {
-            Debug.Log("Original Subset" + string.Join(",",subset));
+            // Debug.Log("Original Subset" + string.Join(",",subset));
             int[] permutationArray = ArrayUtilities.GenerateRNRA_FisherYates(subset.Length,0,subset.Length-1);
             int[] subsetPermutated = new int[subset.Length];
             //Apply the permutation to the subset
@@ -414,21 +412,30 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 subsetPermutated[i] = subset[permutationArray[i]];
             }
-            Debug.Log("Shuffled Subset" + string.Join(",",subsetPermutated));
+            // Debug.Log("Shuffled Subset" + string.Join(",",subsetPermutated));
             var numRows = (int)Mathf.Floor(Mathf.Sqrt(subset.Length));
             var numCols = (int)Mathf.Ceil(subset.Length / numRows);
-            var newMatrx = new int[numRows, numCols];
+            var newMatrix = new int[numRows, numCols];
 
             for (int i = 0; i < numRows; i++)
             {
                 for (int j = 0; j < numCols; j++)
                 {
-                    //Assign an element to the matrix
+                    int index = i * numCols + j;
+                    if (index < subset.Length)
+                    {
+                        newMatrix[i, j] = subsetPermutated[index];
+                    }
+                    else
+                    {
+                        newMatrix[i, j] = -100;
+                    }
 
                 }
             } 
 
-            return null;
+            // Debug.Log("New Matrix:\n" + ArrayUtilities.FormatMatrix(newMatrix));
+            return newMatrix;
         }
 
         
@@ -933,19 +940,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
         

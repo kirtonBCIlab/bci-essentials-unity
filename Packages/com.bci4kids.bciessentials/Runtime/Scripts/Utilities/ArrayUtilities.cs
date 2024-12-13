@@ -282,16 +282,23 @@ namespace BCIEssentials.Utilities
         }
         #endregion
     
-        #region Graph Based Bipartition Array Generation
-        /// <summary>
-        /// Summary will go here
-        /// </summary>
-        /// <param name="arrayLength"></param>
-        
-        public static int[] GenerateGraphBipartitionArray()
+        #region Matrix Printing Utilities
+        public static string FormatMatrix(int[,] matrix)
         {
+            int numRows = matrix.GetLength(0);
+            int numCols = matrix.GetLength(1);
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-            return null;
+            for (int i = 0; i < numRows; i++)
+            {
+                for (int j = 0; j < numCols; j++)
+                {
+                    sb.Append(matrix[i, j].ToString().PadLeft(4));
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
 
         #endregion
