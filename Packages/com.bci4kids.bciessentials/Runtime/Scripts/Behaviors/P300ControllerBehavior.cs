@@ -450,13 +450,19 @@ namespace BCIEssentials.ControllerBehaviors
         {
             for (int i = 0; i < subset1.GetLength(0); i++)
             {
+                List<int> objToFlash = new List<int>();
+
                 for (int j = 0; j < subset1.GetLength(1); j++)
                 {
                     if (subset1[i,j] != -100)
                     {
+                        //Add the object to the list of objects to flash for marker writing
+                        objToFlash.Add(subset1[i,j]);
                         _selectableSPOs[subset1[i,j]]?.StartStimulus();
                     }
                 }
+                //Write the marker for the objects to flash
+                WriteMultiFlashMarker(objToFlash);
                 yield return new WaitForSecondsRealtime(onTime);
                 for (int j = 0; j < subset1.GetLength(1); j++)
                 {
@@ -473,13 +479,20 @@ namespace BCIEssentials.ControllerBehaviors
         {
             for (int i = 0; i < subset1.GetLength(1); i++)
             {
+                //Create empty list to flash
+                List<int> objToFlash = new List<int>();
+
                 for (int j = 0; j < subset1.GetLength(0); j++)
                 {
                     if (subset1[j,i] != -100)
                     {
+                        //Add the object to the list of objects to flash for marker writing
+                        objToFlash.Add(subset1[i,j]);
                         _selectableSPOs[subset1[j,i]]?.StartStimulus();
                     }
                 }
+                //Write the marker for the objects to flash
+                WriteMultiFlashMarker(objToFlash);
                 yield return new WaitForSecondsRealtime(onTime);
                 for (int j = 0; j < subset1.GetLength(0); j++)
                 {
@@ -492,9 +505,29 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        private void WriteMultiFlashMarker()
+        private void WriteMultiFlashMarker(List<int> objToFlash)
         {
+            //Initialize marker string
+            string markerString = "p300,m," + _selectableSPOs.Count.ToString();
 
+            //Add training target
+            if (trainTarget <= _selectableSPOs.Count)
+            {
+                markerString = markerString + "," + trainTarget.ToString();
+            }
+            else
+            {
+                markerString = markerString + "," + "-1";
+            }
+
+            //Add the rest of the objects to the marker string
+            markerString = markerString + "," + string.Join(",",objToFlash);
+
+            // Send marker
+            if (blockOutGoingLSL == false)
+            {
+                marker.Write(markerString);
+            }
         }
 
         private IEnumerator RowColFlashRoutine()
