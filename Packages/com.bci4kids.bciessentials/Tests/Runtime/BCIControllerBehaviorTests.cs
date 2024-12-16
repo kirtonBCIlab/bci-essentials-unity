@@ -532,7 +532,12 @@ namespace BCIEssentials.Tests
         }
     }
 
-    public class BCIP300ControllerBehavior_SpoGraphTests : PlayModeTestRunnerBase
+    #region P300ControllerBehaviorTests
+    //This is where the P300ControllerBehavior tests will be included and defined.
+
+    //TODO: Add test for P300 Graph partitioning
+
+        public class BCIP300ControllerBehavior_SpoGraphTests : PlayModeTestRunnerBase
      {
         private BCIController _testController;
         private GameObject _testControllerObject;
@@ -603,4 +608,6 @@ namespace BCIEssentials.Tests
             return spo;
         }
     }
+    
+    #endregion
 }
