@@ -64,4 +64,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-
+#Don't Ignore the MathNet.Numerics.dll
+!Assets/Plugins/MathNet.Numerics.dll
