@@ -278,6 +278,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             }
 
+            //This is what is causing the issue with the "Trial Ends" marker being sent too early I think.
             StopStimulusRun();
             
             yield return null;
