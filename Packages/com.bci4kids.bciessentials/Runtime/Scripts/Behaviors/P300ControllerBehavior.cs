@@ -71,7 +71,8 @@ namespace BCIEssentials.ControllerBehaviors
 
         private bool blockOutGoingLSL = false;
 
-        private int __uniqueP300ID = 1;
+        //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.
+        private int __uniqueP300ID = 0;
 
         public SpoPopulationMethod myPopMethod = SpoPopulationMethod.GraphBP;
 
@@ -246,15 +247,21 @@ namespace BCIEssentials.ControllerBehaviors
             if (singleFlash)
             {
                 //This may not be the right way to do this.
-                StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
-                // yield return SingleFlashRoutine();
+                Coroutine single_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, SingleFlashRoutine());
+                yield return single_flashCR;
+                //Old method
+                //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
+
             }
 
             if (contextAwareSingleFlash)
             {
                 //This may not be the right way to do this.
-                StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
-                // yield return SingleFlashRoutine();
+                Coroutine single_context_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus,  ContextAwareSingleFlashRoutine());
+                yield return single_context_flashCR;
+                //Old method
+                //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
+
             }
 
             if (multiFlash)
@@ -262,17 +269,23 @@ namespace BCIEssentials.ControllerBehaviors
 
                 if (rowColumn)
                 {
-                    StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
+                    //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
+                    Coroutine rc_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, RowColFlashRoutine());
+                    yield return rc_flashCR;
                 }
 
                 if (checkerboard)
                 {
-                    StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
+                    //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
+                    Coroutine cb_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, CheckerboardFlashRoutine());
+                    yield return cb_flashCR;
                 }
 
                 if(contextAwareMultiFlash)
                 {
-                    StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+                    //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+                    Coroutine context_multi_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+                    yield return context_multi_flashCR;
                 }
 
 
@@ -1079,7 +1092,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                         // Check if the object has a unique ObjectID, 
                         // if not assign it a unique ID
-                        if (taggedGO.GetComponent<SPO>().ObjectID == 0)
+                        if (taggedGO.GetComponent<SPO>().ObjectID == -100)
                         {
                             taggedGO.GetComponent<SPO>().ObjectID = __uniqueP300ID;
                             __uniqueP300ID++;
@@ -1120,7 +1133,7 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                     // Check if the object has a unique ObjectID, 
                     // if not assign it a unique ID
-                    if (obj.GetComponent<SPO>().ObjectID == 0)
+                    if (obj.GetComponent<SPO>().ObjectID == -100)
                     {
                         obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
                         __uniqueP300ID++;
@@ -1137,7 +1150,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 // Check if the object has a unique ObjectID, 
                 // if not assign it a unique ID
-                if (obj.GetComponent<SPO>().ObjectID == 0)
+                if (obj.GetComponent<SPO>().ObjectID == -100)
                 {
                     obj.GetComponent<SPO>().ObjectID = __uniqueP300ID;
                     __uniqueP300ID++;

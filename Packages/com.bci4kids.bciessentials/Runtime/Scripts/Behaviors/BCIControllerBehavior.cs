@@ -727,6 +727,18 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
+        //This is a different Stop start Coroutine Method, that is used to return a coroutine reference. Might be better to use this one, but needs testing.
+        protected Coroutine Stop_Coroutines_Then_Start_New_Coroutine(ref Coroutine reference_coroutine, IEnumerator routine)
+        {
+            if (reference_coroutine != null)
+            {
+                StopCoroutine(reference_coroutine);
+            }
+
+            reference_coroutine = StartCoroutine(routine);
+            return reference_coroutine;
+        }
+
         protected void StopCoroutineReference(ref Coroutine reference)
         {
             if (reference != null)
