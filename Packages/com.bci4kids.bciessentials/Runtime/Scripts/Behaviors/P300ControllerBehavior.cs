@@ -340,7 +340,7 @@ namespace BCIEssentials.ControllerBehaviors
                 //Refresh the List of available SPO Objects. This will update the _validGOs list.
                 PopulateObjectList();
                 //Now get the Graph set for the TSP
-                Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
+                //Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
                 int[] stimOrder = CalculateGraphTSP(_validGOs);
 
                 for (int i = 0; i < stimOrder.Length; i++)
@@ -389,7 +389,7 @@ namespace BCIEssentials.ControllerBehaviors
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
+                //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
                 var (subset1,subset2) = CalculateGraphPartition(_validGOs);
 
                 //Turn the subsets into randomized matrices,
@@ -1150,7 +1150,7 @@ namespace BCIEssentials.ControllerBehaviors
             return allValidGOs;
         }
 
-        public int[] CalculateGraphTSP(List<GameObject> nodes)
+        public int[] CalculateGraphTSP(List<GameObject> nodes, bool debugPrint = false)
         {
             //Get the world points of each item with respect to the camera
             // var cameraTranfsorm = Camera.main.transform;
@@ -1174,14 +1174,18 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                 }
             }
-            //Print the weights in the upper triangle matrix
-            for (int i = 0; i < numNodes; i++)
+
+            if (debugPrint)
             {
-                for (int j = 0; j < numNodes; j++)
+                //Print the weights in the upper triangle matrix
+                for (int i = 0; i < numNodes; i++)
                 {
-                    if (j >= i && objectWeights[i, j] != 0)
+                    for (int j = 0; j < numNodes; j++)
                     {
-                        Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
+                        if (j >= i && objectWeights[i, j] != 0)
+                        {
+                            Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
+                        }
                     }
                 }
             }
@@ -1196,16 +1200,21 @@ namespace BCIEssentials.ControllerBehaviors
                 //chose a different start node
                 startNode = (startNode+1) % numNodes;
             }
-
-            Debug.Log("The start node is " + startNode.ToString());
+          
             var tour = tsp.SolveModifiedTSP(objectWeights, startNode);
             lastTourEndNode = tour[tour.Count - 1];
-            //Print out the tour
-            for (int i = 0; i < tour.Count; i++)
+
+            if(debugPrint)
             {
-                Debug.Log("The tour is " + tour[i].ToString());
+                Debug.Log("The start node is " + startNode.ToString());
+                            //Print out the tour
+                for (int i = 0; i < tour.Count; i++)
+                {
+                    Debug.Log("The tour is " + tour[i].ToString());
+                }
+                Debug.Log("Tour length is: " + tsp.CalculateTourLength(tour));
             }
-            Debug.Log("Tour length is: " + tsp.CalculateTourLength(tour));
+
             int[] tourArray = tour.ToArray();
             return tourArray;
   
