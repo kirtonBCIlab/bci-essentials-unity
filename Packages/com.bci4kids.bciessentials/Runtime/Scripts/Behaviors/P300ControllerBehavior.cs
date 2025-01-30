@@ -1099,6 +1099,9 @@ namespace BCIEssentials.ControllerBehaviors
                         }
 
                         _selectableSPOs.Add(spo);
+                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
+                        //Print out the Dictionary Pairs
+                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
                         spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
                     }
                     break;
