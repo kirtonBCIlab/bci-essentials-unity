@@ -1143,6 +1143,10 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                     uiGOs.Add(obj);
                     _selectableSPOs.Add(uiSpo);
+                    if (!_objectIDtoSPODict.ContainsKey(obj.GetComponent<SPO>().ObjectID))
+                    {
+                        _objectIDtoSPODict.Add(obj.GetComponent<SPO>().ObjectID, uiSpo);
+                    }
                     uiSpo.SelectablePoolIndex = _selectableSPOs.Count - 1;
                     continue;
                 }
@@ -1160,6 +1164,10 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 visibleGOs.Add(obj);
                 _selectableSPOs.Add(spo);
+                if (!_objectIDtoSPODict.ContainsKey(obj.GetComponent<SPO>().ObjectID))
+                {
+                    _objectIDtoSPODict.Add(obj.GetComponent<SPO>().ObjectID, spo);
+                }
                 spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
             }
             var allValidGOs = uiGOs.Concat(visibleGOs).ToList();
