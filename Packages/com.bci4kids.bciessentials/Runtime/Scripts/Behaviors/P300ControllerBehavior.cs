@@ -25,8 +25,8 @@ namespace BCIEssentials.ControllerBehaviors
         public Random randNumFlashes = new Random();
         private int numFlashesPerObjectPerSelection = 3;
 
-        public float onTime = 0.2f;
-        public float offTime = 0.3f;
+        public float onTime = 0.1f;
+        public float offTime = 0.075f;
 
         [Header("Stimulus Flash Paradigms")]
         [Header("Single Flash Properties")]
@@ -49,6 +49,11 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("If true, enables context-aware SPO multi flashing")]
         public bool contextAwareMultiFlash = false;
 
+        [Header("Row/Column & Checkerboard Properties")]
+        [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
+        public int numFlashRows = 5;
+        [Tooltip("Number of columns in the multi-flash RowColumn or Checkerboard")]
+        public int numFlashColumns = 6;
         [Header("Row/Column & Checkerboard Properties")]
         [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
         public int numFlashRows = 5;

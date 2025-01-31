@@ -469,6 +469,19 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
             
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
+            
+            _spos = new List<SPO>
+            {
+                AddSPOToScene(),
+                AddSPOToScene(),
+                AddSPOToScene(),
+            };
+
+            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
+            {
+                _selectableSPOs = _spos
+            });
+
             yield return null;
             
             BCIController.ChangeBehavior(_behavior.BehaviorType);
