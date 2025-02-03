@@ -437,7 +437,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             // Debug.Log("Shuffled Subset" + string.Join(",",subsetPermutated));
             var numRows = (int)Mathf.Floor(Mathf.Sqrt(subset.Length));
-            var numCols = (int)Mathf.Ceil(subset.Length / numRows);
+            var numCols = (int)Mathf.Ceil((float)subset.Length / (float)numRows);
             var newMatrix = new int[numRows, numCols];
 
             for (int i = 0; i < numRows; i++)
@@ -502,7 +502,7 @@ namespace BCIEssentials.ControllerBehaviors
                     if (subset1[j,i] != -100)
                     {
                         //Add the object to the list of objects to flash for marker writing
-                        objToFlash.Add(subset1[i,j]);
+                        objToFlash.Add(subset1[j,i]);
                         _selectableSPOs[subset1[j,i]]?.StartStimulus();
                     }
                 }
