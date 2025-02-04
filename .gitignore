@@ -2,7 +2,10 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-/[Aa]ssets/
+/[Aa]ssets/Packages/
+/[Aa]ssets/Packages.meta
+/[Aa]ssets/Samples/
+/[Aa]ssets/Samples.meta
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -64,4 +67,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-
+# Don't ignore the MathNet.Numerics.dll
+!/Assets/Plugins/

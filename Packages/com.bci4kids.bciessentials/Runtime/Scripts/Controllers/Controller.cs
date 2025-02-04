@@ -652,7 +652,7 @@ public class Controller : MonoBehaviour
             yield return new WaitForSecondsRealtime(receiveInterval);
         }
 
-        Debug.Log("Done receiving markers");
+        
     }
 
 

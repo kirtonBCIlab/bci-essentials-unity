@@ -1,6 +1,6 @@
 {
   "name": "com.bci4kids.bciessentials",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "displayName": "BCI Essentials",
   "description": "A Unity base environment for streamlined development of BCI applications",
   "unity": "2021.3",
@@ -22,6 +22,11 @@
       "displayName": "Controller Hotswapping Example",
       "description": "Demonstrates how to set up a BCI controller with multiple behavior types which can be switched at runtime.",
       "path": "Samples~/Controller Hotswapping Example"
+    },
+    {
+      "displayName": "Environment Aware P300 Example",
+      "description": "Demonstrates a use case where the P300ControllerBehavior flashing updates targets based on other relative BCI objects.",
+      "path": "Samples~/Environment Aware P300"
     },
     {
       "displayName": "Original MI Controller",

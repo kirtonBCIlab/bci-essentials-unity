@@ -41,9 +41,9 @@ namespace BCIEssentials.StimulusObjects
 
         /// <summary>
         /// Assigned in editor or by the PopulateObjectIDList method, this 
-        /// is a unique identifier for this SPO.
+        /// is a unique identifier for this SPO. It defaults to -100.
         /// </summary>
-        public int ObjectID = 0;
+        public int ObjectID = -100;
 
         /// <summary>
         /// Request this SPO stimulus to begin.

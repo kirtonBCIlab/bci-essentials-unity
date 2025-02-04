@@ -13,6 +13,9 @@ Follow these instructions to install BCI Essentials as a package to an existing 
 
 Note - tested with Uniy version 2021.3.15.f1, other editor versions might work but they have not been tested.
 
+## Dependencies
+- Math.NET Numerics: Included as `Assets/Plugins/MathNet.Numerics.dll` for numerical computations.
+
 ### Running Sample
 1. Using Package Manager, select the BCI Essentials package and import the sample named `Original P300 Controller`
 1. Open the test scene located in: `Assets > Samples > BCI Essentials > 1.0.0 > Original P300 Controller > Scenes > P300Training.Unity`

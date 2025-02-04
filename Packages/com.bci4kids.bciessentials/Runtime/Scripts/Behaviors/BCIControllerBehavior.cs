@@ -7,6 +7,7 @@ using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine.Serialization;
+using UnityEngine.Android;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -121,6 +122,8 @@ namespace BCIEssentials.ControllerBehaviors
         protected Coroutine _waitToSelect;
 
         protected Coroutine _training;
+
+        protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
 
         #region Life Cycle Methods
@@ -323,6 +326,7 @@ namespace BCIEssentials.ControllerBehaviors
                 default:
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
+                    _objectIDtoSPODict.Clear(); 
                     var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
                     foreach (var taggedGO in taggedGOs)
                     {
@@ -340,6 +344,9 @@ namespace BCIEssentials.ControllerBehaviors
                         }
 
                         _selectableSPOs.Add(spo);
+                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
+                        //Print out the Dictionary Pairs
+                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
                         spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
                     }
                     break;
@@ -384,6 +391,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             var spo = _selectableSPOs[objectIndex];
+            // var spo = _objectIDtoSPODict[objectIndex]; //TODO: Implement this for ObjectID selection
             if (spo == null)
             {
                 Debug.LogWarning("SPO is now null and can't be selected");
@@ -495,6 +503,18 @@ namespace BCIEssentials.ControllerBehaviors
                         // If there are square brackets then remove them
                         responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
 
+                        //try to parse the rest of the response as an integer. Handle if it is the formate np.int64().
+                        //This grabs the value out of the parenthesis
+                        if (responseString.Contains("(") && responseString.Contains(")"))
+                        {
+                            int startIndex = responseString.IndexOf('(') + 1;
+                            int endIndex = responseString.IndexOf(')');
+                            if (startIndex < endIndex)
+                            {
+                                responseString = responseString.Substring(startIndex, endIndex - startIndex);
+                            }
+                        }
+
                         // If it is a single value then select that value
                         int n;
                         bool isNumeric = int.TryParse(responseString, out n);
@@ -504,13 +524,15 @@ namespace BCIEssentials.ControllerBehaviors
                             if (n < SelectableSPOs.Count)
                             {
                                 Debug.Log("Selected object " + n.ToString());
+                                //Select the correct unique ObjectID
+                                //TODO START HERE FOR SELECTING BASED ON OBJECTID
                                 SelectableSPOs[n].Select();
                             }
                         }
 
                         else
                         {
-                            Debug.Log("Response not numeric, here is the response: " + responseString);
+                            Debug.Log("Response not numeric. Here is the response: " + responseString);
                             continue;
                         }
                     }
@@ -703,6 +725,18 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             reference = StartCoroutine(routine);
+        }
+
+        //This is a different Stop start Coroutine Method, that is used to return a coroutine reference. Might be better to use this one, but needs testing.
+        protected Coroutine Stop_Coroutines_Then_Start_New_Coroutine(ref Coroutine reference_coroutine, IEnumerator routine)
+        {
+            if (reference_coroutine != null)
+            {
+                StopCoroutine(reference_coroutine);
+            }
+
+            reference_coroutine = StartCoroutine(routine);
+            return reference_coroutine;
         }
 
         protected void StopCoroutineReference(ref Coroutine reference)

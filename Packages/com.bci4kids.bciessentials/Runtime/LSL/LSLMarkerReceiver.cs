@@ -103,7 +103,7 @@ namespace BCIEssentials.LSLFramework
             {
                 _streamInlet.open_stream(_settings.OpenStreamTimeout);
             }
-            catch (TimeoutException _)
+            catch (TimeoutException)
             {
                 Debug.LogWarning("Failed to open stream within the timeout period. Stream will try open when polling starts.");
             }
@@ -208,7 +208,7 @@ namespace BCIEssentials.LSLFramework
             }
             catch (LostException e)
             {
-                Debug.LogError($"Lost connection to the StreamOutlet '{StreamInfo.name()}'");
+                Debug.LogError($"Lost connection to the StreamOutlet '{StreamInfo.name()}' + Error: {e.Message}");
             }
 
             if (pulledSamples.Count > 0)
