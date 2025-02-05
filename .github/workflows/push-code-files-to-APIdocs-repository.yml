@@ -20,7 +20,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.APIDOCS_SYNC }}
         with:
-          source-files: 'Packages/'
+          source-files: '/'
           destination-username: 'kirtonBCIlab'
           destination-repository: 'APIdocs-for-bci-essentials-unity'
           destination-branch: 'main'

@@ -1,29 +1,7 @@
-# This .gitignore file should be placed at the root of your Unity project directory
-#
-# Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
-#
-/[Aa]ssets/Packages/
-/[Aa]ssets/Packages.meta
-/[Aa]ssets/Samples/
-/[Aa]ssets/Samples.meta
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
-
-# MemoryCaptures can get excessive in size.
-# They also could contain extremely sensitive data
-/[Mm]emoryCaptures/
-
-# Recordings can get excessive in size
-/[Rr]ecordings/
-
 # Visual Studio cache directory
 .vs/
 .vscode/
+.vsconfig
 
 # Gradle cache directory
 .gradle/
@@ -54,18 +32,11 @@ ExportedObj/
 *.pdb.meta
 *.mdb.meta
 
+/*.meta
+!Editor.meta
+!Runtime.meta
+
 # Unity3D generated file on crash reports
 sysinfo.txt
 
-# Builds
-*.apk
-*.aab
-*.unitypackage
-*.app
-*.swp
-
-# Crashlytics generated file
-crashlytics-build.properties
-
-# Don't ignore the MathNet.Numerics.dll
-!/Assets/Plugins/
+.DS_Store
