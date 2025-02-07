@@ -1,7 +1,7 @@
 # BCIEssentials
 A Unity package for development of BCI applications. This environment needs [BCI-essentials-Python](https://github.com/kirtonBCIlab/bci-essentials-python) to work properly.
 
-## Getting Stdarted
+## Getting Started
 - **[Wiki](https://github.com/kirtonBCIlab/bci-essentials-unity/wiki)** – More detailed installation instructions and tutorials.
 - **[API documentation](https://kirtonbcilab.github.io/APIdocs-for-bci-essentials-unity)**
 
@@ -32,3 +32,16 @@ Note - tested with Uniy version 2021.3.15.f1, other editor versions might work b
 
 </div>
 
+
+## Contribution Setup Guide
+This project is no longer hosted as a skeleton Unity project, containing only package contents.
+
+***Pulling will break a local copy of version 1.2.0 or earlier***
+
+Contributors are recommended to follow the following steps to set up their local development projects:
+1. Create an empty Unity project
+2. Install [LSL4Unity Package](https://github.com/labstreaminglayer/LSL4Unity) using git URL: `https://github.com/labstreaminglayer/LSL4Unity.git` through the Unity package manager
+3. Clone the repository into your project under `Packages/com.bci4kids.bciessentials`
+    - ***The Folder Name Has to Match***
+
+The **[Wiki Page](https://github.com/kirtonBCIlab/bci-essentials-unity/wiki/Contributon-Setup-Guide)** contains more detailed instructions and shell scripts to automate this setup process.
