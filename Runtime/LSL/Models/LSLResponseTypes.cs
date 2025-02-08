@@ -83,7 +83,16 @@ namespace BCIEssentials.LSLFramework
         {
             T newMessage = CreateMessage<T>(captureTime, new[] {sampleValue}) as T;
             if (capturedBody is not "")
-                newMessage.ParseBody(capturedBody);
+            {
+                try
+                {
+                    newMessage.ParseBody(capturedBody);
+                }
+                catch
+                {
+                    Debug.LogWarning($"Failed to parse body of {nameof(T)}");
+                }
+            }
             return newMessage;
         }
 
@@ -120,10 +129,7 @@ namespace BCIEssentials.LSLFramework
 
         protected override void ParseBody(string body)
         {
-            if(int.TryParse(body, out int parseResult))
-                Value = parseResult;
-            else
-                Debug.LogWarning("Failed to parse LSL prediction value");
+            Value = int.Parse(body);
         }
     }
 }
