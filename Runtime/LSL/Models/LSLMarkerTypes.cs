@@ -36,14 +36,14 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public class MIEventMarker: EventMarker
+    public abstract class WindowedEventMarker: EventMarker
     {
         public float WindowLength;
 
         public override string MarkerString
-        => $"mi,{base.MarkerString},{WindowLength.ToString("f2")}";
+        => $"{base.MarkerString},{WindowLength.ToString("f2")}";
 
-        public MIEventMarker
+        public WindowedEventMarker
         (
             int spoCount, float windowLength,
             int trainingTarget = -1
@@ -54,6 +54,46 @@ namespace BCIEssentials.LSLFramework
             WindowLength = windowLength;
         }
     }
+
+    public class MIEventMarker: WindowedEventMarker
+    {
+        public override string MarkerString
+        => $"mi,{base.MarkerString}";
+
+        public MIEventMarker
+        (
+            int spoCount, float windowLength,
+            int trainingTarget = -1
+        )
+        : base(spoCount, windowLength, trainingTarget)
+        {}
+    }
+
+    public class SSVEPEventMarker: WindowedEventMarker
+    {
+        public float[] Frequencies;
+
+        public override string MarkerString
+        => $"ssvep,{base.MarkerString}{FrequenciesString}";
+
+        protected string FrequenciesString
+        => Frequencies switch {
+            {Length: 0} => "",
+            _ => $",{string.Join(",", Frequencies)}"
+        };
+
+        public SSVEPEventMarker
+        (
+            int spoCount, float windowLength,
+            float[] frequencies,
+            int trainingTarget = -1
+        )
+        : base(spoCount, windowLength, trainingTarget)
+        {
+            Frequencies = frequencies;
+        }
+    }
+
 
     public abstract class P300EventMarker: EventMarker
     {
