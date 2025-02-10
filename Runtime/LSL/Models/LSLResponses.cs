@@ -55,6 +55,14 @@ namespace BCIEssentials.LSLFramework
         private static readonly Regex MarkerReceiptRegex
             = new(@"^marker received : (.+)$");
 
+
+        public static LSLResponse BuildResponse
+        (
+            string sampleValue, double captureTime
+        )
+        => BuildResponse(new[] {sampleValue}, captureTime);
+
+
         public static LSLResponse Parse
         (
             string sampleValue
