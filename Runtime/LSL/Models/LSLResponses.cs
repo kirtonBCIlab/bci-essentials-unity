@@ -47,6 +47,13 @@ namespace BCIEssentials.LSLFramework
         }
 
 
+        public override string ToString()
+        => GetType().Name + ": {"
+            + "capture time: " + CaptureTime + ","
+            + "values: [" + string.Join(',', RawSampleValues) + "]"
+            + "}";
+
+
         public static bool TryMatchRegex
         (
             string input, Regex pattern,
