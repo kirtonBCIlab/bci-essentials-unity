@@ -4,19 +4,16 @@ namespace BCIEssentials.LSLFramework
     {
         public string MarkerBody {get; protected set;}
 
-        public static LSLResponse Parse
-        (
-            string markerBody, string sampleValue, double captureTime
-        )
+        public new static LSLResponse Parse(string markerBody)
         => markerBody switch
         {
             _ when !markerBody.Contains(',')
-                => CommandMarkerReceipt.Parse(markerBody, sampleValue, captureTime)
+                => CommandMarkerReceipt.Parse(markerBody)
             ,
             _ when EventMarkerReceipt.TryMatchParadigm(markerBody, out string paradigm)
-                => EventMarkerReceipt.Parse(paradigm, markerBody, sampleValue, captureTime)
+                => EventMarkerReceipt.Parse(paradigm, markerBody)
             ,
-            _ => CreateUnparsedMessage<LSLMarkerReceipt>(captureTime, sampleValue, markerBody)
+            _ => CreateUnparsedMessage<LSLMarkerReceipt>(markerBody)
         };
 
         protected override void ParseBody(string body)
@@ -27,25 +24,22 @@ namespace BCIEssentials.LSLFramework
 
     public class CommandMarkerReceipt: LSLMarkerReceipt
     {
-        public new static LSLResponse Parse
-        (
-            string markerBody, string sampleValue, double captureTime
-        )
+        public new static LSLResponse Parse(string markerBody)
         => markerBody switch
         {
             "Trial Started"
-                => CreateMessage<TrialStartedMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<TrialStartedMarkerReceipt>(markerBody)
             ,
             "Trial Ends"
-                => CreateMessage<TrialEndsMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<TrialEndsMarkerReceipt>(markerBody)
             ,
             "Training Complete"
-                => CreateMessage<TrainingCompleteMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<TrainingCompleteMarkerReceipt>(markerBody)
             ,
             "Update Classifier"
-                => CreateMessage<UpdateClassifierMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<UpdateClassifierMarkerReceipt>(markerBody)
             ,
-            _ => CreateUnparsedMessage<CommandMarkerReceipt>(captureTime, sampleValue, markerBody)
+            _ => CreateUnparsedMessage<CommandMarkerReceipt>(markerBody)
         };
     }
 
@@ -62,24 +56,26 @@ namespace BCIEssentials.LSLFramework
 
         public static LSLResponse Parse
         (
-            string paradigmFlag, string markerBody,
-            string sampleValue, double captureTime
+            string paradigmLabel, string markerBody
         )
-        => paradigmFlag switch
+        => paradigmLabel switch
         {
             "mi"
-                => CreateMessage<MIEventMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<MIEventMarkerReceipt>(markerBody)
             ,
             "p300"
-                => P300EventMarkerReceipt.Parse(markerBody, sampleValue, captureTime)
+                => P300EventMarkerReceipt.Parse(markerBody)
             ,
             "ssvep"
-                => CreateMessage<SSVEPEventMarkerReceipt>(captureTime, sampleValue, markerBody)
+                => BuildPartialResponseFromBody<SSVEPEventMarkerReceipt>(markerBody)
             ,
-            _ => CreateUnparsedMessage<EventMarkerReceipt>(captureTime, sampleValue, markerBody)
+            _ => CreateUnparsedMessage<EventMarkerReceipt>(markerBody)
         };
 
-        public static bool TryMatchParadigm(string markerBody, out string paradigm)
+        public static bool TryMatchParadigm
+        (
+            string markerBody, out string paradigm
+        )
         => TryMatchRegex(markerBody, @"^(mi|p300|ssvep),", out paradigm);
 
 
@@ -134,21 +130,17 @@ namespace BCIEssentials.LSLFramework
 
         // single or multiflash
         // "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
-        public new static LSLResponse Parse
-        (
-            string markerBody,
-            string sampleValue, double captureTime
-        )
+        public new static LSLResponse Parse(string markerBody)
         {
             TryMatchRegex(markerBody, @"^\w+,\s*(\w)", out string flashType);
             return flashType switch {
                 "s"
-                    => CreateMessage<SingleFlashP300EventMarkerReceipt>(captureTime, sampleValue, markerBody)
+                    => BuildPartialResponseFromBody<SingleFlashP300EventMarkerReceipt>(markerBody)
                 ,
                 "m"
-                    => CreateMessage<MultiFlashP300EventMarkerReceipt>(captureTime, sampleValue, markerBody)
+                    => BuildPartialResponseFromBody<MultiFlashP300EventMarkerReceipt>(markerBody)
                 ,
-                _ => CreateUnparsedMessage<P300EventMarkerReceipt>(captureTime, sampleValue, markerBody)
+                _ => CreateUnparsedMessage<P300EventMarkerReceipt>(markerBody)
             };
         }
 

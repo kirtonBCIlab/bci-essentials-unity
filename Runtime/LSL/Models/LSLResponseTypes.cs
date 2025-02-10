@@ -12,42 +12,36 @@ namespace BCIEssentials.LSLFramework
         public LSLResponse() {}
 
 
-        public static LSLResponse Parse
+        public static LSLResponse BuildResponse
         (
             string[] sampleValues, double captureTime
         )
-        => sampleValues switch
         {
-            _ when sampleValues.All(string.IsNullOrEmpty)
-                => CreateMessage<EmptyLSLResponse>(captureTime, sampleValues)
-            ,
-            { Length: 1 } _
-                => SingleChannelLSLResponse.Parse(sampleValues[0], captureTime)
-            ,
-            _ => CreateUnparsedMessage<LSLResponse>(captureTime, sampleValues, string.Join(" | ", sampleValues))
-        };
-        
-        protected static LSLResponse CreateMessage<T>
-        (
-            double captureTime, string[] sampleValues
-        )
-        where T : LSLResponse, new()
-        {
-            return new T()
+            LSLResponse responseObject = sampleValues switch
             {
-                CaptureTime = captureTime,
-                RawSampleValues = sampleValues
+                _ when sampleValues.All(string.IsNullOrEmpty)
+                    => new EmptyLSLResponse()
+                ,
+                { Length: 1 } _
+                    => SingleChannelLSLResponse.Parse(sampleValues[0])
+                ,
+                _ => CreateUnparsedMessage<LSLResponse>(string.Join(" | ", sampleValues))
             };
+
+            responseObject.CaptureTime = captureTime;
+            responseObject.RawSampleValues = sampleValues;
+
+            return responseObject;
         }
 
         protected static LSLResponse CreateUnparsedMessage<T>
         (
-            double captureTime, string[] sampleValues, string warningBody
+            string warningBody
         )
         where T: LSLResponse, new()
         {
             Debug.LogWarning($"Failed to parse {nameof(T)} into meaningful type: {warningBody}");
-            return CreateMessage<T>(captureTime, sampleValues);
+            return new T();
         }
     }
 
@@ -58,51 +52,43 @@ namespace BCIEssentials.LSLFramework
     {
         public static LSLResponse Parse
         (
-            string sampleValue, double captureTime
+            string sampleValue
         )
         => sampleValue switch
         {
             "ping"
-                => CreateMessage<LSLPing>(captureTime, sampleValue)
+                => new LSLPing()
             ,
             _ when TryMatchRegex(sampleValue, @"^\[?(\d+)\]?$", out string predictionBody)
-                => CreateMessage<PredictionResponse>(captureTime, sampleValue, predictionBody)
+                => BuildPartialResponseFromBody<PredictionResponse>(predictionBody)
             ,
             _ when TryMatchRegex(sampleValue, @"^marker received : (.+)$", out string markerBody)
-                => LSLMarkerReceipt.Parse(markerBody, sampleValue, captureTime)
+                => LSLMarkerReceipt.Parse(markerBody)
             ,
-            _ => CreateUnparsedMessage<SingleChannelLSLResponse>(captureTime, sampleValue, sampleValue)
+            _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
         };
 
-        protected static SingleChannelLSLResponse CreateMessage<T>
+        protected static SingleChannelLSLResponse BuildPartialResponseFromBody<T>
         (
-            double captureTime, string sampleValue,
             string capturedBody = ""
         )
         where T : SingleChannelLSLResponse, new()
         {
-            T newMessage = CreateMessage<T>(captureTime, new[] {sampleValue}) as T;
+            T responseObject = new T();
+            
             if (capturedBody is not "")
             {
                 try
                 {
-                    newMessage.ParseBody(capturedBody);
+                    responseObject.ParseBody(capturedBody);
                 }
                 catch
                 {
                     Debug.LogWarning($"Failed to parse body of {nameof(T)}");
                 }
             }
-            return newMessage;
-        }
 
-        protected static LSLResponse CreateUnparsedMessage<T>
-        (
-            double captureTime, string sampleValue, string warningBody
-        )
-        where T: SingleChannelLSLResponse, new()
-        {
-            return CreateUnparsedMessage<T>(captureTime, new[] {sampleValue}, warningBody);
+            return responseObject;
         }
 
 
