@@ -1,6 +1,6 @@
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLMarkerReceipt : SingleChannelLSLResponse
+    public class MarkerReceipt : SingleChannelLSLResponse
     {
         public string MarkerBody {get; protected set;}
 
@@ -13,7 +13,7 @@ namespace BCIEssentials.LSLFramework
             _ when EventMarkerReceipt.TryMatchParadigm(markerBody, out string paradigm)
                 => EventMarkerReceipt.Parse(paradigm, markerBody)
             ,
-            _ => CreateUnparsedMessage<LSLMarkerReceipt>(markerBody)
+            _ => CreateUnparsedMessage<MarkerReceipt>(markerBody)
         };
 
         protected override void ParseBody(string body)
@@ -22,7 +22,7 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
-    public class CommandMarkerReceipt: LSLMarkerReceipt
+    public class CommandMarkerReceipt: MarkerReceipt
     {
         public new static LSLResponse Parse(string markerBody)
         => markerBody switch
@@ -49,7 +49,7 @@ namespace BCIEssentials.LSLFramework
     public class UpdateClassifierMarkerReceipt: CommandMarkerReceipt {}
 
 
-    public class EventMarkerReceipt: LSLMarkerReceipt
+    public class EventMarkerReceipt: MarkerReceipt
     {
         public int SpoCount {get; protected set;}
         public int TrainingTarget {get; protected set;}

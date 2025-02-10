@@ -60,10 +60,10 @@ namespace BCIEssentials.LSLFramework
                 => new LSLPing()
             ,
             _ when TryMatchRegex(sampleValue, @"^\[?(\d+)\]?$", out string predictionBody)
-                => BuildPartialResponseFromBody<PredictionResponse>(predictionBody)
+                => BuildPartialResponseFromBody<Prediction>(predictionBody)
             ,
             _ when TryMatchRegex(sampleValue, @"^marker received : (.+)$", out string markerBody)
-                => LSLMarkerReceipt.Parse(markerBody)
+                => MarkerReceipt.Parse(markerBody)
             ,
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
         };
@@ -109,7 +109,7 @@ namespace BCIEssentials.LSLFramework
 
     public class LSLPing: SingleChannelLSLResponse {}
 
-    public class PredictionResponse: SingleChannelLSLResponse
+    public class Prediction: SingleChannelLSLResponse
     {
         public int Value {get; protected set;}
 
