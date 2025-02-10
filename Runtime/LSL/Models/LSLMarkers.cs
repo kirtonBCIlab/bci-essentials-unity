@@ -55,6 +55,11 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
+    /// <summary>
+    /// Motor Imagery event marker in the format:
+    /// <br/><br/>
+    /// "mi,{spo count},{train target (-1 if n/a)},{window length}"
+    /// </summary>
     public class MIEventMarker: WindowedEventMarker
     {
         public override string MarkerString
@@ -69,6 +74,11 @@ namespace BCIEssentials.LSLFramework
         {}
     }
 
+    /// <summary>
+    /// SSVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{spo count},{training target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
     public class SSVEPEventMarker: WindowedEventMarker
     {
         public float[] Frequencies;
@@ -95,6 +105,13 @@ namespace BCIEssentials.LSLFramework
     }
 
 
+    /// <summary>
+    /// P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
+    /// <br/>
+    /// <i>where 's' or 'm' indicated single or multi flash</i>
+    /// </summary>
     public abstract class P300EventMarker: EventMarker
     {
         public int ActiveSPO;

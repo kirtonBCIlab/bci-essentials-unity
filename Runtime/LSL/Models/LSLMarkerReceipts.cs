@@ -6,6 +6,9 @@ namespace BCIEssentials.LSLFramework
     {
         public string MarkerBody {get; protected set;}
 
+        /// <summary>
+        /// Parse sample into a skeleton response object
+        /// </summary>
         public new static LSLResponse Parse(string markerBody)
         => markerBody switch
         {
@@ -26,6 +29,9 @@ namespace BCIEssentials.LSLFramework
 
     public class CommandMarkerReceipt: MarkerReceipt
     {
+        /// <summary>
+        /// Parse sample into a skeleton response object
+        /// </summary>
         public new static LSLResponse Parse(string markerBody)
         => markerBody switch
         {
@@ -59,6 +65,9 @@ namespace BCIEssentials.LSLFramework
         public int SpoCount {get; protected set;}
         public int TrainingTarget {get; protected set;}
 
+        /// <summary>
+        /// Parse sample into a skeleton response object
+        /// </summary>
         public static LSLResponse Parse
         (
             string paradigmLabel, string markerBody
@@ -98,7 +107,6 @@ namespace BCIEssentials.LSLFramework
     {
         public float WindowLength {get; protected set;}
 
-        // "{paradigm},{spo count},{train target (-1 if n/a)},{window length}..."
         protected override void ParseBodySegments(string[] bodySegments)
         {
             SpoCount = int.Parse(bodySegments[1]);
@@ -107,16 +115,22 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
-    public class MIEventMarkerReceipt: WindowedEventMarkerReceipt
-    {
-        // "mi,{spo count},{train target (-1 if n/a)},{window length}"
-    }
+    /// <summary>
+    /// Receipt for Motor Imagery event marker in the format:
+    /// <br/><br/>
+    /// "mi,{spo count},{train target (-1 if n/a)},{window length}"
+    /// </summary>
+    public class MIEventMarkerReceipt: WindowedEventMarkerReceipt {}
 
+    /// <summary>
+    /// Receipt for SSVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{spo count},{training target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
     public class SSVEPEventMarkerReceipt: EventMarkerReceipt
     {
         public float[] Frequencies {get; protected set;}
 
-        // "ssvep",{spo count},{training target (-1 if n/a)},{window length},{...frequencies}
         protected override void ParseBodySegments(string[] bodySegments)
         {
             base.ParseBodySegments(bodySegments);
@@ -129,6 +143,13 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
+    /// <summary>
+    /// Receipt for P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
+    /// <br/>
+    /// <i>where 's' or 'm' indicated single or multi flash</i>
+    /// </summary>
     public class P300EventMarkerReceipt: EventMarkerReceipt
     {
         private static readonly Regex FlashTypeRegex
@@ -136,8 +157,9 @@ namespace BCIEssentials.LSLFramework
 
         public int ActiveSPO {get; protected set;}
 
-        // single or multiflash
-        // "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
+        /// <summary>
+        /// Parse sample into a skeleton response object
+        /// </summary>
         public new static LSLResponse Parse(string markerBody)
         {
             TryMatchRegex(markerBody, FlashTypeRegex, out string flashType);

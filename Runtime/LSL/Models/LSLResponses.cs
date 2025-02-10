@@ -11,7 +11,9 @@ namespace BCIEssentials.LSLFramework
 
         public LSLResponse() {}
 
-
+        /// <summary>
+        /// Build typed response object from LSL sample.
+        /// </summary>
         public static LSLResponse BuildResponse
         (
             string[] sampleValues, double captureTime
@@ -67,14 +69,19 @@ namespace BCIEssentials.LSLFramework
         private static readonly Regex MarkerReceiptRegex
             = new(@"^marker received : (.+)$");
 
-
+        /// <summary>
+        /// Build typed response object from singular
+        /// channel value of an LSL sample.
+        /// </summary>
         public static LSLResponse BuildResponse
         (
             string sampleValue, double captureTime
         )
         => BuildResponse(new[] {sampleValue}, captureTime);
 
-
+        /// <summary>
+        /// Parse sample into a skeleton response object
+        /// </summary>
         public static LSLResponse Parse
         (
             string sampleValue
@@ -122,6 +129,9 @@ namespace BCIEssentials.LSLFramework
 
     public class LSLPing: SingleChannelLSLResponse {}
 
+    /// <summary>
+    /// Prediction/Selection response from bci-essentials python back end
+    /// </summary>
     public class Prediction: SingleChannelLSLResponse
     {
         public int Value {get; protected set;}
