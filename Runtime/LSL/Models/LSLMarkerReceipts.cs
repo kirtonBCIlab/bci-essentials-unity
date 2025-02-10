@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace BCIEssentials.LSLFramework
 {
     public class MarkerReceipt : SingleChannelLSLResponse
@@ -51,6 +53,9 @@ namespace BCIEssentials.LSLFramework
 
     public class EventMarkerReceipt: MarkerReceipt
     {
+        private static readonly Regex ParadigmRegex
+            = new(@"^(mi|p300|ssvep),");
+
         public int SpoCount {get; protected set;}
         public int TrainingTarget {get; protected set;}
 
@@ -76,7 +81,7 @@ namespace BCIEssentials.LSLFramework
         (
             string markerBody, out string paradigm
         )
-        => TryMatchRegex(markerBody, @"^(mi|p300|ssvep),", out paradigm);
+        => TryMatchRegex(markerBody, ParadigmRegex, out paradigm);
 
 
         protected override void ParseBody(string body)
@@ -126,13 +131,16 @@ namespace BCIEssentials.LSLFramework
 
     public class P300EventMarkerReceipt: EventMarkerReceipt
     {
+        private static readonly Regex FlashTypeRegex
+            = new(@"^\w+,\s*(\w)");
+
         public int ActiveSPO {get; protected set;}
 
         // single or multiflash
         // "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
         public new static LSLResponse Parse(string markerBody)
         {
-            TryMatchRegex(markerBody, @"^\w+,\s*(\w)", out string flashType);
+            TryMatchRegex(markerBody, FlashTypeRegex, out string flashType);
             return flashType switch {
                 "s"
                     => BuildPartialResponseFromBody<SingleFlashP300EventMarkerReceipt>(markerBody)

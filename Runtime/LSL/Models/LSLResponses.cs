@@ -50,6 +50,11 @@ namespace BCIEssentials.LSLFramework
 
     public class SingleChannelLSLResponse: LSLResponse
     {
+        private static readonly Regex PredictionRegex
+            = new(@"^\[?(\d+)\]?$");
+        private static readonly Regex MarkerReceiptRegex
+            = new(@"^marker received : (.+)$");
+
         public static LSLResponse Parse
         (
             string sampleValue
@@ -59,10 +64,10 @@ namespace BCIEssentials.LSLFramework
             "ping"
                 => new LSLPing()
             ,
-            _ when TryMatchRegex(sampleValue, @"^\[?(\d+)\]?$", out string predictionBody)
+            _ when TryMatchRegex(sampleValue, PredictionRegex, out string predictionBody)
                 => BuildPartialResponseFromBody<Prediction>(predictionBody)
             ,
-            _ when TryMatchRegex(sampleValue, @"^marker received : (.+)$", out string markerBody)
+            _ when TryMatchRegex(sampleValue, MarkerReceiptRegex, out string markerBody)
                 => MarkerReceipt.Parse(markerBody)
             ,
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
@@ -97,11 +102,11 @@ namespace BCIEssentials.LSLFramework
 
         public static bool TryMatchRegex
         (
-            string input, string pattern,
+            string input, Regex pattern,
             out string capturedGroup
         )
         {
-            Match match = Regex.Match(input, pattern);
+            Match match = pattern.Match(input);
             capturedGroup = match.Success? match.Groups[1].Value: "";
             return match.Success;
         }
