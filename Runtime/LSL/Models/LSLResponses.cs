@@ -43,6 +43,18 @@ namespace BCIEssentials.LSLFramework
             Debug.LogWarning($"Failed to parse {nameof(T)} into meaningful type: {warningBody}");
             return new T();
         }
+
+
+        public static bool TryMatchRegex
+        (
+            string input, Regex pattern,
+            out string capturedGroup
+        )
+        {
+            Match match = pattern.Match(input);
+            capturedGroup = match.Success? match.Groups[1].Value: "";
+            return match.Success;
+        }
     }
 
     public class EmptyLSLResponse: LSLResponse {}
@@ -81,6 +93,7 @@ namespace BCIEssentials.LSLFramework
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
         };
 
+
         protected static SingleChannelLSLResponse BuildPartialResponseFromBody<T>
         (
             string capturedBody = ""
@@ -104,20 +117,7 @@ namespace BCIEssentials.LSLFramework
             return responseObject;
         }
 
-
         protected virtual void ParseBody(string body) {}
-
-
-        public static bool TryMatchRegex
-        (
-            string input, Regex pattern,
-            out string capturedGroup
-        )
-        {
-            Match match = pattern.Match(input);
-            capturedGroup = match.Success? match.Groups[1].Value: "";
-            return match.Success;
-        }
     }
 
     public class LSLPing: SingleChannelLSLResponse {}
