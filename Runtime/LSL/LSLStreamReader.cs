@@ -34,8 +34,9 @@ namespace BCIEssentials.LSLFramework
             StartCoroutine(RunResolveByType(StreamType, InitializeInlet));
         }
 
-        public void CloseStream()
+        public virtual void CloseStream()
         {
+            _inlet?.close_stream();
             _inlet?.Dispose();
             _inlet = null;
         }

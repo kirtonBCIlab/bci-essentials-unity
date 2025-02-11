@@ -1,12 +1,27 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
     public class LSLResponseProvider: LSLStreamReader
     {
+        [Min(0)]
+        public float PollingPeriod = 0.1f;
+
         private List<IResponseSubscriber> _subscribers = new();
+        
+        public bool IsPolling => _pollingCoroutine is not null;
+        private Coroutine _pollingCoroutine;
+
+
+        public override void CloseStream()
+        {
+            base.CloseStream();
+            StopPolling();
+        }
 
 
         public void SubscribePredictions(Action<Prediction> callback)
@@ -15,15 +30,63 @@ namespace BCIEssentials.LSLFramework
         => Subscribe(callback);
         public void Subscribe<T>(Action<T> callback)
         where T: LSLResponse
-        => _subscribers.Add(new ResponseSubscriber<T>(callback));
+        {
+            _subscribers.Add(new ResponseSubscriber<T>(callback));
+            if (!IsPolling)
+                StartPolling();
+        }
 
         
+        public bool UnsubscribePredictions(Action<Prediction> callback)
+        => Unsubscribe(callback);
+        public bool UnsubscribeAll(Action<LSLResponse> callback)
+        => Unsubscribe(callback);
         public bool Unsubscribe<T>(Action<T> callback)
         where T: LSLResponse
-        => _subscribers.RemoveAll
-        (
-            subscriber => subscriber.MatchesCallback(callback)
-        ) == 1;
+        {
+            int subscribersRemoved = _subscribers.RemoveAll
+            (
+                subscriber => subscriber.MatchesCallback(callback)
+            );
+
+            if (_subscribers.Count == 0)
+                StopPolling();
+            
+            return subscribersRemoved == 1;
+        }
+
+
+        private void StartPolling()
+        {
+            StopPolling();
+            if (!HasLiveInlet && !IsResolvingStream)
+                OpenStream();
+
+            _pollingCoroutine = StartCoroutine(RunPollForSamples());
+        }
+
+        private void StopPolling()
+        {
+            if (IsPolling)
+            {
+                StopCoroutine(_pollingCoroutine);
+                _pollingCoroutine = null;
+            }
+        }
+
+
+        protected IEnumerator RunPollForSamples()
+        {
+            while(true)
+            {
+                if (HasLiveInlet)
+                {
+                    PruneSubscriberList();
+                    Array.ForEach(PullAllResponses(), NotifySubscribers);
+                }
+                yield return new WaitForSeconds(PollingPeriod);
+            }
+        }
 
 
         protected void NotifySubscribers(LSLResponse response)
