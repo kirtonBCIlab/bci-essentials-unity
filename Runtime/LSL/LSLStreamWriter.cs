@@ -9,15 +9,14 @@ namespace BCIEssentials.LSLFramework
         public string StreamType = "LSL_Marker_Strings";
         public bool PrintLogs = false;
 
-        public bool HasConsumers
-            => _outlet is not null
-            && _outlet.have_consumers();
+        public bool HasConsumers => _outlet?.have_consumers() ?? false;
+        protected bool HasLiveOutlet => _outlet is not null;
         private StreamOutlet _outlet;
 
 
         void Start()
         {
-            if (_outlet is null)
+            if (!HasLiveOutlet)
                 OpenStream();
         }
 
@@ -26,7 +25,7 @@ namespace BCIEssentials.LSLFramework
 
         public bool OpenStream()
         {
-            if (_outlet is not null)
+            if (HasLiveOutlet)
             {
                 Debug.LogWarning($"Stream already initialized");
                 return false;
@@ -43,12 +42,16 @@ namespace BCIEssentials.LSLFramework
             return true;
         }
 
-        public void CloseStream() => _outlet?.Close();
+        public void CloseStream()
+        {
+            _outlet?.Close();
+            _outlet = null;
+        }
 
 
         public void PushString(string s)
         {
-            if (_outlet is not null || OpenStream())
+            if (HasLiveOutlet || OpenStream())
             {
                 _outlet.push_sample(new[] {s});
                 if (PrintLogs)
