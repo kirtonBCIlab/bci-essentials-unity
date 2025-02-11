@@ -1,6 +1,6 @@
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLMarkerStreamWriter: LSLOutletHost
+    public class LSLMarkerStreamWriter: LSLStreamWriter
     {
         public void PushTrialStartedMarker()
             => PushCommandMarker<TrialStartedMarker>();

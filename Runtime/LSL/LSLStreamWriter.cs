@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLOutletHost: MonoBehaviour
+    public class LSLStreamWriter: MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";
         public string StreamType = "LSL_Marker_Strings";
