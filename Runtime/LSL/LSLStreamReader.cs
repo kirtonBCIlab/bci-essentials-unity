@@ -11,6 +11,7 @@ namespace BCIEssentials.LSLFramework
     {
         public string StreamType = "BCI";
         [SerializeField] bool _openOnStart = false;
+        public bool PrintLogs = false;
 
         protected bool IsResolvingStream = false;
 
@@ -75,6 +76,10 @@ namespace BCIEssentials.LSLFramework
         {
             double captureTime = _inlet.pull_sample(_sampleBuffer, 0);
             parsedResponse = BuildResponse(_sampleBuffer, captureTime);
+            if (PrintLogs)
+            {
+                Debug.Log($"Pulled {parsedResponse}");
+            }
             return captureTime;
         }
     }
