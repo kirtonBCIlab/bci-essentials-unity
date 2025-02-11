@@ -6,6 +6,20 @@ using System;
 
 namespace BCIEssentials.LSLFramework
 {
+    /** <summary>
+    Utility class for finding LSL streams
+    <br/><br/>
+    Provides both synchronous and asynchronous methods
+    <code>
+    StartCoroutine(LSLStreamResolver.RunResolveByType("BCI", UseStreamInfo));
+    </code> or
+    <code>
+    if (LSLStreamResolver.TryResolveByType("BCI", out StreamInfo resolvedStream))
+    {
+        UseStreamInfo(resolvedStreamInfo);
+    }
+    </code>
+    </summary> **/
     public static class LSLStreamResolver
     {
         public static bool TryResolveByType
