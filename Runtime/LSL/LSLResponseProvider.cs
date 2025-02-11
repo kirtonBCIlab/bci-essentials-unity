@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    /** <summary>
+    A convenience class that pulls responses from an LSL
+    outlet, providing them through typed callback subscriptions.
+    </summary> **/
     public class LSLResponseProvider: LSLStreamReader
     {
         [Min(0)]
@@ -28,6 +32,20 @@ namespace BCIEssentials.LSLFramework
         => Subscribe(callback);
         public void SubscribeAll(Action<LSLResponse> callback)
         => Subscribe(callback);
+        /** <summary>
+        Add a method to the callback list,
+        starting to poll if not already doing so.
+        <br/>
+        Will only send responses of the specified type.
+        <br/><br/>
+        Methods with invalidated targets will be automatically unsubscribed,
+        enabling the use of lambdas or other anonymous delegates
+        <example><code>
+        provider.Subscribe((Prediction p) =>
+            Debug.Log("Prediction Received: " + p.Value);
+        );
+        </code></example>
+        </summary> **/
         public void Subscribe<T>(Action<T> callback)
         where T: LSLResponse
         {
@@ -41,6 +59,13 @@ namespace BCIEssentials.LSLFramework
         => Unsubscribe(callback);
         public bool UnsubscribeAll(Action<LSLResponse> callback)
         => Unsubscribe(callback);
+        /** <summary>
+        Remove a method from the callback list,
+        ceasing to poll if it is empty.
+        <br/>
+        Not necessary for cleanup, as any method with an
+        invalidated target is automatically unsubscribed
+        </summary> **/
         public bool Unsubscribe<T>(Action<T> callback)
         where T: LSLResponse
         {
