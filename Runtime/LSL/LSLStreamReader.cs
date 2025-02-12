@@ -51,7 +51,7 @@ namespace BCIEssentials.LSLFramework
         }
 
         
-        public LSLResponse[] PullAllResponses(int maxSamples = 50)
+        public virtual LSLResponse[] PullAllResponses(int maxSamples = 50)
         {
             if (!HasLiveInlet)
             {

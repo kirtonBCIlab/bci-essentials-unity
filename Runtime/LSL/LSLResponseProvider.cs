@@ -107,12 +107,19 @@ namespace BCIEssentials.LSLFramework
                 if (HasLiveInlet)
                 {
                     PruneSubscriberList();
-                    Array.ForEach(PullAllResponses(), NotifySubscribers);
+                    PullAllResponses();
                 }
                 yield return new WaitForSeconds(PollingPeriod);
             }
         }
 
+
+        public override LSLResponse[] PullAllResponses(int maxSamples = 50)
+        {
+            LSLResponse[] pulledResponses = base.PullAllResponses(maxSamples);
+            Array.ForEach(pulledResponses, NotifySubscribers);
+            return pulledResponses;
+        }
 
         protected void NotifySubscribers(LSLResponse response)
         => _subscribers.ToList().ForEach
