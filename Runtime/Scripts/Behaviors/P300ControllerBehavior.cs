@@ -339,6 +339,8 @@ namespace BCIEssentials.ControllerBehaviors
                 // Wait
                 yield return new WaitForSecondsRealtime(offTime);
             }
+
+            yield return null;
         }
         
         private IEnumerator ContextAwareSingleFlashRoutine()
@@ -391,6 +393,8 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return new WaitForSecondsRealtime(offTime);
                 }
             }
+
+            yield return null;
         }
 
         
@@ -418,9 +422,7 @@ namespace BCIEssentials.ControllerBehaviors
                 //Now shuffle!
             }
 
-
             yield return null;
-
         }
 
         private int[,] SubsetToRandomMatrix(int[] subset)
@@ -486,6 +488,8 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 yield return new WaitForSecondsRealtime(offTime);
             }
+
+            yield return null;
         }
 
         private IEnumerator FlashColsSubsets(int[,] subset1)
@@ -516,6 +520,8 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 yield return new WaitForSecondsRealtime(offTime);
             }
+
+            yield return null;
         }
 
         private void WriteMultiFlashMarker(List<int> objToFlash)
