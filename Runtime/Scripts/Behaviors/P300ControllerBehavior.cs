@@ -238,127 +238,118 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator OnStimulusRunBehavior()
         {
+            // Stop any existing flash routines
+            StopCoroutineReference(ref _runStimulus);
+            
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-            Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-            // numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-            // UnityEngine.Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
+            Debug.Log($"Number of flashes is {numFlashesPerObjectPerSelection}");
 
+            // Only run one flash type at a time
             if (singleFlash)
             {
-                //This may not be the right way to do this.
-                Coroutine single_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, SingleFlashRoutine());
-                yield return single_flashCR;
-                //Old method
-                //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
-
+                Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, SingleFlashRoutine());
             }
-
-            if (contextAwareSingleFlash)
+            else if (contextAwareSingleFlash) 
             {
-                //This may not be the right way to do this.
-                Coroutine single_context_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus,  ContextAwareSingleFlashRoutine());
-                yield return single_context_flashCR;
-                //Old method
-                //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
-
+                Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
             }
-
-            if (multiFlash)
+            else if (multiFlash)
             {
-
                 if (rowColumn)
                 {
-                    //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
-                    Coroutine rc_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, RowColFlashRoutine());
-                    yield return rc_flashCR;
+                    Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, RowColFlashRoutine());
                 }
-
-                if (checkerboard)
+                else if (checkerboard)
                 {
-                    //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
-                    Coroutine cb_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, CheckerboardFlashRoutine());
-                    yield return cb_flashCR;
+                    Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, CheckerboardFlashRoutine());
                 }
-
-                if(contextAwareMultiFlash)
+                else if (contextAwareMultiFlash)
                 {
-                    //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
-                    Coroutine context_multi_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
-                    yield return context_multi_flashCR;
+                    Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
                 }
-
-
             }
 
-            //This is what is causing the issue with the "Trial Ends" marker being sent too early I think.
+            // Wait until stimulus is complete before stopping
+            while (StimulusRunning)
+            {
+                yield return null;
+            }
+
             StopStimulusRun();
-            
-            yield return null;
         }
+        // protected override IEnumerator OnStimulusRunBehavior()
+        // {
+        //     numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
+        //     Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
+        //     // numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
+        //     // UnityEngine.Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
+
+        //     if (singleFlash)
+        //     {
+        //         //This may not be the right way to do this.
+        //         Coroutine single_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, SingleFlashRoutine());
+        //         // yield return single_flashCR;
+        //         //Old method
+        //         //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
+
+        //     }
+
+        //     if (contextAwareSingleFlash)
+        //     {
+        //         //This may not be the right way to do this.
+        //         Coroutine single_context_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus,  ContextAwareSingleFlashRoutine());
+        //         // yield return single_context_flashCR;
+        //         //Old method
+        //         //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
+
+        //     }
+
+        //     if (multiFlash)
+        //     {
+
+        //         if (rowColumn)
+        //         {
+        //             //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
+        //             Coroutine rc_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, RowColFlashRoutine());
+        //             yield return rc_flashCR;
+        //         }
+
+        //         if (checkerboard)
+        //         {
+        //             //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
+        //             Coroutine cb_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, CheckerboardFlashRoutine());
+        //             yield return cb_flashCR;
+        //         }
+
+        //         if(contextAwareMultiFlash)
+        //         {
+        //             //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+        //             Coroutine context_multi_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+        //             yield return context_multi_flashCR;
+        //         }
+
+
+        //     }
+
+        //     //This is what is causing the issue with the "Trial Ends" marker being sent too early I think.
+        //     StopStimulusRun();
+            
+        //     yield return null;
+        // }
 
         //TODO There is a bug where this is sending "Trial Ended" before the last flash is sent.
         private IEnumerator SingleFlashRoutine()
         {
-            int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
-            int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
-
-            for (int i = 0; i < stimOrder.Length; i++)
+            try 
             {
-                GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
-
-                string markerString = "p300,s," + _selectableSPOs.Count.ToString();
-
-                if (trainTarget <= _selectableSPOs.Count)
-                {
-                    markerString = markerString + "," + trainTarget.ToString();
-                }
-                else
-                {
-                    markerString = markerString + "," + "-1";
-                }
-
-                markerString = markerString + "," + stimOrder[i].ToString();
-                // markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
-
-
-                // Turn on
-                currentObject.GetComponent<SPO>().StartStimulus();
-
-                // Send marker
-                if (!blockOutGoingLSL)
-                {
-                    marker.Write(markerString);
-                }
-
-                // Wait
-                yield return new WaitForSecondsRealtime(onTime);
-
-                // Turn off
-                currentObject.GetComponent<SPO>().StopStimulus();
-
-                // Wait
-                yield return new WaitForSecondsRealtime(offTime);
-            }
-
-            yield return null;
-        }
-        
-        private IEnumerator ContextAwareSingleFlashRoutine()
-        {
-
-            int totalFlashes = numFlashesPerObjectPerSelection;          
-
-            //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
-            for (int jj = 0; jj < totalFlashes; jj++)
-            {
-                //Refresh the List of available SPO Objects. This will update the _validGOs list.
-                PopulateObjectList();
-                //Now get the Graph set for the TSP
-                //Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
-                int[] stimOrder = CalculateGraphTSP(_validGOs);
+                int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
+                int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
+                    // End flashing if the stimulus is no longer running
+                    if (!StimulusRunning) { yield break; }
+                    
                     GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
 
                     string markerString = "p300,s," + _selectableSPOs.Count.ToString();
@@ -371,8 +362,10 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         markerString = markerString + "," + "-1";
                     }
-                    Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                    markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+
+                    markerString = markerString + "," + stimOrder[i].ToString();
+                    // markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+
 
                     // Turn on
                     currentObject.GetComponent<SPO>().StartStimulus();
@@ -392,37 +385,114 @@ namespace BCIEssentials.ControllerBehaviors
                     // Wait
                     yield return new WaitForSecondsRealtime(offTime);
                 }
-            }
 
-            yield return null;
+                yield return null;
+            }
+            finally
+            {
+                StopStimulusRun();
+            }
+        }
+        
+        private IEnumerator ContextAwareSingleFlashRoutine()
+        {
+            try
+            {
+                int totalFlashes = numFlashesPerObjectPerSelection;          
+
+                //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
+                for (int jj = 0; jj < totalFlashes; jj++)
+                {
+                    // End flashing if the stimulus is no longer running
+                    if (!StimulusRunning) { yield break; }
+
+                    //Refresh the List of available SPO Objects. This will update the _validGOs list.
+                    PopulateObjectList();
+                    //Now get the Graph set for the TSP
+                    //Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
+                    int[] stimOrder = CalculateGraphTSP(_validGOs);
+
+                    for (int i = 0; i < stimOrder.Length; i++)
+                    {
+                        GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+
+                        string markerString = "p300,s," + _selectableSPOs.Count.ToString();
+
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString = markerString + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString = markerString + "," + "-1";
+                        }
+                        Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
+                        markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
+
+                        // Turn on
+                        currentObject.GetComponent<SPO>().StartStimulus();
+
+                        // Send marker
+                        if (!blockOutGoingLSL)
+                        {
+                            marker.Write(markerString);
+                        }
+
+                        // Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        // Turn off
+                        currentObject.GetComponent<SPO>().StopStimulus();
+
+                        // Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
+                }
+
+                yield return null;
+            }
+            finally
+            {
+                StopStimulusRun();
+            }
         }
 
         
         private IEnumerator ContextAwareMultiFlashRoutine()
         {
-            //Total number of flashes for each grouping of objects.
-            int totalFlashes = numFlashesPerObjectPerSelection;
-                      
-            for (int jj = 0; jj < totalFlashes; jj++)
+            try
             {
-                //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
-                var (subset1,subset2) = CalculateGraphPartition(_validGOs);
+                //Total number of flashes for each grouping of objects.
+                int totalFlashes = numFlashesPerObjectPerSelection;
+                        
+                for (int jj = 0; jj < totalFlashes; jj++)
+                {
+                    // End flashing if the stimulus is no longer running
+                    if (!StimulusRunning) { yield break; }
+                    
+                    //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
+                    var (subset1,subset2) = CalculateGraphPartition(_validGOs);
 
-                //Turn the subsets into randomized matrices,
-                int[,] randMat1 = SubsetToRandomMatrix(subset1);
-                int[,] randMat2 = SubsetToRandomMatrix(subset2);
-                
-                //Flash through the rows of randMat1 first, then randMat2.
-                //Off time is included in these coroutines.
-                yield return StartCoroutine(FlashRowsSubsets(randMat1));
-                yield return StartCoroutine(FlashRowsSubsets(randMat2));
-                yield return StartCoroutine(FlashColsSubsets(randMat1));
-                yield return StartCoroutine(FlashColsSubsets(randMat2));
+                    //Turn the subsets into randomized matrices,
+                    int[,] randMat1 = SubsetToRandomMatrix(subset1);
+                    int[,] randMat2 = SubsetToRandomMatrix(subset2);
+                    
+                    //Flash through the rows of randMat1 first, then randMat2.
+                    //Off time is included in these coroutines.
+                    yield return StartCoroutine(FlashRowsSubsets(randMat1));
+                    yield return StartCoroutine(FlashRowsSubsets(randMat2));
+                    yield return StartCoroutine(FlashColsSubsets(randMat1));
+                    yield return StartCoroutine(FlashColsSubsets(randMat2));
 
-                //Now shuffle!
+                    //Now shuffle!
+                }
+
+                yield return null;
             }
-
-            yield return null;
+            finally
+            {
+                StopStimulusRun();
+            }
         }
 
         private int[,] SubsetToRandomMatrix(int[] subset)
@@ -551,503 +621,525 @@ namespace BCIEssentials.ControllerBehaviors
 
         private IEnumerator RowColFlashRoutine()
         {
-            // // For multi flash selection, create virtual rows and columns
-            // int numSelections = _selectableSPOs.Count;
-            // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-            // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
-
-            // int[,] rcMatrix = new int[numColumns, numRows];
-            int[,] rcMatrix = Initialize2DMultiFlash();
-            int numRows = rcMatrix.GetLength(0);
-            int numColumns = rcMatrix.GetLength(1);
-            int count = 0;
-            for (int i = 0; i < numRows; i++)
+            try
             {
-                for (int j = 0; j < numColumns; j++)
+                // // For multi flash selection, create virtual rows and columns
+                // int numSelections = _selectableSPOs.Count;
+                // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
+                // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
+
+                // int[,] rcMatrix = new int[numColumns, numRows];
+                int[,] rcMatrix = Initialize2DMultiFlash();
+                int numRows = rcMatrix.GetLength(0);
+                int numColumns = rcMatrix.GetLength(1);
+                int count = 0;
+                for (int i = 0; i < numRows; i++)
                 {
-                    if (count <= _selectableSPOs.Count)
-                        rcMatrix[i, j] = count;
-                    //print(i.ToString() + j.ToString() + count.ToString());
-                    count++;
-                }
-            }
-
-            // Number of flashes per row/column
-            int totalColumnFlashes = numFlashesPerObjectPerSelection * numColumns;
-            int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
-
-            // Create a random order to flash rows and columns
-            int[] columnStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalColumnFlashes, 0, numColumns-1);
-            int[] rowStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalRowFlashes, 0, numRows-1);
-
-            for (int i = 0; i < totalColumnFlashes; i++)
-            {
-                //Initialize marker string
-                string markerString = "p300,m," + _selectableSPOs.Count.ToString();
-
-                //Add training target
-                if (trainTarget <= _selectableSPOs.Count)
-                {
-                    markerString = markerString + "," + trainTarget.ToString();
-                }
-                else
-                {
-                    markerString = markerString + "," + "-1";
+                    for (int j = 0; j < numColumns; j++)
+                    {
+                        if (count <= _selectableSPOs.Count)
+                            rcMatrix[i, j] = count;
+                        //print(i.ToString() + j.ToString() + count.ToString());
+                        count++;
+                    }
                 }
 
-                // Turn on column 
-                int columnIndex = columnStimOrder[i];
-                for (int n = 0; n < numRows; n++)
+                // Number of flashes per row/column
+                int totalColumnFlashes = numFlashesPerObjectPerSelection * numColumns;
+                int totalRowFlashes = numFlashesPerObjectPerSelection * numRows;
+
+                // Create a random order to flash rows and columns
+                int[] columnStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalColumnFlashes, 0, numColumns-1);
+                int[] rowStimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalRowFlashes, 0, numRows-1);
+
+                for (int i = 0; i < totalColumnFlashes; i++)
                 {
-                    _selectableSPOs[rcMatrix[n, columnIndex]]?.StartStimulus();
-                    markerString = markerString + "," + rcMatrix[n, columnIndex];
-                }
-
-                //// Add train target to marker
-                //if (trainTarget <= objectList.Count)
-                //{
-                //    markerString = markerString + "," + trainTarget.ToString();
-                //}
-
-                // Send marker
-                if (blockOutGoingLSL == false)
-                {
-                    marker.Write(markerString);
-                }
-
-                //Wait
-                yield return new WaitForSecondsRealtime(onTime);
-
-                //Turn off column
-                for (int n = 0; n < numRows; n++)
-                {
-                    _selectableSPOs[rcMatrix[n, columnIndex]]?.StopStimulus();
-                }
-
-                //Wait
-                yield return new WaitForSecondsRealtime(offTime);
-
-                // Flash row if available
-                if (i <= totalRowFlashes)
-                {
+                    // End flashing if the stimulus is no longer running
+                    if (!StimulusRunning) { yield break; }
                     //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+                    string markerString = "p300,m," + _selectableSPOs.Count.ToString();
 
-
-                    // Add training target
+                    //Add training target
                     if (trainTarget <= _selectableSPOs.Count)
                     {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
+                        markerString = markerString + "," + trainTarget.ToString();
                     }
                     else
                     {
-                        markerString1 = markerString1 + "," + "-1";
+                        markerString = markerString + "," + "-1";
                     }
 
-                    // Turn on row
-                    int rowIndex = rowStimOrder[i];
-                    for (int m = 0; m < numColumns; m++)
+                    // Turn on column 
+                    int columnIndex = columnStimOrder[i];
+                    for (int n = 0; n < numRows; n++)
                     {
-                        //Turn on row
-                        _selectableSPOs[rcMatrix[rowIndex, m]]?.StartStimulus();
-
-                        //Add to marker
-                        markerString1 = markerString1 + "," + rcMatrix[rowIndex, m];
+                        _selectableSPOs[rcMatrix[n, columnIndex]]?.StartStimulus();
+                        markerString = markerString + "," + rcMatrix[n, columnIndex];
                     }
 
-                    ////Add train target to marker
+                    //// Add train target to marker
                     //if (trainTarget <= objectList.Count)
                     //{
-                    //    markerString1 = markerString1 + "," + trainTarget.ToString();
+                    //    markerString = markerString + "," + trainTarget.ToString();
                     //}
 
-                    //Send Marker
+                    // Send marker
                     if (blockOutGoingLSL == false)
                     {
-                        marker.Write(markerString1);
+                        marker.Write(markerString);
                     }
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
 
-                    //Turn off Row
-                    for (int m = 0; m < numColumns; m++)
+                    //Turn off column
+                    for (int n = 0; n < numRows; n++)
                     {
-                        _selectableSPOs[rcMatrix[rowIndex, m]].StopStimulus();
+                        _selectableSPOs[rcMatrix[n, columnIndex]]?.StopStimulus();
                     }
-
 
                     //Wait
                     yield return new WaitForSecondsRealtime(offTime);
+
+                    // Flash row if available
+                    if (i <= totalRowFlashes)
+                    {
+                        //Initialize marker string
+                        string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+
+
+                        // Add training target
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString1 = markerString1 + "," + "-1";
+                        }
+
+                        // Turn on row
+                        int rowIndex = rowStimOrder[i];
+                        for (int m = 0; m < numColumns; m++)
+                        {
+                            //Turn on row
+                            _selectableSPOs[rcMatrix[rowIndex, m]]?.StartStimulus();
+
+                            //Add to marker
+                            markerString1 = markerString1 + "," + rcMatrix[rowIndex, m];
+                        }
+
+                        ////Add train target to marker
+                        //if (trainTarget <= objectList.Count)
+                        //{
+                        //    markerString1 = markerString1 + "," + trainTarget.ToString();
+                        //}
+
+                        //Send Marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerString1);
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off Row
+                        for (int m = 0; m < numColumns; m++)
+                        {
+                            _selectableSPOs[rcMatrix[rowIndex, m]].StopStimulus();
+                        }
+
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
                 }
+
+                yield return null;
+            }
+            finally
+            {
+                StopStimulusRun();
             }
         }
         
         //TODO: Need to fix Checkerboard Flashing while I'm here
         private IEnumerator CheckerboardFlashRoutine()
         {
-            // For multi flash selection, create virtual rows and columns
-            // int numSelections = _selectableSPOs.Count;
-            // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-            // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
-
-            // int[,] rcMatrix = new int[numColumns, numRows];
-            int[,] rcMatrix = Initialize2DMultiFlash();
-            int numColumns = rcMatrix.GetLength(0);
-            int numRows = rcMatrix.GetLength(1);
-                                // get the size of the black/white matrices
-            double maxBWsize = Math.Ceiling((numRows * numColumns) / 2f);
-
-            // get the number of rows and columns
-            int bwCols = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
-            int bwRows = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
-            // check if cbRows needs to match cbCols or if we can remove a row
-            if (maxBWsize < ((bwRows * bwCols) - bwRows))
+            try
             {
-                bwRows = bwRows - 1;
+                // For multi flash selection, create virtual rows and columns
+                // int numSelections = _selectableSPOs.Count;
+                // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
+                // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
+
+                // int[,] rcMatrix = new int[numColumns, numRows];
+                int[,] rcMatrix = Initialize2DMultiFlash();
+                int numColumns = rcMatrix.GetLength(0);
+                int numRows = rcMatrix.GetLength(1);
+                                    // get the size of the black/white matrices
+                double maxBWsize = Math.Ceiling((numRows * numColumns) / 2f);
+
+                // get the number of rows and columns
+                int bwCols = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
+                int bwRows = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
+                // check if cbRows needs to match cbCols or if we can remove a row
+                if (maxBWsize < ((bwRows * bwCols) - bwRows))
+                {
+                    bwRows = bwRows - 1;
+                }
+
+                int realBWSize = bwCols * bwRows;
+
+                int[] blackList = new int[realBWSize];
+                int[] whiteList = new int[realBWSize];
+
+                int blackCount = 0;
+                int whiteCount = 0;
+
+                Debug.Log("There are " + bwRows.ToString() + " rows and " + bwCols.ToString() +
+                            " columns in the BW matrices");
+
+                //This isn't actually shuffling between each target. Need to include it in the loop.
+                Random rnd = new Random();
+                int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
+
+                // assign from CB to BW
+                for (int i = 0; i < _selectableSPOs.Count; i++)
+                {
+
+                    // if there is an odd number of columns
+                    if (numColumns % 2 == 1)
+                    {
+                        //evens assigned to black
+                        if (shuffledArray[i] % 2 == 0)
+                        {
+                            blackList[blackCount] = shuffledArray[i];
+                            blackCount++;
+                        }
+                        //odds assigned to white
+                        else
+                        {
+                            whiteList[whiteCount] = shuffledArray[i];
+                            whiteCount++;
+                        }
+                    }
+
+                    // if there is an even number of columns
+                    if (numColumns % 2 == 0)
+                    {
+                        //assigned to black
+                        int numR = shuffledArray[i] / numColumns;
+                        // print("to place" + shuffledArray[i].ToString());
+                        // print("row number" + numR.ToString());
+
+                        if (((shuffledArray[i] - (numR % 2)) % 2) == 0)
+                        {
+                            blackList[blackCount] = shuffledArray[i];
+                            // print(shuffledArray[i] + " is black");
+                            blackCount++;
+                        }
+                        //assigned to white
+                        else
+                        {
+                            whiteList[whiteCount] = shuffledArray[i];
+                            // print(shuffledArray[i] + " is white");
+                            whiteCount++;
+                        }
+                    }
+
+                }
+
+                // set the remaining values to 99
+                while (whiteCount < realBWSize)
+                {
+                    whiteList[whiteCount] = 99;
+                    whiteCount++;
+                }
+
+                // set the remaining values to 99
+                while (blackCount < realBWSize)
+                {
+                    blackList[blackCount] = 99;
+                    blackCount++;
+                }
+
+                // Print the white and black indices
+                Debug.Log("blacks");
+                LogArrayValues(blackList);
+                Debug.Log("whites");
+                LogArrayValues(whiteList);
+
+                // reshape the black and white arrays to 2D
+                int[,] blackMat = new int[bwRows, bwCols];
+                int[,] whiteMat = new int[bwRows, bwCols];
+
+                int count = 0;
+                for (int i = 0; i < bwRows; i++)
+                {
+                    for (int j = 0; j < bwCols; j++)
+                    {
+                        print(count.ToString());
+                        blackMat[i, j] = blackList[count];
+                        whiteMat[i, j] = whiteList[count];
+
+                        count++;
+                    }
+                }
+
+                int[] objectsToFlash = new int[bwCols];
+
+                // for flash count
+                for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
+                {
+                    // End flashing if the stimulus is no longer running
+                    if (!StimulusRunning) { yield break; }
+                    
+                    // for black rows
+                    for (int br = 0; br < bwRows; br++)
+                    {
+                        for (int c = 0; c < bwCols; c++)
+                        {
+                            objectsToFlash[c] = blackMat[br, c];
+                        }
+
+                        LogArrayValues(objectsToFlash);
+
+                        //Initialize marker string
+                        string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+
+                        // Add training target
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString1 = markerString1 + "," + "-1";
+                        }
+
+                        // Turn on objects to flash
+                        for (int fi = 0; fi < bwCols; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+
+                                //Add to marker
+                                markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            }
+                        }
+
+                        //Send Marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerString1);
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off objects to flash
+                        for (int fi = 0; fi < bwCols; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StopStimulus();
+                            }
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+
+                    }
+
+                    // for white rows
+                    for (int wr = 0; wr < bwRows; wr++)
+                    {
+                        for (int c = 0; c < bwCols; c++)
+                        {
+                            objectsToFlash[c] = whiteMat[wr, c];
+                        }
+
+                        LogArrayValues(objectsToFlash);
+
+                        //Initialize marker string
+                        string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+
+                        // Add training target
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString1 = markerString1 + "," + "-1";
+                        }
+
+                        // Turn on objects to flash
+                        for (int fi = 0; fi < bwCols; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+
+                                //Add to marker
+                                markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            }
+                        }
+
+                        //Send Marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerString1);
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off objects to flash
+                        for (int fi = 0; fi < bwCols; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StopStimulus();
+                            }
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
+
+                    // for black columns
+                    for (int bc = 0; bc < bwCols; bc++)
+                    {
+                        for (int r = 0; r < bwRows; r++)
+                        {
+                            objectsToFlash[r] = blackMat[r, bc];
+                        }
+
+                        LogArrayValues(objectsToFlash);
+
+                        //Initialize marker string
+                        string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+
+                        // Add training target
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString1 = markerString1 + "," + "-1";
+                        }
+
+                        // Turn on objects to flash
+                        for (int fi = 0; fi < bwRows; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+
+                                //Add to marker
+                                markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            }
+                        }
+
+                        //Send Marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerString1);
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off objects to flash
+                        for (int fi = 0; fi < bwRows; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StopStimulus();
+                            }
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
+
+                    // for white columns
+                    for (int wc = 0; wc < bwCols; wc++)
+                    {
+                        for (int r = 0; r < bwRows; r++)
+                        {
+                            objectsToFlash[r] = whiteMat[r, wc];
+                        }
+
+                        LogArrayValues(objectsToFlash);
+
+                        //Initialize marker string
+                        string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
+
+                        // Add training target
+                        if (trainTarget <= _selectableSPOs.Count)
+                        {
+                            markerString1 = markerString1 + "," + trainTarget.ToString();
+                        }
+                        else
+                        {
+                            markerString1 = markerString1 + "," + "-1";
+                        }
+
+                        // Turn on objects to flash
+                        for (int fi = 0; fi < bwRows; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+
+                                //Add to marker
+                                markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            }
+                        }
+
+                        //Send Marker
+                        if (blockOutGoingLSL == false)
+                        {
+                            marker.Write(markerString1);
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(onTime);
+
+                        //Turn off objects to flash
+                        for (int fi = 0; fi < bwRows; fi++)
+                        {
+                            if (objectsToFlash[fi] != 99)
+                            {
+                                //Turn on row
+                                _selectableSPOs[objectsToFlash[fi]].StopStimulus();
+                            }
+                        }
+
+                        //Wait
+                        yield return new WaitForSecondsRealtime(offTime);
+                    }
+                }
+
+                yield return null;
             }
-
-            int realBWSize = bwCols * bwRows;
-
-            int[] blackList = new int[realBWSize];
-            int[] whiteList = new int[realBWSize];
-
-            int blackCount = 0;
-            int whiteCount = 0;
-
-            Debug.Log("There are " + bwRows.ToString() + " rows and " + bwCols.ToString() +
-                        " columns in the BW matrices");
-
-            //This isn't actually shuffling between each target. Need to include it in the loop.
-            Random rnd = new Random();
-            int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
-
-            // assign from CB to BW
-            for (int i = 0; i < _selectableSPOs.Count; i++)
+            finally
             {
-
-                // if there is an odd number of columns
-                if (numColumns % 2 == 1)
-                {
-                    //evens assigned to black
-                    if (shuffledArray[i] % 2 == 0)
-                    {
-                        blackList[blackCount] = shuffledArray[i];
-                        blackCount++;
-                    }
-                    //odds assigned to white
-                    else
-                    {
-                        whiteList[whiteCount] = shuffledArray[i];
-                        whiteCount++;
-                    }
-                }
-
-                // if there is an even number of columns
-                if (numColumns % 2 == 0)
-                {
-                    //assigned to black
-                    int numR = shuffledArray[i] / numColumns;
-                    // print("to place" + shuffledArray[i].ToString());
-                    // print("row number" + numR.ToString());
-
-                    if (((shuffledArray[i] - (numR % 2)) % 2) == 0)
-                    {
-                        blackList[blackCount] = shuffledArray[i];
-                        // print(shuffledArray[i] + " is black");
-                        blackCount++;
-                    }
-                    //assigned to white
-                    else
-                    {
-                        whiteList[whiteCount] = shuffledArray[i];
-                        // print(shuffledArray[i] + " is white");
-                        whiteCount++;
-                    }
-                }
-
+                StopStimulusRun();
             }
-
-            // set the remaining values to 99
-            while (whiteCount < realBWSize)
-            {
-                whiteList[whiteCount] = 99;
-                whiteCount++;
-            }
-
-            // set the remaining values to 99
-            while (blackCount < realBWSize)
-            {
-                blackList[blackCount] = 99;
-                blackCount++;
-            }
-
-            // Print the white and black indices
-            Debug.Log("blacks");
-            LogArrayValues(blackList);
-            Debug.Log("whites");
-            LogArrayValues(whiteList);
-
-            // reshape the black and white arrays to 2D
-            int[,] blackMat = new int[bwRows, bwCols];
-            int[,] whiteMat = new int[bwRows, bwCols];
-
-            int count = 0;
-            for (int i = 0; i < bwRows; i++)
-            {
-                for (int j = 0; j < bwCols; j++)
-                {
-                    print(count.ToString());
-                    blackMat[i, j] = blackList[count];
-                    whiteMat[i, j] = whiteList[count];
-
-                    count++;
-                }
-            }
-
-            int[] objectsToFlash = new int[bwCols];
-
-            // for flash count
-            for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
-            {
-                // for black rows
-                for (int br = 0; br < bwRows; br++)
-                {
-                    for (int c = 0; c < bwCols; c++)
-                    {
-                        objectsToFlash[c] = blackMat[br, c];
-                    }
-
-                    LogArrayValues(objectsToFlash);
-
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
-                    // Turn on objects to flash
-                    for (int fi = 0; fi < bwCols; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
-
-                            //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
-                        }
-                    }
-
-                    //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off objects to flash
-                    for (int fi = 0; fi < bwCols; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StopStimulus();
-                        }
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-
-                }
-
-                // for white rows
-                for (int wr = 0; wr < bwRows; wr++)
-                {
-                    for (int c = 0; c < bwCols; c++)
-                    {
-                        objectsToFlash[c] = whiteMat[wr, c];
-                    }
-
-                    LogArrayValues(objectsToFlash);
-
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
-                    // Turn on objects to flash
-                    for (int fi = 0; fi < bwCols; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
-
-                            //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
-                        }
-                    }
-
-                    //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off objects to flash
-                    for (int fi = 0; fi < bwCols; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StopStimulus();
-                        }
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-                }
-
-                // for black columns
-                for (int bc = 0; bc < bwCols; bc++)
-                {
-                    for (int r = 0; r < bwRows; r++)
-                    {
-                        objectsToFlash[r] = blackMat[r, bc];
-                    }
-
-                    LogArrayValues(objectsToFlash);
-
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
-                    // Turn on objects to flash
-                    for (int fi = 0; fi < bwRows; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
-
-                            //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
-                        }
-                    }
-
-                    //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off objects to flash
-                    for (int fi = 0; fi < bwRows; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StopStimulus();
-                        }
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-                }
-
-                // for white columns
-                for (int wc = 0; wc < bwCols; wc++)
-                {
-                    for (int r = 0; r < bwRows; r++)
-                    {
-                        objectsToFlash[r] = whiteMat[r, wc];
-                    }
-
-                    LogArrayValues(objectsToFlash);
-
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
-                    // Turn on objects to flash
-                    for (int fi = 0; fi < bwRows; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
-
-                            //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
-                        }
-                    }
-
-                    //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off objects to flash
-                    for (int fi = 0; fi < bwRows; fi++)
-                    {
-                        if (objectsToFlash[fi] != 99)
-                        {
-                            //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StopStimulus();
-                        }
-                    }
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
-                }
-            }
-
         }
 
         
@@ -1363,10 +1455,20 @@ namespace BCIEssentials.ControllerBehaviors
 
         public override void StopStimulusRun()
         {
-            // End thhe stimulus Coroutine
+            // Stop all running coroutines
+            StopCoroutineReference(ref _runStimulus);
+            
+            // Turn off any active flashing
+            foreach(var spo in _selectableSPOs)
+            {
+                if(spo != null)
+                {
+                    spo.StopStimulus();
+                }
+            }
+            
             StimulusRunning = false;
 
-            // Send the marker to end
             if (blockOutGoingLSL == false)
             {
                 marker.Write("Trial Ends");

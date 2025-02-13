@@ -248,15 +248,15 @@ namespace BCIEssentials.ControllerBehaviors
             
             // Send the marker to start
             marker.Write("Trial Started");
-
             ReceiveMarkers();
             PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
+            
+            // Start new stimulus run immediately
+            _runStimulus = StartCoroutine(RunStimulus());
 
-            // Not required for P300
             if (sendConstantMarkers)
             {
-                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
+                _sendMarkers = StartCoroutine(SendMarkers(trainTarget));
             }
         }
 
@@ -267,6 +267,11 @@ namespace BCIEssentials.ControllerBehaviors
         {
             StimulusRunning = false;
 
+            // Immediately stop all coroutines
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _sendMarkers);
+            StopCoroutineReference(ref _waitToSelect);
+
             // Send the marker to end
             if (marker != null)
             {
@@ -276,11 +281,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         protected virtual IEnumerator RunStimulus()
         {
-            while (StimulusRunning)
-            {
-                yield return OnStimulusRunBehavior();
-            }
-
+            yield return OnStimulusRunBehavior();
             yield return OnStimulusRunComplete();
             
             StopCoroutineReference(ref _runStimulus);
@@ -732,7 +733,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (reference_coroutine != null)
             {
-                StopCoroutine(reference_coroutine);
+                StopCoroutineReference(ref reference_coroutine);
             }
 
             reference_coroutine = StartCoroutine(routine);
