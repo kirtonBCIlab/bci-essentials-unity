@@ -28,7 +28,7 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        public void SubscribePredictions(Action<Prediction> callback)
+        public void SubscribePredictions(Action<LSLPredictionResponse> callback)
         => Subscribe(callback);
         public void SubscribeAll(Action<LSLResponse> callback)
         => Subscribe(callback);
@@ -55,7 +55,7 @@ namespace BCIEssentials.LSLFramework
         }
 
         
-        public bool UnsubscribePredictions(Action<Prediction> callback)
+        public bool UnsubscribePredictions(Action<LSLPredictionResponse> callback)
         => Unsubscribe(callback);
         public bool UnsubscribeAll(Action<LSLResponse> callback)
         => Unsubscribe(callback);

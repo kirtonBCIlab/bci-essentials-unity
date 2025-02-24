@@ -99,7 +99,7 @@ namespace BCIEssentials.LSLFramework
                 => new LSLPing()
             ,
             _ when TryMatchRegex(sampleValue, PredictionRegex, out string predictionBody)
-                => BuildPartialResponseFromBody<Prediction>(predictionBody)
+                => BuildPartialResponseFromBody<LSLPredictionResponse>(predictionBody)
             ,
             _ when TryMatchRegex(sampleValue, MarkerReceiptRegex, out string markerBody)
                 => MarkerReceipt.Parse(markerBody)
@@ -139,7 +139,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Prediction/Selection response from bci-essentials python back end
     /// </summary>
-    public class Prediction: SingleChannelLSLResponse
+    public class LSLPredictionResponse: SingleChannelLSLResponse
     {
         public int Value {get; protected set;}
 
