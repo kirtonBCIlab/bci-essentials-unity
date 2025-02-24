@@ -28,6 +28,18 @@ namespace BCIEssentials.LSLFramework
             )
         );
 
+        public void PushSwitchMarker
+        (
+            int objectCount, float windowLength,
+            int trainingTarget = -1
+        )
+        => PushMarker(
+            new SwitchEventMarker
+            (
+                objectCount, windowLength, trainingTarget
+            )
+        );
+
         public void PushSSVEPMarker
         (
             int objectCount, float windowLength,
@@ -42,16 +54,16 @@ namespace BCIEssentials.LSLFramework
             )
         );
 
-        public void PushSSVEPMarker
+        public void PushTVEPMarker
         (
             int objectCount, float windowLength,
-            float[] frequencies,
+            IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         => PushMarker(
-            new SSVEPEventMarker
+            new TVEPEventMarker
             (
-                objectCount, windowLength, 
+                objectCount, windowLength,
                 frequencies, trainingTarget
             )
         );
@@ -72,18 +84,6 @@ namespace BCIEssentials.LSLFramework
         public void PushMultiFlashP300EventMarker
         (
             int objectCount, IEnumerable<int> activeObjects,
-            int trainingTarget = -1
-        )
-        => PushMarker(
-            new MultiFlashP300EventMarker
-            (
-                objectCount, activeObjects, trainingTarget
-            )
-        );
-
-        public void PushMultiFlashP300EventMarker
-        (
-            int objectCount, int[] activeObjects,
             int trainingTarget = -1
         )
         => PushMarker(

@@ -77,11 +77,17 @@ namespace BCIEssentials.LSLFramework
             "mi"
                 => BuildPartialResponseFromBody<MIEventMarkerReceipt>(markerBody)
             ,
-            "p300"
-                => P300EventMarkerReceipt.Parse(markerBody)
+            "switch"
+                => BuildPartialResponseFromBody<SwitchEventMarkerReceipt>(markerBody)
             ,
             "ssvep"
                 => BuildPartialResponseFromBody<SSVEPEventMarkerReceipt>(markerBody)
+            ,
+            "tvep"
+                => BuildPartialResponseFromBody<TVEPEventMarkerReceipt>(markerBody)
+            ,
+            "p300"
+                => P300EventMarkerReceipt.Parse(markerBody)
             ,
             _ => CreateUnparsedMessage<EventMarkerReceipt>(markerBody)
         };
@@ -123,11 +129,14 @@ namespace BCIEssentials.LSLFramework
     public class MIEventMarkerReceipt: WindowedEventMarkerReceipt {}
 
     /// <summary>
-    /// Receipt for SSVEP event marker in the format:
+    /// Receipt for Switch event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "switch,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class SSVEPEventMarkerReceipt: EventMarkerReceipt
+    public class SwitchEventMarkerReceipt: WindowedEventMarkerReceipt {}
+
+
+    public abstract class VisualEvokedPotentialEventMarkerReceipt: WindowedEventMarkerReceipt
     {
         public float[] Frequencies {get; protected set;}
 
@@ -142,6 +151,21 @@ namespace BCIEssentials.LSLFramework
             }
         }
     }
+
+    /// <summary>
+    /// Receipt for SSVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
+    public class SSVEPEventMarkerReceipt: VisualEvokedPotentialEventMarkerReceipt {}
+    
+    /// <summary>
+    /// Receipt for TVEP event marker in the format:
+    /// <br/><br/>
+    /// "tvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
+    public class TVEPEventMarkerReceipt: VisualEvokedPotentialEventMarkerReceipt {}
+
 
     /// <summary>
     /// Receipt for P300 event marker in the format:

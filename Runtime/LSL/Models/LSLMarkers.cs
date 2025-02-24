@@ -87,16 +87,31 @@ namespace BCIEssentials.LSLFramework
     }
 
     /// <summary>
-    /// SSVEP event marker in the format:
+    /// Switch event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "switch,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class SSVEPEventMarker: WindowedEventMarker
+    public class SwitchEventMarker: WindowedEventMarker
+    {
+        public override string MarkerString
+        => $"switch,{base.MarkerString}";
+
+        public SwitchEventMarker
+        (
+            int objectCount, float windowLength,
+            int trainingTarget = -1
+        )
+        : base(objectCount, windowLength, trainingTarget)
+        {}
+    }
+
+
+    public abstract class VisualEvokedPotentialEventMarker: WindowedEventMarker
     {
         public float[] Frequencies;
 
         public override string MarkerString
-        => $"ssvep,{base.MarkerString}{FrequenciesString}";
+        => $"{base.MarkerString}{FrequenciesString}";
 
         protected string FrequenciesString
         => Frequencies switch {
@@ -104,25 +119,61 @@ namespace BCIEssentials.LSLFramework
             _ => $",{string.Join(",", Frequencies)}"
         };
 
+        public VisualEvokedPotentialEventMarker
+        (
+            int objectCount, float windowLength,
+            float[] frequencies,
+            int trainingTarget = -1
+        ): base(objectCount, windowLength, trainingTarget)
+        {
+            Frequencies = frequencies;
+        }
+    }
+
+    /// <summary>
+    /// SSVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
+    public class SSVEPEventMarker: VisualEvokedPotentialEventMarker
+    {
+        public override string MarkerString
+        => $"ssvep,{base.MarkerString}";
+
         public SSVEPEventMarker
         (
             int objectCount, float windowLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
-        : this(objectCount, windowLength, frequencies.ToArray(), trainingTarget)
-        {}
+        : base
+        (
+            objectCount, windowLength,
+            frequencies.ToArray(), trainingTarget
+        ) {}
+    }
 
-        public SSVEPEventMarker
+    /// <summary>
+    /// TVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// </summary>
+    public class TVEPEventMarker: VisualEvokedPotentialEventMarker
+    {
+        public override string MarkerString
+        => $"tvep,{base.MarkerString}";
+
+        public TVEPEventMarker
         (
             int objectCount, float windowLength,
-            float[] frequencies,
+            IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
-        : base(objectCount, windowLength, trainingTarget)
-        {
-            Frequencies = frequencies;
-        }
+        : base
+        (
+            objectCount, windowLength,
+            frequencies.ToArray(), trainingTarget
+        ) {}
     }
 
 
@@ -187,16 +238,9 @@ namespace BCIEssentials.LSLFramework
             int objectCount, IEnumerable<int> activeObjects,
             int trainingTarget = -1
         )
-        : this(objectCount, activeObjects.ToArray(), trainingTarget)
-        {}
-
-        public MultiFlashP300EventMarker
-        (
-            int objectCount, int[] activeObjects,
-            int trainingTarget = -1
-        ): base(objectCount, trainingTarget)
+        : base(objectCount, trainingTarget)
         {
-            ActiveObjects = activeObjects;
+            ActiveObjects = activeObjects.ToArray();
         }
     }
 }
