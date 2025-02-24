@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace BCIEssentials.LSLFramework
 {
     public class LSLMarkerStreamWriter: LSLStreamWriter
@@ -23,6 +25,20 @@ namespace BCIEssentials.LSLFramework
             new MIEventMarker
             (
                 spoCount, windowLength, trainingTarget
+            )
+        );
+
+        public void PushSSVEPMarker
+        (
+            int spoCount, float windowLength,
+            IEnumerable<float> frequencies,
+            int trainingTarget = -1
+        )
+        => PushMarker(
+            new SSVEPEventMarker
+            (
+                spoCount, windowLength,
+                frequencies, trainingTarget
             )
         );
 
@@ -55,14 +71,25 @@ namespace BCIEssentials.LSLFramework
 
         public void PushMultiFlashP300EventMarker
         (
+            int spoCount, IEnumerable<int> activeSPOs,
+            int trainingTarget = -1
+        )
+        => PushMarker(
+            new MultiFlashP300EventMarker
+            (
+                spoCount, activeSPOs, trainingTarget
+            )
+        );
+
+        public void PushMultiFlashP300EventMarker
+        (
             int spoCount, int[] activeSPOs,
             int trainingTarget = -1
         )
         => PushMarker(
             new MultiFlashP300EventMarker
             (
-                spoCount, activeSPOs,
-                trainingTarget
+                spoCount, activeSPOs, trainingTarget
             )
         );
 

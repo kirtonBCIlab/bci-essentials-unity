@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace BCIEssentials.LSLFramework
 {
     public interface ILSLMarker
@@ -33,6 +36,17 @@ namespace BCIEssentials.LSLFramework
 
         public virtual string MarkerString
         => $"{SpoCount},{TrainingTarget}";
+
+        public EventMarker
+        (
+            int spoCount, int trainingTarget
+        )
+        {
+            SpoCount = spoCount;
+            TrainingTarget = trainingTarget;
+            if (TrainingTarget > spoCount || trainingTarget < 0)
+                TrainingTarget = -1;
+        }
     }
 
 
@@ -46,11 +60,9 @@ namespace BCIEssentials.LSLFramework
         public WindowedEventMarker
         (
             int spoCount, float windowLength,
-            int trainingTarget = -1
-        )
+            int trainingTarget
+        ): base(spoCount, trainingTarget)
         {
-            SpoCount = spoCount;
-            TrainingTarget = trainingTarget;
             WindowLength = windowLength;
         }
     }
@@ -95,6 +107,15 @@ namespace BCIEssentials.LSLFramework
         public SSVEPEventMarker
         (
             int spoCount, float windowLength,
+            IEnumerable<float> frequencies,
+            int trainingTarget = -1
+        )
+        : this(spoCount, windowLength, frequencies.ToArray(), trainingTarget)
+        {}
+
+        public SSVEPEventMarker
+        (
+            int spoCount, float windowLength,
             float[] frequencies,
             int trainingTarget = -1
         )
@@ -112,7 +133,14 @@ namespace BCIEssentials.LSLFramework
     /// <br/>
     /// <i>where 's' or 'm' indicates single or multi flash</i>
     /// </summary>
-    public abstract class P300EventMarker: EventMarker {}
+    public abstract class P300EventMarker: EventMarker
+    {
+        public P300EventMarker
+        (
+            int spoCount, int trainingTarget
+        ): base(spoCount, trainingTarget)
+        {}
+    }
 
     /// <summary>
     /// P300 event marker in the format:
@@ -130,11 +158,9 @@ namespace BCIEssentials.LSLFramework
         (
             int spoCount, int activeSpo,
             int trainingTarget = -1
-        )
+        ): base(spoCount, trainingTarget)
         {
-            SpoCount = spoCount;
             ActiveSPO = activeSpo;
-            TrainingTarget = trainingTarget;
         }
     }
 
@@ -158,13 +184,19 @@ namespace BCIEssentials.LSLFramework
 
         public MultiFlashP300EventMarker
         (
-            int spoCount, int[] activeSpos,
+            int spoCount, IEnumerable<int> activeSpos,
             int trainingTarget = -1
         )
+        : this(spoCount, activeSpos.ToArray(), trainingTarget)
+        {}
+
+        public MultiFlashP300EventMarker
+        (
+            int spoCount, int[] activeSpos,
+            int trainingTarget = -1
+        ): base(spoCount, trainingTarget)
         {
-            SpoCount = spoCount;
             ActiveSPOs = activeSpos;
-            TrainingTarget = trainingTarget;
         }
     }
 }
