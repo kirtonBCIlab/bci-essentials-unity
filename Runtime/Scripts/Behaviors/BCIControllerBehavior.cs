@@ -49,6 +49,7 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
+        protected int SPOCount => _selectableSPOs.Count;
 
         private int __uniqueID = 1;
 
@@ -112,8 +113,8 @@ namespace BCIEssentials.ControllerBehaviors
         public BCITrainingType CurrentTrainingType { get; private set; }
         
         
-        protected LSLMarkerStream marker;
-        protected LSLResponseStream response;
+        protected LSLMarkerStreamWriter OutStream;
+        protected LSLResponseProvider InStream;
 
         protected Coroutine _receiveMarkers;
         protected Coroutine _sendMarkers;
@@ -149,10 +150,10 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         /// <param name="lslMarkerStream">The lsl stream to write markers to.</param>
         /// <param name="lslResponseStream">The stream to poll for markers.</param>
-        public void Initialize(LSLMarkerStream lslMarkerStream, LSLResponseStream lslResponseStream)
+        public void Initialize(LSLMarkerStreamWriter lslMarkerStream, LSLResponseProvider lslResponseStream)
         {
-            marker = lslMarkerStream;
-            response = lslResponseStream;
+            OutStream = lslMarkerStream;
+            InStream = lslResponseStream;
 
             //A value of -1 is the default
             //A value of 0 can break stimulus effects
@@ -173,15 +174,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void CleanUp()
         {
-            if (setup != null)
-            {
-                setup.DestroyMatrix();
-            }
-
-            if (response != null)
-            {
-                response.Disconnect();
-            }
+            setup?.DestroyMatrix();
+            InStream?.CloseStream();
 
             StimulusRunning = false;
             StopCoroutineReference(ref _receiveMarkers);
@@ -247,9 +241,9 @@ namespace BCIEssentials.ControllerBehaviors
             LastSelectedSPO = null;
             
             // Send the marker to start
-            marker.Write("Trial Started");
+            OutStream?.PushTrialStartedMarker();
 
-            ReceiveMarkers();
+            StartReceivingMarkers();
             PopulateObjectList();
             StopStartCoroutine(ref _runStimulus, RunStimulus());
 
@@ -268,10 +262,7 @@ namespace BCIEssentials.ControllerBehaviors
             StimulusRunning = false;
 
             // Send the marker to end
-            if (marker != null)
-            {
-                marker.Write("Trial Ends");
-            }
+            OutStream?.PushTrialEndsMarker();
         }
         
         protected virtual IEnumerator RunStimulus()
@@ -443,106 +434,29 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual IEnumerator SendMarkers(int trainingIndex = 99)
         {
-            // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                string markerString = "marker";
-
-                if (trainingIndex <= _selectableSPOs.Count)
-                {
-                    markerString = markerString + "," + trainingIndex.ToString();
-                }
-
                 // Send the marker
-                marker.Write(markerString);
-
+                // OutStream.WriteMarker(...);
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
             }
         }
 
-        public virtual void ReceiveMarkers()
+        public virtual void StartReceivingMarkers()
         {
-            if (!response.Connected)
-            {
-                response.Connect();
-            }
+            InStream.UnsubscribePredictions(OnPredictionReceived);
+            InStream.SubscribePredictions(OnPredictionReceived);
+        }
 
-            if (response.Polling)
-            {
-                response.StopPolling();
-            }
-
-            //Ping count
-            int pingCount = 0;
-            response.StartPolling(responses =>
-            {
-                foreach (var response in responses)
-                {
-                    if (response.Equals("ping"))
-                    {
-                        pingCount++;
-                        if (pingCount % 100 == 0)
-                        {
-                            Debug.Log($"Ping Count: {pingCount}");
-                        }
-                    }
-
-                    // Else if response contains "received" then skip it
-                    else if (response.Contains("received"))
-                    {
-                        continue;
-                    }
-
-                    else if (response != "")
-                    {
-                        string responseString = response;
-                        //print("WE GOT A RESPONSE");
-                        print("response : " + responseString);
-
-                        // If there are square brackets then remove them
-                        responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
-
-                        //try to parse the rest of the response as an integer. Handle if it is the formate np.int64().
-                        //This grabs the value out of the parenthesis
-                        if (responseString.Contains("(") && responseString.Contains(")"))
-                        {
-                            int startIndex = responseString.IndexOf('(') + 1;
-                            int endIndex = responseString.IndexOf(')');
-                            if (startIndex < endIndex)
-                            {
-                                responseString = responseString.Substring(startIndex, endIndex - startIndex);
-                            }
-                        }
-
-                        // If it is a single value then select that value
-                        int n;
-                        bool isNumeric = int.TryParse(responseString, out n);
-                        if (isNumeric)
-                        {
-                            //Run on selection based on index
-                            if (n < SelectableSPOs.Count)
-                            {
-                                Debug.Log("Selected object " + n.ToString());
-                                //Select the correct unique ObjectID
-                                //TODO START HERE FOR SELECTING BASED ON OBJECTID
-                                SelectableSPOs[n].Select();
-                            }
-                        }
-
-                        else
-                        {
-                            Debug.Log("Response not numeric. Here is the response: " + responseString);
-                            continue;
-                        }
-                    }
-                }
-            });
+        protected virtual void OnPredictionReceived(LSLPredictionResponse prediction)
+        {
+            SelectSPO(prediction.Value);
         }
 
         public void StopReceivingMarkers()
         {
-            response.StopPolling();
+            InStream.UnsubscribePredictions(OnPredictionReceived);
         }
         #endregion
 
@@ -566,18 +480,18 @@ namespace BCIEssentials.ControllerBehaviors
             switch (trainingType)
             {
                 case BCITrainingType.Automated:
-                    ReceiveMarkers();
+                    StartReceivingMarkers();
                     trainingBehavior = WhileDoAutomatedTraining();
                     break;
                 case BCITrainingType.Iterative:
-                    ReceiveMarkers();
+                    StartReceivingMarkers();
                     trainingBehavior = WhileDoIterativeTraining();
                     break;
                 case BCITrainingType.User:
                     trainingBehavior = WhileDoUserTraining();
                     break;
                 case BCITrainingType.Single:
-                    ReceiveMarkers();
+                    StartReceivingMarkers();
                     trainingBehavior = WhileDoSingleTraining();
                     break;
                 default:
@@ -676,7 +590,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(trainBreak);
             }
 
-            marker.Write("Training Complete");
+            OutStream.PushTrainingCompleteMarker();
         }
 
         protected virtual IEnumerator WhileDoUserTraining()
@@ -751,7 +665,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void PassBessyPythonMessage(string message)
         {
-            marker.Write(message);
+            OutStream.PushString(message);
         }
 
         #endregion

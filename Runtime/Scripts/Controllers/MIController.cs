@@ -20,7 +20,7 @@ namespace BCIEssentials.Controllers
         protected override void Start()
         {
             // Attach Scripts
-            Initialize(GetComponent<LSLMarkerStream>(), GetComponent<LSLResponseStream>());
+            Initialize(GetComponent<LSLMarkerStreamWriter>(), GetComponent<LSLResponseProvider>());
 
             // Set the target framerate
             Application.targetFrameRate = refreshRate;

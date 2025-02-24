@@ -43,28 +43,8 @@ namespace BCIEssentials.ControllerBehaviors
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
-                string freqString = "";
-                for (int i = 0; i < realFreqFlash.Length; i++)
-                {
-                    freqString = freqString + "," + realFreqFlash[i].ToString();
-                }
-
-                string trainingString;
-                if (trainingIndex <= _selectableSPOs.Count)
-                {
-                    trainingString = trainingIndex.ToString();
-                }
-                else
-                {
-                    trainingString = "-1";
-                }
-
-                string markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                      windowLength.ToString() + freqString;
-
                 // Send the marker
-                marker.Write(markerString);
+                OutStream.PushSSVEPMarker(SPOCount, windowLength, realFreqFlash, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);

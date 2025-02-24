@@ -57,7 +57,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         // update the classifier
                         Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        marker.Write("Update Classifier");
+                        OutStream.PushUpdateClassifierMarker();
                         updateCounter++;
                     }
                 }
@@ -104,7 +104,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             // Send marker
-            marker.Write("Training Complete");
+            OutStream.PushTrainingCompleteMarker();
 
             yield return 0;
 
@@ -115,11 +115,8 @@ namespace BCIEssentials.ControllerBehaviors
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
-                string trainingString = trainingIndex <= _selectableSPOs.Count ? trainingIndex.ToString() : "-1";
-
                 // Send the marker
-                marker.Write($"switch, {_selectableSPOs.Count}, {trainingString}, {windowLength}");
+                OutStream.PushSwitchMarker(SPOCount, windowLength, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
