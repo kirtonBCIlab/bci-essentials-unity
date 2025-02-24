@@ -31,20 +31,20 @@ namespace BCIEssentials.LSLFramework
 
     public abstract class EventMarker: ILSLMarker
     {
-        public int SpoCount;
+        public int ObjectCount;
         public int TrainingTarget;
 
         public virtual string MarkerString
-        => $"{SpoCount},{TrainingTarget}";
+        => $"{ObjectCount},{TrainingTarget}";
 
         public EventMarker
         (
-            int spoCount, int trainingTarget
+            int objectCount, int trainingTarget
         )
         {
-            SpoCount = spoCount;
+            ObjectCount = objectCount;
             TrainingTarget = trainingTarget;
-            if (TrainingTarget > spoCount || trainingTarget < 0)
+            if (TrainingTarget > objectCount || trainingTarget < 0)
                 TrainingTarget = -1;
         }
     }
@@ -59,9 +59,9 @@ namespace BCIEssentials.LSLFramework
 
         public WindowedEventMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             int trainingTarget
-        ): base(spoCount, trainingTarget)
+        ): base(objectCount, trainingTarget)
         {
             WindowLength = windowLength;
         }
@@ -70,7 +70,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Motor Imagery event marker in the format:
     /// <br/><br/>
-    /// "mi,{spo count},{train target (-1 if n/a)},{window length}"
+    /// "mi,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
     public class MIEventMarker: WindowedEventMarker
     {
@@ -79,17 +79,17 @@ namespace BCIEssentials.LSLFramework
 
         public MIEventMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             int trainingTarget = -1
         )
-        : base(spoCount, windowLength, trainingTarget)
+        : base(objectCount, windowLength, trainingTarget)
         {}
     }
 
     /// <summary>
     /// SSVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{spo count},{training target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
     /// </summary>
     public class SSVEPEventMarker: WindowedEventMarker
     {
@@ -106,20 +106,20 @@ namespace BCIEssentials.LSLFramework
 
         public SSVEPEventMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
-        : this(spoCount, windowLength, frequencies.ToArray(), trainingTarget)
+        : this(objectCount, windowLength, frequencies.ToArray(), trainingTarget)
         {}
 
         public SSVEPEventMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             float[] frequencies,
             int trainingTarget = -1
         )
-        : base(spoCount, windowLength, trainingTarget)
+        : base(objectCount, windowLength, trainingTarget)
         {
             Frequencies = frequencies;
         }
@@ -129,7 +129,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,[sm],{spo count},{train target (-1 if n/a)}..."
+    /// "p300,[sm],{object count},{train target (-1 if n/a)}..."
     /// <br/>
     /// <i>where 's' or 'm' indicates single or multi flash</i>
     /// </summary>
@@ -137,66 +137,66 @@ namespace BCIEssentials.LSLFramework
     {
         public P300EventMarker
         (
-            int spoCount, int trainingTarget
-        ): base(spoCount, trainingTarget)
+            int objectCount, int trainingTarget
+        ): base(objectCount, trainingTarget)
         {}
     }
 
     /// <summary>
     /// P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,s,{spo count},{train target (-1 if n/a)},{active spo}"
+    /// "p300,s,{object count},{train target (-1 if n/a)},{active object}"
     /// </summary>
     public class SingleFlashP300EventMarker: P300EventMarker
     {
-        public int ActiveSPO;
+        public int ActiveObject;
 
         public override string MarkerString
-        => $"p300,s,{base.MarkerString}, {ActiveSPO}";
+        => $"p300,s,{base.MarkerString}, {ActiveObject}";
 
         public SingleFlashP300EventMarker
         (
-            int spoCount, int activeSpo,
+            int objectCount, int activeObject,
             int trainingTarget = -1
-        ): base(spoCount, trainingTarget)
+        ): base(objectCount, trainingTarget)
         {
-            ActiveSPO = activeSpo;
+            ActiveObject = activeObject;
         }
     }
 
     /// <summary>
     /// P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,m,{spo count},{train target (-1 if n/a)},{...active spos}"
+    /// "p300,m,{object count},{train target (-1 if n/a)},{...active objects}"
     /// </summary>
     public class MultiFlashP300EventMarker: P300EventMarker
     {
-        public int[] ActiveSPOs;
+        public int[] ActiveObjects;
 
         public override string MarkerString
-        => $"p300,m,{base.MarkerString}{ActiveSpoString}";
+        => $"p300,m,{base.MarkerString}{ActiveObjectString}";
 
-        protected string ActiveSpoString
-        => ActiveSPOs switch {
+        protected string ActiveObjectString
+        => ActiveObjects switch {
             null or {Length: 0} => "",
-            _ => $",{string.Join(',', ActiveSPOs)}"
+            _ => $",{string.Join(',', ActiveObjects)}"
         };
 
         public MultiFlashP300EventMarker
         (
-            int spoCount, IEnumerable<int> activeSpos,
+            int objectCount, IEnumerable<int> activeObjects,
             int trainingTarget = -1
         )
-        : this(spoCount, activeSpos.ToArray(), trainingTarget)
+        : this(objectCount, activeObjects.ToArray(), trainingTarget)
         {}
 
         public MultiFlashP300EventMarker
         (
-            int spoCount, int[] activeSpos,
+            int objectCount, int[] activeObjects,
             int trainingTarget = -1
-        ): base(spoCount, trainingTarget)
+        ): base(objectCount, trainingTarget)
         {
-            ActiveSPOs = activeSpos;
+            ActiveObjects = activeObjects;
         }
     }
 }

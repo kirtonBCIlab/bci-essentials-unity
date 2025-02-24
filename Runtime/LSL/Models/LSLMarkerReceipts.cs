@@ -62,7 +62,7 @@ namespace BCIEssentials.LSLFramework
         private static readonly Regex ParadigmRegex
             = new(@"^(mi|p300|ssvep),");
 
-        public int SpoCount {get; protected set;}
+        public int ObjectCount {get; protected set;}
         public int TrainingTarget {get; protected set;}
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace BCIEssentials.LSLFramework
 
         protected override void ParseBodySegments(string[] bodySegments)
         {
-            SpoCount = int.Parse(bodySegments[1]);
+            ObjectCount = int.Parse(bodySegments[1]);
             TrainingTarget = int.Parse(bodySegments[2]);
             WindowLength = float.Parse(bodySegments[3]);
         }
@@ -118,14 +118,14 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Receipt for Motor Imagery event marker in the format:
     /// <br/><br/>
-    /// "mi,{spo count},{train target (-1 if n/a)},{window length}"
+    /// "mi,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
     public class MIEventMarkerReceipt: WindowedEventMarkerReceipt {}
 
     /// <summary>
     /// Receipt for SSVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{spo count},{training target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
     /// </summary>
     public class SSVEPEventMarkerReceipt: EventMarkerReceipt
     {
@@ -146,7 +146,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Receipt for P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,[sm],{spo count},{train target (-1 if n/a)}..."
+    /// "p300,[sm],{object count},{train target (-1 if n/a)}..."
     /// <br/>
     /// <i>where 's' or 'm' indicates single or multi flash</i>
     /// </summary>
@@ -174,7 +174,7 @@ namespace BCIEssentials.LSLFramework
 
         protected override void ParseBodySegments(string[] bodySegments)
         {
-            SpoCount = int.Parse(bodySegments[2]);
+            ObjectCount = int.Parse(bodySegments[2]);
             TrainingTarget = int.Parse(bodySegments[3]);
         }
     }
@@ -182,36 +182,36 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Receipt for P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,s,{spo count},{train target (-1 if n/a)},{active spo}"
+    /// "p300,s,{object count},{train target (-1 if n/a)},{active object}"
     /// </summary>
     public class SingleFlashP300EventMarkerReceipt: P300EventMarkerReceipt
     {
-        public int ActiveSPO {get; protected set;}
+        public int ActiveObject {get; protected set;}
 
         protected override void ParseBodySegments(string[] bodySegments)
         {
             base.ParseBodySegments(bodySegments);
-            ActiveSPO = int.Parse(bodySegments[4]);
+            ActiveObject = int.Parse(bodySegments[4]);
         }
     }
     
     /// <summary>
     /// Receipt for P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,m,{spo count},{train target (-1 if n/a)},{...active spo}"
+    /// "p300,m,{object count},{train target (-1 if n/a)},{...active object}"
     /// </summary>
     public class MultiFlashP300EventMarkerReceipt: P300EventMarkerReceipt
     {
-        public int[] ActiveSPOs {get; protected set;}
+        public int[] ActiveObjects {get; protected set;}
 
         protected override void ParseBodySegments(string[] bodySegments)
         {
             base.ParseBodySegments(bodySegments);
 
-            ActiveSPOs = new int[bodySegments.Length - 4];
+            ActiveObjects = new int[bodySegments.Length - 4];
             for (int i = 4; i < bodySegments.Length; i++)
             {
-                ActiveSPOs[i] = int.Parse(bodySegments[i]);
+                ActiveObjects[i] = int.Parse(bodySegments[i]);
             }
         }
     }

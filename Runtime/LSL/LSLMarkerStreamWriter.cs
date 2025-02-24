@@ -18,78 +18,78 @@ namespace BCIEssentials.LSLFramework
 
         public void PushMIMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             int trainingTarget = -1
         )
         => PushMarker(
             new MIEventMarker
             (
-                spoCount, windowLength, trainingTarget
+                objectCount, windowLength, trainingTarget
             )
         );
 
         public void PushSSVEPMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         => PushMarker(
             new SSVEPEventMarker
             (
-                spoCount, windowLength,
+                objectCount, windowLength,
                 frequencies, trainingTarget
             )
         );
 
         public void PushSSVEPMarker
         (
-            int spoCount, float windowLength,
+            int objectCount, float windowLength,
             float[] frequencies,
             int trainingTarget = -1
         )
         => PushMarker(
             new SSVEPEventMarker
             (
-                spoCount, windowLength, 
+                objectCount, windowLength, 
                 frequencies, trainingTarget
             )
         );
 
         public void PushSingleFlashP300EventMarker
         (
-            int spoCount, int activeSPO,
+            int objectCount, int activeObject,
             int trainingTarget = -1
         )
         => PushMarker(
             new SingleFlashP300EventMarker
             (
-                spoCount, activeSPO,
+                objectCount, activeObject,
                 trainingTarget
             )
         );
 
         public void PushMultiFlashP300EventMarker
         (
-            int spoCount, IEnumerable<int> activeSPOs,
+            int objectCount, IEnumerable<int> activeObjects,
             int trainingTarget = -1
         )
         => PushMarker(
             new MultiFlashP300EventMarker
             (
-                spoCount, activeSPOs, trainingTarget
+                objectCount, activeObjects, trainingTarget
             )
         );
 
         public void PushMultiFlashP300EventMarker
         (
-            int spoCount, int[] activeSPOs,
+            int objectCount, int[] activeObjects,
             int trainingTarget = -1
         )
         => PushMarker(
             new MultiFlashP300EventMarker
             (
-                spoCount, activeSPOs, trainingTarget
+                objectCount, activeObjects, trainingTarget
             )
         );
 
