@@ -1,5 +1,6 @@
 using LSL;
 using UnityEngine;
+using static System.Diagnostics.Process;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -31,11 +32,13 @@ namespace BCIEssentials.LSLFramework
                 return false;
             }
             
+            string deviceID = SystemInfo.deviceUniqueIdentifier;
+            int processID = GetCurrentProcess().Id;
             var streamInfo = new StreamInfo
             (
                 StreamName, StreamType,
                 channel_format: channel_format_t.cf_string,
-                source_id: $"{SystemInfo.deviceUniqueIdentifier}-Unity"
+                source_id: $"{deviceID}-Unity-{processID}"
             );
             _outlet = new StreamOutlet(streamInfo);
             
