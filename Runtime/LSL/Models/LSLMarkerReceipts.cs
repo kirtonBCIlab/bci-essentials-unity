@@ -146,16 +146,14 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Receipt for P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
+    /// "p300,[sm],{spo count},{train target (-1 if n/a)}..."
     /// <br/>
-    /// <i>where 's' or 'm' indicated single or multi flash</i>
+    /// <i>where 's' or 'm' indicates single or multi flash</i>
     /// </summary>
     public class P300EventMarkerReceipt: EventMarkerReceipt
     {
         private static readonly Regex FlashTypeRegex
             = new(@"^\w+,\s*(\w)");
-
-        public int ActiveSPO {get; protected set;}
 
         /// <summary>
         /// Parse sample into a skeleton response object
@@ -178,10 +176,43 @@ namespace BCIEssentials.LSLFramework
         {
             SpoCount = int.Parse(bodySegments[2]);
             TrainingTarget = int.Parse(bodySegments[3]);
-            ActiveSPO = int.Parse(bodySegments[4]);
         }
     }
 
-    public class SingleFlashP300EventMarkerReceipt: P300EventMarkerReceipt {}
-    public class MultiFlashP300EventMarkerReceipt: P300EventMarkerReceipt {}
+    /// <summary>
+    /// Receipt for P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,s,{spo count},{train target (-1 if n/a)},{active spo}"
+    /// </summary>
+    public class SingleFlashP300EventMarkerReceipt: P300EventMarkerReceipt
+    {
+        public int ActiveSPO {get; protected set;}
+
+        protected override void ParseBodySegments(string[] bodySegments)
+        {
+            base.ParseBodySegments(bodySegments);
+            ActiveSPO = int.Parse(bodySegments[4]);
+        }
+    }
+    
+    /// <summary>
+    /// Receipt for P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,m,{spo count},{train target (-1 if n/a)},{...active spo}"
+    /// </summary>
+    public class MultiFlashP300EventMarkerReceipt: P300EventMarkerReceipt
+    {
+        public int[] ActiveSPOs {get; protected set;}
+
+        protected override void ParseBodySegments(string[] bodySegments)
+        {
+            base.ParseBodySegments(bodySegments);
+
+            ActiveSPOs = new int[bodySegments.Length - 4];
+            for (int i = 4; i < bodySegments.Length; i++)
+            {
+                ActiveSPOs[i] = int.Parse(bodySegments[i]);
+            }
+        }
+    }
 }

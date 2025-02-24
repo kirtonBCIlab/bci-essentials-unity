@@ -88,7 +88,7 @@ namespace BCIEssentials.LSLFramework
 
         protected string FrequenciesString
         => Frequencies switch {
-            {Length: 0} => "",
+            null or {Length: 0} => "",
             _ => $",{string.Join(",", Frequencies)}"
         };
 
@@ -108,18 +108,25 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// P300 event marker in the format:
     /// <br/><br/>
-    /// "p300,[sm],{spo count},{train target (-1 if n/a)},{active spo}"
+    /// "p300,[sm],{spo count},{train target (-1 if n/a)}..."
     /// <br/>
-    /// <i>where 's' or 'm' indicated single or multi flash</i>
+    /// <i>where 's' or 'm' indicates single or multi flash</i>
     /// </summary>
-    public abstract class P300EventMarker: EventMarker
+    public abstract class P300EventMarker: EventMarker {}
+
+    /// <summary>
+    /// P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,s,{spo count},{train target (-1 if n/a)},{active spo}"
+    /// </summary>
+    public class SingleFlashP300EventMarker: P300EventMarker
     {
         public int ActiveSPO;
 
         public override string MarkerString
-        => $"{base.MarkerString},{ActiveSPO}";
+        => $"p300,s,{base.MarkerString}, {ActiveSPO}";
 
-        public P300EventMarker
+        public SingleFlashP300EventMarker
         (
             int spoCount, int activeSpo,
             int trainingTarget = -1
@@ -131,31 +138,33 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
-    public class SingleFlashP300EventMarker: P300EventMarker
-    {
-        public override string MarkerString
-        => $"p300,s,{base.MarkerString}";
-
-        public SingleFlashP300EventMarker
-        (
-            int spoCount, int activeSpo,
-            int trainingTarget = -1
-        )
-        : base(spoCount, activeSpo, trainingTarget)
-        {}
-    }
-
+    /// <summary>
+    /// P300 event marker in the format:
+    /// <br/><br/>
+    /// "p300,m,{spo count},{train target (-1 if n/a)},{...active spos}"
+    /// </summary>
     public class MultiFlashP300EventMarker: P300EventMarker
     {
+        public int[] ActiveSPOs;
+
         public override string MarkerString
-        => $"p300,m,{base.MarkerString}";
+        => $"p300,m,{base.MarkerString}{ActiveSpoString}";
+
+        protected string ActiveSpoString
+        => ActiveSPOs switch {
+            null or {Length: 0} => "",
+            _ => $",{string.Join(',', ActiveSPOs)}"
+        };
 
         public MultiFlashP300EventMarker
         (
-            int spoCount, int activeSpo,
+            int spoCount, int[] activeSpos,
             int trainingTarget = -1
         )
-        : base(spoCount, activeSpo, trainingTarget)
-        {}
+        {
+            SpoCount = spoCount;
+            ActiveSPOs = activeSpos;
+            TrainingTarget = trainingTarget;
+        }
     }
 }

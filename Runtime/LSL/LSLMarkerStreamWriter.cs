@@ -55,13 +55,13 @@ namespace BCIEssentials.LSLFramework
 
         public void PushMultiFlashP300EventMarker
         (
-            int spoCount, int activeSPO,
+            int spoCount, int[] activeSPOs,
             int trainingTarget = -1
         )
         => PushMarker(
             new MultiFlashP300EventMarker
             (
-                spoCount, activeSPO,
+                spoCount, activeSPOs,
                 trainingTarget
             )
         );
