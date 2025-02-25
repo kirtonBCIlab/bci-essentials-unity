@@ -42,7 +42,7 @@ namespace BCIEssentials.LSLFramework
         )
         where T: LSLResponse, new()
         {
-            Debug.LogWarning($"Failed to parse {nameof(T)} into meaningful type: {warningBody}");
+            Debug.LogWarning($"Failed to parse {typeof(T).Name} into meaningful type: {warningBody}");
             return new T();
         }
 
@@ -128,7 +128,7 @@ namespace BCIEssentials.LSLFramework
                 }
                 catch
                 {
-                    Debug.LogWarning($"Failed to parse body of {nameof(T)}");
+                    Debug.LogWarning($"Failed to parse body of {typeof(T).Name}");
                 }
             }
 
