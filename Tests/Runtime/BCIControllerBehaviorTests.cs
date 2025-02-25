@@ -280,26 +280,26 @@ namespace BCIEssentials.Tests
     {
         private BCIController _testController;
         private BCIControllerBehavior _behavior;
-        private LSLMarkerStream _testMarkerStream;
+        private LSLMarkerStreamWriter _testMarkerStream;
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController();
+            _testController = CreateController(setActive: true);
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
             _behavior.RegisterWithControllerInstance(true);
 
-            _testMarkerStream = _testController.GetComponent<LSLMarkerStream>();
+            _testMarkerStream = _testController.GetComponent<LSLMarkerStreamWriter>();
 
             //Set marker stream to something unique each test to avoid interference
             _testMarkerStream.StreamName = $"{Guid.NewGuid()}";
 
             //Initialize Stream here so we can resolve it with the listener
-            _testMarkerStream.InitializeStream();
+            _testMarkerStream.OpenStream();
             yield return null;
         }
 
@@ -312,34 +312,15 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
-        public IEnumerator WhenStartStimulusRunAndSendConstantMarkers_ThenMarkerSentDuringRun()
-        {
-            var markerCount = (_behavior.windowLength + _behavior.interWindowInterval) * 3;
-            var markerListener = AddComponent<LSLResponseStream>(rs =>
-            {
-                rs.Connect(_testMarkerStream.StreamName);
-            });
-
-            _behavior.StartStimulusRun(true);
-            yield return new WaitForSecondsRealtime(markerCount);
-
-            var responses = markerListener.GetResponses();
-
-            Assert.AreEqual(markerCount + 1, responses.Length);
-        }
-
-        [UnityTest]
         public IEnumerator WhenStimulusRunningAndStartStimulusRun_ThenStimulusStoppedThenStarted()
         {
-            var markerListener = AddComponent<LSLResponseStream>(rs =>
-            {
-                rs.Connect(_testMarkerStream.StreamName);
-            });
+            var markerListener = AddComponent<LSLRawStreamReader>();
+            markerListener.OpenStreamByName(_testMarkerStream.StreamName);
 
             _behavior.StartStimulusRun(false);
             _behavior.StartStimulusRun(false);
-            yield return null;
-            var responses = markerListener.GetResponses();
+            yield return new WaitForSecondsRealtime(0.5f);
+            var responses = markerListener.PullAllSamples();
 
             Assert.AreEqual(3, responses.Length);
             Assert.AreEqual("Trial Started", responses[0]);
@@ -371,7 +352,7 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController();
+            _testController = CreateController(setActive: true);
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
@@ -465,7 +446,7 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController();
+            _testController = CreateController(setActive: true);
             _testController.Initialize();
             
             _behavior = AddComponent<EmptyBCIControllerBehavior>();

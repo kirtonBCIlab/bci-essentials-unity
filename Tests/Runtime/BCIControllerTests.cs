@@ -40,8 +40,8 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenAwakeAndNoMarkerStreamPresent_ThenControllerDisabled()
         {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLMarkerStream).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLMarkerStream>());
+            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLMarkerStreamWriter).ToString());
+            Object.DestroyImmediate(_testController.GetComponent<LSLMarkerStreamWriter>());
 
             _testController.gameObject.SetActive(true);
 
@@ -51,8 +51,8 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenAwakeAndNoResponseStreamPresent_ThenControllerDisabled()
         {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLResponseStream).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLResponseStream>());
+            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLResponseProvider).ToString());
+            Object.DestroyImmediate(_testController.GetComponent<LSLResponseProvider>());
 
             _testController.gameObject.SetActive(true);
 

@@ -45,8 +45,8 @@ namespace BCIEssentials.Tests.Utilities
             var gameObject = new GameObject();
             gameObject.SetActive(false);
 
-            gameObject.AddComponent<LSLMarkerStream>();
-            gameObject.AddComponent<LSLResponseStream>();
+            gameObject.AddComponent<LSLMarkerStreamWriter>();
+            gameObject.AddComponent<LSLResponseProvider>().PollingPeriod = 0.02f;
 
             var controller = gameObject.AddComponent<BCIController>();
             controller.AssignInspectorProperties(inspectorProperties);
