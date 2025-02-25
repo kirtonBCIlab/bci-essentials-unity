@@ -60,7 +60,7 @@ namespace BCIEssentials.LSLFramework
     public class EventMarkerReceipt: MarkerReceipt
     {
         private static readonly Regex ParadigmRegex
-            = new(@"^(mi|p300|ssvep),");
+            = new(@"^(mi|switch|p300|ssvep|tvep),");
 
         public int ObjectCount {get; protected set;}
         public int TrainingTarget {get; protected set;}
