@@ -71,10 +71,12 @@ namespace BCIEssentials.LSLFramework
 
     public class SingleChannelLSLResponse: LSLResponse
     {
+        private static readonly char[] TrimmedCharacters
+            = new[] {'[', ']'};
         private static readonly Regex PredictionRegex
-            = new(@"^\[?(\d+)\]?$");
+            = new(@"^(\d+)$");
         private static readonly Regex MarkerReceiptRegex
-            = new(@"^marker received : (.+)$");
+            = new(@"^marker received\s*:\s*(.+)$");
 
         /// <summary>
         /// Build typed response object from singular
@@ -93,15 +95,17 @@ namespace BCIEssentials.LSLFramework
         (
             string sampleValue
         )
-        => sampleValue switch
+        => sampleValue.Trim(TrimmedCharacters).Trim() switch
         {
             "ping"
                 => new LSLPing()
             ,
-            _ when TryMatchRegex(sampleValue, PredictionRegex, out string predictionBody)
+            string trimmedSample when
+                TryMatchRegex(trimmedSample, PredictionRegex, out string predictionBody)
                 => BuildPartialResponseFromBody<LSLPredictionResponse>(predictionBody)
             ,
-            _ when TryMatchRegex(sampleValue, MarkerReceiptRegex, out string markerBody)
+            string trimmedSample when
+                TryMatchRegex(trimmedSample, MarkerReceiptRegex, out string markerBody)
                 => MarkerReceipt.Parse(markerBody)
             ,
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)

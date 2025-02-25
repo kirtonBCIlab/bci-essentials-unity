@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -102,7 +103,9 @@ namespace BCIEssentials.LSLFramework
         protected override void ParseBody(string body)
         {
             base.ParseBody(body);
-            ParseBodySegments(body.Split(","));
+            string[] bodySegments = body.Split(",");
+            bodySegments = bodySegments.Select(s => s.Trim()).ToArray();
+            ParseBodySegments(bodySegments);
         }
 
         protected virtual void ParseBodySegments(string[] bodySegments) {}
