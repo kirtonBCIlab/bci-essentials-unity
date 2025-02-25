@@ -47,7 +47,7 @@ namespace BCIEssentials.LSLFramework
             _sampleBuffer = new string[resolvedStreamInfo.channel_count()];
             _inlet = new(resolvedStreamInfo);
             IsResolvingStream = false;
-            _inlet.open_stream(0);
+            _inlet.open_stream(0.1);
         }
 
         
