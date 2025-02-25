@@ -313,7 +313,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Send marker
                 if (!blockOutGoingLSL)
                 {
-                    OutStream.PushSingleFlashP300EventMarker
+                    OutStream.PushSingleFlashP300Marker
                     (
                         SPOCount, activeIndex, trainTarget
                     );
@@ -369,7 +369,7 @@ namespace BCIEssentials.ControllerBehaviors
                     if (!blockOutGoingLSL)
                     {
                         Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                        OutStream.PushSingleFlashP300EventMarker
+                        OutStream.PushSingleFlashP300Marker
                         (
                             SPOCount, currentObject.ObjectID, trainTarget
                         );
@@ -516,7 +516,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (blockOutGoingLSL == false)
             {
-                OutStream.PushMultiFlashP300EventMarker
+                OutStream.PushMultiFlashP300Marker
                 (
                     SPOCount, objToFlash, trainTarget
                 );

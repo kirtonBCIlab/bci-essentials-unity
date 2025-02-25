@@ -68,7 +68,7 @@ namespace BCIEssentials.LSLFramework
             )
         );
 
-        public void PushSingleFlashP300EventMarker
+        public void PushSingleFlashP300Marker
         (
             int objectCount, int activeObject,
             int trainingTarget = -1
@@ -81,7 +81,7 @@ namespace BCIEssentials.LSLFramework
             )
         );
 
-        public void PushMultiFlashP300EventMarker
+        public void PushMultiFlashP300Marker
         (
             int objectCount, IEnumerable<int> activeObjects,
             int trainingTarget = -1
