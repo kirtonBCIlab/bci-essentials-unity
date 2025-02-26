@@ -150,7 +150,7 @@ namespace BCIEssentials.LSLFramework
             Frequencies = new float[bodySegments.Length - 4];
             for (int i = 4; i < bodySegments.Length; i++)
             {
-                Frequencies[i] = float.Parse(bodySegments[i]);
+                Frequencies[i - 4] = float.Parse(bodySegments[i]);
             }
         }
     }
@@ -238,7 +238,7 @@ namespace BCIEssentials.LSLFramework
             ActiveObjects = new int[bodySegments.Length - 4];
             for (int i = 4; i < bodySegments.Length; i++)
             {
-                ActiveObjects[i] = int.Parse(bodySegments[i]);
+                ActiveObjects[i - 4] = int.Parse(bodySegments[i]);
             }
         }
     }

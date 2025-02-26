@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -126,9 +127,12 @@ namespace BCIEssentials.LSLFramework
                 {
                     responseObject.ParseBody(capturedBody);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Debug.LogWarning($"Failed to parse body of {typeof(T).Name}");
+                    throw new FormatException
+                    (
+                        $"Body of {typeof(T).Name} was in unexpected format: {capturedBody}"
+                    , ex);
                 }
             }
 
