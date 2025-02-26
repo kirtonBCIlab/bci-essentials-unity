@@ -8,10 +8,9 @@ using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.Utilities;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
-using BCIEssentials.Tests.TestResources;
 using UnityEngine;
 using UnityEngine.TestTools;
-using LogAssert = BCIEssentials.Tests.TestResources.LogAssert;
+using LogAssert = BCIEssentials.Tests.Utilities.LogAssert;
 using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests

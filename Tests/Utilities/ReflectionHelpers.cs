@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace BCIEssentials.Tests.TestResources
+namespace BCIEssentials.Tests.Utilities
 {
     public static class ReflectionHelpers
     {

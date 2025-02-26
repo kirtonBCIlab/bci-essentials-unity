@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace BCIEssentials.Tests.TestResources
+namespace BCIEssentials.Tests.Utilities
 {
     [CreateAssetMenu(menuName = "BCI Essentials/Testing/Resource Library", fileName = "ResourceLibrary", order = 0)]
     public class ResourceLibraryAsset : ScriptableObject

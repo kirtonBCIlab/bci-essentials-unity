@@ -3,13 +3,12 @@ using System.Collections;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.TestTools;
-using LogAssert = BCIEssentials.Tests.TestResources.LogAssert;
+using LogAssert = BCIEssentials.Tests.Utilities.LogAssert;
 using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests

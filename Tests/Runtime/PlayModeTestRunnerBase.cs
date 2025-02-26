@@ -3,7 +3,6 @@ using System.Collections;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
-using BCIEssentials.Tests.TestResources;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

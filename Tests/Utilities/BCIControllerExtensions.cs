@@ -1,7 +1,7 @@
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 
-namespace BCIEssentials.Tests.TestResources
+namespace BCIEssentials.Tests.Utilities
 {
     public static class BCIControllerExtensions
     {

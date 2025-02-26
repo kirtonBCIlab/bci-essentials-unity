@@ -1,14 +1,13 @@
 using System.Collections;
-using BCIEssentials.Tests.TestResources;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.Utilities
 {
     public static class EditorSceneLoader
     {
-        private const string k_AssetPath = "Packages/com.bci4kids.bciessentials/Tests/Resources/Runtime/ResourceLibrary.asset";
+        private const string k_AssetPath = "Packages/com.bci4kids.bciessentials/Tests/Resources/ResourceLibrary.asset";
         
         private static ResourceLibraryAsset _resourceLibrary;
         

@@ -1,0 +1,9 @@
+{
+    "name": "Bci4Kids.BciEssentials.Tests.Resources",
+    "rootNamespace": "BciEssentials.Tests.Resources",
+    "references": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
+}

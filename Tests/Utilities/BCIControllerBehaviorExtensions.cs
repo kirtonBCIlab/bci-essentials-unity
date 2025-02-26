@@ -4,7 +4,7 @@ using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
-namespace BCIEssentials.Tests.TestResources
+namespace BCIEssentials.Tests.Utilities
 {
     public static class BCIControllerBehaviorExtensions
     {
