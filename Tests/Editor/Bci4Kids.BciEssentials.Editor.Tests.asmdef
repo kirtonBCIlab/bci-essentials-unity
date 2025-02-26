@@ -2,7 +2,8 @@
     "name": "Bci4Kids.BciEssentials.Editor.Tests",
     "rootNamespace": "BciEssentials.Editor.Tests",
     "references": [
-        "Bci4Kids.BciEssentials"
+        "Bci4Kids.BciEssentials",
+        "Bci4Kids.BciEssentials.LSLFramework"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
