@@ -1,0 +1,16 @@
+{
+    "name": "Bci4Kids.BciEssentials.Tests.TestResources",
+    "rootNamespace": "BciEssentials.Tests.TestResources",
+    "references": [
+        "Bci4Kids.BciEssentials",
+        "Bci4Kids.BciEssentials.LSLFramework",
+        "labstreaminglayer.LSL4Unity.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
+}

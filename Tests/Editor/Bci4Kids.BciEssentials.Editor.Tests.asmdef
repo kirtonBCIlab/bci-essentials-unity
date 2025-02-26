@@ -1,0 +1,14 @@
+{
+    "name": "Bci4Kids.BciEssentials.Editor.Tests",
+    "rootNamespace": "BciEssentials.Editor.Tests",
+    "references": [
+        "Bci4Kids.BciEssentials"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": false
+}

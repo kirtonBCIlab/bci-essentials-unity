@@ -1,26 +1,18 @@
 {
-    "name": "Tests",
-    "rootNamespace": "",
+    "name": "Bci4Kids.BciEssentials.Tests",
+    "rootNamespace": "BciEssentials.Tests",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "Bci4Kids.BciEssentials.Runtime",
-        "Bci4kids.BciEssentials.Tests.Resources",
-        "Bci4kids.BciEssentials.Tests.Resources.Editor",
+        "Bci4Kids.BciEssentials",
+        "Bci4Kids.BciEssentials.LSLFramework",
+        "Bci4Kids.BciEssentials.Tests.TestResources",
         "labstreaminglayer.LSL4Unity.Runtime"
     ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll",
         "NSubstitute.dll"
     ],
-    "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "autoReferenced": false
 }
