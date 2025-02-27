@@ -32,7 +32,7 @@ namespace BCIEssentials.LSLFramework
             };
 
             responseObject.CaptureTime = captureTime;
-            responseObject.RawSampleValues = sampleValues;
+            responseObject.RawSampleValues = (string[])sampleValues.Clone();
 
             return responseObject;
         }

@@ -13,11 +13,11 @@ namespace BCIEssentials.Tests
     {
         [Test]
         public void TryResolveByType_WhenOutletAvailable_ThenReturnsTrue()
-        => Assert.IsTrue(TryResolveByType(TestOutletType, out _));
+        => Assert.IsTrue(TryResolveByType(PersistentOutletType, out _));
 
         [Test]
         public void TryResolveByName_WhenOutletAvailable_ThenReturnsTrue()
-        => Assert.IsTrue(TryResolveByName(TestOutletName, out _));
+        => Assert.IsTrue(TryResolveByName(PersistentOutletName, out _));
 
 
         [Test]
@@ -30,14 +30,13 @@ namespace BCIEssentials.Tests
 
 
         [UnityTest]
-        public IEnumerator RunResolveByType_WhenOutletBecomesAvailable_ThenConnectsInlet()
+        public IEnumerator RunResolveByType_WhenOutletBecomesAvailable_ThenResolves()
         {
-            string outletType = "Delayed Test Markers";
             StreamInfo resolvedStreamInfo = null;
 
             AddCoroutineRunner(
                 RunResolveByType(
-                    outletType,
+                    TestScopeOutletType,
                     streamInfo => resolvedStreamInfo = streamInfo,
                     0.02f
                 )
@@ -45,7 +44,7 @@ namespace BCIEssentials.Tests
             yield return new WaitForSecondsRealtime(0.1f);
 
             Assert.IsNull(resolvedStreamInfo);
-            StreamOutlet outlet = BuildOutlet(streamType: outletType);
+            StreamOutlet outlet = BuildTestScopedOutlet();
             yield return new WaitForSecondsRealtime(0.1f);
 
             Assert.IsNotNull(resolvedStreamInfo);

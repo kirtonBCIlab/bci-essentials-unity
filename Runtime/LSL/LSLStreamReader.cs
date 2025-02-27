@@ -16,7 +16,7 @@ namespace BCIEssentials.LSLFramework
         protected bool IsResolvingStream = false;
 
         public int SamplesAvailable => _inlet?.samples_available() ?? 0;
-        protected bool HasLiveInlet => _inlet is not null;
+        public bool HasLiveInlet => _inlet is not null;
         private StreamInlet _inlet;
         private string[] _sampleBuffer;
 

@@ -26,6 +26,9 @@ namespace BCIEssentials.Tests.Utilities
 
     public class PlayModeTestRunnerBase
     {
+        protected static string CurrentTestName
+        => TestContext.CurrentContext.Test.Name;
+
         [UnitySetUp]
         public virtual IEnumerator TestSetup()
         {
@@ -35,7 +38,7 @@ namespace BCIEssentials.Tests.Utilities
 
         protected void LogTestName()
         {
-            Debug.Log($"<color=green>Test Started: '{TestContext.CurrentContext.Test.Name}'</color>");
+            Debug.Log($"<color=green>Test Started: '{CurrentTestName}'</color>");
         }
 
         protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null,
@@ -91,6 +94,14 @@ namespace BCIEssentials.Tests.Utilities
             var t = gameObject.AddComponent<T>();
             setup?.Invoke(t);
             return t;
+        }
+
+        public static void Destroy(Component component)
+        {
+            if (component.gameObject)
+                Object.Destroy(component.gameObject);
+            else if (component)
+                Object.Destroy(component);
         }
         
         protected static CoroutineRunner RepeatForSeconds(Action onRepeat, int repeatCount, float repeatDelay = 0, Action onComplete = null)

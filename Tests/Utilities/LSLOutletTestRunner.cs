@@ -4,32 +4,39 @@ using System.Collections;
 using UnityEngine.TestTools;
 
 using static System.Diagnostics.Process;
+using NUnit.Framework;
 
 namespace BCIEssentials.Tests.Utilities
 {
     public class LSLOutletTestRunner: PlayModeTestRunnerBase
     {
-        protected StreamOutlet TestOutlet;
-        protected const string TestOutletName = "Unity Testing Outlet";
-        protected const string TestOutletType = "Test Markers";
+        protected StreamOutlet PersistentOutlet;
+        protected const string PersistentOutletName = "UnityTestingOutlet";
+        protected const string PersistentOutletType = "TestMarkers";
+        protected static string TestScopeOutletType
+        => $"TestMarkersFor:{CurrentTestName}";
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
         {
             yield return base.TestSetup();
-            TestOutlet = BuildOutlet(TestOutletName, TestOutletType);
+            PersistentOutlet = BuildOutlet();
         }
 
-        [UnityTearDown]
+        [TearDown]
         public void TearDown()
         {
-            TestOutlet.Dispose();
+            PersistentOutlet.Dispose();
         }
+
+
+        public static StreamOutlet BuildTestScopedOutlet()
+        => BuildOutlet(streamType: TestScopeOutletType);
 
         public static StreamOutlet BuildOutlet
         (
-            string streamName = "Unity Testing Outlet",
-            string streamType = "Test Markers"
+            string streamName = PersistentOutletName,
+            string streamType = PersistentOutletType
         )
         {
             string deviceID = SystemInfo.deviceUniqueIdentifier;
@@ -38,7 +45,7 @@ namespace BCIEssentials.Tests.Utilities
             (
                 streamName, streamType,
                 channel_format: channel_format_t.cf_string,
-                source_id: $"{deviceID}-Unity-{processID}"
+                source_id: $"{deviceID}-Unity-{processID}-{CurrentTestName}"
             );
             return new StreamOutlet(streamInfo);
         }
