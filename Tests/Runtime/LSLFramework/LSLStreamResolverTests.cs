@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using LSL;
-using BCIEssentials.Tests.Utilities;
+using BCIEssentials.Tests.Utilities.LSLFramework;
 using NUnit.Framework;
 
 using static BCIEssentials.LSLFramework.LSLStreamResolver;

@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 using static System.Diagnostics.Process;
 using NUnit.Framework;
 
-namespace BCIEssentials.Tests.Utilities
+namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
     public class LSLOutletTestRunner: PlayModeTestRunnerBase
     {

@@ -6,6 +6,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Tests.Utilities;
+using BCIEssentials.Tests.Utilities.LSLFramework;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
 using UnityEngine;

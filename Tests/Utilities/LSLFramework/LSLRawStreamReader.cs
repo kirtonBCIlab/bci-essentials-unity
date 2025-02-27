@@ -3,7 +3,7 @@ using UnityEngine;
 using LSL;
 using BCIEssentials.LSLFramework;
 
-namespace BCIEssentials.Tests.Utilities
+namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
     using static LSLStreamResolver;
 

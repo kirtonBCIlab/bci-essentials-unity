@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Tests.Utilities;
+using BCIEssentials.Tests.Utilities.LSLFramework;
 using NUnit.Framework;
 
 namespace BCIEssentials.Tests.LSLFramework
