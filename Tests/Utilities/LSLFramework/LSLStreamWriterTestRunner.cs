@@ -16,13 +16,12 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
             Action<LSLStreamWriter> testMethod = null
         )
         => TestStreamWriter<LSLStreamWriter>(testMethod);
-        public IEnumerator TestStreamWriter<T>
+        public void TestStreamWriter<T>
         (
             Action<T> testMethod = null
         ) where T: LSLStreamWriter
         {
             var outStream = BuildTestSpecificStreamWriter<T>();
-            yield return new WaitForEndOfFrame();
 
             AssertConnectable(outStream);
             testMethod?.Invoke(outStream);
@@ -81,6 +80,7 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
             outStream => {
                 outStream.StreamName = $"UnityTestingOutletFor:{CurrentTestName}";
                 outStream.StreamType = "StreamWriterTestMarkers";
+                outStream.OpenStream();
             }
         );
 

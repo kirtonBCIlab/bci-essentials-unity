@@ -86,13 +86,11 @@ namespace BCIEssentials.Tests.LSLFramework
         );
 
 
-        private IEnumerator TestStreamReaderWithPushedSample
+        private void TestStreamReaderWithPushedSample
         (
             string sampleString, Action<LSLStreamReader> testMethod
         )
         {
-            yield return new WaitForEndOfFrame();
-            
             var outlet = BuildTestSpecificOutlet();
             var inStream = BuildAndOpenTestSpecificStreamReader();
             
