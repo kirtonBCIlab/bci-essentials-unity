@@ -11,7 +11,7 @@ namespace BCIEssentials.LSLFramework
         public bool PrintLogs = false;
 
         public bool HasConsumers => _outlet?.have_consumers() ?? false;
-        public bool HasLiveOutlet => _outlet is not null;
+        protected bool HasLiveOutlet => _outlet is not null;
         private StreamOutlet _outlet;
 
 
