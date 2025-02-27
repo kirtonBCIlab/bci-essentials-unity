@@ -39,15 +39,40 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
         (
             Action<T, StreamInlet> testMethod = null
         ) where T: LSLStreamWriter
-        => TestStreamWriter<T>(outStream => {
-            TryResolveByName(outStream.StreamName, out var streamInfo);
-            StreamInlet inlet = new(streamInfo);
-            inlet.open_stream(0);
+        => TestStreamWriter<T>
+        (
+            outStream => {
+                TryResolveByName(outStream.StreamName, out var streamInfo);
+                StreamInlet inlet = new(streamInfo);
+                inlet.open_stream(0);
 
-            testMethod?.Invoke(outStream, inlet);
+                testMethod?.Invoke(outStream, inlet);
 
-            inlet.Dispose();
-        });
+                inlet.Dispose();
+            }
+        );
+
+        public void TestStreamWriteAgainstPulledSample
+        (
+            Action<LSLStreamWriter> pushMethod,
+            string expectedSampleValue
+        )
+        => TestStreamWriteAgainstPulledSample<LSLStreamWriter>(pushMethod, expectedSampleValue);
+        public void TestStreamWriteAgainstPulledSample<T>
+        (
+            Action<T> pushMethod, string expectedSampleValue
+        ) where T: LSLStreamWriter
+        => TestStreamWriterWithInlet<T>
+        (
+            (outStream, inlet) => {
+                pushMethod(outStream);
+                Assert.NotZero(inlet.samples_available());
+
+                var sampleBuffer = new string[1];
+                inlet.pull_sample(sampleBuffer, 0);
+                Assert.AreEqual(expectedSampleValue, sampleBuffer[0]);
+            }
+        );
 
 
         protected T BuildTestSpecificStreamWriter<T>()
