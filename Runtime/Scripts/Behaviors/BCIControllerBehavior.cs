@@ -113,7 +113,7 @@ namespace BCIEssentials.ControllerBehaviors
         public BCITrainingType CurrentTrainingType { get; private set; }
         
         
-        protected LSLMarkerStreamWriter OutStream;
+        protected LSLMarkerWriter OutStream;
         protected LSLResponseProvider InStream;
 
         protected Coroutine _receiveMarkers;
@@ -150,7 +150,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         /// <param name="lslMarkerStream">The lsl stream to write markers to.</param>
         /// <param name="lslResponseStream">The stream to poll for markers.</param>
-        public void Initialize(LSLMarkerStreamWriter lslMarkerStream, LSLResponseProvider lslResponseStream)
+        public void Initialize(LSLMarkerWriter lslMarkerStream, LSLResponseProvider lslResponseStream)
         {
             OutStream = lslMarkerStream;
             InStream = lslResponseStream;

@@ -10,7 +10,7 @@ namespace BCIEssentials.Controllers
 {
     public class BCIController : MonoBehaviour
     {
-        [SerializeField] private LSLMarkerStreamWriter _lslMarkerStream;
+        [SerializeField] private LSLMarkerWriter _lslMarkerStream;
         [SerializeField] private LSLResponseProvider _lslResponseStream;
         
         [Space]
@@ -32,7 +32,7 @@ namespace BCIEssentials.Controllers
         {
             if (_lslMarkerStream == null && !TryGetComponent(out _lslMarkerStream))
             {
-                Debug.LogError($"No component of type {typeof(LSLMarkerStreamWriter)} found");
+                Debug.LogError($"No component of type {typeof(LSLMarkerWriter)} found");
                 enabled = false;
                 return;
             }

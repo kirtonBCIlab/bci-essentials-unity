@@ -279,7 +279,7 @@ namespace BCIEssentials.Tests
     {
         private BCIController _testController;
         private BCIControllerBehavior _behavior;
-        private LSLMarkerStreamWriter _testMarkerStream;
+        private LSLMarkerWriter _testMarkerStream;
 
         [UnitySetUp]
         public override IEnumerator TestSetup()
@@ -292,7 +292,7 @@ namespace BCIEssentials.Tests
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
             _behavior.RegisterWithControllerInstance(true);
 
-            _testMarkerStream = _testController.GetComponent<LSLMarkerStreamWriter>();
+            _testMarkerStream = _testController.GetComponent<LSLMarkerWriter>();
 
             //Set marker stream to something unique each test to avoid interference
             _testMarkerStream.StreamName = $"{Guid.NewGuid()}";

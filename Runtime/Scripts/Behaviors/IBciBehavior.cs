@@ -7,7 +7,7 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public BCIBehaviorType Type { get; }
         
-        public void Initialize(LSLMarkerStreamWriter markerStream, LSLResponseProvider responseStream);
+        public void Initialize(LSLMarkerWriter markerStream, LSLResponseProvider responseStream);
 
         public void CleanUp();
 
