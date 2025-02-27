@@ -23,5 +23,23 @@ namespace BCIEssentials.Tests.LSLFramework
                 outStream.PushMarker(marker);
             }, expectedSampleValue
         );
+
+        [Test]
+        [TestCase(2, 1.5f, 1, "mi,2,1,1.50")]
+        [TestCase(2, 1.5f, -1, "mi,2,-1,1.50")]
+        [TestCase(2, 2.5f, 4, "mi,2,-1,2.50")]
+        [TestCase(2, 2.5f, -2, "mi,2,-1,2.50")]
+        public void PushMIMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
+        (
+            int objectCount, float windowLength,
+            int trainingTarget, string expectedSampleValue
+        )
+        => TestStreamWriteAgainstPulledSample
+        (
+            (LSLMarkerWriter outStream) => outStream.PushMIMarker
+            (
+                objectCount, windowLength, trainingTarget
+            ), expectedSampleValue
+        );
     }
 }
