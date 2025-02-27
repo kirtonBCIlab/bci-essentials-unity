@@ -32,11 +32,11 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator OpenStream_WhenOutletBecomesAvailable_ThenConnects()
         {
-            var inStream = BuildAndOpenTestScopedStreamReader();
+            var inStream = BuildAndOpenTestSpecificStreamReader();
             yield return new WaitForSecondsRealtime(0.15f);
 
             AssertNotConnected(inStream);
-            var outlet = BuildTestScopedOutlet();
+            var outlet = BuildTestSpecificOutlet();
             yield return new WaitForSecondsRealtime(0.1f);
 
             AssertConnected(inStream);
@@ -56,59 +56,59 @@ namespace BCIEssentials.Tests
 
         [Test]
         public void WhenSamplePushed_ThenSamplesAvailable()
-        {
-            var outlet = BuildTestScopedOutlet();
-            var inStream = BuildAndOpenTestScopedStreamReader();
-            
-            AssertConnected(inStream);
-            outlet.push_sample(new[] {"ping"});
-
-            Assert.AreEqual(1, inStream.SamplesAvailable);
-            inStream.PullAllResponses();
-
-            outlet.Dispose();
-            Destroy(inStream);
-        }
+        => TestStreamReaderWithPushedSample
+        (
+            "ping", inStream => {
+                Assert.AreEqual(1, inStream.SamplesAvailable);
+            }
+        );
 
         [Test]
         public void PullResponses_WhenSamplePushed_ThenSamplePulled()
-        {
-            var outlet = BuildTestScopedOutlet();
-            var inStream = BuildAndOpenTestScopedStreamReader();
-            
-            AssertConnected(inStream);
-            outlet.push_sample(new[] {"test"});
-
-            var responses = inStream.PullAllResponses();
-            Assert.AreEqual(1, responses.Length);
-            Assert.AreEqual("test", responses[0].RawSampleValues[0]);
-
-            outlet.Dispose();
-            Destroy(inStream);
-        }
+        => TestStreamReaderWithPushedSample
+        (
+            "test", inStream =>
+            {
+                var responses = inStream.PullAllResponses();
+                Assert.AreEqual(1, responses.Length);
+                Assert.AreEqual("test", responses[0].RawSampleValues[0]);
+            }
+        );
 
         [Test]
         public void PullResponses_WhenPredictionSamplePushed_ThenParsedPredictionPulled()
+        => TestStreamReaderWithPushedSample
+        (
+            "1", inStream => {
+                var responses = inStream.PullAllResponses();
+                Assert.AreEqual(1, responses.Length);
+                var response = responses[0];
+                Assert.IsInstanceOf<LSLPredictionResponse>(response);
+                Assert.AreEqual(1, (response as LSLPredictionResponse).Value);
+            }
+        );
+
+
+        private void TestStreamReaderWithPushedSample
+        (
+            string sampleString, Action<LSLStreamReader> testMethod
+        )
         {
-            var outlet = BuildTestScopedOutlet();
-            var inStream = BuildAndOpenTestScopedStreamReader();
+            var outlet = BuildTestSpecificOutlet();
+            var inStream = BuildAndOpenTestSpecificStreamReader();
             
             AssertConnected(inStream);
-            outlet.push_sample(new[] {"1"});
+            outlet.push_sample(new[] {sampleString});
 
-            var responses = inStream.PullAllResponses();
-            Assert.AreEqual(1, responses.Length);
-            var response = responses[0];
-            Assert.IsInstanceOf<LSLPredictionResponse>(response);
-            Assert.AreEqual(1, (response as LSLPredictionResponse).Value);
+            testMethod(inStream);
 
             outlet.Dispose();
             Destroy(inStream);
         }
 
 
-        private LSLStreamReader BuildAndOpenTestScopedStreamReader()
-        => BuildAndOpenStreamReader(TestScopeOutletType);
+        private LSLStreamReader BuildAndOpenTestSpecificStreamReader()
+        => BuildAndOpenStreamReader(TestSpecificOutletType);
         
         private LSLStreamReader BuildAndOpenStreamReader
         (

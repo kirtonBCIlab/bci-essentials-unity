@@ -13,7 +13,7 @@ namespace BCIEssentials.Tests.Utilities
         protected StreamOutlet PersistentOutlet;
         protected const string PersistentOutletName = "UnityTestingOutlet";
         protected const string PersistentOutletType = "TestMarkers";
-        protected static string TestScopeOutletType
+        protected static string TestSpecificOutletType
         => $"TestMarkersFor:{CurrentTestName}";
 
         [UnitySetUp]
@@ -30,8 +30,8 @@ namespace BCIEssentials.Tests.Utilities
         }
 
 
-        public static StreamOutlet BuildTestScopedOutlet()
-        => BuildOutlet(streamType: TestScopeOutletType);
+        public static StreamOutlet BuildTestSpecificOutlet()
+        => BuildOutlet(streamType: TestSpecificOutletType);
 
         public static StreamOutlet BuildOutlet
         (

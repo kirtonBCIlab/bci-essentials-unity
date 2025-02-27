@@ -36,7 +36,7 @@ namespace BCIEssentials.Tests
 
             AddCoroutineRunner(
                 RunResolveByType(
-                    TestScopeOutletType,
+                    TestSpecificOutletType,
                     streamInfo => resolvedStreamInfo = streamInfo,
                     0.02f
                 )
@@ -44,7 +44,7 @@ namespace BCIEssentials.Tests
             yield return new WaitForSecondsRealtime(0.1f);
 
             Assert.IsNull(resolvedStreamInfo);
-            StreamOutlet outlet = BuildTestScopedOutlet();
+            StreamOutlet outlet = BuildTestSpecificOutlet();
             yield return new WaitForSecondsRealtime(0.1f);
 
             Assert.IsNotNull(resolvedStreamInfo);
