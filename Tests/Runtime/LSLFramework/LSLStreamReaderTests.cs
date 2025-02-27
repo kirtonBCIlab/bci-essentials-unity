@@ -5,11 +5,8 @@ using UnityEngine.TestTools;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
-using LSL;
 
-using static BCIEssentials.LSLFramework.LSLStreamResolver;
-
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.LSLFramework
 {
     public class LSLStreamReaderTests: LSLOutletTestRunner
     {

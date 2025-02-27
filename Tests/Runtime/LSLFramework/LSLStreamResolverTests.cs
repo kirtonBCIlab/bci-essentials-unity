@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 using static BCIEssentials.LSLFramework.LSLStreamResolver;
 
-namespace BCIEssentials.Tests
+namespace BCIEssentials.Tests.LSLFramework
 {
     public class LSLStreamResolverTests: LSLOutletTestRunner
     {
