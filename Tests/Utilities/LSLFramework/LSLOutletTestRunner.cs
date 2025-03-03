@@ -1,53 +1,57 @@
 using LSL;
 using UnityEngine;
-using System.Collections;
-using UnityEngine.TestTools;
+using NUnit.Framework;
 
 using static System.Diagnostics.Process;
-using NUnit.Framework;
 
 namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
     public class LSLOutletTestRunner: PlayModeTestRunnerBase
     {
-        protected StreamOutlet PersistentOutlet;
-        protected const string PersistentOutletName = "UnityTestingOutlet";
-        protected const string PersistentOutletType = "TestMarkers";
-        protected static string TestSpecificOutletType
+        protected static string OutletName
+        => $"UnityTestingOutletFor:{CurrentTestName}";
+        protected static string OutletType
         => $"TestMarkersFor:{CurrentTestName}";
 
-        [UnitySetUp]
-        public override IEnumerator TestSetup()
+        protected StreamOutlet Outlet;
+
+        [SetUp]
+        public virtual void SetUp()
         {
-            yield return base.TestSetup();
-            PersistentOutlet = BuildOutlet();
+            Outlet = BuildOutlet();
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
-            PersistentOutlet.Dispose();
+            Outlet.Dispose();
         }
 
 
-        public static StreamOutlet BuildTestSpecificOutlet()
-        => BuildOutlet(streamType: TestSpecificOutletType);
+        protected static StreamOutlet BuildOutlet()
+        => BuildTypedOutlet(OutletType);
 
-        public static StreamOutlet BuildOutlet
-        (
-            string streamName = PersistentOutletName,
-            string streamType = PersistentOutletType
-        )
+        protected static StreamOutlet BuildTypedOutlet(string type)
         {
             string deviceID = SystemInfo.deviceUniqueIdentifier;
             int processID = GetCurrentProcess().Id;
             var streamInfo = new StreamInfo
             (
-                streamName, streamType,
+                OutletName, type,
                 channel_format: channel_format_t.cf_string,
                 source_id: $"{deviceID}-Unity-{processID}-{CurrentTestName}"
             );
             return new StreamOutlet(streamInfo);
+        }
+
+
+        protected void PushStringThroughOutlet(string sampleValue)
+        {
+            Outlet.push_sample(new[] {sampleValue});
+            // required to make tests work in sequence,
+            // updates some state in Unity or otherwise delays
+            // execution long enough for the sample to get through lsl
+            Debug.Log($"Writing test marker: {sampleValue}");
         }
     }
 }

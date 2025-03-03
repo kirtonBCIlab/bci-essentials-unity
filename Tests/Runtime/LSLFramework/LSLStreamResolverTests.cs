@@ -13,11 +13,11 @@ namespace BCIEssentials.Tests.LSLFramework
     {
         [Test]
         public void TryResolveByType_WhenOutletAvailable_ThenReturnsTrue()
-        => Assert.IsTrue(TryResolveByType(PersistentOutletType, out _));
+        => Assert.IsTrue(TryResolveByType(OutletType, out _));
 
         [Test]
         public void TryResolveByName_WhenOutletAvailable_ThenReturnsTrue()
-        => Assert.IsTrue(TryResolveByName(PersistentOutletName, out _));
+        => Assert.IsTrue(TryResolveByName(OutletName, out _));
 
 
         [Test]
@@ -33,19 +33,20 @@ namespace BCIEssentials.Tests.LSLFramework
         public IEnumerator RunResolveByType_WhenOutletBecomesAvailable_ThenResolves()
         {
             StreamInfo resolvedStreamInfo = null;
+            string streamType = OutletType + "-Delayed";
 
             AddCoroutineRunner(
                 RunResolveByType(
-                    TestSpecificOutletType,
+                    streamType,
                     streamInfo => resolvedStreamInfo = streamInfo,
                     0.02f
                 )
             ).StartRun();
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime(0.05f);
 
             Assert.IsNull(resolvedStreamInfo);
-            StreamOutlet outlet = BuildTestSpecificOutlet();
-            yield return new WaitForSecondsRealtime(0.1f);
+            StreamOutlet outlet = BuildTypedOutlet(streamType);
+            yield return new WaitForSecondsRealtime(0.05f);
 
             Assert.IsNotNull(resolvedStreamInfo);
             outlet.Dispose();

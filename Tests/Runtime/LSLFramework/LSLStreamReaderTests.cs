@@ -10,12 +10,27 @@ namespace BCIEssentials.Tests.LSLFramework
 {
     public class LSLStreamReaderTests: LSLOutletTestRunner
     {
+        LSLStreamReader InStream;
+
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+            InStream = BuildAndOpenStreamReader(OutletType);
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            Destroy(InStream);
+            base.TearDown();
+        }
+
+
         [Test]
         public void OpenStream_WhenOutletExists_ThenConnects()
         {
-            var inStream = BuildAndOpenStreamReader(PersistentOutletType);
-            AssertConnected(inStream);
-            Destroy(inStream);
+            AssertConnected(InStream);
         }
 
         [Test]
@@ -29,11 +44,12 @@ namespace BCIEssentials.Tests.LSLFramework
         [UnityTest]
         public IEnumerator OpenStream_WhenOutletBecomesAvailable_ThenConnects()
         {
-            var inStream = BuildAndOpenTestSpecificStreamReader();
+            string streamType = OutletType + "-Delayed";
+            var inStream = BuildAndOpenStreamReader(streamType);
             yield return new WaitForSecondsRealtime(0.15f);
 
             AssertNotConnected(inStream);
-            var outlet = BuildTestSpecificOutlet();
+            var outlet = BuildTypedOutlet(streamType);
             yield return new WaitForSecondsRealtime(0.1f);
 
             AssertConnected(inStream);
@@ -44,72 +60,42 @@ namespace BCIEssentials.Tests.LSLFramework
         [Test]
         public void CloseStream_WhenConnected_ThenDisconnects()
         {
-            var inStream = BuildAndOpenStreamReader(PersistentOutletType);
-            AssertConnected(inStream);
-            inStream.CloseStream();
-            AssertNotConnected(inStream);
-            Destroy(inStream);
+            AssertConnected(InStream);
+            InStream.CloseStream();
+            AssertNotConnected(InStream);
         }
 
         [Test]
         public void WhenSamplePushed_ThenSamplesAvailable()
-        => TestStreamReaderWithPushedSample
-        (
-            "ping", inStream => {
-                Assert.AreEqual(1, inStream.SamplesAvailable);
-            }
-        );
+        {
+            PushStringThroughOutlet("ping");
+            Assert.AreEqual(1, InStream.SamplesAvailable);
+        }
 
         [Test]
         public void PullResponses_WhenSamplePushed_ThenSamplePulled()
-        => TestStreamReaderWithPushedSample
-        (
-            "test", inStream =>
-            {
-                var responses = inStream.PullAllResponses();
-                Assert.AreEqual(1, responses.Length);
-                Assert.AreEqual("test", responses[0].RawSampleValues[0]);
-            }
-        );
+        {
+            PushStringThroughOutlet("test");
+            var responses = InStream.PullAllResponses();
+            Assert.AreEqual(1, responses.Length);
+            Assert.AreEqual("test", responses[0].RawSampleValues[0]);
+        }
 
         [Test]
         public void PullResponses_WhenPredictionSamplePushed_ThenParsedPredictionPulled()
-        => TestStreamReaderWithPushedSample
-        (
-            "1", inStream => {
-                var responses = inStream.PullAllResponses();
-                Assert.AreEqual(1, responses.Length);
-                var response = responses[0];
-                Assert.IsInstanceOf<LSLPredictionResponse>(response);
-                Assert.AreEqual(1, (response as LSLPredictionResponse).Value);
-            }
-        );
-
-
-        private void TestStreamReaderWithPushedSample
-        (
-            string sampleString, Action<LSLStreamReader> testMethod
-        )
         {
-            var outlet = BuildTestSpecificOutlet();
-            var inStream = BuildAndOpenTestSpecificStreamReader();
-            
-            AssertConnected(inStream);
-            outlet.push_sample(new[] {sampleString});
-
-            testMethod(inStream);
-
-            outlet.Dispose();
-            Destroy(inStream);
+            PushStringThroughOutlet("1");
+            var responses = InStream.PullAllResponses();
+            Assert.AreEqual(1, responses.Length);
+            Assert.IsInstanceOf<LSLPredictionResponse>(responses[0]);
+            var prediction = responses[0] as LSLPredictionResponse;
+            Assert.AreEqual(1, prediction.Value);
         }
 
-
-        private LSLStreamReader BuildAndOpenTestSpecificStreamReader()
-        => BuildAndOpenStreamReader(TestSpecificOutletType);
         
         private LSLStreamReader BuildAndOpenStreamReader
         (
-            string streamType = PersistentOutletType
+            string streamType
         )
         {
             var inStream = AddComponent<LSLStreamReader>();
