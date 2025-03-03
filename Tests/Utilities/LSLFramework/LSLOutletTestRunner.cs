@@ -47,6 +47,7 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
 
         protected void PushStringThroughOutlet(string sampleValue)
         {
+            Outlet.wait_for_consumers();
             Outlet.push_sample(new[] {sampleValue});
             // required to make tests work in sequence,
             // updates some state in Unity or otherwise delays
