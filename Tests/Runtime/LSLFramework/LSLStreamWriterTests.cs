@@ -15,14 +15,14 @@ namespace BCIEssentials.Tests.LSLFramework
         [Test]
         public void CloseStream_WhenStreamOpen_ThenClosed()
         {
-            _outStream.CloseStream();
+            OutStream.CloseStream();
             AssertNotConnectable();
         }
 
         [Test]
         public void PushString_WhenStringPushed_ThenSamplePulled()
         {
-            _outStream.PushString("test");
+            OutStream.PushString("test");
             AssertPulledSample("test");
         }
     }

@@ -10,27 +10,29 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
     public class LSLStreamWriterTestRunner<T>:
         PlayModeTestRunnerBase where T: LSLStreamWriter
     {
-        protected T _outStream;
+        protected T OutStream;
         private StreamInlet _inlet;
 
         [SetUp]
-        public virtual void Setup()
+        public virtual void SetUp()
         {
-            _outStream = BuildTestSpecificStreamWriter();
+            OutStream = BuildTestSpecificStreamWriter();
             _inlet = ConnectTestInlet();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            Destroy(_outStream);
+            Destroy(OutStream);
             _inlet.Dispose();
         }
 
-        public void AssertPulledSample(string expectedSampleValue)
+
+        protected void AssertPulledSample(string expectedSampleValue)
         {
-            // updates some state in Unity or otherwise
-            // delays execution long enough for the sample to get through lsl
+            // required to make tests work in sequence,
+            // updates some state in Unity or otherwise delays
+            // execution long enough for the sample to get through lsl
             Debug.Log($"Testing for marker: {expectedSampleValue}");
 
             var sampleBuffer = new string[1];
@@ -50,7 +52,7 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
 
         protected StreamInlet ConnectTestInlet()
         {
-            var resolvedStreams = LSL.LSL.resolve_stream("name", _outStream.StreamName, 1, 1);
+            var resolvedStreams = LSL.LSL.resolve_stream("name", OutStream.StreamName, 1, 1);
             Assert.NotZero(resolvedStreams.Length);
             
             StreamInlet inlet = new(resolvedStreams[0]);
@@ -59,8 +61,8 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
         }
 
         protected void AssertConnectable()
-        => Assert.IsTrue(TryResolveByName(_outStream.StreamName, out _));
+        => Assert.IsTrue(TryResolveByName(OutStream.StreamName, out _));
         protected void AssertNotConnectable()
-        => Assert.IsFalse(TryResolveByName(_outStream.StreamName, out _));
+        => Assert.IsFalse(TryResolveByName(OutStream.StreamName, out _));
     }
 }

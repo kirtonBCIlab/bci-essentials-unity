@@ -18,7 +18,7 @@ namespace BCIEssentials.Tests.LSLFramework
         )
         {
             var marker = (ICommandMarker)Activator.CreateInstance(markerType);
-            _outStream.PushMarker(marker);
+            OutStream.PushMarker(marker);
             AssertPulledSample(expectedSampleValue);
         }
 
@@ -33,7 +33,7 @@ namespace BCIEssentials.Tests.LSLFramework
             int trainingTarget, string expectedSampleValue
         )
         {
-            _outStream.PushMIMarker(objectCount, windowLength, trainingTarget);
+            OutStream.PushMIMarker(objectCount, windowLength, trainingTarget);
             AssertPulledSample(expectedSampleValue);
         }
     }
