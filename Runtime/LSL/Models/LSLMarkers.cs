@@ -203,7 +203,7 @@ namespace BCIEssentials.LSLFramework
         public int ActiveObject;
 
         public override string MarkerString
-        => $"p300,s,{base.MarkerString}, {ActiveObject}";
+        => $"p300,s,{base.MarkerString},{ActiveObject}";
 
         public SingleFlashP300EventMarker
         (
