@@ -46,11 +46,11 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             string streamType = OutletType + "-Delayed";
             var inStream = BuildAndOpenStreamReader(streamType);
-            yield return new WaitForSecondsRealtime(0.15f);
+            yield return new WaitForSecondsRealtime(0.05f);
 
             AssertNotConnected(inStream);
             var outlet = BuildTypedOutlet(streamType);
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime(0.05f);
 
             AssertConnected(inStream);
             outlet.Dispose();
@@ -100,7 +100,7 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             var inStream = AddComponent<LSLStreamReader>();
             inStream.StreamType = streamType;
-            inStream.OpenStream();
+            inStream.OpenStream(0.02f);
             return inStream;
         }
 

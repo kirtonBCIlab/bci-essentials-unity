@@ -29,10 +29,15 @@ namespace BCIEssentials.LSLFramework
         void OnDestroy() => CloseStream();
 
         
-        public void OpenStream()
+        public void OpenStream(float resolutionPeriod = 0.1f)
         {
             IsResolvingStream = true;
-            StartCoroutine(RunResolveByType(StreamType, InitializeInlet));
+            StartCoroutine(
+                RunResolveByType(
+                    StreamType, InitializeInlet,
+                    resolutionPeriod
+                )
+            );
         }
 
         public virtual void CloseStream()
