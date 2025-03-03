@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace BCIEssentials.Tests.LSLFramework
 {
-    public class LSLMarkerWriterTests: LSLStreamWriterTestRunner
+    public class LSLMarkerWriterTests: LSLStreamWriterTestRunner<LSLMarkerWriter>
     {
         [Test]
         [TestCase(typeof(TrialStartedMarker), "Trial Started")]
@@ -16,13 +16,11 @@ namespace BCIEssentials.Tests.LSLFramework
         (
             Type markerType, string expectedSampleValue
         )
-        => TestStreamWriteAgainstPulledSample<LSLMarkerWriter>
-        (
-            outStream => {
-                var marker = (ICommandMarker)Activator.CreateInstance(markerType);
-                outStream.PushMarker(marker);
-            }, expectedSampleValue
-        );
+        {
+            var marker = (ICommandMarker)Activator.CreateInstance(markerType);
+            _outStream.PushMarker(marker);
+            AssertPulledSample(expectedSampleValue);
+        }
 
         [Test]
         [TestCase(2, 1.5f, 1, "mi,2,1,1.50")]
@@ -34,12 +32,9 @@ namespace BCIEssentials.Tests.LSLFramework
             int objectCount, float windowLength,
             int trainingTarget, string expectedSampleValue
         )
-        => TestStreamWriteAgainstPulledSample
-        (
-            (LSLMarkerWriter outStream) => outStream.PushMIMarker
-            (
-                objectCount, windowLength, trainingTarget
-            ), expectedSampleValue
-        );
+        {
+            _outStream.PushMIMarker(objectCount, windowLength, trainingTarget);
+            AssertPulledSample(expectedSampleValue);
+        }
     }
 }
