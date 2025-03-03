@@ -6,7 +6,7 @@ using static System.Diagnostics.Process;
 
 namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
-    public class LSLOutletTestRunner: PlayModeTestRunnerBase
+    public class LSLOutletTestRunner: PersistentScenePlayModeTestRunner
     {
         protected static string OutletName
         => $"UnityTestingOutletFor:{CurrentTestName}";

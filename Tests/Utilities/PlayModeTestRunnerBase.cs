@@ -168,4 +168,14 @@ namespace BCIEssentials.Tests.Utilities
             onContinue?.Invoke();
         }
     }
+
+    public class PersistentScenePlayModeTestRunner: PlayModeTestRunnerBase
+    {
+        [UnitySetUp]
+        public override IEnumerator TestSetup()
+        {
+            LogTestName();
+            yield return null;
+        }
+    }
 }
