@@ -1246,65 +1246,65 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-    public (int[] subset1, int[] subset2) CalculateGraphPartition(List<GameObject> nodes)
-    {
-        // Get 2D screen positions
-        List<Vector2> screenPositions = CalculateOffsetFromCamera(nodes, Camera.main);
-        int numNodes = nodes.Count;
-        float[,] objectWeights = new float[numNodes, numNodes];
-
-        foreach (var node in nodes)
+        public (int[] subset1, int[] subset2) CalculateGraphPartition(List<GameObject> nodes)
         {
-            int i = nodes.IndexOf(node);
-            for (int j = 0; j < numNodes; j++)
+            // Get 2D screen positions
+            List<Vector2> screenPositions = CalculateOffsetFromCamera(nodes, Camera.main);
+            int numNodes = nodes.Count;
+            float[,] objectWeights = new float[numNodes, numNodes];
+
+            foreach (var node in nodes)
             {
-                if (i == j)
+                int i = nodes.IndexOf(node);
+                for (int j = 0; j < numNodes; j++)
                 {
-                    objectWeights[i, j] = 0;
+                    if (i == j)
+                    {
+                        objectWeights[i, j] = 0;
+                    }
+                    else
+                    {
+                        // Calculate 2D screen-space distance
+                        float distance = Vector2.Distance(
+                            screenPositions[i], 
+                            screenPositions[j]
+                        );
+                        // Convert distance to weight (inverse relationship)
+                        objectWeights[i, j] = 1.0f / (distance + 1.0f);
+                    }
+                }
+            }
+
+            var lpPart = new GraphUtilities();
+            return lpPart.LaplaceGP(objectWeights);
+        }
+
+        public List<Vector2> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
+        {
+            List<Vector2> screenPositions = new();
+            foreach (var obj in goList)
+            {
+                if (obj.layer == 5 || obj.TryGetComponent<RectTransform>(out var rectT))
+                {
+                    // UI Elements - get screen position directly from RectTransform
+                    RectTransform tempRT = obj.GetComponent<RectTransform>();
+                    RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                        tempRT,
+                        tempRT.position,
+                        myCamera,
+                        out Vector3 screenPos
+                    );
+                    screenPositions.Add(new Vector2(screenPos.x, screenPos.y));
                 }
                 else
                 {
-                    // Calculate 2D screen-space distance
-                    float distance = Vector2.Distance(
-                        screenPositions[i], 
-                        screenPositions[j]
-                    );
-                    // Convert distance to weight (inverse relationship)
-                    objectWeights[i, j] = 1.0f / (distance + 1.0f);
+                    // 3D Objects - project to screen space
+                    Vector3 screenPos = myCamera.WorldToScreenPoint(obj.transform.position);
+                    screenPositions.Add(screenPos);
                 }
             }
+            return screenPositions;
         }
-
-        var lpPart = new GraphUtilities();
-        return lpPart.LaplaceGP(objectWeights);
-    }
-
-    public List<Vector2> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
-    {
-        List<Vector2> screenPositions = new();
-        foreach (var obj in goList)
-        {
-            if (obj.layer == 5 || obj.TryGetComponent<RectTransform>(out var rectT))
-            {
-                // UI Elements - get screen position directly from RectTransform
-                RectTransform tempRT = obj.GetComponent<RectTransform>();
-                RectTransformUtility.ScreenPointToWorldPointInRectangle(
-                    tempRT,
-                    tempRT.position,
-                    myCamera,
-                    out Vector3 screenPos
-                );
-                screenPositions.Add(new Vector2(screenPos.x, screenPos.y));
-            }
-            else
-            {
-                // 3D Objects - project to screen space
-                Vector3 screenPos = myCamera.WorldToScreenPoint(obj.transform.position);
-                screenPositions.Add(screenPos);
-            }
-        }
-        return screenPositions;
-    }
         
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
