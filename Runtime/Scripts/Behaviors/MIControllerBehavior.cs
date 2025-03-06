@@ -48,7 +48,6 @@ namespace BCIEssentials.ControllerBehaviors
             // Not required for P300
             if (sendConstantMarkers)
             {
-                Debug.Log("Train target is " + trainTarget);
                 // If trainTarget == -1, then we are trying to classify, pass -1 along
                 if (trainTarget == 99)
                 {
@@ -103,8 +102,11 @@ namespace BCIEssentials.ControllerBehaviors
                 // Get the target from the array
                 trainTarget = trainArray[i];
 
+                // Get the index of the target object
+                int targetID = _selectableSPOs[trainTarget].ObjectID; 
+
                 // 
-                Debug.Log($"Running training selection {i} on option {trainTarget}");
+                Debug.Log($"Running training selection {i} on option {targetID}");
 
                 // Turn on train target
                 _selectableSPOs[trainTarget].OnTrainTarget();
