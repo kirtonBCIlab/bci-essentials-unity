@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571363, b: 0.30692217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -261,8 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22e7b6c803084ef8a0e32f34a19c0070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentRefreshRate: 0
-  _averageRefreshRate: 0
 --- !u!1001 &1130954600
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -317,6 +315,26 @@ PrefabInstance:
     - target: {fileID: 1649985292535673242, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
       propertyPath: m_Name
       value: ControllerManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644194211345973512, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
+      propertyPath: _spoPrefab
+      value: 
+      objectReference: {fileID: 7639228323464969584, guid: c93b3f46e6c8308479c1223c029818a5, type: 3}
+    - target: {fileID: 6644194211345973513, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
+      propertyPath: setupRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644194211345973513, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
+      propertyPath: pauseBeforeTraining
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644194211345973513, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
+      propertyPath: numTrainingSelections
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644194211345973513, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}
+      propertyPath: trainTargetPresentationTime
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42ce536088f800e4d94b8a8c92ae7277, type: 3}

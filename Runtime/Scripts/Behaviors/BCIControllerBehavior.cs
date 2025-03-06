@@ -337,7 +337,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                         // Check if the object has a unique ObjectID, 
                         // if not assign it a unique ID
-                        if (taggedGO.GetComponent<SPO>().ObjectID == 0)
+                        if (taggedGO.GetComponent<SPO>().ObjectID == -100)
                         {
                             taggedGO.GetComponent<SPO>().ObjectID = __uniqueID;
                             __uniqueID++;
