@@ -1,0 +1,14 @@
+{
+    "name": "Bci4Kids.BciEssentials.Tests",
+    "rootNamespace": "BciEssentials.Tests",
+    "references": [
+        "Bci4Kids.BciEssentials",
+        "Bci4Kids.BciEssentials.LSLFramework",
+        "Bci4Kids.BciEssentials.Tests.Utilities",
+        "labstreaminglayer.LSL4Unity.Runtime"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "autoReferenced": false
+}

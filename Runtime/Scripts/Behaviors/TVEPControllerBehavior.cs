@@ -37,25 +37,8 @@ namespace BCIEssentials.ControllerBehaviors
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                // Desired format is: ["Tvep", number of options, training target (-1 if n/a), window length, frequencies]
-                string freqString = "";
-                freqString = freqString + "," + realFreqFlash.ToString();
-
-                string trainingString;
-                if (trainingIndex <= _selectableSPOs.Count)
-                {
-                    trainingString = trainingIndex.ToString();
-                }
-                else
-                {
-                    trainingString = "-1";
-                }
-
-                string markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                      windowLength.ToString() + freqString;
-
                 // Send the marker
-                marker.Write(markerString);
+                OutStream.PushTVEPMarker(SPOCount, windowLength, new[] {realFreqFlash}, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);

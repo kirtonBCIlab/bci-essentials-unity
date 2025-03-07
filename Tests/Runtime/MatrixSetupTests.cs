@@ -27,7 +27,7 @@ namespace BCIEssentials.Tests.Utilities
         [Test]
         public void WhenSetUpMatrixWithNullSPO_ThenNoObjectsGenerated()
         {
-            TestResources.LogAssert.ExpectStartingWith(LogType.Error, "No SPO");
+            Utilities.LogAssert.ExpectStartingWith(LogType.Error, "No SPO");
             
             _matrixSetup.SetUpMatrix();
 

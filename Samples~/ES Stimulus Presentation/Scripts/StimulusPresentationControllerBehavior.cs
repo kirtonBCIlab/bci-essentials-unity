@@ -5,6 +5,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.StimulusEffects;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -68,17 +69,15 @@ namespace BCIEssentials.ControllerBehaviors
         {
             while (StimulusRunning)
             {
-                string freqString = "";
                 string markerString=  "";
-                string trainingString;
                 
                 if(!_offMessages)
                 {
-                    freqString = freqString + "," + realFreqFlash.ToString();
-                    trainingString = (trainingIndex <= _selectableSPOs.Count) ? trainingIndex.ToString() : "-1";
-                    
-                    markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                        windowLength.ToString() + freqString + stimulusString;
+                    markerString = new TVEPEventMarker
+                    (
+                        SPOCount, windowLength,
+                        new[] {realFreqFlash}, trainingIndex
+                    ).MarkerString;
                 }
 
                 if(_offMessages)
@@ -95,7 +94,7 @@ namespace BCIEssentials.ControllerBehaviors
                     markerString = "Resting state, eyes closed";
                 }
 
-                marker.Write(markerString);
+                OutStream.PushString(markerString);
 
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
             }
