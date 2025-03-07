@@ -1177,7 +1177,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             //Get the world points of each item with respect to the camera
             // var cameraTranfsorm = Camera.main.transform;
-            List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
+            List<Vector2> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
             int numNodes = nodes.Count;
             float[,] objectWeights = new float[numNodes, numNodes];
         
@@ -1248,80 +1248,62 @@ namespace BCIEssentials.ControllerBehaviors
 
         public (int[] subset1, int[] subset2) CalculateGraphPartition(List<GameObject> nodes)
         {
-            //Get the world points of each item with respect to the camera
-            // var cameraTranfsorm = Camera.main.transform;
-            List<Vector3> correctedNodePositions = CalculateOffsetFromCamera(nodes, Camera.main);
+            // Get 2D screen positions
+            List<Vector2> screenPositions = CalculateOffsetFromCamera(nodes, Camera.main);
             int numNodes = nodes.Count;
             float[,] objectWeights = new float[numNodes, numNodes];
-        
+
             foreach (var node in nodes)
             {
-                //use Vector3.Angle to get the angle between every object in the scene. Store this as weights in a graph
-                //This is a symmetric matrix, so we only need to calculate the upper triangle
-                for (int i = 0; i < numNodes; i++)
+                int i = nodes.IndexOf(node);
+                for (int j = 0; j < numNodes; j++)
                 {
-                    if (i == nodes.IndexOf(node))
+                    if (i == j)
                     {
-                        objectWeights[nodes.IndexOf(node), i] = 0;
+                        objectWeights[i, j] = 0;
                     }
                     else
                     {
-                        objectWeights[nodes.IndexOf(node), i] = Vector3.Angle(correctedNodePositions[nodes.IndexOf(node)], correctedNodePositions[i]);
+                        // Calculate 2D screen-space distance
+                        float distance = Vector2.Distance(
+                            screenPositions[i], 
+                            screenPositions[j]
+                        );
+                        // Convert distance to weight (inverse relationship)
+                        objectWeights[i, j] = 1.0f / (distance + 1.0f);
                     }
                 }
             }
-            // //Print the weights in the upper triangle matrix
-            // for (int i = 0; i < numNodes; i++)
-            // {
-            //     for (int j = 0; j < numNodes; j++)
-            //     {
-            //         if (j >= i && objectWeights[i, j] != 0)
-            //         {
-            //             Debug.Log($"Angle (weight) between {nodes[i].name} and {nodes[j].name}: {objectWeights[i, j]}");
-            //         }
-            //     }
-            // }
 
             var lpPart = new GraphUtilities();
-            var (subset1, subset2) = lpPart.LaplaceGP(objectWeights);
-            //Print out the partition
-            Debug.Log("Partition 1: " + string.Join(",", subset1));
-            var subset1Weight = lpPart.GetLPSubsetWeight(objectWeights, subset1.ToList());
-            Debug.Log("Partition 1 Weight: " + subset1Weight);
-            Debug.Log("Partition 2: " + string.Join(",", subset2));
-            var subset2Weight = lpPart.GetLPSubsetWeight(objectWeights, subset2.ToList());
-            Debug.Log("Partition 2 Weight: " + subset2Weight);
-            return (subset1, subset2);
+            return lpPart.LaplaceGP(objectWeights);
         }
 
-        public List<Vector3> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
+        public List<Vector2> CalculateOffsetFromCamera(List<GameObject> goList, Camera myCamera)
         {
-
-            var cameraTranfsorm = myCamera.transform;
-            List<Vector3> correctedGOPositions = new List<Vector3>();
+            List<Vector2> screenPositions = new();
             foreach (var obj in goList)
             {
-                if (obj.layer==5 || obj.TryGetComponent<RectTransform>(out var rectT))
+                if (obj.layer == 5 || obj.TryGetComponent<RectTransform>(out var rectT))
                 {
-                    Debug.Log("Found a UI Element, dealing with it");
-                    //Get the world position of the object
-
+                    // UI Elements - get screen position directly from RectTransform
                     RectTransform tempRT = obj.GetComponent<RectTransform>();
-                    Vector3 screenPosition = tempRT.TransformPoint(tempRT.rect.center);
-                    Ray ray = RectTransformUtility.ScreenPointToRay(myCamera, screenPosition);
-                    Vector3 worldPosition = ray.direction;
-                    // Debug.Log("The world position of the object is " + worldPosition.ToString());
-                    correctedGOPositions.Add(worldPosition);
+                    RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                        tempRT,
+                        tempRT.position,
+                        myCamera,
+                        out Vector3 screenPos
+                    );
+                    screenPositions.Add(new Vector2(screenPos.x, screenPos.y));
                 }
                 else
                 {
-                    //Now subtract the camera position from the object position
-                    Vector3 objectDirection = obj.transform.position - cameraTranfsorm.position;
-                    // Debug.Log("The direction of the real world object is " + objectDirection.ToString());
-                    correctedGOPositions.Add(objectDirection);
+                    // 3D Objects - project to screen space
+                    Vector3 screenPos = myCamera.WorldToScreenPoint(obj.transform.position);
+                    screenPositions.Add(screenPos);
                 }
             }
-            return correctedGOPositions;
+            return screenPositions;
         }
         
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
