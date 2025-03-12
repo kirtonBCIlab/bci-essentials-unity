@@ -39,9 +39,9 @@ namespace BCIEssentials.ControllerBehaviors
             LastSelectedSPO = null;
             
             // Send the marker to start
-            marker.Write("Trial Started");
+            OutStream.PushTrialStartedMarker();
 
-            ReceiveMarkers();
+            StartReceivingMarkers();
             PopulateObjectList();
             StopStartCoroutine(ref _runStimulus, RunStimulus());
 
@@ -86,7 +86,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         // update the classifier
                         Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        marker.Write("Update Classifier");
+                        OutStream.PushUpdateClassifierMarker();
                         updateCounter++;
                     }
                     else if (selectionCounter >=
@@ -94,7 +94,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         // update the classifier
                         Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        marker.Write("Update Classifier");
+                        OutStream.PushUpdateClassifierMarker();
                         updateCounter++;
                     }
                 }
@@ -144,7 +144,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             // Send marker
-            marker.Write("Training Complete");
+            OutStream.PushTrainingCompleteMarker();
 
             yield return 0;
 
@@ -181,7 +181,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    marker.Write($"mi, 1, {targetID}, {windowLength}");
+                    OutStream.PushMIMarker(1, windowLength, targetID);
 
                     yield return new WaitForSecondsRealtime(windowLength);
 
@@ -199,7 +199,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.LogError("No target object specified for single training");
             }
 
-            marker.Write("Trial Ends");
+            OutStream.PushTrialEndsMarker();
 
             yield return null;
         }
@@ -260,7 +260,7 @@ namespace BCIEssentials.ControllerBehaviors
         public override void UpdateClassifier()
         {
             Debug.Log("Updating the classifier");
-            marker.Write("Training Complete");
+            OutStream.PushTrainingCompleteMarker();
         }
 
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
@@ -268,85 +268,12 @@ namespace BCIEssentials.ControllerBehaviors
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                // Desired format is: [mi, number of options, training label (or -1 if n/a), window length] 
-                string trainingString = trainingIndex <= _selectableSPOs.Count ? trainingIndex.ToString() : "-1";
-
                 // Send the marker
-                marker.Write($"mi, {_selectableSPOs.Count}, {trainingString}, {windowLength}");
+                OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
             }
-        }
-
-        public override void ReceiveMarkers()
-        {
-            if (!response.Connected)
-            {
-                response.Connect();
-            }
-
-            if (response.Polling)
-            {
-                response.StopPolling();
-            }
-
-            //Ping count
-            int pingCount = 0;
-            response.StartPolling(responses =>
-            {
-                foreach (var response in responses)
-                {
-                    if (response.Equals("ping"))
-                    {
-                        pingCount++;
-                        if (pingCount % 100 == 0)
-                        {
-                            Debug.Log($"Ping Count: {pingCount}");
-                        }
-                    }
-
-                    // Else if response contains "received" then skip it
-                    else if (response.Contains("received"))
-                    {
-                        continue;
-                    }
-
-                    else if (response != "")
-                    {
-                        string responseString = response;
-                        //print("WE GOT A RESPONSE");
-                        print("response : " + responseString);
-
-                        // If there are square brackets then remove them
-                        responseString = responseString.Replace("[", "").Replace("]","").Replace(".", "");
-
-                        // If it is a single value then select that value
-                        int n;
-                        bool isNumeric = int.TryParse(responseString, out n);
-                        if (isNumeric)
-                        {
-                            //Run on selection based on ObjectID
-
-                            //Check if n is the objectID of any of the SPOs and if so, select it
-                            foreach (var spo in _selectableSPOs)
-                            {
-                                if (spo.ObjectID == n)
-                                {
-                                    spo.Select();
-                                    LastSelectedSPO = spo;
-                                    Debug.Log("Selected object with objectID " + n.ToString());
-                                }
-                            }
-                        }
-
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                }
-            });
         }
     }
 }

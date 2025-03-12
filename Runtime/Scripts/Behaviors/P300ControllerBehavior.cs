@@ -165,7 +165,7 @@ namespace BCIEssentials.ControllerBehaviors
                 trainTarget = 99;
             }
 
-            marker.Write("Training Complete");
+            OutStream.PushTrainingCompleteMarker();
 
         }
 
@@ -304,22 +304,8 @@ namespace BCIEssentials.ControllerBehaviors
 
             for (int i = 0; i < stimOrder.Length; i++)
             {
-                GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
-
-                string markerString = "p300,s," + _selectableSPOs.Count.ToString();
-
-                if (trainTarget <= _selectableSPOs.Count)
-                {
-                    markerString = markerString + "," + trainTarget.ToString();
-                }
-                else
-                {
-                    markerString = markerString + "," + "-1";
-                }
-
-                markerString = markerString + "," + stimOrder[i].ToString();
-                // markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
-
+                int activeIndex = stimOrder[i];
+                GameObject currentObject = _selectableSPOs[activeIndex]?.gameObject;
 
                 // Turn on
                 currentObject.GetComponent<SPO>().StartStimulus();
@@ -327,7 +313,10 @@ namespace BCIEssentials.ControllerBehaviors
                 // Send marker
                 if (!blockOutGoingLSL)
                 {
-                    marker.Write(markerString);
+                    OutStream.PushSingleFlashP300Marker
+                    (
+                        SPOCount, activeIndex, trainTarget
+                    );
                 }
 
                 // Wait
@@ -357,7 +346,8 @@ namespace BCIEssentials.ControllerBehaviors
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
-                    GameObject currentObject = _selectableSPOs[stimOrder[i]]?.gameObject;
+                    int activeIndex = stimOrder[i];
+                    SPO currentObject = _selectableSPOs[activeIndex]?.gameObject?.GetComponent<SPO>();
 
                     string markerString = "p300,s," + _selectableSPOs.Count.ToString();
 
@@ -373,19 +363,23 @@ namespace BCIEssentials.ControllerBehaviors
                     markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
 
                     // Turn on
-                    currentObject.GetComponent<SPO>().StartStimulus();
+                    currentObject.StartStimulus();
 
                     // Send marker
                     if (!blockOutGoingLSL)
                     {
-                        marker.Write(markerString);
+                        Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
+                        OutStream.PushSingleFlashP300Marker
+                        (
+                            SPOCount, currentObject.ObjectID, trainTarget
+                        );
                     }
 
                     // Wait
                     yield return new WaitForSecondsRealtime(onTime);
 
                     // Turn off
-                    currentObject.GetComponent<SPO>().StopStimulus();
+                    currentObject.StopStimulus();
 
                     // Wait
                     yield return new WaitForSecondsRealtime(offTime);
@@ -520,26 +514,12 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void WriteMultiFlashMarker(List<int> objToFlash)
         {
-            //Initialize marker string
-            string markerString = "p300,m," + _selectableSPOs.Count.ToString();
-
-            //Add training target
-            if (trainTarget <= _selectableSPOs.Count)
-            {
-                markerString = markerString + "," + trainTarget.ToString();
-            }
-            else
-            {
-                markerString = markerString + "," + "-1";
-            }
-
-            //Add the rest of the objects to the marker string
-            markerString = markerString + "," + string.Join(",",objToFlash);
-
-            // Send marker
             if (blockOutGoingLSL == false)
             {
-                marker.Write(markerString);
+                OutStream.PushMultiFlashP300Marker
+                (
+                    SPOCount, objToFlash, trainTarget
+                );
             }
         }
 
@@ -576,38 +556,18 @@ namespace BCIEssentials.ControllerBehaviors
 
             for (int i = 0; i < totalColumnFlashes; i++)
             {
-                //Initialize marker string
-                string markerString = "p300,m," + _selectableSPOs.Count.ToString();
-
-                //Add training target
-                if (trainTarget <= _selectableSPOs.Count)
-                {
-                    markerString = markerString + "," + trainTarget.ToString();
-                }
-                else
-                {
-                    markerString = markerString + "," + "-1";
-                }
-
                 // Turn on column 
                 int columnIndex = columnStimOrder[i];
+                List<int> flashingObjects = new();
                 for (int n = 0; n < numRows; n++)
                 {
-                    _selectableSPOs[rcMatrix[n, columnIndex]]?.StartStimulus();
-                    markerString = markerString + "," + rcMatrix[n, columnIndex];
+                    int objectIndex = rcMatrix[n, columnIndex];
+                    _selectableSPOs[objectIndex]?.StartStimulus();
+                    flashingObjects.Add(objectIndex);
                 }
-
-                //// Add train target to marker
-                //if (trainTarget <= objectList.Count)
-                //{
-                //    markerString = markerString + "," + trainTarget.ToString();
-                //}
 
                 // Send marker
-                if (blockOutGoingLSL == false)
-                {
-                    marker.Write(markerString);
-                }
+                WriteMultiFlashMarker(flashingObjects);
 
                 //Wait
                 yield return new WaitForSecondsRealtime(onTime);
@@ -624,42 +584,22 @@ namespace BCIEssentials.ControllerBehaviors
                 // Flash row if available
                 if (i <= totalRowFlashes)
                 {
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
                     // Turn on row
                     int rowIndex = rowStimOrder[i];
+                    flashingObjects.Clear();
                     for (int m = 0; m < numColumns; m++)
                     {
+                        int objectIndex = rcMatrix[rowIndex, m];
                         //Turn on row
-                        _selectableSPOs[rcMatrix[rowIndex, m]]?.StartStimulus();
+                        _selectableSPOs[objectIndex]?.StartStimulus();
 
                         //Add to marker
-                        markerString1 = markerString1 + "," + rcMatrix[rowIndex, m];
+                        flashingObjects.Add(objectIndex);
                     }
-
-                    ////Add train target to marker
-                    //if (trainTarget <= objectList.Count)
-                    //{
-                    //    markerString1 = markerString1 + "," + trainTarget.ToString();
-                    //}
 
                     //Send Marker
                     if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
+                    WriteMultiFlashMarker(flashingObjects);
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
@@ -814,37 +754,23 @@ namespace BCIEssentials.ControllerBehaviors
 
                     LogArrayValues(objectsToFlash);
 
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
+                    List<int> flashingObjects = new();
                     // Turn on objects to flash
                     for (int fi = 0; fi < bwCols; fi++)
                     {
                         if (objectsToFlash[fi] != 99)
                         {
+                            int objectIndex = objectsToFlash[fi];
                             //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+                            _selectableSPOs[objectIndex].StartStimulus();
 
                             //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            flashingObjects.Add(objectIndex);
                         }
                     }
 
                     //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
+                    WriteMultiFlashMarker(flashingObjects);
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
@@ -874,37 +800,23 @@ namespace BCIEssentials.ControllerBehaviors
 
                     LogArrayValues(objectsToFlash);
 
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
+                    List<int> flashingObjects = new();
                     // Turn on objects to flash
                     for (int fi = 0; fi < bwCols; fi++)
                     {
                         if (objectsToFlash[fi] != 99)
                         {
+                            int objectIndex = objectsToFlash[fi];
                             //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+                            _selectableSPOs[objectIndex].StartStimulus();
 
                             //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            flashingObjects.Add(objectIndex);
                         }
                     }
 
                     //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
+                    WriteMultiFlashMarker(flashingObjects);
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
@@ -933,37 +845,23 @@ namespace BCIEssentials.ControllerBehaviors
 
                     LogArrayValues(objectsToFlash);
 
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
+                    List<int> flashingObjects = new();
                     // Turn on objects to flash
                     for (int fi = 0; fi < bwRows; fi++)
                     {
                         if (objectsToFlash[fi] != 99)
                         {
+                            int objectIndex = objectsToFlash[fi];
                             //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+                            _selectableSPOs[objectIndex].StartStimulus();
 
                             //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            flashingObjects.Add(objectIndex);
                         }
                     }
 
                     //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
+                    WriteMultiFlashMarker(flashingObjects);
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
@@ -992,37 +890,24 @@ namespace BCIEssentials.ControllerBehaviors
 
                     LogArrayValues(objectsToFlash);
 
-                    //Initialize marker string
-                    string markerString1 = "p300,m," + _selectableSPOs.Count.ToString();
-
-                    // Add training target
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString1 = markerString1 + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString1 = markerString1 + "," + "-1";
-                    }
-
+                    
+                    List<int> flashingObjects = new();
                     // Turn on objects to flash
                     for (int fi = 0; fi < bwRows; fi++)
                     {
                         if (objectsToFlash[fi] != 99)
                         {
+                            int objectID = objectsToFlash[fi];
                             //Turn on row
-                            _selectableSPOs[objectsToFlash[fi]].StartStimulus();
+                            _selectableSPOs[objectID].StartStimulus();
 
                             //Add to marker
-                            markerString1 = markerString1 + "," + objectsToFlash[fi].ToString();
+                            flashingObjects.Add(objectID);
                         }
                     }
 
                     //Send Marker
-                    if (blockOutGoingLSL == false)
-                    {
-                        marker.Write(markerString1);
-                    }
+                    WriteMultiFlashMarker(flashingObjects);
 
                     //Wait
                     yield return new WaitForSecondsRealtime(onTime);
@@ -1323,10 +1208,10 @@ namespace BCIEssentials.ControllerBehaviors
             // Send the marker to start
             if (blockOutGoingLSL == false)
             {
-                marker.Write("Trial Started");
+                OutStream.PushTrialStartedMarker();
             }
 
-            ReceiveMarkers();
+            StartReceivingMarkers();
             PopulateObjectList();
             StopStartCoroutine(ref _runStimulus, RunStimulus());
 
@@ -1345,7 +1230,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Send the marker to end
             if (blockOutGoingLSL == false)
             {
-                marker.Write("Trial Ends");
+                OutStream.PushTrialEndsMarker();
             }
         }
 

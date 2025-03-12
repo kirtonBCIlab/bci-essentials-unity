@@ -3,13 +3,12 @@ using System.Collections;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Tests.TestResources;
 using BCIEssentials.Tests.Utilities;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.TestTools;
-using LogAssert = BCIEssentials.Tests.TestResources.LogAssert;
+using LogAssert = BCIEssentials.Tests.Utilities.LogAssert;
 using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests
@@ -40,8 +39,8 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenAwakeAndNoMarkerStreamPresent_ThenControllerDisabled()
         {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLMarkerStream).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLMarkerStream>());
+            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLMarkerWriter).ToString());
+            Object.DestroyImmediate(_testController.GetComponent<LSLMarkerWriter>());
 
             _testController.gameObject.SetActive(true);
 
@@ -51,8 +50,8 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenAwakeAndNoResponseStreamPresent_ThenControllerDisabled()
         {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLResponseStream).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLResponseStream>());
+            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLResponseProvider).ToString());
+            Object.DestroyImmediate(_testController.GetComponent<LSLResponseProvider>());
 
             _testController.gameObject.SetActive(true);
 

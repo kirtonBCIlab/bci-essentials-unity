@@ -45,23 +45,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0070b41ff2de85e4ba4b273315f74265, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFrameRate: 60
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
+  setup: {fileID: 6644194211345973512}
   setupRequired: 0
-  listExists: 0
-  objectList: []
+  targetFrameRate: 60
+  _hotkeysEnabled: 1
+  _selectableSPOs: []
   windowLength: 2
   interWindowInterval: 0
-  stimOn: 0
   numTrainingSelections: 9
   numTrainWindows: 3
   pauseBeforeTraining: 2
-  trainTargetPersistent: 0
   trainTargetPresentationTime: 3
   trainBreak: 1
   shamFeedback: 0
+  trainTargetPersistent: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 6644194211345973512}
+  myTag: BCI
   numSelectionsBeforeTraining: 2
   numSelectionsBetweenTraining: 2
 --- !u!114 &6644194211345973512
@@ -77,8 +78,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
-  _numColumns: 2
   _numRows: 1
+  _numColumns: 2
   _spacing: {x: 4, y: 0}
 --- !u!1 &1649985291859044835
 GameObject:
@@ -125,23 +126,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce01ae687a6194a48adf9dab50c3130f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFrameRate: 165
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
+  setup: {fileID: 5532972414438851522}
   setupRequired: 1
-  listExists: 0
-  objectList: []
+  targetFrameRate: 165
+  _hotkeysEnabled: 1
+  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
-  stimOn: 0
   numTrainingSelections: 12
   numTrainWindows: 6
   pauseBeforeTraining: 2
-  trainTargetPersistent: 0
   trainTargetPresentationTime: 3
   trainBreak: 1
   shamFeedback: 0
+  trainTargetPersistent: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 5532972414438851522}
+  myTag: BCI
   setFreqFlash:
   - 8
   - 10
@@ -163,8 +165,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
-  _numColumns: 3
   _numRows: 2
+  _numColumns: 3
   _spacing: {x: 2, y: 2}
 --- !u!1 &1649985292535673242
 GameObject:
@@ -176,8 +178,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1649985292535673238}
   - component: {fileID: 5532972415090187197}
-  - component: {fileID: 5532972415090187194}
-  - component: {fileID: 5532972415090187195}
+  - component: {fileID: 8178904105061118666}
+  - component: {fileID: 2566001631052182581}
   m_Layer: 0
   m_Name: ControllerManager
   m_TagString: Untagged
@@ -215,10 +217,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffa8dfff27ddf714abcbba57f76469d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lslMarkerStream: {fileID: 5532972415090187194}
-  _lslResponseStream: {fileID: 5532972415090187195}
+  _lslMarkerStream: {fileID: 8178904105061118666}
+  _lslResponseStream: {fileID: 2566001631052182581}
   _dontDestroyActiveInstance: 1
---- !u!114 &5532972415090187194
+--- !u!114 &8178904105061118666
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -227,13 +229,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649985292535673242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abcc24b3277378e439b2519bf143cb32, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a8771d2f5118f04290065e4181ccc69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   StreamName: UnityMarkerStream
   StreamType: LSL_Marker_Strings
-  StreamId: MyStreamID-Unity1234
---- !u!114 &5532972415090187195
+  PrintLogs: 0
+--- !u!114 &2566001631052182581
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -242,12 +244,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649985292535673242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 725310e9dbbc07a40960a87df5dd5764, type: 3}
+  m_Script: {fileID: 11500000, guid: 991f28f423ad3d945a7c6b50090b8ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  responsePredicate: name='PythonResponse'
-  value: PythonResponse
-  pyRespIndex: 0
+  StreamType: BCI
+  _openOnStart: 0
+  PrintLogs: 0
+  PollingPeriod: 0.1
 --- !u!1 &1649985293060537292
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,35 +296,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fc542aefa44840bb3889f25d6e245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFrameRate: 60
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
+  setup: {fileID: 5532972415639130385}
   setupRequired: 0
-  listExists: 0
-  objectList: []
+  targetFrameRate: 60
+  _hotkeysEnabled: 1
+  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
-  stimOn: 0
   numTrainingSelections: 5
   numTrainWindows: 0
   pauseBeforeTraining: 2
-  trainTargetPersistent: 0
   trainTargetPresentationTime: 3
   trainBreak: 1
   shamFeedback: 0
+  trainTargetPersistent: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 5532972415639130385}
+  myTag: BCI
+  trainBufferTime: 0
   numFlashesLowerLimit: 9
   numFlashesUpperLimit: 12
   onTime: 0.1
   offTime: 0.075
   singleFlash: 1
+  contextAwareSingleFlash: 0
   multiFlash: 0
   rowColumn: 0
   checkerboard: 0
-  checkerBoardRows: 3
-  checkerBoardCols: 4
+  contextAwareMultiFlash: 0
+  numFlashRows: 5
+  numFlashColumns: 6
   timeDebug: 0
-  trainBufferTime: 0
+  myPopMethod: 3
 --- !u!114 &5532972415639130385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,6 +342,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spoPrefab: {fileID: 7639228323464969584, guid: 4a190a7ad6ec4e64d87105d7de7f0611, type: 3}
-  _numColumns: 3
   _numRows: 3
+  _numColumns: 3
   _spacing: {x: 2, y: 2}

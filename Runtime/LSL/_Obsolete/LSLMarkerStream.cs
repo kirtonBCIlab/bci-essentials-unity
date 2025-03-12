@@ -1,8 +1,10 @@
-﻿using LSL;
+﻿using System;
+using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    [Obsolete]
     public class LSLMarkerStream : MonoBehaviour, IMarkerStream
     {
         public string StreamName = "UnityMarkerStream";
