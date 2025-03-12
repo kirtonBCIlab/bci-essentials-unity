@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -325,12 +325,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4280385884697554931}
+  - component: {fileID: 4280385884697554945}
   - component: {fileID: 4280385884697554944}
+  - component: {fileID: 4280385884697554941}
   - component: {fileID: 4280385884697554943}
   - component: {fileID: 4280385884697554942}
-  - component: {fileID: 4280385884697554941}
   m_Layer: 0
-  m_Name: SVVEPController
+  m_Name: P300Controller
   m_TagString: MasterController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -348,9 +349,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: b9c6f9c35efb1934dbfbcd51cf36d69a, type: 3}
+  _spoPrefab: {fileID: 7639228323464969584, guid: d5294f13333eb5048bfa701d5c78b9db, type: 3}
+  _numRows: 3
   _numColumns: 3
-  _numRows: 2
   _spacing: {x: 2, y: 2}
 --- !u!114 &4280385884697554942
 MonoBehaviour:
@@ -361,12 +362,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4280385884697554932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 725310e9dbbc07a40960a87df5dd5764, type: 3}
+  m_Script: {fileID: 11500000, guid: 991f28f423ad3d945a7c6b50090b8ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetStreamName: UnityMarkerStream
-  _resolveTimeout: 1
-  _pollFrequency: 0
+  StreamType: BCI
+  _openOnStart: 0
+  PrintLogs: 0
+  PollingPeriod: 0.1
 --- !u!114 &4280385884697554943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,12 +378,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4280385884697554932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abcc24b3277378e439b2519bf143cb32, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a8771d2f5118f04290065e4181ccc69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   StreamName: UnityMarkerStream
   StreamType: LSL_Marker_Strings
-  StreamId: MyStreamID-Unity1234
+  PrintLogs: 0
 --- !u!114 &4280385884697554944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,34 +393,54 @@ MonoBehaviour:
   m_GameObject: {fileID: 4280385884697554932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4dd56602d8b72e498f55bcf004f0d45, type: 3}
+  m_Script: {fileID: 11500000, guid: 6b0fc542aefa44840bb3889f25d6e245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  refreshRate: 165
+  _selfRegister: 1
+  _selfRegisterAsActive: 1
+  setup: {fileID: 4280385884697554941}
   setupRequired: 1
-  listExists: 0
-  objectList: []
-  objectsToRemove: []
+  targetFrameRate: 60
+  _hotkeysEnabled: 1
+  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
-  stimOn: 0
-  numTrainingSelections: 12
-  numTrainWindows: 6
+  numTrainingSelections: 5
+  numTrainWindows: 3
   pauseBeforeTraining: 2
-  trainTargetPersistent: 0
   trainTargetPresentationTime: 3
   trainBreak: 1
   shamFeedback: 0
+  trainTargetPersistent: 0
   trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 0}
-  marker: {fileID: 0}
-  response: {fileID: 0}
-  setFreqFlash:
-  - 6
-  - 10
-  - 12
-  - 15
-  - 18
-  - 20
-  realFreqFlash: []
+  myTag: BCI
+  trainBufferTime: 0
+  numFlashesLowerLimit: 9
+  numFlashesUpperLimit: 12
+  onTime: 0.2
+  offTime: 0.3
+  singleFlash: 1
+  contextAwareSingleFlash: 0
+  multiFlash: 0
+  rowColumn: 0
+  checkerboard: 1
+  contextAwareMultiFlash: 0
+  numFlashRows: 5
+  numFlashColumns: 6
+  timeDebug: 0
+  myPopMethod: 3
+--- !u!114 &4280385884697554945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4280385884697554932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa8dfff27ddf714abcbba57f76469d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lslMarkerStream: {fileID: 4280385884697554943}
+  _lslResponseStream: {fileID: 4280385884697554942}
+  _dontDestroyActiveInstance: 0
