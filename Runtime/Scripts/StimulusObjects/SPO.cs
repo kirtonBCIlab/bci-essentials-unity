@@ -1,6 +1,6 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 // Base class for the Stimulus Presenting Objects (SPOs)
 
@@ -11,22 +11,6 @@ namespace BCIEssentials.StimulusObjects
     /// </summary>
     public class SPO : MonoBehaviour
     {
-        [Space(20)]
-        [Tooltip("Invoked when the SPO Controller requests this stimulus to start.")]
-        public UnityEvent StartStimulusEvent = new();
-
-        [Tooltip("Invoked when the SPO Controller requests this stimulus to stop.")]
-        public UnityEvent StopStimulusEvent = new();
-
-        [Tooltip("Invoked when the SPO Controller selects this SPO")]
-        public UnityEvent OnSelectedEvent = new();
-
-        [Tooltip("Invoked when the SPO Controller requests training to start")]
-        public UnityEvent StartTrainingStimulusEvent = new();
-
-        [Tooltip("Invoked when the SPO Controller requests training to stop.")]
-        public UnityEvent StopTrainingStimulusEvent = new();
-
         /// <summary>
         /// Determines if this object is available to be selected
         /// by the <see cref="Controller"/>;
@@ -34,16 +18,34 @@ namespace BCIEssentials.StimulusObjects
         public bool Selectable = true;
 
         /// <summary>
-        /// Assigned by the SPO Controller, this represents the
-        /// index of this SPO in the controllers pool of selectables. 
-        /// </summary>
-        public int SelectablePoolIndex;
-
-        /// <summary>
         /// Assigned in editor or by the PopulateObjectIDList method, this 
         /// is a unique identifier for this SPO. It defaults to -100.
         /// </summary>
+        [Tooltip("Will be set by controller behaviour if the list of objects is dynamically populated")]
         public int ObjectID = -100;
+
+        /// <summary>
+        /// Assigned by the SPO Controller, this represents the
+        /// index of this SPO in the controllers pool of selectables. 
+        /// </summary>
+        [HideInInspector]
+        public int SelectablePoolIndex;
+
+
+        [Header("Start stimulus presentation")]
+        [FormerlySerializedAs("StartStimulusEvent")]
+        public UnityEvent OnStimulusTriggered = new();
+
+        [Header("Stop stimulus presentation")]
+        [FormerlySerializedAs("StopStimulusEvent")]
+        public UnityEvent OnStimulusEndTriggered = new();
+
+        [FormerlySerializedAs("OnSelectedEvent")]
+        public UnityEvent OnSelected = new();
+
+        public UnityEvent OnSetAsTrainingTarget = new();
+        public UnityEvent OnRemovedAsTrainingTarget = new();
+
 
         /// <summary>
         /// Request this SPO stimulus to begin.
@@ -51,7 +53,7 @@ namespace BCIEssentials.StimulusObjects
         /// <returns>The time at the beginning of this frame using <see cref="Time.time"/></returns>
         public virtual float StartStimulus()
         {
-            StartStimulusEvent?.Invoke();
+            OnStimulusTriggered?.Invoke();
 
             //Stimulus request time
             return Time.time;
@@ -62,7 +64,7 @@ namespace BCIEssentials.StimulusObjects
         /// </summary>
         public virtual void StopStimulus()
         {
-            StopStimulusEvent?.Invoke();
+            OnStimulusEndTriggered?.Invoke();
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace BCIEssentials.StimulusObjects
         /// </summary>
         public virtual void Select()
         {
-            OnSelectedEvent?.Invoke();
+            OnSelected?.Invoke();
         }
 
         //TODO: Remove when refactored training out
@@ -80,7 +82,7 @@ namespace BCIEssentials.StimulusObjects
             try
             {
                 //TODO - If it evaluates as null, try to invoke the default StartStimulus option.
-                StartTrainingStimulusEvent?.Invoke();
+                OnSetAsTrainingTarget?.Invoke();
             }
             catch(UnassignedReferenceException e)
             {
@@ -95,7 +97,7 @@ namespace BCIEssentials.StimulusObjects
             try
             {
                 //TODO - If evaluates as null, try to invoke the default StopStimulus option
-                StopTrainingStimulusEvent?.Invoke();
+                OnRemovedAsTrainingTarget?.Invoke();
             }
             catch(UnassignedReferenceException e)
             {
@@ -119,7 +121,5 @@ namespace BCIEssentials.StimulusObjects
             transform.localScale = new Vector3(objectScale.x / scaleValue, objectScale.y / scaleValue,
                     objectScale.z / scaleValue);
         }
-
-
     }
 }
