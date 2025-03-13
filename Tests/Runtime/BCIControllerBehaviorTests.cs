@@ -159,9 +159,9 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenInitializeAndRequiresMatrixSetUp_ThenMatrixSetUp()
         {
-            var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
-            matrix.Initialize(spo, 2, 2, Vector2.one);
+            var matrix = new SPOGridFactory(spo, 2, 2, Vector2.one);
+
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
                 setupRequired = true,
@@ -184,14 +184,14 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenCleanUp_ThenMatrixDestroyed()
         {
-            var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
-            matrix.Initialize(spo, 2, 2, Vector2.one);
+            var matrix = new SPOGridFactory(spo, 2, 2, Vector2.one);
+
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
                 setup = matrix
             });
-            matrix.SetUpMatrix();
+            matrix.CreateObjects();
 
             _behavior.CleanUp();
             yield return null;

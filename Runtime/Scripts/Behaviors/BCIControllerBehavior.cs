@@ -31,8 +31,8 @@ namespace BCIEssentials.ControllerBehaviors
 
         [Header("Default SPO Setup")]
         [Tooltip("Component used to set-up default SPO objects")]
-        [SerializeField] protected MatrixSetup setup;
-        [Tooltip("Indicate whether or not to use the setup component")]
+        [SerializeField] private SPOFactory _spoSetup;
+        [Tooltip("Whether to automatically trigger the setup factory")]
         public bool setupRequired;
         
         [Header("System Properties and Targets")]
@@ -164,7 +164,7 @@ namespace BCIEssentials.ControllerBehaviors
             
             if (setupRequired)
             {
-                setup.SetUpMatrix();
+                _spoSetup?.CreateObjects();
             }
         }
 
@@ -174,7 +174,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void CleanUp()
         {
-            setup?.DestroyMatrix();
+            _spoSetup?.DestroyObjects();
             InStream?.CloseStream();
 
             StimulusRunning = false;

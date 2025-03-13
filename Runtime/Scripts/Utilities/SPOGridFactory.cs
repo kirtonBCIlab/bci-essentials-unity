@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using BCIEssentials.StimulusObjects;
 using UnityEngine;
 
@@ -9,73 +8,48 @@ namespace BCIEssentials.Utilities
     /// Instantiates a matrix of BCI objects.
     /// All objects are given the tag "BCI" so that they can be collected by the controller script.
     /// </summary>
-    public class MatrixSetup : MonoBehaviour
+    [CreateAssetMenu(menuName = "BCI Essentials/SPO Grid Factory", fileName = "SPO Grid Factory")]
+    public class SPOGridFactory: SPOFactory
     {
-        [SerializeField] private SPO _spoPrefab;
-
         [Space]
         [SerializeField] private int _numRows = 1;
         [SerializeField] private int _numColumns = 1;
         [SerializeField] private Vector2 _spacing = Vector2.one;
 
-        public readonly List<SPO> MatrixObjects = new();
 
-        public void Initialize(SPO prefab, int columns, int rows, Vector2 spacing)
+        public SPOGridFactory
+        (
+            SPO prefab,
+            int columns, int rows,
+            Vector2 spacing
+        )
+        : base(prefab)
         {
-            _spoPrefab = prefab;
             _numColumns = Math.Max(1, columns);
             _numRows = Math.Max(1, rows);
             _spacing = spacing;
         }
+        
+        public SPOGridFactory(): base(null) {}
 
-        [ContextMenu("Set Up Matrix")]
-        public void SetUpMatrix()
-        {
-            if (_spoPrefab == null)
-            {
-                Debug.LogError("No SPO for matrix");
-                return;
-            }
 
-            if (MatrixObjects.Count > 0)
-            {
-                DestroyMatrix();
-            }
-
-            InstantiateMatrixObjects();
-            CenterCameraToMatrix();
-        }
-
-        public void DestroyMatrix()
-        {
-            foreach (var spo in MatrixObjects)
-            {
-                if (spo != null)
-                {
-                    Destroy(spo.gameObject);
-                }
-            }
-
-            MatrixObjects.Clear();
-        }
-
-        private void InstantiateMatrixObjects()
+        protected override void InstantiateConfiguredObjects(Transform objectParent = null)
         {
             for (int rowIndex = 0; rowIndex < _numRows; rowIndex++)
             {
                 for (int columnIndex = 0; columnIndex < _numColumns; columnIndex++)
                 {
                     //Instantiating prefabs
-                    var spo = Instantiate(_spoPrefab);
+                    var spo = InstantiateObject(objectParent);
 
                     //Setup SPO
-                    MatrixObjects.Add(spo);
+                    FabricatedObjects.Add(spo);
                     spo.StopStimulus();
 
                     //Setup GameObject
                     var spoGameObject = spo.gameObject;
                     spoGameObject.SetActive(true);
-                    spoGameObject.name = $"Object {MatrixObjects.Count}";
+                    spoGameObject.name = $"Object {FabricatedObjects.Count}";
 
                     //Setting position of object
                     var position = (Vector3)_spacing;
@@ -85,17 +59,19 @@ namespace BCIEssentials.Utilities
                     spoGameObject.transform.position = position;
                 }
             }
+
+            CenterCameraToMatrix();
         }
 
         private void CenterCameraToMatrix()
         {
             var totalPosition = Vector3.zero;
-            foreach (var spo in MatrixObjects)
+            foreach (var spo in FabricatedObjects)
             {
                 totalPosition += spo.transform.position;
             }
 
-            var centerPosition = totalPosition / MatrixObjects.Count;
+            var centerPosition = totalPosition / FabricatedObjects.Count;
             centerPosition.z = -10f;
 
             var mainCamera = Camera.main;

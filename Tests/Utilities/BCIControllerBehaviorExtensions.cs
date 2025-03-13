@@ -16,7 +16,7 @@ namespace BCIEssentials.Tests.Utilities
             public List<SPO> _selectableSPOs = null;
             
             //Training
-            public MatrixSetup setup;
+            public SPOGridFactory setup;
             public bool? setupRequired;
         }
 

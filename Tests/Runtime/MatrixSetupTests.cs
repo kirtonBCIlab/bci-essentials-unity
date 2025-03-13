@@ -10,7 +10,7 @@ namespace BCIEssentials.Tests.Utilities
     internal class MatrixSetupTests : PlayModeTestRunnerBase
     {
         private Camera _mainCamera;
-        private MatrixSetup _matrixSetup;
+        private SPOGridFactory _matrixSetup;
         private SPO _spo;
 
         [UnitySetUp]
@@ -18,7 +18,7 @@ namespace BCIEssentials.Tests.Utilities
         {
             yield return base.TestSetup();
 
-            _matrixSetup = new GameObject().AddComponent<MatrixSetup>();
+            _matrixSetup = new SPOGridFactory();
             _spo = new GameObject().AddComponent<SPO>();
             _mainCamera = new GameObject().AddComponent<Camera>();
             _mainCamera.tag = "MainCamera";
@@ -29,9 +29,9 @@ namespace BCIEssentials.Tests.Utilities
         {
             Utilities.LogAssert.ExpectStartingWith(LogType.Error, "No SPO");
             
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup.CreateObjects();
 
-            Assert.AreEqual(0, _matrixSetup.MatrixObjects.Count);
+            Assert.AreEqual(0, _matrixSetup.FabricatedObjects.Count);
         }
 
         [Test]
@@ -44,11 +44,11 @@ namespace BCIEssentials.Tests.Utilities
         public void WhenSetUpMatrixWithDifferentRowsAndColumns_ThenMatrixGeneratedWithCorrectRowsAndColumns(
             int columnCount, int rowCount, int expectedCount)
         {
-            _matrixSetup.Initialize(_spo, columnCount, rowCount, Vector2.one);
+            _matrixSetup = new(_spo, columnCount, rowCount, Vector2.one);
 
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup.CreateObjects();
 
-            Assert.AreEqual(expectedCount, _matrixSetup.MatrixObjects.Count);
+            Assert.AreEqual(expectedCount, _matrixSetup.FabricatedObjects.Count);
         }
 
         [Test]
@@ -58,8 +58,8 @@ namespace BCIEssentials.Tests.Utilities
         public void WhenSetUpMatrixWithDifferentSpacing_ThenMatrixGeneratedWithCorrectSpacing(float spacingX,
             float spacingY)
         {
-            _matrixSetup.Initialize(_spo, 2, 2, new Vector2(spacingX, spacingY));
-            _matrixSetup.transform.position = Vector3.zero;
+            _matrixSetup = new(_spo, 2, 2, new Vector2(spacingX, spacingY));
+            
             var expectedPositions = new Vector3[]
             {
                 new(0, 0, 0),
@@ -68,13 +68,13 @@ namespace BCIEssentials.Tests.Utilities
                 new(spacingX, spacingY, 0),
             };
 
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup.CreateObjects();
 
-            Assert.AreEqual(_matrixSetup.MatrixObjects.Count, 4);
+            Assert.AreEqual(_matrixSetup.FabricatedObjects.Count, 4);
 
-            for (var index = 0; index < _matrixSetup.MatrixObjects.Count; index++)
+            for (var index = 0; index < _matrixSetup.FabricatedObjects.Count; index++)
             {
-                var actualPosition = _matrixSetup.MatrixObjects[index].transform.position;
+                var actualPosition = _matrixSetup.FabricatedObjects[index].transform.position;
                 Assert.AreEqual(expectedPositions[index], actualPosition);
             }
         }
@@ -82,12 +82,11 @@ namespace BCIEssentials.Tests.Utilities
         [Test]
         public void WhenSetUpMatrix_ThenCameraCenteredOnMatrix()
         {
-            _matrixSetup.transform.position = Vector3.zero;
             _mainCamera.transform.position = Vector3.zero;
 
-            _matrixSetup.Initialize(_spo, 5, 5, Vector2.one);
+            _matrixSetup = new(_spo, 5, 5, Vector2.one);
 
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup.CreateObjects();
 
             Assert.AreEqual(new Vector3(2, 2, -10), _mainCamera.transform.position);
         }
@@ -95,23 +94,23 @@ namespace BCIEssentials.Tests.Utilities
         [Test]
         public void WhenSetUpMatrixAgain_ThenPreviousObjectsDestroyed()
         {
-            _matrixSetup.Initialize(_spo, 1, 1, Vector2.one);
-            _matrixSetup.SetUpMatrix();
-            var previousSpo = _matrixSetup.MatrixObjects[0];
+            _matrixSetup = new(_spo, 1, 1, Vector2.one);
+            _matrixSetup.CreateObjects();
+            var previousSpo = _matrixSetup.FabricatedObjects[0];
             
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup.CreateObjects();
             
-            Assert.AreNotEqual(_matrixSetup.MatrixObjects[0], previousSpo);
+            Assert.AreNotEqual(_matrixSetup.FabricatedObjects[0], previousSpo);
         }
 
         [UnityTest]
-        public IEnumerator WhenDestroyMatrix_ThenGeneratedMatrixObjectsDestroyed()
+        public IEnumerator WhenDestroyMatrix_ThenGeneratedOwnedObjectsDestroyed()
         {
-            _matrixSetup.Initialize(_spo, 1, 1, Vector2.one);
-            _matrixSetup.SetUpMatrix();
+            _matrixSetup = new(_spo, 1, 1, Vector2.one);
+            _matrixSetup.CreateObjects();
             var totalSceneObjectCount = Object.FindObjectsOfType<GameObject>().Length;
             
-            _matrixSetup.DestroyMatrix();
+            _matrixSetup.DestroyObjects();
             yield return null;
 
             var objects = Object.FindObjectsOfType<GameObject>();
