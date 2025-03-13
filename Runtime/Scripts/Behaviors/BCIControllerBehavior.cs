@@ -20,13 +20,14 @@ namespace BCIEssentials.ControllerBehaviors
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
-        [Header("BCI Registration")]
+        [Header("Controller Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
         
         [SerializeField]
         [Tooltip("Whether to set as active behavior when self registering.")]
+        [ShowIf("_selfRegister")]
         private bool _selfRegisterAsActive;
 
         [Header("Default SPO Setup")]
@@ -47,7 +48,7 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
 
-        [Header("SPO Objects")]
+        [Header("Stimulus Presenting Objects")]
         [SerializeField]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
@@ -59,9 +60,11 @@ namespace BCIEssentials.ControllerBehaviors
 
         [Header("BCI Signal Properties")]
         //StimulusOn/Off + sending Markers
+        [FoldoutGroup("Signal Properties")]
         [Tooltip("The length of the processing window")]
         //TODO: Rename this more appropriately to our Epoch/scheme
         public float windowLength = 1.0f;
+        [FoldoutGroup("Signal Properties")]
         [Tooltip("The interval between processing windows")]
         public float interWindowInterval = 0f;
 

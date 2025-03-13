@@ -9,11 +9,6 @@ namespace BCIEssentials.Editor
 {
     public abstract class CustomInspector: UnityEditor.Editor
     {
-        const BindingFlags FieldSearchFlags
-            = BindingFlags.Instance
-            | BindingFlags.Public
-            | BindingFlags.NonPublic;
-
         private List<string> _drawnProperties = new();
 
         public override void OnInspectorGUI()
@@ -25,7 +20,11 @@ namespace BCIEssentials.Editor
 
             DrawInspector();
 
-            if (GetTargetFieldNames().Any(name => !_drawnProperties.Contains(name)))
+            if (
+                serializedObject.GetPropertyNames().Any(
+                    name => !_drawnProperties.Contains(name)
+                )
+            )
             {
                 DrawHeader("Properties Unhandled By Custom Inspector:", 40);
                 DrawPropertiesExcluding(serializedObject, _drawnProperties.ToArray());
@@ -116,35 +115,5 @@ namespace BCIEssentials.Editor
 
         protected SerializedProperty GetProperty(string propertyPath)
         => serializedObject.FindProperty(propertyPath);
-
-
-        private IEnumerable<string> GetTargetFieldNames()
-        => GetFieldNames(serializedObject.targetObject.GetType());
-        private IEnumerable<string> GetFieldNames(Type type)
-        {
-            FieldInfo[] fields = type.GetFields(FieldSearchFlags);
-
-            return fields.Select(fieldInfo => fieldInfo.Name);
-        }
-
-
-        private bool PropertyHasAttribute<T>
-        (SerializedProperty property) where T: Attribute
-        => PropertyHasAttribute<T>(property.propertyPath);
-        private bool PropertyHasAttribute<T>
-        (string path) where T: Attribute
-        {
-            Type type = serializedObject.targetObject.GetType();
-
-            FieldInfo fieldInfo = type.GetField(path, FieldSearchFlags);
-            if (fieldInfo != null)
-                return fieldInfo.GetCustomAttribute<T>() != null;
-
-            PropertyInfo propertyInfo = type.GetProperty(path);
-            if (propertyInfo != null)
-                return propertyInfo.GetCustomAttribute<T>() != null;
-
-            return false;
-        }
     }
 }
