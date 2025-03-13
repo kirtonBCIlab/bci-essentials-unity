@@ -35,8 +35,15 @@ namespace BCIEssentials
                 return false;
             }
 
-            return conditionProperty.boolValue ||
-                conditionProperty.objectReferenceValue != null;
+            return conditionProperty.propertyType switch {
+                SerializedPropertyType.Boolean
+                    => conditionProperty.boolValue
+                ,
+                SerializedPropertyType.ObjectReference
+                    => conditionProperty.objectReferenceValue != null
+                ,
+                    _ => true
+            };
         }
     }
 }

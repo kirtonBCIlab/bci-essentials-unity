@@ -35,6 +35,7 @@ namespace BCIEssentials.Editor
                     foldoutLabel = null;
                     foldoutProperties.Clear();
 
+                    // TODO: refactor to support showif attributes inside a foldout group
                     if (property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute))
                     {
                         DrawPropertyIf(
