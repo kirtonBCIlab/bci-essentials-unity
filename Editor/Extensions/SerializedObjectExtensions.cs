@@ -24,7 +24,7 @@ namespace BCIEssentials.Editor
 
             do {
                 if (iterator.name == "m_Script") continue;
-                action(iterator);
+                action(iterator.Copy());
             } while (iterator.NextVisible(false));
         }
 
@@ -50,6 +50,17 @@ namespace BCIEssentials.Editor
         where T : PropertyAttribute
         => target.FindProperty(propertyPath).GetAttribute<T>();
         
+        public static bool TryGetAttribute<T>
+        (
+            this SerializedProperty property,
+            out T attribute
+        )
+        where T : PropertyAttribute
+        {
+            attribute = GetAttribute<T>(property);
+            return attribute != null;
+        }
+
         public static T GetAttribute<T>
         (
             this SerializedProperty property
@@ -57,6 +68,10 @@ namespace BCIEssentials.Editor
         where T : PropertyAttribute
         {
             Type type = property.serializedObject.targetObject.GetType();
+
+            FieldInfo fieldInfo = type.GetField(property.name, PropertySearchFlags);
+            if (fieldInfo != null)
+                return fieldInfo.GetCustomAttribute<T>();
 
             PropertyInfo propertyInfo = type.GetProperty(property.name, PropertySearchFlags);
             if (propertyInfo != null)

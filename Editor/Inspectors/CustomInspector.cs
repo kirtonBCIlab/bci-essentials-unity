@@ -91,25 +91,33 @@ namespace BCIEssentials.Editor
         => Array.ForEach(properties, property => DrawPropertyIf(condition, property));
 
 
-        protected void DrawPropertiesInFoldoutGroup
+        protected bool DrawPropertiesInFoldoutGroup
         (
-            ref bool foldOut, string label,
+            bool foldout, string label,
             params string[] paths
         )
         {
-            foldOut = EditorGUILayout.BeginFoldoutHeaderGroup(foldOut, label);
-            DrawPropertiesIf(foldOut, paths);
+            foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, label);
+            DrawPropertiesIf(foldout, paths);
             EditorGUILayout.EndFoldoutHeaderGroup();
+            return foldout;
         }
-        protected void DrawPropertiesInFoldoutGroup
+        protected bool DrawPropertiesInFoldoutGroup
         (
-            ref bool foldOut, string label,
+            bool foldout, string label,
+            IEnumerable<SerializedProperty> properties
+        )
+        => DrawPropertiesInFoldoutGroup(foldout, label, properties.ToArray());
+        protected bool DrawPropertiesInFoldoutGroup
+        (
+            bool foldout, string label,
             params SerializedProperty[] properties
         )
         {
-            foldOut = EditorGUILayout.BeginFoldoutHeaderGroup(foldOut, label);
-            DrawPropertiesIf(foldOut, properties);
+            foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, label);
+            DrawPropertiesIf(foldout, properties);
             EditorGUILayout.EndFoldoutHeaderGroup();
+            return foldout;
         }
         
 
