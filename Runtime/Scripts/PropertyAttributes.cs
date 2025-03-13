@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BCIEssentials.Utilities
+namespace BCIEssentials
 {
     public class InspectorReadOnlyAttribute : PropertyAttribute { }
 }

@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace BCIEssentials.Utilities.Editor
+namespace BCIEssentials.Editor
 {
     [CustomPropertyDrawer(typeof(InspectorReadOnlyAttribute))]
     public class InspectorReadOnlyDrawer : PropertyDrawer
