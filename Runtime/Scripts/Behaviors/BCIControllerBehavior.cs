@@ -30,6 +30,8 @@ namespace BCIEssentials.ControllerBehaviors
         private bool _selfRegisterAsActive;
 
         [Header("Default SPO Setup")]
+        [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
+        [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
         [Tooltip("Component used to set-up default SPO objects")]
         [SerializeField] private SPOFactory _spoSetup;
         [Tooltip("Whether to automatically trigger the setup factory")]
@@ -164,7 +166,7 @@ namespace BCIEssentials.ControllerBehaviors
             
             if (setupRequired)
             {
-                _spoSetup?.CreateObjects();
+                SetUpSPOs();
             }
         }
 
@@ -174,7 +176,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void CleanUp()
         {
-            _spoSetup?.DestroyObjects();
+            CleanUpSPOs();
             InStream?.CloseStream();
 
             StimulusRunning = false;
@@ -183,6 +185,20 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _waitToSelect);
         }
+
+
+        [ContextMenu("Set Up SPOs")]
+        protected void SetUpSPOs()
+        {
+            _spoSetup?.CreateObjects(transform);
+        }
+
+        [ContextMenu("Remove Fabricated SPOs")]
+        protected void CleanUpSPOs()
+        {
+            _spoSetup?.DestroyObjects();
+        }
+
 
         /// <summary>
         /// Register this behavior with the active <see cref="BCIController.Instance"/>.

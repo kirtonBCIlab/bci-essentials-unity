@@ -44,7 +44,7 @@ namespace BCIEssentials.Utilities
             {
                 if (spo != null)
                 {
-                    Destroy(spo.gameObject);
+                    DestroyImmediate(spo.gameObject);
                 }
             }
 
