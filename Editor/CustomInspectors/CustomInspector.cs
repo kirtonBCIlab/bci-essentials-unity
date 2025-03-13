@@ -9,6 +9,11 @@ namespace BCIEssentials.Editor
 {
     public abstract class CustomInspector: UnityEditor.Editor
     {
+        const BindingFlags FieldSearchFlags
+            = BindingFlags.Instance
+            | BindingFlags.Public
+            | BindingFlags.NonPublic;
+
         private List<string> _drawnProperties = new();
 
         public override void OnInspectorGUI()
@@ -18,7 +23,7 @@ namespace BCIEssentials.Editor
             DrawProperty("m_Script");
             GUI.enabled = true;
 
-            DrawProperties();
+            DrawInspector();
 
             if (GetTargetFieldNames().Any(name => !_drawnProperties.Contains(name)))
             {
@@ -29,24 +34,8 @@ namespace BCIEssentials.Editor
             serializedObject.ApplyModifiedProperties();
         }
 
-        public abstract void DrawProperties();
-
-        protected void DrawProperty(string propertyPath)
-        => DrawProperty(GetProperty(propertyPath));
-        protected void DrawProperty(SerializedProperty property)
-        {
-            EditorGUILayout.PropertyField(property);
-            _drawnProperties.Add(property.name);
-        }
-
-        protected void DrawPropertyFieldIf(string propertyPath, bool condition)
-        {
-            if (condition) DrawProperty(propertyPath);
-            else _drawnProperties.Add(propertyPath);
-        }
-
-        protected SerializedProperty GetProperty(string propertyPath)
-        => serializedObject.FindProperty(propertyPath);
+        public abstract void DrawInspector();
+        
 
         protected void DrawHeader(string headerText, float space = 20)
         {
@@ -54,31 +43,108 @@ namespace BCIEssentials.Editor
             GUILayout.Label(headerText, EditorStyles.boldLabel);
         }
 
-        protected void DrawFoldoutGroup(ref bool toggle, string label, Action content)
+
+        protected void DrawProperty(string propertyPath)
+        => DrawProperty(GetProperty(propertyPath));
+        protected void DrawProperty(SerializedProperty property)
         {
-            toggle = EditorGUILayout.BeginFoldoutHeaderGroup(toggle, label);
-            content();
-            EditorGUILayout.EndFoldoutHeaderGroup();
+            EditorGUILayout.PropertyField(property);
+            _drawnProperties.Add(property.propertyPath);
         }
 
-        protected void DrawToggleGroup(ref bool toggle, string label, Action content)
+        protected SerializedProperty DrawAndGetProperty(string propertyPath)
         {
-            toggle = EditorGUILayout.BeginToggleGroup(label, toggle);
-            content();
-            EditorGUILayout.EndToggleGroup();
+            SerializedProperty property = GetProperty(propertyPath);
+            DrawProperty(property);
+            return property;
         }
+
+        protected void DrawPropertyIf(bool condition, string propertyPath)
+        => DrawPropertyIf(condition, GetProperty(propertyPath));
+        protected void DrawPropertyIf(bool condition, SerializedProperty property)
+        {
+            if (condition) DrawProperty(property);
+            else _drawnProperties.Add(property.propertyPath);
+        }
+
+
+        protected void DrawProperties(params string[] paths)
+        {
+            foreach (string propertyPath in paths)
+                DrawProperty(propertyPath);
+        }
+        protected void DrawProperties(params SerializedProperty[] properties)
+        {
+            foreach (SerializedProperty property in properties)
+                DrawProperty(property);
+        }
+
+
+        protected void DrawPropertiesIf
+        (
+            bool condition, params string[] paths
+        )
+        => Array.ForEach(paths, path => DrawPropertyIf(condition, path));
+        protected void DrawPropertiesIf
+        (
+            bool condition, params SerializedProperty[] properties
+        )
+        => Array.ForEach(properties, property => DrawPropertyIf(condition, property));
+
+
+        protected void DrawPropertiesInFoldoutGroup
+        (
+            ref bool foldOut, string label,
+            params string[] paths
+        )
+        {
+            foldOut = EditorGUILayout.BeginFoldoutHeaderGroup(foldOut, label);
+            DrawPropertiesIf(foldOut, paths);
+            EditorGUILayout.EndFoldoutHeaderGroup();
+        }
+        protected void DrawPropertiesInFoldoutGroup
+        (
+            ref bool foldOut, string label,
+            params SerializedProperty[] properties
+        )
+        {
+            foldOut = EditorGUILayout.BeginFoldoutHeaderGroup(foldOut, label);
+            DrawPropertiesIf(foldOut, properties);
+            EditorGUILayout.EndFoldoutHeaderGroup();
+        }
+        
+
+        protected SerializedProperty GetProperty(string propertyPath)
+        => serializedObject.FindProperty(propertyPath);
 
 
         private IEnumerable<string> GetTargetFieldNames()
         => GetFieldNames(serializedObject.targetObject.GetType());
         private IEnumerable<string> GetFieldNames(Type type)
         {
-            BindingFlags fieldSearchFlags = BindingFlags.Instance;
-            fieldSearchFlags |= BindingFlags.Public;
-            fieldSearchFlags |= BindingFlags.NonPublic;
-            FieldInfo[] fields = type.GetFields(fieldSearchFlags);
+            FieldInfo[] fields = type.GetFields(FieldSearchFlags);
 
             return fields.Select(fieldInfo => fieldInfo.Name);
+        }
+
+
+        private bool PropertyHasAttribute<T>
+        (SerializedProperty property) where T: Attribute
+        => PropertyHasAttribute<T>(property.propertyPath);
+        private bool PropertyHasAttribute<T>
+        (string path) where T: Attribute
+        {
+            Type type = serializedObject.targetObject.GetType();
+
+            FieldInfo fieldInfo = type.GetField(path, FieldSearchFlags);
+            if (fieldInfo != null)
+                return fieldInfo.GetCustomAttribute<T>() != null;
+
+            PropertyInfo propertyInfo = type.GetProperty(path);
+            if (propertyInfo != null)
+                return propertyInfo.GetCustomAttribute<T>() != null;
+
+            return false;
         }
     }
 }
