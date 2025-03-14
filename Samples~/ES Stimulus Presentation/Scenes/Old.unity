@@ -133,7 +133,6 @@ GameObject:
   m_Component:
   - component: {fileID: 196778431}
   - component: {fileID: 196778430}
-  - component: {fileID: 196778429}
   - component: {fileID: 196778428}
   - component: {fileID: 196778433}
   - component: {fileID: 196778432}
@@ -159,22 +158,6 @@ MonoBehaviour:
   _lslMarkerStream: {fileID: 196778433}
   _lslResponseStream: {fileID: 196778432}
   _dontDestroyActiveInstance: 1
---- !u!114 &196778429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 196778425}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
-  _numRows: 1
-  _numColumns: 1
-  _spacing: {x: 1, y: 1}
 --- !u!114 &196778430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,12 +171,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _selfRegister: 1
-  _selfRegisterAsActive: 0
-  setup: {fileID: 196778429}
-  setupRequired: 1
+  _selfRegisterAsActive: 1
+  SPOTag: BCI
+  _spoFactory: {fileID: 11400000, guid: 04feb4fadcdc3534a89e9adae7bf640d, type: 2}
+  FactorySetupRequired: 1
   targetFrameRate: 60
   _hotkeysEnabled: 1
-  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 0
@@ -204,7 +187,6 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  myTag: BCI
   setFreqFlash: 0
   realFreqFlash: 0
   mainCam: {fileID: 1577016186}
