@@ -28,15 +28,19 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to set as active behavior when self registering.")]
         private bool _selfRegisterAsActive;
 
+        [Space(12)]
+        [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
+        public string SPOTag = "BCI";
+
         [Header("Default SPO Setup")]
         [SerializeField]
         [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
         [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
         [Tooltip("Component used to set-up default SPO objects")]
-        private SPOFactory _spoSetup;
-        [ShowIf("_spoSetup")]
-        [Tooltip("Whether to automatically trigger the setup factory")]
-        public bool setupRequired;
+        private SPOFactory _spoFactory;
+        [ShowIf("_spoFactory")]
+        [Tooltip("Whether to automatically trigger the setup factory when initialized")]
+        public bool FactorySetupRequired;
         
         [FoldoutGroup("System Properties and Targets")]
         [SerializeField, Min(-1)]
@@ -90,10 +94,6 @@ namespace BCIEssentials.ControllerBehaviors
         [FoldoutGroup("Training Properties")]
         [Tooltip("The target object to train on, defaulted to a random high number")]
         public int trainTarget = 99;
-
-        [Header("BCI Training Tag")]
-        [FormerlySerializedAs("_myTag")]
-        public string myTag = "BCI";
 
         #endregion
         
@@ -172,7 +172,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Application.targetFrameRate = targetFrameRate; 
             }
             
-            if (setupRequired)
+            if (FactorySetupRequired)
             {
                 SetUpSPOs();
             }
@@ -198,13 +198,13 @@ namespace BCIEssentials.ControllerBehaviors
         [ContextMenu("Set Up SPOs")]
         protected void SetUpSPOs()
         {
-            _spoSetup?.CreateObjects(transform);
+            _spoFactory?.CreateObjects(transform);
         }
 
         [ContextMenu("Remove Fabricated SPOs")]
         protected void CleanUpSPOs()
         {
-            _spoSetup?.DestroyObjects();
+            _spoFactory?.DestroyObjects();
         }
 
 
@@ -342,7 +342,7 @@ namespace BCIEssentials.ControllerBehaviors
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
                     _objectIDtoSPODict.Clear(); 
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
                     foreach (var taggedGO in taggedGOs)
                     {
                         if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)

@@ -966,7 +966,7 @@ namespace BCIEssentials.ControllerBehaviors
                 default:
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
                     foreach (var taggedGO in taggedGOs)
                     {
                         if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
@@ -1004,7 +1004,7 @@ namespace BCIEssentials.ControllerBehaviors
         public List<GameObject> GetGameSPOsInCameraView()
         {
             Camera mainCamera = Camera.main;
-            var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+            var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
             List<GameObject> visibleGOs = new List<GameObject>();
             List<GameObject> uiGOs = new List<GameObject>();
 

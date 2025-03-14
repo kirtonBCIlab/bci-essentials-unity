@@ -164,8 +164,8 @@ namespace BCIEssentials.Tests
 
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
-                setupRequired = true,
-                setup = matrix
+                FactorySetupRequired = true,
+                _spoFactory = matrix
             });
 
             _behavior.Initialize(null, null);
@@ -189,7 +189,7 @@ namespace BCIEssentials.Tests
 
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
-                setup = matrix
+                _spoFactory = matrix
             });
             matrix.CreateObjects();
 
@@ -219,7 +219,7 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenPopulateObjectListWithTagMethod_ThenObjectListPopulated()
         {
-            var noComponent = new GameObject { tag = _behavior.myTag };
+            var noComponent = new GameObject { tag = _behavior.SPOTag };
             var noTag = AddSPOToScene("");
             var falseIncludeMe = AddSPOToScene(includeMe: false);
             var included = AddSPOToScene();
