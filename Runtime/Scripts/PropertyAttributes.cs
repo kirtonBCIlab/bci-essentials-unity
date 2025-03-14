@@ -14,11 +14,23 @@ namespace BCIEssentials
     public class FoldoutGroupAttribute : PropertyAttribute
     {
         public string Label;
+        public int FontSize;
+        public float TopMargin, BottomMargin;
 
-        public FoldoutGroupAttribute(string label)
+        public FoldoutGroupAttribute
+        (
+            string label, int fontSize = 14,
+            float topMargin = 12, float bottomMargin = 0
+        )
         {
             Label = label;
+            FontSize = fontSize;
+            TopMargin = topMargin;
+            BottomMargin = bottomMargin;
         }
+
+        public bool IsSiblingTo(FoldoutGroupAttribute a)
+        => a != null && Label == a.Label;
     }
 
     public class ShowIfAttribute : PropertyAttribute

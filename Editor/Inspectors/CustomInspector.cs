@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -36,10 +35,24 @@ namespace BCIEssentials.Editor
         public abstract void DrawInspector();
         
 
-        protected void DrawHeader(string headerText, float space = 20)
+        protected void DrawHeader
+        (
+            string headerText,
+            int fontSize = 12,
+            float topMargin = 20
+        )
         {
-            GUILayout.Space(space);
-            GUILayout.Label(headerText, EditorStyles.boldLabel);
+            DrawSpace(topMargin);
+            GUIStyle style = EditorStyles.boldLabel;
+            int previousFontSize = style.fontSize;
+            style.fontSize = fontSize;
+            GUILayout.Label(headerText, style);
+            style.fontSize = previousFontSize;
+        }
+
+        protected void DrawSpace(float pixels)
+        {
+            if (pixels > 0) GUILayout.Space(pixels);
         }
 
 
@@ -105,18 +118,22 @@ namespace BCIEssentials.Editor
         protected bool DrawPropertiesInFoldoutGroup
         (
             bool foldout, string label,
-            IEnumerable<SerializedProperty> properties
-        )
-        => DrawPropertiesInFoldoutGroup(foldout, label, properties.ToArray());
-        protected bool DrawPropertiesInFoldoutGroup
-        (
-            bool foldout, string label,
-            params SerializedProperty[] properties
+            IEnumerable <SerializedProperty> properties,
+            int fontSize = 14,
+            float topMargin = 12, float bottomMargin = 0
         )
         {
-            foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, label);
+            DrawSpace(topMargin);
+            GUIStyle style = EditorStyles.foldoutHeader;
+            int previousFontSize = style.fontSize;
+            style.fontSize = fontSize;
+
+            foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, label, style);
             EditorGUILayout.EndFoldoutHeaderGroup();
-            DrawPropertiesIf(foldout, properties);
+            style.fontSize = previousFontSize;
+
+            DrawPropertiesIf(foldout, properties.ToArray());
+            DrawSpace(bottomMargin);
             return foldout;
         }
         

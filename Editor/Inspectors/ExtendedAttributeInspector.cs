@@ -10,28 +10,36 @@ namespace BCIEssentials.Editor
 
         public override void DrawInspector()
         {
-            string foldoutLabel = null;
+            FoldoutGroupAttribute currentFoldoutGroupAttribute = null;
             List<SerializedProperty> foldoutProperties = new();
 
             serializedObject.ForEachProperty(property => {
                 if (property.TryGetAttribute<FoldoutGroupAttribute>(out var foldoutAttribute))
                 {
-                    if (foldoutAttribute.Label == foldoutLabel)
+                    if (foldoutAttribute.IsSiblingTo(currentFoldoutGroupAttribute))
                     {
                         foldoutProperties.Add(property);
                     }
                     else
                     {
-                        DrawFoldoutGroupIfHasLabel(foldoutLabel, foldoutProperties);
+                        DrawFoldoutGroupFromAttribute
+                        (
+                            currentFoldoutGroupAttribute,
+                            foldoutProperties
+                        );
 
-                        foldoutLabel = foldoutAttribute.Label;
+                        currentFoldoutGroupAttribute = foldoutAttribute;
                         foldoutProperties = new() {property};
                     }
                 }
                 else {
-                    DrawFoldoutGroupIfHasLabel(foldoutLabel, foldoutProperties);
+                    DrawFoldoutGroupFromAttribute
+                    (
+                        currentFoldoutGroupAttribute,
+                        foldoutProperties
+                    );
 
-                    foldoutLabel = null;
+                    currentFoldoutGroupAttribute = null;
                     foldoutProperties.Clear();
 
                     // TODO: refactor to support showif attributes inside a foldout group
@@ -51,13 +59,14 @@ namespace BCIEssentials.Editor
         }
 
         
-        private void DrawFoldoutGroupIfHasLabel
+        private void DrawFoldoutGroupFromAttribute
         (
-            string label,
+            FoldoutGroupAttribute attribute,
             IEnumerable<SerializedProperty> properties
         )
         {
-            if (label == null) return;
+            if (attribute == null) return;
+            string label = attribute.Label;
 
             if (!foldoutGroupToggles.ContainsKey(label))
                 foldoutGroupToggles.Add(label, false);
@@ -65,7 +74,8 @@ namespace BCIEssentials.Editor
             foldoutGroupToggles[label]
             = DrawPropertiesInFoldoutGroup(
                 foldoutGroupToggles[label],
-                label, properties
+                label, properties, attribute.FontSize,
+                attribute.TopMargin, attribute.BottomMargin
             );
         }
     }
