@@ -27,38 +27,42 @@ namespace BCIEssentials.Editor
                             currentFoldoutGroupAttribute,
                             foldoutProperties
                         );
-
                         currentFoldoutGroupAttribute = foldoutAttribute;
                         foldoutProperties = new() {property};
                     }
                 }
-                else {
+                else
+                {
                     DrawFoldoutGroupFromAttribute
                     (
                         currentFoldoutGroupAttribute,
                         foldoutProperties
                     );
-
                     currentFoldoutGroupAttribute = null;
                     foldoutProperties.Clear();
 
-                    // TODO: refactor to support showif attributes inside a foldout group
-                    if (property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute))
-                    {
-                        DrawPropertyIf(
-                            showIfAttribute.ShouldShow(serializedObject),
-                            property
-                        );
-                    }
-                    else
-                    {
-                        DrawProperty(property);
-                    }
+                    DrawProperty(property);
                 }
             });
         }
 
-        
+
+        protected override void DrawProperty(SerializedProperty property)
+        {
+            if
+            (
+                property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute)
+                &&
+                !showIfAttribute.ShouldShow(serializedObject)
+            )
+            {
+                HideProperty(property);
+            }
+            else
+                base.DrawProperty(property);
+        }
+
+
         private void DrawFoldoutGroupFromAttribute
         (
             FoldoutGroupAttribute attribute,

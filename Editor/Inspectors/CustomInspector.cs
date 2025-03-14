@@ -8,25 +8,23 @@ namespace BCIEssentials.Editor
 {
     public abstract class CustomInspector: UnityEditor.Editor
     {
-        private List<string> _drawnProperties = new();
+        private List<string> _handledProperties = new();
 
         public override void OnInspectorGUI()
         {
-            _drawnProperties.Clear();
-            GUI.enabled = false;
-            DrawProperty("m_Script");
-            GUI.enabled = true;
+            _handledProperties.Clear();
+            HideProperty("m_Script");
 
             DrawInspector();
 
             if (
                 serializedObject.GetPropertyNames().Any(
-                    name => !_drawnProperties.Contains(name)
+                    name => !_handledProperties.Contains(name)
                 )
             )
             {
                 DrawHeader("Properties Unhandled By Custom Inspector:", 40);
-                DrawPropertiesExcluding(serializedObject, _drawnProperties.ToArray());
+                DrawPropertiesExcluding(serializedObject, _handledProperties.ToArray());
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -58,10 +56,10 @@ namespace BCIEssentials.Editor
 
         protected void DrawProperty(string propertyPath)
         => DrawProperty(GetProperty(propertyPath));
-        protected void DrawProperty(SerializedProperty property)
+        protected virtual void DrawProperty(SerializedProperty property)
         {
             EditorGUILayout.PropertyField(property);
-            _drawnProperties.Add(property.propertyPath);
+            _handledProperties.Add(property.propertyPath);
         }
 
         protected SerializedProperty DrawAndGetProperty(string propertyPath)
@@ -76,8 +74,13 @@ namespace BCIEssentials.Editor
         protected void DrawPropertyIf(bool condition, SerializedProperty property)
         {
             if (condition) DrawProperty(property);
-            else _drawnProperties.Add(property.propertyPath);
+            else HideProperty(property);
         }
+
+        protected void HideProperty(string propertyPath)
+        => _handledProperties.Add(propertyPath);
+        protected void HideProperty(SerializedProperty property)
+        => HideProperty(property.propertyPath);
 
 
         protected void DrawProperties(params string[] paths)
