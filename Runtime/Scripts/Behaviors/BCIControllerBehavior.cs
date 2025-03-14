@@ -6,7 +6,9 @@ using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
-using UnityEngine.Serialization;
+using UnityEditor.SceneManagement;
+using System.IO;
+using UnityEditor;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -36,6 +38,7 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField]
         [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
         [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
+        [ContextMenuItem("Create New SPO Factory Asset", "CreateAndAssignSPOFactory")]
         [Tooltip("Component used to set-up default SPO objects")]
         private SPOFactory _spoFactory;
         [ShowIf("_spoFactory")]
@@ -205,6 +208,20 @@ namespace BCIEssentials.ControllerBehaviors
         protected void CleanUpSPOs()
         {
             _spoFactory?.DestroyObjects();
+        }
+
+        protected void CreateAndAssignSPOFactory()
+        {
+            if (_spoFactory)
+            {
+                Debug.LogWarning("An SPO Factory is Already Set");
+                return;
+            }
+            _spoFactory = SPOGridFactory.CreateInstance(null, 3, 2, Vector2.one * 2);
+            string scenePath = EditorSceneManager.GetActiveScene().path;
+            string folderPath = Path.GetDirectoryName(scenePath);
+            string fileName = $"{name} SPO Factory.asset";
+            AssetDatabase.CreateAsset(_spoFactory,  $"{folderPath}\\{fileName}");
         }
 
 
