@@ -18,7 +18,7 @@ namespace BCIEssentials.Tests.Utilities
         {
             yield return base.TestSetup();
 
-            _matrixSetup = new SPOGridFactory();
+            _matrixSetup = SPOGridFactory.CreateInstance();
             _spo = new GameObject().AddComponent<SPO>();
             _mainCamera = new GameObject().AddComponent<Camera>();
             _mainCamera.tag = "MainCamera";
@@ -44,7 +44,7 @@ namespace BCIEssentials.Tests.Utilities
         public void WhenSetUpMatrixWithDifferentRowsAndColumns_ThenMatrixGeneratedWithCorrectRowsAndColumns(
             int columnCount, int rowCount, int expectedCount)
         {
-            _matrixSetup = new(_spo, columnCount, rowCount, Vector2.one);
+            _matrixSetup = SPOGridFactory.CreateInstance(_spo, columnCount, rowCount, Vector2.one);
 
             _matrixSetup.CreateObjects();
 
@@ -58,7 +58,7 @@ namespace BCIEssentials.Tests.Utilities
         public void WhenSetUpMatrixWithDifferentSpacing_ThenMatrixGeneratedWithCorrectSpacing(float spacingX,
             float spacingY)
         {
-            _matrixSetup = new(_spo, 2, 2, new Vector2(spacingX, spacingY));
+            _matrixSetup = SPOGridFactory.CreateInstance(_spo, 2, 2, new Vector2(spacingX, spacingY));
             
             var expectedPositions = new Vector3[]
             {
@@ -84,7 +84,7 @@ namespace BCIEssentials.Tests.Utilities
         {
             _mainCamera.transform.position = Vector3.zero;
 
-            _matrixSetup = new(_spo, 5, 5, Vector2.one);
+            _matrixSetup = SPOGridFactory.CreateInstance(_spo, 5, 5, Vector2.one);
 
             _matrixSetup.CreateObjects();
 
@@ -94,7 +94,7 @@ namespace BCIEssentials.Tests.Utilities
         [Test]
         public void WhenSetUpMatrixAgain_ThenPreviousObjectsDestroyed()
         {
-            _matrixSetup = new(_spo, 1, 1, Vector2.one);
+            _matrixSetup = SPOGridFactory.CreateInstance(_spo, 1, 1, Vector2.one);
             _matrixSetup.CreateObjects();
             var previousSpo = _matrixSetup.FabricatedObjects[0];
             
@@ -106,7 +106,7 @@ namespace BCIEssentials.Tests.Utilities
         [UnityTest]
         public IEnumerator WhenDestroyMatrix_ThenGeneratedOwnedObjectsDestroyed()
         {
-            _matrixSetup = new(_spo, 1, 1, Vector2.one);
+            _matrixSetup = SPOGridFactory.CreateInstance(_spo, 1, 1, Vector2.one);
             _matrixSetup.CreateObjects();
             var totalSceneObjectCount = Object.FindObjectsOfType<GameObject>().Length;
             

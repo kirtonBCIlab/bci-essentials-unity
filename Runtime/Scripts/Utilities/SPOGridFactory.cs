@@ -17,20 +17,33 @@ namespace BCIEssentials.Utilities
         [SerializeField] private Vector2 _spacing = Vector2.one;
 
 
-        public SPOGridFactory
+        public static SPOGridFactory CreateInstance()
+        => CreateInstance<SPOGridFactory>();
+
+        public static SPOGridFactory CreateInstance
         (
             SPO prefab,
             int columns, int rows,
             Vector2 spacing
         )
-        : base(prefab)
         {
+            var instance = CreateInstance<SPOGridFactory>();
+            instance.Init(prefab, columns, rows, spacing);
+            return instance;
+        }
+
+        public void Init
+        (
+            SPO prefab,
+            int columns, int rows,
+            Vector2 spacing
+        )
+        {
+            base.Init(prefab);
             _numColumns = Math.Max(1, columns);
             _numRows = Math.Max(1, rows);
             _spacing = spacing;
         }
-        
-        public SPOGridFactory(): base(null) {}
 
 
         protected override void InstantiateConfiguredObjects(Transform objectParent = null)

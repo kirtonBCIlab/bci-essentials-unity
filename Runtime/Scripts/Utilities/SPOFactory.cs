@@ -10,10 +10,11 @@ namespace BCIEssentials.Utilities
 
         public readonly List<SPO> FabricatedObjects = new();
 
-        public SPOFactory(SPO prefab)
+        public void Init(SPO prefab)
         {
             _spoPrefab = prefab;
         }
+
 
         [ContextMenu("Build SPOs")]
         public void CreateObjects(Transform objectParent = null)
