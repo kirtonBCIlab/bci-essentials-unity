@@ -1,6 +1,6 @@
 {
   "name": "com.bci4kids.bciessentials",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "displayName": "BCI Essentials",
   "description": "A Unity base environment for streamlined development of BCI applications",
   "unity": "2021.3",
@@ -29,24 +29,19 @@
       "path": "Samples~/Environment Aware P300"
     },
     {
-      "displayName": "Original MI Controller",
-      "description": "An example setup for the prepackage style MI Controller.",
-      "path": "Samples~/Original MI Controller"
+      "displayName": "Motor Imagery Example",
+      "description": "An example setup for the MI Controller Behaviour.",
+      "path": "Samples~/Motor Imagery"
     },
     {
-      "displayName": "Original P300 Controller",
-      "description": "An example setup for the prepackage style P300 Controller.",
-      "path": "Samples~/Original P300 Controller"
+      "displayName": "P300 Example",
+      "description": "An example setup for the P300 Controller Behaviour.",
+      "path": "Samples~/P300"
     },
     {
-      "displayName": "Original SSVEP Controller",
-      "description": "An example setup for the prepackage style SSVEP Controller.",
-      "path": "Samples~/Original SSVEP Controller"
-    },
-    {
-      "displayName": "Basic Marker Receviers Example",
-      "description": "An example on how different types of Marker Receivers can be used with the LSLServiceProvider.",
-      "path": "Samples~/BasicMarkerReceivers"
+      "displayName": "SSVEP Example",
+      "description": "An example setup for the SSVEP Controller Behaviour.",
+      "path": "Samples~/SSVEP"
     },
     {
       "displayName": "ES Stimulus Presentation",
