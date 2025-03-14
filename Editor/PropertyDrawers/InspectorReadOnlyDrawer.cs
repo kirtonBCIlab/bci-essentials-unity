@@ -14,10 +14,12 @@ namespace BCIEssentials.Editor
         /// <param name="label">Label.</param>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var previousGUIState = GUI.enabled;
-            GUI.enabled = false;
+            // var previousGUIState = GUI.enabled;
+            // GUI.enabled = false;
+            EditorGUI.BeginDisabledGroup(true);
             EditorGUI.PropertyField(position, property, label);
-            GUI.enabled = previousGUIState;
+            EditorGUI.EndDisabledGroup();
+            // GUI.enabled = previousGUIState;
         }
     }
 }
