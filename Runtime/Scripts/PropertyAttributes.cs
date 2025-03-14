@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace BCIEssentials
 {
+    /// <summary>
+    /// Base class for MonoBehaviours using
+    /// [FoldoutGroup] and [ShowIf] attributes
+    /// </summary>
+    public abstract class MonoBehaviourUsingExtendedAttributes: MonoBehaviour {}
+
     public class InspectorReadOnlyAttribute : PropertyAttribute { }
 
     public class FoldoutGroupAttribute : PropertyAttribute

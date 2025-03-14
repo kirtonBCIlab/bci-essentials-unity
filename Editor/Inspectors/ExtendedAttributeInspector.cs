@@ -1,11 +1,10 @@
 using UnityEditor;
-using BCIEssentials.ControllerBehaviors;
 using System.Collections.Generic;
 
 namespace BCIEssentials.Editor
 {
-    [CustomEditor(typeof(BCIControllerBehavior), true)]
-    public class BCIControllerBehaviourInspector: CustomInspector
+    [CustomEditor(typeof(MonoBehaviourUsingExtendedAttributes), true)]
+    public class ExtendedAttributeInspector: CustomInspector
     {
         Dictionary<string, bool> foldoutGroupToggles = new();
 

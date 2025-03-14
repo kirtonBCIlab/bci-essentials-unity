@@ -7,14 +7,13 @@ using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
 using UnityEngine.Serialization;
-using UnityEngine.Android;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     /// <summary>
     /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
     /// </summary>
-    public abstract class BCIControllerBehavior : MonoBehaviour
+    public abstract class BCIControllerBehavior : MonoBehaviourUsingExtendedAttributes
     {
         /// <summary>
         /// The type of BCI behavior implemented.
