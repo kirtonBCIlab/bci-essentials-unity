@@ -641,6 +641,14 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
+        protected IEnumerator WaitForStimulusToComplete()
+        {
+            while (StimulusRunning)
+            {
+                yield return null;
+            }
+        }
+
         //This is a different Stop start Coroutine Method, that is used to return a coroutine reference. Might be better to use this one, but needs testing.
         protected Coroutine Stop_Coroutines_Then_Start_New_Coroutine(ref Coroutine reference_coroutine, IEnumerator routine)
         {
