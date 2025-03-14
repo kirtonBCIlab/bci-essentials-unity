@@ -8,11 +8,6 @@ namespace BCIEssentials.Editor
 {
     public static class SerializedObjectExtensions
     {
-        const BindingFlags PropertySearchFlags
-            = BindingFlags.Instance
-            | BindingFlags.Public
-            | BindingFlags.NonPublic;
-
         public static void ForEachProperty
         (
             this SerializedObject target,
@@ -66,18 +61,36 @@ namespace BCIEssentials.Editor
             this SerializedProperty property
         )
         where T : PropertyAttribute
-        {
-            Type type = property.serializedObject.targetObject.GetType();
+        => GetAttributeFromTypeAndParents<T>
+        (
+            property.name,
+            property.serializedObject.targetObject.GetType()
+        );
 
-            FieldInfo fieldInfo = type.GetField(property.name, PropertySearchFlags);
+
+        const BindingFlags MemberFlags
+            = BindingFlags.Instance
+            | BindingFlags.Public
+            | BindingFlags.NonPublic;
+
+        private static T GetAttributeFromTypeAndParents<T>
+        (
+            string name, Type type
+        )
+        where T : PropertyAttribute
+        {
+            if (type == typeof(MonoBehaviour) || type == typeof(object))
+                return null;
+
+            FieldInfo fieldInfo = type.GetField(name, MemberFlags);
             if (fieldInfo != null)
                 return fieldInfo.GetCustomAttribute<T>();
 
-            PropertyInfo propertyInfo = type.GetProperty(property.name, PropertySearchFlags);
+            PropertyInfo propertyInfo = type.GetProperty(name, MemberFlags);
             if (propertyInfo != null)
                 return propertyInfo.GetCustomAttribute<T>();
 
-            return null;
+            return GetAttributeFromTypeAndParents<T>(name, type.BaseType);
         }
     }
 }
