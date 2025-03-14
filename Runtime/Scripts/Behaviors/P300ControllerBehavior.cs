@@ -17,7 +17,7 @@ namespace BCIEssentials.ControllerBehaviors
         [Header("P300 Training Properties")]
         public float trainBufferTime = 0f;
         
-        [Header("P300 Pattern Flashing Properties")]
+        [FoldoutGroup("P300 Pattern Flashing Properties")]
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
         public Random randNumFlashes = new Random();
@@ -26,11 +26,12 @@ namespace BCIEssentials.ControllerBehaviors
         public float onTime = 0.1f;
         public float offTime = 0.075f;
 
-        [Header("Stimulus Flash Paradigms")]
+        [FoldoutGroup("Stimulus Flash Paradigms")]
         [Header("Single Flash Properties")]
         [Tooltip("If true, only one SPO will flash at a time")]
         public bool singleFlash = true;
 
+        [ShowIf("singleFlash")]
         [Tooltip("If true, enables context-aware SPO single flashing")]
         public bool contextAwareSingleFlash = false;
 
@@ -39,17 +40,23 @@ namespace BCIEssentials.ControllerBehaviors
         "Needs to be true for rowColumn and checkerboard to work")]
         public bool multiFlash = false;
         
+        [ShowIf("multiFlash")]
         [Tooltip("If true, flashes objects in rows and columns. Requires Multiflash to be true")]
         public bool rowColumn = false;
         
+        [ShowIf("multiFlash")]
         [Tooltip("If true, flashes objects in a checkerboard pattern. Requires Multiflash to be true")]
         public bool checkerboard = true;
+
+        [ShowIf("multiFlash")]
         [Tooltip("If true, enables context-aware SPO multi flashing")]
         public bool contextAwareMultiFlash = false;
 
         [Header("Row/Column & Checkerboard Properties")]
+        [ShowIf("multiFlash")]
         [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
         public int numFlashRows = 5;
+        [ShowIf("multiFlash")]
         [Tooltip("Number of columns in the multi-flash RowColumn or Checkerboard")]
         public int numFlashColumns = 6;
 
@@ -65,9 +72,9 @@ namespace BCIEssentials.ControllerBehaviors
         private float oldTimeOfWrite = 0;
         private float timeLag = 0;
 
-        [Header("Debugging Parameters")]
+        [FoldoutGroup("Debugging Parameters", 12, 20)]
         public bool timeDebug = false;
-
+        [EndFoldoutGroup]
         private bool blockOutGoingLSL = false;
 
         //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.

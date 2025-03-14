@@ -50,8 +50,7 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         protected int targetFrameRate = 60;
 
-        [FoldoutGroup("System Properties and Targets")]
-        [SerializeField]
+        [SerializeField, EndFoldoutGroup]
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
 
@@ -69,7 +68,6 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("The length of the processing window")]
         //TODO: Rename this more appropriately to our Epoch/scheme
         public float windowLength = 1.0f;
-        [FoldoutGroup("Signal Properties")]
         [Tooltip("The interval between processing windows")]
         public float interWindowInterval = 0f;
 
@@ -77,24 +75,18 @@ namespace BCIEssentials.ControllerBehaviors
         [FoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
-        [FoldoutGroup("Training Properties")]
         [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
         public int numTrainWindows = 3;
-        [FoldoutGroup("Training Properties")]
         [Tooltip("Before training starts, pause for this amount of time")]
         public float pauseBeforeTraining = 2;
-        [FoldoutGroup("Training Properties")]
         [Tooltip("The time the target is displayed for, before the sequence begins")]
         public float trainTargetPresentationTime = 3f;
-        [FoldoutGroup("Training Properties")]
         public float trainBreak = 1f;
-        [FoldoutGroup("Training Properties")]
         [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
-        [FoldoutGroup("Training Properties")]
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
-        [FoldoutGroup("Training Properties")]
+        [EndFoldoutGroup]
         [Tooltip("The target object to train on, defaulted to a random high number")]
         public int trainTarget = 99;
 
