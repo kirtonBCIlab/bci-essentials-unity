@@ -33,6 +33,8 @@ namespace BCIEssentials
         => a != null && Label == a.Label;
     }
 
+    public class EndFoldoutGroupAttribute: PropertyAttribute {}
+
     public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionPropertyPath;

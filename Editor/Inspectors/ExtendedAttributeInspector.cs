@@ -8,42 +8,41 @@ namespace BCIEssentials.Editor
     {
         Dictionary<string, bool> foldoutGroupToggles = new();
 
+        bool IsTraversingFoldoutGroup
+        => currentFoldoutGroupAttribute != null;
+        FoldoutGroupAttribute currentFoldoutGroupAttribute;
+        List<SerializedProperty> currentFoldoutGroupProperties;
+
+
         public override void DrawInspector()
         {
-            FoldoutGroupAttribute currentFoldoutGroupAttribute = null;
-            List<SerializedProperty> foldoutProperties = new();
+            currentFoldoutGroupAttribute = null;
+            currentFoldoutGroupProperties = new();
 
             serializedObject.ForEachProperty(property => {
                 if (property.TryGetAttribute<FoldoutGroupAttribute>(out var foldoutAttribute))
                 {
-                    if (foldoutAttribute.IsSiblingTo(currentFoldoutGroupAttribute))
+                    DrawCurrentFoldoutGroupIfItExists();
+                    currentFoldoutGroupAttribute = foldoutAttribute;
+                    currentFoldoutGroupProperties = new() {property};
+                }
+                else if (IsTraversingFoldoutGroup)
+                {
+                    currentFoldoutGroupProperties.Add(property);
+                    if (property.TryGetAttribute<EndFoldoutGroupAttribute>(out _))
                     {
-                        foldoutProperties.Add(property);
-                    }
-                    else
-                    {
-                        DrawFoldoutGroupFromAttribute
-                        (
-                            currentFoldoutGroupAttribute,
-                            foldoutProperties
-                        );
-                        currentFoldoutGroupAttribute = foldoutAttribute;
-                        foldoutProperties = new() {property};
+                        DrawCurrentFoldoutGroupIfItExists();
+                        ClearCurrentFoldoutGroup();
                     }
                 }
                 else
                 {
-                    DrawFoldoutGroupFromAttribute
-                    (
-                        currentFoldoutGroupAttribute,
-                        foldoutProperties
-                    );
-                    currentFoldoutGroupAttribute = null;
-                    foldoutProperties.Clear();
-
                     DrawProperty(property);
                 }
             });
+
+            DrawCurrentFoldoutGroupIfItExists();
+            ClearCurrentFoldoutGroup();
         }
 
 
@@ -63,14 +62,10 @@ namespace BCIEssentials.Editor
         }
 
 
-        private void DrawFoldoutGroupFromAttribute
-        (
-            FoldoutGroupAttribute attribute,
-            IEnumerable<SerializedProperty> properties
-        )
+        private void DrawCurrentFoldoutGroupIfItExists()
         {
-            if (attribute == null) return;
-            string label = attribute.Label;
+            if (!IsTraversingFoldoutGroup) return;
+            string label = currentFoldoutGroupAttribute.Label;
 
             if (!foldoutGroupToggles.ContainsKey(label))
                 foldoutGroupToggles.Add(label, false);
@@ -78,9 +73,17 @@ namespace BCIEssentials.Editor
             foldoutGroupToggles[label]
             = DrawPropertiesInFoldoutGroup(
                 foldoutGroupToggles[label],
-                label, properties, attribute.FontSize,
-                attribute.TopMargin, attribute.BottomMargin
+                label, currentFoldoutGroupProperties,
+                currentFoldoutGroupAttribute.FontSize,
+                currentFoldoutGroupAttribute.TopMargin,
+                currentFoldoutGroupAttribute.BottomMargin
             );
+        }
+
+        private void ClearCurrentFoldoutGroup()
+        {
+            currentFoldoutGroupAttribute = null;
+            currentFoldoutGroupProperties.Clear();
         }
     }
 }
