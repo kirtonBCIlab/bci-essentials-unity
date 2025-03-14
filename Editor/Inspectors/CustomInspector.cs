@@ -115,8 +115,8 @@ namespace BCIEssentials.Editor
         )
         {
             foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, label);
-            DrawPropertiesIf(foldout, properties);
             EditorGUILayout.EndFoldoutHeaderGroup();
+            DrawPropertiesIf(foldout, properties);
             return foldout;
         }
         
