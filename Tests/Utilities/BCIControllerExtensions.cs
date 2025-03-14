@@ -7,8 +7,8 @@ namespace BCIEssentials.Tests.Utilities
     {
         public class Properties
         {
-            public LSLMarkerStream _lslMarkerStream;
-            public LSLResponseStream _lslResponseStream;
+            public LSLMarkerWriter _lslMarkerStream;
+            public LSLResponseProvider _lslResponseStream;
             public bool? _dontDestroyActiveInstance;
         }
 

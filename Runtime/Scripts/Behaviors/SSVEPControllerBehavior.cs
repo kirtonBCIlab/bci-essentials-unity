@@ -9,8 +9,10 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         
-        [SerializeField] private float[] setFreqFlash;
-        [SerializeField] private float[] realFreqFlash;
+        [SerializeField]
+        private float[] setFreqFlash;
+        [SerializeField, InspectorReadOnly]
+        private float[] realFreqFlash;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];

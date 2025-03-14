@@ -33,7 +33,7 @@ namespace BCIEssentials.Tests
         public void WhenStartStimulus_ThenEventInvoked()
         {
             var eventCalled = false;
-            _testSpo.StartStimulusEvent.AddListener(() =>
+            _testSpo.OnStimulusTriggered.AddListener(() =>
             {
                 eventCalled = true;
             });
@@ -47,7 +47,7 @@ namespace BCIEssentials.Tests
         public void WhenSelect_ThenEventInvoked()
         {
             var eventCalled = false;
-            _testSpo.OnSelectedEvent.AddListener(() =>
+            _testSpo.OnSelected.AddListener(() =>
             {
                 eventCalled = true;
             });
@@ -61,7 +61,7 @@ namespace BCIEssentials.Tests
         public void WhenStopStimulus_ThenEventInvoked()
         {
             var eventCalled = false;
-            _testSpo.StopStimulusEvent.AddListener(() =>
+            _testSpo.OnStimulusEndTriggered.AddListener(() =>
             {
                 eventCalled = true;
             });
@@ -75,7 +75,7 @@ namespace BCIEssentials.Tests
         public void WhenOnTrainTarget_ThenEventInvoked()
         {
             var eventCalled = false;
-            _testSpo.StartTrainingStimulusEvent.AddListener(()=>
+            _testSpo.OnSetAsTrainingTarget.AddListener(()=>
             {
                 eventCalled = true;
             });
@@ -89,7 +89,7 @@ namespace BCIEssentials.Tests
         public void WhenOffTrainTarget_ThenEventInvoked()
         {
             var eventCalled = false;
-            _testSpo.StopTrainingStimulusEvent.AddListener(()=>
+            _testSpo.OnRemovedAsTrainingTarget.AddListener(()=>
             {
                 eventCalled = true;
             });

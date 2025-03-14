@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BCIEssentials.ControllerBehaviors;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
@@ -10,6 +11,7 @@ using BCIEssentials.Tests.Utilities.LSLFramework;
 using BCIEssentials.Utilities;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using LogAssert = BCIEssentials.Tests.Utilities.LogAssert;
 using Object = UnityEngine.Object;
@@ -159,19 +161,29 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenInitializeAndRequiresMatrixSetUp_ThenMatrixSetUp()
         {
-            var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
-            matrix.Initialize(spo, 2, 2, Vector2.one);
+            var matrix = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
+
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
-                setupRequired = true,
-                setup = matrix
+                FactorySetupRequired = true,
+                _spoFactory = matrix
             });
 
             _behavior.Initialize(null, null);
 
             //Matrix generated + original
-            Assert.AreEqual(5, Object.FindObjectsOfType<SPO>().Length);
+            Assert.AreEqual(5, CountComponentsInActiveScene<SPO>());
+        }
+
+        private int CountComponentsInActiveScene<T>() where T: Component
+        {
+            return SceneManager.GetActiveScene()
+            .GetRootGameObjects().Sum
+            (
+                gameObject => gameObject
+                .GetComponentsInChildren<T>().Length
+            );
         }
 
         [Test]
@@ -184,14 +196,14 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenCleanUp_ThenMatrixDestroyed()
         {
-            var matrix = _testControllerObject.AddComponent<MatrixSetup>();
             var spo = AddSPOToScene();
-            matrix.Initialize(spo, 2, 2, Vector2.one);
+            var matrix = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
+
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
-                setup = matrix
+                _spoFactory = matrix
             });
-            matrix.SetUpMatrix();
+            matrix.CreateObjects();
 
             _behavior.CleanUp();
             yield return null;
@@ -219,7 +231,7 @@ namespace BCIEssentials.Tests
         [Test]
         public void WhenPopulateObjectListWithTagMethod_ThenObjectListPopulated()
         {
-            var noComponent = new GameObject { tag = _behavior.myTag };
+            var noComponent = new GameObject { tag = _behavior.SPOTag };
             var noTag = AddSPOToScene("");
             var falseIncludeMe = AddSPOToScene(includeMe: false);
             var included = AddSPOToScene();
