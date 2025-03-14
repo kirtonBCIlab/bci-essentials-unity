@@ -24,31 +24,31 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
         
-        [SerializeField]
+        [SerializeField, ShowIf("_selfRegister")]
         [Tooltip("Whether to set as active behavior when self registering.")]
-        [ShowIf("_selfRegister")]
         private bool _selfRegisterAsActive;
 
         [Header("Default SPO Setup")]
+        [SerializeField]
         [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
         [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
         [Tooltip("Component used to set-up default SPO objects")]
-        [SerializeField] private SPOFactory _spoSetup;
+        private SPOFactory _spoSetup;
+        [ShowIf("_spoSetup")]
         [Tooltip("Whether to automatically trigger the setup factory")]
         public bool setupRequired;
         
-        [Header("System Properties and Targets")]
-        [SerializeField]
+        [FoldoutGroup("System Properties and Targets")]
+        [SerializeField, Min(-1)]
         [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
-        [Min(-1)]
         protected int targetFrameRate = 60;
 
+        [FoldoutGroup("System Properties and Targets")]
         [SerializeField]
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
 
         [Header("Stimulus Presenting Objects")]
-        [SerializeField]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
         protected int SPOCount => _selectableSPOs.Count;
@@ -57,7 +57,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         #region Refactorable Properties
 
-        [Header("BCI Signal Properties")]
         //StimulusOn/Off + sending Markers
         [FoldoutGroup("Signal Properties")]
         [Tooltip("The length of the processing window")]
@@ -68,20 +67,27 @@ namespace BCIEssentials.ControllerBehaviors
         public float interWindowInterval = 0f;
 
         //Training
-        [Header("BCI Training Properties")]
+        [FoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
         public int numTrainWindows = 3;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("Before training starts, pause for this amount of time")]
         public float pauseBeforeTraining = 2;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("The time the target is displayed for, before the sequence begins")]
         public float trainTargetPresentationTime = 3f;
+        [FoldoutGroup("Training Properties")]
         public float trainBreak = 1f;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
+        [FoldoutGroup("Training Properties")]
         [Tooltip("The target object to train on, defaulted to a random high number")]
         public int trainTarget = 99;
 
