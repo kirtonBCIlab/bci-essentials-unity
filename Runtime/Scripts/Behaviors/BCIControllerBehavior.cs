@@ -72,7 +72,7 @@ namespace BCIEssentials.ControllerBehaviors
         public float interWindowInterval = 0f;
 
         //Training
-        [FoldoutGroup("Training Properties")]
+        [FoldoutGroup("Training Properties", bottomMargin: 12)]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
         [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
