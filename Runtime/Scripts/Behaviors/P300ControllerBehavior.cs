@@ -134,14 +134,10 @@ namespace BCIEssentials.ControllerBehaviors
 
                 yield return new WaitForSecondsRealtime(0.5f);
 
-                // Calculate the length of the trial
-                float trialTime = CalculateTrialTime();
-                Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
-
+                // Start stimulus and wait for it to complete
                 StartStimulusRun(false);
-                yield return new WaitForSecondsRealtime(trialTime);
+                yield return StartCoroutine(WaitForStimulusToComplete());
                 yield return new WaitForSecondsRealtime(trainBufferTime);
-                //stimulusOff();
 
                 // If sham feedback is true, then show it
                 if (shamFeedback)
@@ -195,15 +191,10 @@ namespace BCIEssentials.ControllerBehaviors
 
             yield return new WaitForSecondsRealtime(0.5f);
 
-            // Calculate the length of the trial
-            float trialTime = CalculateTrialTime();
-            Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
-
+            // Start stimulus and wait for the trial to end
             StartStimulusRun(false);
-
-            yield return new WaitForSecondsRealtime(trialTime);
+            yield return StartCoroutine(WaitForStimulusToComplete());
             yield return new WaitForSecondsRealtime(trainBufferTime);
-            //stimulusOff();
 
             // If sham feedback is true, then show it
             if (shamFeedback)
@@ -923,10 +914,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
         }
-
-        
-        
-        
         
         private int[,] Initialize2DMultiFlash()
         {
@@ -940,62 +927,6 @@ namespace BCIEssentials.ControllerBehaviors
 
                 int[,] rcMatrix = new int[numRows, numColumns];
                 return rcMatrix;
-        }
-
-        private float CalculateTrialTime()
-        {
-            // Base time per flash cycle (on + off time)
-            float flashCycle = onTime + offTime;
-            float trialTime = 0f;
-            
-            if (multiFlash)
-            {
-                if (contextAwareMultiFlash)
-                {
-                    // For context-aware multi-flash:
-                    // Number of flash sequences = numFlashesPerObjectPerSelection
-                    // Each sequence includes rows and columns for two subsets
-                    int estimatedSubsetSize = _selectableSPOs.Count / 2;
-                    int estimatedRows = (int)Mathf.Floor(Mathf.Sqrt(estimatedSubsetSize));
-                    int estimatedCols = (int)Mathf.Ceil((float)estimatedSubsetSize / (float)estimatedRows);
-                    
-                    // Total flashes = numFlashes * (rows + columns) * 2 subsets
-                    trialTime = flashCycle * numFlashesPerObjectPerSelection * (estimatedRows + estimatedCols) * 2;
-                }
-                else if (rowColumn)
-                {
-                    // For row-column flashing:
-                    int numColumns = numFlashColumns; 
-                    int numRows = numFlashRows;
-                    
-                    // Total flashes = numFlashes * (rows + columns)
-                    trialTime =  flashCycle * numFlashesPerObjectPerSelection * (numRows + numColumns);
-                }
-                else if (checkerboard)
-                {
-                    // For checkerboard:
-                    // More complex with black/white patterns
-                    int numColumns = numFlashColumns;
-                    int numRows = numFlashRows;
-                    float maxBWsize = Mathf.Ceil(numRows * numColumns / 2f);
-                    
-                    int bwCols = Mathf.CeilToInt(Mathf.Sqrt(maxBWsize));
-                    int bwRows = Mathf.CeilToInt(Mathf.Sqrt(maxBWsize));
-                    
-                    // Adjust rows if needed (same as in CheckerboardFlashRoutine)
-                    if (maxBWsize < ((bwRows * bwCols) - bwRows)) { bwRows--; }
-                                        
-                    // Each flash iteration has 4 components: black rows, white rows, black columns, white columns
-                    trialTime = flashCycle * numFlashesPerObjectPerSelection * (bwRows * 2 + bwCols * 2);
-                }
-            }
-            else
-            {
-                // Default to individual flashes 
-                trialTime = flashCycle * numFlashesPerObjectPerSelection * _selectableSPOs.Count;
-            }
-            
-            return trialTime;
         }
 
         /// <summary>
