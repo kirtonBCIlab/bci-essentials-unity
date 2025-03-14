@@ -135,9 +135,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(0.5f);
 
                 // Calculate the length of the trial
-                float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                                  (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
-
+                float trialTime = CalculateTrialTime();
                 Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
 
                 StartStimulusRun(false);
@@ -198,10 +196,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return new WaitForSecondsRealtime(0.5f);
 
             // Calculate the length of the trial
-
-            float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                              (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
-
+            float trialTime = CalculateTrialTime();
             Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
 
             StartStimulusRun(false);
@@ -947,6 +942,62 @@ namespace BCIEssentials.ControllerBehaviors
                 return rcMatrix;
         }
 
+        private float CalculateTrialTime()
+        {
+            // Base time per flash cycle (on + off time)
+            float flashCycle = onTime + offTime;
+            float trialTime = 0f;
+            
+            if (multiFlash)
+            {
+                if (contextAwareMultiFlash)
+                {
+                    // For context-aware multi-flash:
+                    // Number of flash sequences = numFlashesPerObjectPerSelection
+                    // Each sequence includes rows and columns for two subsets
+                    int estimatedSubsetSize = _selectableSPOs.Count / 2;
+                    int estimatedRows = (int)Mathf.Floor(Mathf.Sqrt(estimatedSubsetSize));
+                    int estimatedCols = (int)Mathf.Ceil((float)estimatedSubsetSize / (float)estimatedRows);
+                    
+                    // Total flashes = numFlashes * (rows + columns) * 2 subsets
+                    trialTime = flashCycle * numFlashesPerObjectPerSelection * (estimatedRows + estimatedCols) * 2;
+                }
+                else if (rowColumn)
+                {
+                    // For row-column flashing:
+                    int numColumns = numFlashColumns; 
+                    int numRows = numFlashRows;
+                    
+                    // Total flashes = numFlashes * (rows + columns)
+                    trialTime =  flashCycle * numFlashesPerObjectPerSelection * (numRows + numColumns);
+                }
+                else if (checkerboard)
+                {
+                    // For checkerboard:
+                    // More complex with black/white patterns
+                    int numColumns = numFlashColumns;
+                    int numRows = numFlashRows;
+                    float maxBWsize = Mathf.Ceil(numRows * numColumns / 2f);
+                    
+                    int bwCols = Mathf.CeilToInt(Mathf.Sqrt(maxBWsize));
+                    int bwRows = Mathf.CeilToInt(Mathf.Sqrt(maxBWsize));
+                    
+                    // Adjust rows if needed (same as in CheckerboardFlashRoutine)
+                    if (maxBWsize < ((bwRows * bwCols) - bwRows)) { bwRows--; }
+                                        
+                    // Each flash iteration has 4 components: black rows, white rows, black columns, white columns
+                    trialTime = flashCycle * numFlashesPerObjectPerSelection * (bwRows * 2 + bwCols * 2);
+                }
+            }
+            else
+            {
+                // Default to individual flashes 
+                trialTime = flashCycle * numFlashesPerObjectPerSelection * _selectableSPOs.Count;
+            }
+            
+            return trialTime;
+        }
+
         /// <summary>
         /// Populate the <see cref="SelectableSPOs"/> using a particular method.
         /// This extends the typical BCI Controller Behavior to enable "context
@@ -1226,7 +1277,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             // End thhe stimulus Coroutine
             StimulusRunning = false;
-
+            
             // Send the marker to end
             if (blockOutGoingLSL == false)
             {
