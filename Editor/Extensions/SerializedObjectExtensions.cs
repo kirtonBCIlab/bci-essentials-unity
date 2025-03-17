@@ -42,7 +42,7 @@ namespace BCIEssentials.Editor
             this SerializedObject target,
             string propertyPath
         )
-        where T : PropertyAttribute
+        where T : Attribute
         => target.FindProperty(propertyPath).GetAttribute<T>();
         
         public static bool TryGetAttribute<T>
@@ -50,7 +50,7 @@ namespace BCIEssentials.Editor
             this SerializedProperty property,
             out T attribute
         )
-        where T : PropertyAttribute
+        where T : Attribute
         {
             attribute = GetAttribute<T>(property);
             return attribute != null;
@@ -60,7 +60,7 @@ namespace BCIEssentials.Editor
         (
             this SerializedProperty property
         )
-        where T : PropertyAttribute
+        where T : Attribute
         => GetAttributeFromTypeAndParents<T>
         (
             property.name,
@@ -77,7 +77,7 @@ namespace BCIEssentials.Editor
         (
             string name, Type type
         )
-        where T : PropertyAttribute
+        where T : Attribute
         {
             if (type == typeof(MonoBehaviour) || type == typeof(object))
                 return null;

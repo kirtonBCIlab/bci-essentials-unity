@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -45,10 +47,11 @@ namespace BCIEssentials
         }
     }
 
-    public class ShowIfAttribute : PropertyAttribute
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class ShowIfAttribute : Attribute
     {
         public string ConditionPropertyPath;
-        public int IntegerValue;
+        public int[] ValidValues;
 
         public ShowIfAttribute(string conditionPropertyPath)
         {
@@ -56,10 +59,11 @@ namespace BCIEssentials
         }
         public ShowIfAttribute
         (
-            string conditionPropertyPath, int integerValue
+            string conditionPropertyPath,
+            params int[] validValues
         ): this(conditionPropertyPath)
         {
-            IntegerValue = integerValue;
+            ValidValues = validValues;
         }
 
         public bool ShouldShow(SerializedObject target)
@@ -77,8 +81,9 @@ namespace BCIEssentials
                 SerializedPropertyType.Boolean
                     => conditionProperty.boolValue
                 ,
-                SerializedPropertyType.Integer | SerializedPropertyType.Enum
-                    => conditionProperty.intValue == IntegerValue
+                SerializedPropertyType.Integer
+                | SerializedPropertyType.Enum
+                    => ValidValues.Any(v => v == conditionProperty.intValue)
                 ,
                 SerializedPropertyType.ObjectReference
                     => conditionProperty.objectReferenceValue != null
