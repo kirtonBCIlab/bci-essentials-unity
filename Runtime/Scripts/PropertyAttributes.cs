@@ -47,7 +47,7 @@ namespace BCIEssentials
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
     public class ShowIfAttribute : Attribute
     {
         public string ConditionPropertyPath;

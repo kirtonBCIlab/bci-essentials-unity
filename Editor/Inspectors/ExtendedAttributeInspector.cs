@@ -49,8 +49,11 @@ namespace BCIEssentials.Editor
         protected override void DrawProperty(SerializedProperty property)
         {
             bool shouldHideProperty = false;
-            if (property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute))
-                shouldHideProperty = !showIfAttribute.ShouldShow(serializedObject);
+            if (property.TryGetAttributes<ShowIfAttribute>(out var showIfAttributes))
+            {
+                foreach(ShowIfAttribute attribute in showIfAttributes)
+                    shouldHideProperty |= !attribute.ShouldShow(serializedObject);
+            }
             
             if (property.TryGetAttribute<ShowWithFoldoutGroupAttribute>(out var showWithGroupAttribute))
             {

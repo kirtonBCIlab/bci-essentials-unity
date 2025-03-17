@@ -55,6 +55,16 @@ namespace BCIEssentials.Editor
             attribute = GetAttribute<T>(property);
             return attribute != null;
         }
+        public static bool TryGetAttributes<T>
+        (
+            this SerializedProperty property,
+            out T[] attributes
+        )
+        where T : Attribute
+        {
+            attributes = GetAttributes<T>(property);
+            return attributes != null;
+        }
 
         public static T GetAttribute<T>
         (
@@ -62,6 +72,16 @@ namespace BCIEssentials.Editor
         )
         where T : Attribute
         => GetAttributeFromTypeAndParents<T>
+        (
+            property.name,
+            property.serializedObject.targetObject.GetType()
+        );
+        public static T[] GetAttributes<T>
+        (
+            this SerializedProperty property
+        )
+        where T : Attribute
+        => GetAttributesFromTypeAndParents<T>
         (
             property.name,
             property.serializedObject.targetObject.GetType()
@@ -91,6 +111,26 @@ namespace BCIEssentials.Editor
                 return propertyInfo.GetCustomAttribute<T>();
 
             return GetAttributeFromTypeAndParents<T>(name, type.BaseType);
+        }
+
+        private static T[] GetAttributesFromTypeAndParents<T>
+        (
+            string name, Type type
+        )
+        where T : Attribute
+        {
+            if (type == typeof(MonoBehaviour) || type == typeof(object))
+                return null;
+
+            FieldInfo fieldInfo = type.GetField(name, MemberFlags);
+            if (fieldInfo != null)
+                return (T[])fieldInfo.GetCustomAttributes<T>();
+
+            PropertyInfo propertyInfo = type.GetProperty(name, MemberFlags);
+            if (propertyInfo != null)
+                return (T[])propertyInfo.GetCustomAttributes<T>();
+
+            return GetAttributesFromTypeAndParents<T>(name, type.BaseType);
         }
     }
 }
