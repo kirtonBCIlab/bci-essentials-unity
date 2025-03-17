@@ -48,10 +48,18 @@ namespace BCIEssentials
     public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionPropertyPath;
+        public int IntegerValue;
 
         public ShowIfAttribute(string conditionPropertyPath)
         {
             ConditionPropertyPath = conditionPropertyPath;
+        }
+        public ShowIfAttribute
+        (
+            string conditionPropertyPath, int integerValue
+        ): this(conditionPropertyPath)
+        {
+            IntegerValue = integerValue;
         }
 
         public bool ShouldShow(SerializedObject target)
@@ -68,6 +76,9 @@ namespace BCIEssentials
             return conditionProperty.propertyType switch {
                 SerializedPropertyType.Boolean
                     => conditionProperty.boolValue
+                ,
+                SerializedPropertyType.Integer | SerializedPropertyType.Enum
+                    => conditionProperty.intValue == IntegerValue
                 ,
                 SerializedPropertyType.ObjectReference
                     => conditionProperty.objectReferenceValue != null
