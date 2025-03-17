@@ -141,16 +141,10 @@ namespace BCIEssentials.ControllerBehaviors
 
                 yield return new WaitForSecondsRealtime(0.5f);
 
-                // Calculate the length of the trial
-                float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                                  (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
-
-                Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
-
+                // Start stimulus and wait for it to complete
                 StartStimulusRun(false);
-                yield return new WaitForSecondsRealtime(trialTime);
+                yield return StartCoroutine(WaitForStimulusToComplete());
                 yield return new WaitForSecondsRealtime(trainBufferTime);
-                //stimulusOff();
 
                 // If sham feedback is true, then show it
                 if (shamFeedback)
@@ -204,18 +198,10 @@ namespace BCIEssentials.ControllerBehaviors
 
             yield return new WaitForSecondsRealtime(0.5f);
 
-            // Calculate the length of the trial
-
-            float trialTime = (onTime + offTime) * (1f + (10f / Application.targetFrameRate)) *
-                              (float)numFlashesPerObjectPerSelection * (float)_selectableSPOs.Count;
-
-            Debug.Log("This trial will take ~" + trialTime.ToString() + " seconds");
-
+            // Start stimulus and wait for the trial to end
             StartStimulusRun(false);
-
-            yield return new WaitForSecondsRealtime(trialTime);
+            yield return StartCoroutine(WaitForStimulusToComplete());
             yield return new WaitForSecondsRealtime(trainBufferTime);
-            //stimulusOff();
 
             // If sham feedback is true, then show it
             if (shamFeedback)
@@ -935,10 +921,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
         }
-
-        
-        
-        
         
         private int[,] Initialize2DMultiFlash()
         {
@@ -1233,7 +1215,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             // End thhe stimulus Coroutine
             StimulusRunning = false;
-
+            
             // Send the marker to end
             if (blockOutGoingLSL == false)
             {
