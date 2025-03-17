@@ -9,10 +9,13 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         
+        [FoldoutGroup("Stimulus Frequencies")]
         [SerializeField]
-        private float[] setFreqFlash;
-        [SerializeField, InspectorReadOnly]
-        private float[] realFreqFlash;
+        [Tooltip("User-defined set of target stimulus frequencies [Hz]")]
+        private float[] requestedFlashingFrequencies;
+        [SerializeField, EndFoldoutGroup, InspectorReadOnly]
+        [Tooltip("Calculated best-match achievable frequencies based on the application framerate [Hz]")]
+        private float[] realFlashingFrequencies;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -24,19 +27,19 @@ namespace BCIEssentials.ControllerBehaviors
         {
             base.PopulateObjectList(populationMethod);
 
-            realFreqFlash = new float[_selectableSPOs.Count];
+            realFlashingFrequencies = new float[_selectableSPOs.Count];
 
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = targetFrameRate / setFreqFlash[i];
+                period = targetFrameRate / requestedFlashingFrequencies[i];
                 // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFlashingFrequencies[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
 
-                Debug.Log($"frequency {i + 1} : {realFreqFlash[i]}");
+                Debug.Log($"frequency {i + 1} : {realFlashingFrequencies[i]}");
             }
         }
 
@@ -46,7 +49,7 @@ namespace BCIEssentials.ControllerBehaviors
             while (StimulusRunning)
             {
                 // Send the marker
-                OutStream.PushSSVEPMarker(SPOCount, windowLength, realFreqFlash, trainingIndex);
+                OutStream.PushSSVEPMarker(SPOCount, windowLength, realFlashingFrequencies, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);

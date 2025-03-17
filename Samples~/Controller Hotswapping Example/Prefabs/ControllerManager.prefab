@@ -124,7 +124,7 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  setFreqFlash:
+  requestedFlashingFrequencies:
   - 8
   - 10
   - 12
