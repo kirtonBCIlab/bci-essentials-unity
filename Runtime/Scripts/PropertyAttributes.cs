@@ -35,6 +35,16 @@ namespace BCIEssentials
 
     public class EndFoldoutGroupAttribute: PropertyAttribute {}
 
+    public class ShowWithFoldoutGroupAttribute: PropertyAttribute
+    {
+        public string GroupLabel;
+
+        public ShowWithFoldoutGroupAttribute(string groupLabel)
+        {
+            GroupLabel = groupLabel;
+        }
+    }
+
     public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionPropertyPath;

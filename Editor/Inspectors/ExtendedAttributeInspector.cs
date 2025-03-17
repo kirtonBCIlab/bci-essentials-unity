@@ -48,15 +48,19 @@ namespace BCIEssentials.Editor
 
         protected override void DrawProperty(SerializedProperty property)
         {
-            if
-            (
-                property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute)
-                &&
-                !showIfAttribute.ShouldShow(serializedObject)
-            )
+            bool shouldHideProperty = false;
+            if (property.TryGetAttribute<ShowIfAttribute>(out var showIfAttribute))
+                shouldHideProperty = !showIfAttribute.ShouldShow(serializedObject);
+            
+            if (property.TryGetAttribute<ShowWithFoldoutGroupAttribute>(out var showWithGroupAttribute))
             {
-                HideProperty(property);
+                string groupLabel = showWithGroupAttribute.GroupLabel;
+                if (foldoutGroupToggles.ContainsKey(groupLabel))
+                    shouldHideProperty |= !foldoutGroupToggles[groupLabel];
             }
+
+            if (shouldHideProperty)
+                HideProperty(property);
             else
                 base.DrawProperty(property);
         }

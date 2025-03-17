@@ -14,7 +14,7 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.P300;
 
-        [Header("P300 Training Properties")]
+        [ShowWithFoldoutGroup("Training Properties")]
         [Tooltip("The time between the end of a sequence and making a selection [sec]")]
         public float trainBufferTime = 0f;
         
