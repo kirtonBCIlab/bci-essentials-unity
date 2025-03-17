@@ -159,15 +159,15 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenInitializeAndRequiresMatrixSetUp_ThenMatrixSetUp()
+        public void WhenInitializeAndRequiresFactorySetUp_ThenObjectsCreated()
         {
             var spo = AddSPOToScene();
-            var matrix = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
+            var spoFactory = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
 
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
                 FactorySetupRequired = true,
-                _spoFactory = matrix
+                _spoFactory = spoFactory
             });
 
             _behavior.Initialize(null, null);
@@ -194,16 +194,16 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
-        public IEnumerator WhenCleanUp_ThenMatrixDestroyed()
+        public IEnumerator WhenCleanUp_ThenFactoryObjectsDestroyed()
         {
             var spo = AddSPOToScene();
-            var matrix = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
+            var spoFactory = SPOGridFactory.CreateInstance(spo, 2, 2, Vector2.one);
 
             _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
             {
-                _spoFactory = matrix
+                _spoFactory = spoFactory
             });
-            matrix.CreateObjects();
+            spoFactory.CreateObjects();
 
             _behavior.CleanUp();
             yield return null;
