@@ -15,6 +15,7 @@ namespace BCIEssentials.ControllerBehaviors
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.P300;
 
         [Header("P300 Training Properties")]
+        [Tooltip("The time between the end of a sequence and making a selection [sec]")]
         public float trainBufferTime = 0f;
         
         [FoldoutGroup("P300 Pattern Flashing Properties")]
@@ -23,7 +24,9 @@ namespace BCIEssentials.ControllerBehaviors
         public Random randNumFlashes = new Random();
         private int numFlashesPerObjectPerSelection = 3;
 
+        [Tooltip("[sec]")]
         public float onTime = 0.1f;
+        [Tooltip("[sec]")]
         public float offTime = 0.075f;
 
         [FoldoutGroup("Stimulus Flash Paradigms")]

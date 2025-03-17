@@ -47,7 +47,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         [FoldoutGroup("System Properties and Targets")]
         [SerializeField, Min(-1)]
-        [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
+        [Tooltip("The applications target frame rate [Hz]. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         protected int targetFrameRate = 60;
 
         [SerializeField, EndFoldoutGroup]
@@ -65,10 +65,10 @@ namespace BCIEssentials.ControllerBehaviors
 
         //StimulusOn/Off + sending Markers
         [FoldoutGroup("Signal Properties")]
-        [Tooltip("The length of the processing window")]
+        [Tooltip("The length of the processing window [sec]")]
         //TODO: Rename this more appropriately to our Epoch/scheme
         public float windowLength = 1.0f;
-        [Tooltip("The interval between processing windows")]
+        [Tooltip("The interval between processing windows [sec]")]
         public float interWindowInterval = 0f;
 
         //Training
@@ -77,10 +77,11 @@ namespace BCIEssentials.ControllerBehaviors
         public int numTrainingSelections;
         [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
         public int numTrainWindows = 3;
-        [Tooltip("Before training starts, pause for this amount of time")]
+        [Tooltip("Before training starts, pause for this amount of time [sec]")]
         public float pauseBeforeTraining = 2;
-        [Tooltip("The time the target is displayed for, before the sequence begins")]
+        [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
         public float trainTargetPresentationTime = 3f;
+        [Tooltip("Rest time between training windows [sec]")]
         public float trainBreak = 1f;
         [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
