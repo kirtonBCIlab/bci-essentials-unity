@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 439125805200747300}
   - component: {fileID: 6644194211345973513}
-  - component: {fileID: 6644194211345973512}
   m_Layer: 0
   m_Name: MIControllerBehavior
   m_TagString: Untagged
@@ -47,11 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
-  setup: {fileID: 6644194211345973512}
-  setupRequired: 0
+  SPOTag: BCI
+  _spoFactory: {fileID: 11400000, guid: 742b42676bf053442b2d98c4ba8f2b18, type: 2}
+  FactorySetupRequired: 1
   targetFrameRate: 60
   _hotkeysEnabled: 1
-  _selectableSPOs: []
   windowLength: 2
   interWindowInterval: 0
   numTrainingSelections: 9
@@ -62,25 +61,8 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  myTag: BCI
   numSelectionsBeforeTraining: 2
   numSelectionsBetweenTraining: 2
---- !u!114 &6644194211345973512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 439125805200747299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: c93b3f46e6c8308479c1223c029818a5, type: 3}
-  _numRows: 1
-  _numColumns: 2
-  _spacing: {x: 4, y: 0}
 --- !u!1 &1649985291859044835
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +73,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1649985291859044833}
   - component: {fileID: 5532972414438851525}
-  - component: {fileID: 5532972414438851522}
   m_Layer: 0
   m_Name: SSVEPControllerBehavior
   m_TagString: Untagged
@@ -128,11 +109,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
-  setup: {fileID: 5532972414438851522}
-  setupRequired: 1
+  SPOTag: BCI
+  _spoFactory: {fileID: 11400000, guid: b49306ce22f5a9d4d848717eb04761c0, type: 2}
+  FactorySetupRequired: 1
   targetFrameRate: 165
   _hotkeysEnabled: 1
-  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 12
@@ -143,8 +124,7 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  myTag: BCI
-  setFreqFlash:
+  requestedFlashingFrequencies:
   - 8
   - 10
   - 12
@@ -152,22 +132,6 @@ MonoBehaviour:
   - 18
   - 20
   realFreqFlash: []
---- !u!114 &5532972414438851522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649985291859044835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: c93b3f46e6c8308479c1223c029818a5, type: 3}
-  _numRows: 2
-  _numColumns: 3
-  _spacing: {x: 2, y: 2}
 --- !u!1 &1649985292535673242
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +225,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1649985293060537290}
   - component: {fileID: 5532972415639130384}
-  - component: {fileID: 5532972415639130385}
   m_Layer: 0
   m_Name: P300ControllerBehavior
   m_TagString: Untagged
@@ -298,11 +261,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
-  setup: {fileID: 5532972415639130385}
-  setupRequired: 0
+  SPOTag: BCI
+  _spoFactory: {fileID: 11400000, guid: f10aba30caad32345985da46bd8337b6, type: 2}
+  FactorySetupRequired: 1
   targetFrameRate: 60
   _hotkeysEnabled: 1
-  _selectableSPOs: []
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 5
@@ -313,7 +276,6 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  myTag: BCI
   trainBufferTime: 0
   numFlashesLowerLimit: 9
   numFlashesUpperLimit: 12
@@ -329,19 +291,3 @@ MonoBehaviour:
   numFlashColumns: 6
   timeDebug: 0
   myPopMethod: 3
---- !u!114 &5532972415639130385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649985293060537292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: c93b3f46e6c8308479c1223c029818a5, type: 3}
-  _numRows: 3
-  _numColumns: 3
-  _spacing: {x: 2, y: 2}

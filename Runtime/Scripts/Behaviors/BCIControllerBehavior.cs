@@ -6,47 +6,55 @@ using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
-using UnityEngine.Serialization;
-using UnityEngine.Android;
+using UnityEditor.SceneManagement;
+using System.IO;
+using UnityEditor;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     /// <summary>
     /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
     /// </summary>
-    public abstract class BCIControllerBehavior : MonoBehaviour
+    public abstract class BCIControllerBehavior : MonoBehaviourUsingExtendedAttributes
     {
         /// <summary>
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
-        [Header("BCI Registration")]
+        [Header("Controller Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
         
-        [SerializeField]
+        [SerializeField, ShowIf("_selfRegister")]
         [Tooltip("Whether to set as active behavior when self registering.")]
         private bool _selfRegisterAsActive;
 
+        [Space(12)]
+        [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
+        public string SPOTag = "BCI";
+
         [Header("Default SPO Setup")]
-        [Tooltip("Component used to set-up default SPO objects")]
-        [SerializeField] protected MatrixSetup setup;
-        [Tooltip("Indicate whether or not to use the setup component")]
-        public bool setupRequired;
-        
-        [Header("System Properties and Targets")]
         [SerializeField]
-        [Tooltip("The applications target frame rate. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
-        [Min(-1)]
+        [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
+        [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
+        [ContextMenuItem("Create New SPO Factory Asset", "CreateAndAssignSPOFactory")]
+        [Tooltip("Component used to set-up default SPO objects")]
+        private SPOFactory _spoFactory;
+        [ShowIf("_spoFactory")]
+        [Tooltip("Whether to automatically trigger the setup factory when initialized")]
+        public bool FactorySetupRequired;
+        
+        [FoldoutGroup("System Properties and Targets")]
+        [SerializeField, Min(-1)]
+        [Tooltip("The applications target frame rate [Hz]. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         protected int targetFrameRate = 60;
 
-        [SerializeField]
+        [SerializeField, EndFoldoutGroup]
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
 
-        [Header("SPO Objects")]
-        [SerializeField]
+        [Header("Stimulus Presenting Objects")]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
         protected int SPOCount => _selectableSPOs.Count;
@@ -55,35 +63,33 @@ namespace BCIEssentials.ControllerBehaviors
 
         #region Refactorable Properties
 
-        [Header("BCI Signal Properties")]
         //StimulusOn/Off + sending Markers
-        [Tooltip("The length of the processing window")]
+        [FoldoutGroup("Signal Properties")]
+        [Tooltip("The length of the processing window [sec]")]
         //TODO: Rename this more appropriately to our Epoch/scheme
         public float windowLength = 1.0f;
-        [Tooltip("The interval between processing windows")]
+        [Tooltip("The interval between processing windows [sec]")]
         public float interWindowInterval = 0f;
 
         //Training
-        [Header("BCI Training Properties")]
+        [FoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
         [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
         public int numTrainWindows = 3;
-        [Tooltip("Before training starts, pause for this amount of time")]
+        [Tooltip("Before training starts, pause for this amount of time [sec]")]
         public float pauseBeforeTraining = 2;
-        [Tooltip("The time the target is displayed for, before the sequence begins")]
+        [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
         public float trainTargetPresentationTime = 3f;
+        [Tooltip("Rest time between training windows [sec]")]
         public float trainBreak = 1f;
         [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
+        [EndFoldoutGroup]
         [Tooltip("The target object to train on, defaulted to a random high number")]
         public int trainTarget = 99;
-
-        [Header("BCI Training Tag")]
-        [FormerlySerializedAs("_myTag")]
-        public string myTag = "BCI";
 
         #endregion
         
@@ -162,9 +168,9 @@ namespace BCIEssentials.ControllerBehaviors
                 Application.targetFrameRate = targetFrameRate; 
             }
             
-            if (setupRequired)
+            if (FactorySetupRequired)
             {
-                setup.SetUpMatrix();
+                SetUpSPOs();
             }
         }
 
@@ -174,7 +180,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void CleanUp()
         {
-            setup?.DestroyMatrix();
+            CleanUpSPOs();
             InStream?.CloseStream();
 
             StimulusRunning = false;
@@ -183,6 +189,34 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _waitToSelect);
         }
+
+
+        [ContextMenu("Set Up SPOs")]
+        protected void SetUpSPOs()
+        {
+            _spoFactory?.CreateObjects(transform);
+        }
+
+        [ContextMenu("Remove Fabricated SPOs")]
+        protected void CleanUpSPOs()
+        {
+            _spoFactory?.DestroyObjects();
+        }
+
+        protected void CreateAndAssignSPOFactory()
+        {
+            if (_spoFactory)
+            {
+                Debug.LogWarning("An SPO Factory is Already Set");
+                return;
+            }
+            _spoFactory = SPOGridFactory.CreateInstance(null, 3, 2, Vector2.one * 2);
+            string scenePath = EditorSceneManager.GetActiveScene().path;
+            string folderPath = Path.GetDirectoryName(scenePath);
+            string fileName = $"{name} SPO Factory.asset";
+            AssetDatabase.CreateAsset(_spoFactory,  $"{folderPath}\\{fileName}");
+        }
+
 
         /// <summary>
         /// Register this behavior with the active <see cref="BCIController.Instance"/>.
@@ -318,7 +352,7 @@ namespace BCIEssentials.ControllerBehaviors
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
                     _objectIDtoSPODict.Clear(); 
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
                     foreach (var taggedGO in taggedGOs)
                     {
                         if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)

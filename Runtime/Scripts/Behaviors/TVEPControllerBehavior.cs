@@ -9,8 +9,13 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
-        [SerializeField] private float setFreqFlash;
-        [SerializeField] private float realFreqFlash;
+        [FoldoutGroup("Stimulus Frequency")]
+        [SerializeField]
+        [Tooltip("User-defined target stimulus frequency [Hz]")]
+        private float requestedFlashingFrequency;
+        [SerializeField, EndFoldoutGroup, InspectorReadOnly]
+        [Tooltip("Calculated best-match achievable frequency based on the application framerate [Hz]")]
+        private float realFlashingFrequency;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -25,10 +30,10 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = targetFrameRate / setFreqFlash;
+                period = targetFrameRate / requestedFlashingFrequency;
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFlashingFrequency = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
             }
         }
 
@@ -38,7 +43,7 @@ namespace BCIEssentials.ControllerBehaviors
             while (StimulusRunning)
             {
                 // Send the marker
-                OutStream.PushTVEPMarker(SPOCount, windowLength, new[] {realFreqFlash}, trainingIndex);
+                OutStream.PushTVEPMarker(SPOCount, windowLength, new[] {realFlashingFrequency}, trainingIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);

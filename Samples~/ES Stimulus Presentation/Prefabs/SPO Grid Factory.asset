@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c249545e1cd9c1d489703eb826ff29be, type: 3}
+  m_Name: SPO Grid Factory
+  m_EditorClassIdentifier: 
+  _spoPrefab: {fileID: -4835161535002556767, guid: 995d6ca6b9f09244bae22c10021bcc24, type: 3}
+  _numRows: 1
+  _numColumns: 1
+  _spacing: {x: 1, y: 1}

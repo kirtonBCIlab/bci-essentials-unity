@@ -7,67 +7,60 @@ using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
 using Random = System.Random;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     public class P300ControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.P300;
+        public enum FlashPlurality {Single, Multiple}
+        public enum SingleFlashPattern {Random, ContextAware}
+        public enum MultiFlashPattern {RowColumn, Checkerboard, ContextAware}
 
-        [Header("P300 Training Properties")]
+        [ShowWithFoldoutGroup("Training Properties")]
+        [Tooltip("The time between the end of a sequence and making a selection [sec]")]
         public float trainBufferTime = 0f;
         
-        [Header("P300 Pattern Flashing Properties")]
+        [FoldoutGroup("P300 Pattern Flashing Properties")]
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
         public Random randNumFlashes = new Random();
         private int numFlashesPerObjectPerSelection = 3;
 
+        [Tooltip("[sec]")]
         public float onTime = 0.1f;
+        [Tooltip("[sec]")]
         public float offTime = 0.075f;
 
-        [Header("Stimulus Flash Paradigms")]
-        [Header("Single Flash Properties")]
-        [Tooltip("If true, only one SPO will flash at a time")]
-        public bool singleFlash = true;
 
-        [Tooltip("If true, enables context-aware SPO single flashing")]
-        public bool contextAwareSingleFlash = false;
+        [FoldoutGroup("Stimulus Flash Paradigms")]
+        [Tooltip("Whether to flash multiple SPOs at a time or just one")]
+        public FlashPlurality flashPlurality;
 
-        [Header("Multi Flash Properties")]
-        [Tooltip("If true, enables multiple SPOs to flash at the same time." +
-        "Needs to be true for rowColumn and checkerboard to work")]
-        public bool multiFlash = false;
-        
-        [Tooltip("If true, flashes objects in rows and columns. Requires Multiflash to be true")]
-        public bool rowColumn = false;
-        
-        [Tooltip("If true, flashes objects in a checkerboard pattern. Requires Multiflash to be true")]
-        public bool checkerboard = true;
-        [Tooltip("If true, enables context-aware SPO multi flashing")]
-        public bool contextAwareMultiFlash = false;
+        [ShowIf("flashPlurality", (int)FlashPlurality.Single)]
+        [Tooltip("Whether to enable context-aware SPO single flashing")]
+        public SingleFlashPattern singleFlashPattern;
+
+        [ShowIf("flashPlurality", (int)FlashPlurality.Multiple)]
+        [Tooltip("The pattern in which to flash objects")]
+        public MultiFlashPattern multiFlashPattern;
+
 
         [Header("Row/Column & Checkerboard Properties")]
+        [ShowIf("flashPlurality", (int)FlashPlurality.Multiple)]
+        [ShowIf("multiFlashPattern", (int)MultiFlashPattern.RowColumn, (int)MultiFlashPattern.Checkerboard)]
         [Tooltip("Number of rows in multi-flash RowColumn or Checkerboard")]
         public int numFlashRows = 5;
+        [ShowIf("flashPlurality", (int)FlashPlurality.Multiple)]
+        [ShowIf("multiFlashPattern", (int)MultiFlashPattern.RowColumn, (int)MultiFlashPattern.Checkerboard)]
         [Tooltip("Number of columns in the multi-flash RowColumn or Checkerboard")]
         public int numFlashColumns = 6;
 
 
-
-        public enum multiFlashMethod
-        {
-            Random
-        };
-
-        private float timeOfFlash = 0;
-        private float timeOfWrite = 0;
-        private float oldTimeOfWrite = 0;
-        private float timeLag = 0;
-
-        [Header("Debugging Parameters")]
+        [FoldoutGroup("Debugging Parameters", 12, 20)]
         public bool timeDebug = false;
-
+        [EndFoldoutGroup]
         private bool blockOutGoingLSL = false;
 
         //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.
@@ -229,51 +222,62 @@ namespace BCIEssentials.ControllerBehaviors
             // numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             // UnityEngine.Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
 
-            if (singleFlash)
+            switch (flashPlurality)
             {
-                //This may not be the right way to do this.
-                Coroutine single_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, SingleFlashRoutine());
-                yield return single_flashCR;
-                //Old method
-                //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
-
-            }
-
-            if (contextAwareSingleFlash)
-            {
-                //This may not be the right way to do this.
-                Coroutine single_context_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus,  ContextAwareSingleFlashRoutine());
-                yield return single_context_flashCR;
-                //Old method
-                //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
-
-            }
-
-            if (multiFlash)
-            {
-
-                if (rowColumn)
-                {
-                    //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
-                    Coroutine rc_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, RowColFlashRoutine());
-                    yield return rc_flashCR;
-                }
-
-                if (checkerboard)
-                {
-                    //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
-                    Coroutine cb_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, CheckerboardFlashRoutine());
-                    yield return cb_flashCR;
-                }
-
-                if(contextAwareMultiFlash)
-                {
-                    //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
-                    Coroutine context_multi_flashCR = Stop_Coroutines_Then_Start_New_Coroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
-                    yield return context_multi_flashCR;
-                }
-
-
+                case FlashPlurality.Single:
+                    switch (singleFlashPattern)
+                    {
+                        case SingleFlashPattern.Random:
+                            //This may not be the right way to do this.
+                            Coroutine single_flashCR
+                            = Stop_Coroutines_Then_Start_New_Coroutine(
+                                ref _runStimulus, SingleFlashRoutine()
+                            );
+                            yield return single_flashCR;
+                            //Old method
+                            //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
+                        break;
+                        case SingleFlashPattern.ContextAware:
+                            //This may not be the right way to do this.
+                            Coroutine single_context_flashCR
+                            = Stop_Coroutines_Then_Start_New_Coroutine(
+                                ref _runStimulus,  ContextAwareSingleFlashRoutine()
+                            );
+                            yield return single_context_flashCR;
+                            //Old method
+                            //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
+                        break;
+                    }
+                break;
+                case FlashPlurality.Multiple:
+                    switch (multiFlashPattern)
+                    {
+                        case MultiFlashPattern.RowColumn:
+                            //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
+                            Coroutine rc_flashCR
+                            = Stop_Coroutines_Then_Start_New_Coroutine(
+                                ref _runStimulus, RowColFlashRoutine()
+                            );
+                            yield return rc_flashCR;
+                        break;
+                        case MultiFlashPattern.Checkerboard:
+                            //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
+                            Coroutine cb_flashCR
+                            = Stop_Coroutines_Then_Start_New_Coroutine(
+                                ref _runStimulus, CheckerboardFlashRoutine()
+                            );
+                            yield return cb_flashCR;
+                        break;
+                        case MultiFlashPattern.ContextAware:
+                            //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
+                            Coroutine context_multi_flashCR
+                            = Stop_Coroutines_Then_Start_New_Coroutine(
+                                ref _runStimulus, ContextAwareMultiFlashRoutine()
+                            );
+                            yield return context_multi_flashCR;
+                        break;
+                    }
+                break;
             }
 
             //This is what is causing the issue with the "Trial Ends" marker being sent too early I think.
@@ -948,7 +952,7 @@ namespace BCIEssentials.ControllerBehaviors
                 default:
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs.Clear();
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
                     foreach (var taggedGO in taggedGOs)
                     {
                         if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
@@ -986,7 +990,7 @@ namespace BCIEssentials.ControllerBehaviors
         public List<GameObject> GetGameSPOsInCameraView()
         {
             Camera mainCamera = Camera.main;
-            var taggedGOs = GameObject.FindGameObjectsWithTag(myTag);
+            var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
             List<GameObject> visibleGOs = new List<GameObject>();
             List<GameObject> uiGOs = new List<GameObject>();
 

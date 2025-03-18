@@ -16,8 +16,8 @@ namespace BCIEssentials.Tests.Utilities
             public List<SPO> _selectableSPOs = null;
             
             //Training
-            public MatrixSetup setup;
-            public bool? setupRequired;
+            public SPOGridFactory _spoFactory;
+            public bool? FactorySetupRequired;
         }
 
         public static T AssignInspectorProperties<T>(this T component, Properties properties) where T : BCIControllerBehavior
@@ -47,14 +47,14 @@ namespace BCIEssentials.Tests.Utilities
                 ReflectionHelpers.SetField(component, nameof(properties._selectableSPOs), properties._selectableSPOs);
             }
             
-            if (properties.setup != null)
+            if (properties._spoFactory != null)
             {
-                ReflectionHelpers.SetField(component, nameof(properties.setup), properties.setup);
+                ReflectionHelpers.SetField(component, nameof(properties._spoFactory), properties._spoFactory);
             }
             
-            if (properties.setupRequired != null)
+            if (properties.FactorySetupRequired != null)
             {
-                ReflectionHelpers.SetField(component, nameof(properties.setupRequired), properties.setupRequired);
+                ReflectionHelpers.SetField(component, nameof(properties.FactorySetupRequired), properties.FactorySetupRequired);
             }
 
             return component;

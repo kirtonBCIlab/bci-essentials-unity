@@ -1,7 +1,8 @@
 using UnityEditor;
 using UnityEngine;
+using BCIEssentials.Controllers;
 
-namespace BCIEssentials.Controllers.Editor
+namespace BCIEssentials.Editor
 {
     [CustomEditor(typeof(BCIController))]
     public class BCIControllerDebugInspector : UnityEditor.Editor
