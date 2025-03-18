@@ -311,6 +311,10 @@ namespace BCIEssentials.Controllers
                 Instance.ActiveBehavior.StartTraining(trainingType);
             }
         }
+        public static void StartAutomatedTraining() => StartTraining(BCITrainingType.Automated);
+        public static void StartUserTraining() => StartTraining(BCITrainingType.User);
+        public static void StartIterativeTraining() => StartTraining(BCITrainingType.Iterative);
+        public static void StartSingleTraining() => StartTraining(BCITrainingType.Single);
 
         /// <summary>
         /// Stops the current training run.
@@ -320,14 +324,6 @@ namespace BCIEssentials.Controllers
             if (Instance.ActiveBehavior != null)
             {
                 Instance.ActiveBehavior.StopTraining();
-            }
-        }
-
-        public static void WhileDoSingleTraining()
-        {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.StartCoroutine(Instance.ActiveBehavior.WhileDoSingleTraining());
             }
         }
 
