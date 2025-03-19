@@ -12,7 +12,7 @@ namespace BCIEssentials.Editor
             Rect labelPosition = position;
             labelPosition.xMax -= position.width / 2;
             EditorGUI.LabelField(labelPosition, label);
-            
+
             position.xMin += position.width / 2;
             property.enumValueIndex = (int)KeyCodeField(position, (KeyCode)property.enumValueIndex);
         }
@@ -26,17 +26,17 @@ namespace BCIEssentials.Editor
             switch(currentEvent.GetTypeForControl(keyboardControlId))
             {
                 case EventType.Repaint:
-                    GUIStyle style = EditorStyles.miniButton;// GUI.skin.GetStyle("TextField");
-                    string s = currentValue.ToString();
-                    if (GUIUtility.keyboardControl == keyboardControlId)
-                        s = "Press a Key to Bind";
-                    style.Draw(position, new GUIContent(s), keyboardControlId);
+                    DrawKeycodeField(
+                        position, currentValue,
+                        GUIUtility.keyboardControl == keyboardControlId
+                    );
                 break;
                 case EventType.MouseDown:
                     if (
                         position.Contains(currentEvent.mousePosition) &&
                         currentEvent.button == 0 && GUIUtility.hotControl == 0
-                    ) {
+                    )
+                    {
                         GUIUtility.hotControl = keyboardControlId;
                         GUIUtility.keyboardControl = keyboardControlId;
                         currentEvent.Use();
@@ -61,6 +61,21 @@ namespace BCIEssentials.Editor
             }
 
             return currentValue;
+        }
+
+        public static void DrawKeycodeField
+        (
+            Rect position, KeyCode displayValue,
+            bool isEditing = false
+        )
+        {
+            GUIStyle style = EditorStyles.miniButton;
+            string valueString = displayValue.ToString();
+
+            bool isHover = position.Contains(Event.current.mousePosition);
+            
+            string displayString = isEditing? "Press a Key to Bind" : valueString;
+            style.Draw(position, displayString, isHover, isEditing, isEditing, isEditing);
         }
     }
 }
