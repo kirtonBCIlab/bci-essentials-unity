@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    [CustomPropertyDrawer(typeof(KeyCode))]
-    public class KeyCodeDrawer: PropertyDrawer
+    using Controllers;
+
+    [CustomPropertyDrawer(typeof(KeyBind))]
+    public class KeyBindDrawer: PropertyDrawer
     {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -13,8 +15,13 @@ namespace BCIEssentials.Editor
             labelPosition.xMax -= position.width / 2;
             EditorGUI.LabelField(labelPosition, label);
 
-            position.xMin += position.width / 2;
-            property.enumValueIndex = (int)KeyCodeField(position, (KeyCode)property.enumValueIndex);
+            SerializedProperty boundKeyProperty = property.FindPropertyRelative(nameof(KeyBind.BoundKey));
+            Rect keyBindFieldPosition = position;
+            keyBindFieldPosition.xMin += position.width / 2;
+
+            KeyCode value = (KeyCode)boundKeyProperty.enumValueFlag;
+            value = KeyCodeField(keyBindFieldPosition, value);
+            boundKeyProperty.enumValueFlag = (int)value;
         }
 
 
@@ -26,7 +33,7 @@ namespace BCIEssentials.Editor
             switch(currentEvent.GetTypeForControl(keyboardControlId))
             {
                 case EventType.Repaint:
-                    DrawKeycodeField(
+                    DrawKeyCodeField(
                         position, currentValue,
                         GUIUtility.keyboardControl == keyboardControlId
                     );
@@ -63,7 +70,7 @@ namespace BCIEssentials.Editor
             return currentValue;
         }
 
-        public static void DrawKeycodeField
+        public static void DrawKeyCodeField
         (
             Rect position, KeyCode displayValue,
             bool isEditing = false

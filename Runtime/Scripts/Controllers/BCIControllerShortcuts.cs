@@ -6,14 +6,14 @@ namespace BCIEssentials.Controllers
 {
     public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
     {
-        public KeyCode ToggleStimulusRunBinding = KeyCode.S;
+        public KeyBind ToggleStimulusRunBinding = KeyCode.S;
 
         [FoldoutGroup("Start Training")]
-        public KeyCode StartAutomatedTrainingBinding = KeyCode.T;
-        public KeyCode StartIterativeTrainingBinding = KeyCode.I;
-        public KeyCode StartUserTrainingBinding = KeyCode.U;
-        public KeyCode StartSingleTrainingBinding = KeyCode.Semicolon;
-        public KeyCode UpdateClassifierBinding = KeyCode.Backspace;
+        public KeyBind StartAutomatedTrainingBinding = KeyCode.T;
+        public KeyBind StartIterativeTrainingBinding = KeyCode.I;
+        public KeyBind StartUserTrainingBinding = KeyCode.U;
+        public KeyBind StartSingleTrainingBinding = KeyCode.Semicolon;
+        public KeyBind UpdateClassifierBinding = KeyCode.Backspace;
 
         [FoldoutGroup("Object Selection")]
         public IndexedKeyBind[] ObjectSelectionBindings
@@ -26,7 +26,7 @@ namespace BCIEssentials.Controllers
         };
 
 
-        protected KeycodeShortcut[] BoundShortCuts;
+        protected KeyboardShortcut[] BoundShortCuts;
 
 
         private void Start()
@@ -36,7 +36,7 @@ namespace BCIEssentials.Controllers
 
         private void Update()
         {
-            foreach(KeycodeShortcut shortcut in BoundShortCuts)
+            foreach(KeyboardShortcut shortcut in BoundShortCuts)
                 shortcut.InvokeIfKeyPressed();
         }
 
@@ -47,8 +47,8 @@ namespace BCIEssentials.Controllers
             BoundShortCuts.Concat(GetObjectSelectionShortcuts());
         }
 
-        protected KeycodeShortcut[] GetStaticShortcuts()
-        => new KeycodeShortcut[]
+        protected KeyboardShortcut[] GetStaticShortcuts()
+        => new KeyboardShortcut[]
         {
             new(ToggleStimulusRunBinding, BCIController.StartStopStimulus),
             new(StartAutomatedTrainingBinding, BCIController.StartAutomatedTraining),
@@ -58,43 +58,50 @@ namespace BCIEssentials.Controllers
             new(UpdateClassifierBinding, BCIController.UpdateClassifier)
         };
 
-        protected KeycodeShortcut[] GetObjectSelectionShortcuts()
-        => (KeycodeShortcut[])ObjectSelectionBindings.Select(
-            indexedBinding => new KeycodeShortcut(
-                indexedBinding.Binding,
-                () => BCIController.SelectSPOAtEndOfRun(indexedBinding.Index)
+        protected KeyboardShortcut[] GetObjectSelectionShortcuts()
+        => (KeyboardShortcut[])ObjectSelectionBindings.Select(
+            indexedBinding => new KeyboardShortcut(
+                indexedBinding, BindSelectionMethod(indexedBinding)
             )
         );
+        protected Action BindSelectionMethod(IndexedKeyBind binding)
+        => () => BCIController.SelectSPOAtEndOfRun(binding.Index);        
+    }
 
+    [Serializable]
+    public class KeyBind
+    {
+        public KeyCode BoundKey;
+        public KeyBind(KeyCode keyCode) { BoundKey = keyCode; }
+        public static implicit operator KeyCode(KeyBind b) => b.BoundKey;
+        public static implicit operator KeyBind(KeyCode k) => new(k);
 
-        [Serializable]
-        public struct IndexedKeyBind
+        public bool WasPressedThisFrame
+        => Input.GetKeyDown(BoundKey);
+    }
+
+    [Serializable]
+    public class IndexedKeyBind: KeyBind
+    {
+        public int Index;
+        public IndexedKeyBind(KeyCode keyCode, int index)
+        : base(keyCode) { Index = index; }
+    }
+
+    public class KeyboardShortcut
+    {
+        public KeyBind Binding;
+        public Action Method;
+
+        public KeyboardShortcut(KeyBind binding, Action method)
         {
-            public int Index;
-            public KeyCode Binding;
-
-            public IndexedKeyBind(KeyCode shortcut, int index)
-            {
-                Binding = shortcut;
-                Index = index;
-            }
+            Binding = binding;
+            Method = method;
         }
 
-        public struct KeycodeShortcut
+        public void InvokeIfKeyPressed()
         {
-            public KeyCode Binding;
-            public Action Method;
-
-            public KeycodeShortcut(KeyCode binding, Action method)
-            {
-                Binding = binding;
-                Method = method;
-            }
-
-            public readonly void InvokeIfKeyPressed()
-            {
-                if (Input.GetKeyDown(Binding)) Method?.Invoke();
-            }
+            if (Binding.WasPressedThisFrame) Method?.Invoke();
         }
     }
 }
