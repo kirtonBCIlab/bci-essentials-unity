@@ -12,6 +12,7 @@ namespace BCIEssentials.Editor
         const float ItemCountLabelWidth = 48f;
         static readonly Vector2 ItemSpacing = new(4f, 2f);
         static readonly float LineHeight = EditorGUIUtility.singleLineHeight;
+        static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
 
         static readonly GUIContent AddButtonContent
         = new (EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
@@ -22,17 +23,23 @@ namespace BCIEssentials.Editor
         = new (EditorStyles.foldoutHeader)
         { clipping = TextClipping.Clip };
 
+
         private IndexedKeyBindSet _target;
         private bool _foldout;
+
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (_target == null) Initialize(property);
 
-            if (_foldout)
-                return LineHeight + (LineHeight + ItemSpacing.y) * (1 + _target.Count);
+            float height = LineHeight;
 
-            return LineHeight;
+            if (_foldout)
+            {
+                height += ColumnHeaderSpacing;
+                height += (LineHeight + ItemSpacing.y) * _target.Count;
+            }
+            return height;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -47,7 +54,7 @@ namespace BCIEssentials.Editor
 
             if(!_foldout) return;
 
-            position.y += LineHeight * 2;
+            position.y += LineHeight + ColumnHeaderSpacing;
             DrawItems(position);
         }
 
@@ -80,6 +87,20 @@ namespace BCIEssentials.Editor
                 0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
             };
             GUI.Label(itemCountRect, itemCountLabel, EditorStyles.miniLabel);
+
+            if (_foldout)
+            {
+                position.y += LineHeight * 1.2f;
+                Rect indexHeaderRect = position
+                    .HorizontalSlice(0, 0.2f)
+                    .Narrowed(ItemSpacing.x);
+                GUI.Label(indexHeaderRect, "Index");
+
+                Rect keyCodeHeaderRect = position
+                    .HorizontalSlice(0.2f)
+                    .Narrowed(ButtonWidth + ItemSpacing.x);
+                GUI.Label(keyCodeHeaderRect, "KeyCode");
+            }
         }
 
         private void DrawItems(Rect position)
