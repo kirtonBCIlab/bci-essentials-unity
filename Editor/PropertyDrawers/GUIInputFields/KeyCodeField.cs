@@ -61,8 +61,10 @@ namespace BCIEssentials.Editor
 
             bool isHover = position.Contains(Event.current.mousePosition);
             
-            string displayString = isEditing? "Press a Key to Bind" : valueString;
-            style.Draw(position, displayString, isHover, isEditing, isEditing, isEditing);
+            string displayString = isEditing? "Press any Key" : valueString;
+            GUIContent content = new(displayString);
+            content.tooltip = "Click to Rebind";
+            style.Draw(position, content, isHover, isEditing, isEditing, isEditing);
         }
 
         public static string TrimSuffix(this string s, string suffix)
