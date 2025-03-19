@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
+    using System.Collections.Generic;
     using Controllers;
 
     [CustomPropertyDrawer(typeof(IndexedKeyBindSet))]
@@ -77,7 +78,11 @@ namespace BCIEssentials.Editor
             }
 
             Rect buttonRect = GetRightButtonRect(position);
-            GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton);
+            if (GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton))
+            {
+                _target.Add(_target.Count, KeyCode.None);
+                _foldout = true;
+            }
 
             Rect itemCountRect = buttonRect
                 .Resized(ItemCountLabelWidth, LineHeight);
@@ -106,6 +111,7 @@ namespace BCIEssentials.Editor
         private void DrawItems(Rect position)
         {
             int listIndex = 0;
+            int? itemToDelete = null;
             foreach (IndexedKeyBind binding in _target)
             {
                 int index = binding.Index;
@@ -129,10 +135,18 @@ namespace BCIEssentials.Editor
                     _target[listIndex].BoundKey = keyCode;
 
                 Rect buttonRect = GetRightButtonRect(position);
-                GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton);
+                if (GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton))
+                    itemToDelete = listIndex;
 
                 position.y += LineHeight + ItemSpacing.y;
                 listIndex++;
+            }
+
+            if (itemToDelete.HasValue)
+            {
+                _target.RemoveAt(itemToDelete.Value);
+                if (_target.Count == 0)
+                    _foldout = false;
             }
         }
 
