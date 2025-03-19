@@ -41,6 +41,7 @@ namespace BCIEssentials.Editor
                     {
                         GUIUtility.hotControl = 0;
                         GUIUtility.keyboardControl = 0;
+                        GUI.changed = true;
                         currentEvent.Use();
                         return currentEvent.keyCode;
                     }

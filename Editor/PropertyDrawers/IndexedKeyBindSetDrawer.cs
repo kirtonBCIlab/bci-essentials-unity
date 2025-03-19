@@ -9,28 +9,45 @@ namespace BCIEssentials.Editor
     public class IndexedKeyBindSetDrawer: PropertyDrawer
     {
         const float ButtonWidth = 20f;
+        static readonly Vector2 ItemSpacing = new(4f, 2f);
         static readonly float LineHeight = EditorGUIUtility.singleLineHeight;
 
         static readonly GUIContent AddButtonContent
         = new GUIContent(EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
-        static readonly GUIStyle AddButtonStyle
-        = new(EditorStyles.miniButton)
-        {
-            padding = new RectOffset(2, 2, 2, 2)
-        };
+        static readonly GUIContent RemoveButtonContent
+        = new GUIContent(EditorGUIUtility.IconContent("d_winbtn_win_close@2x"));
 
         private IndexedKeyBindSet _target;
         private bool _foldout;
 
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            if (_target == null) Initialize(property);
+
+            if (_foldout)
+                return LineHeight + (LineHeight + ItemSpacing.y) * (1 + _target.Count);
+
+            return LineHeight;
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (_target == null)
-                Initialize(property);
+            if (_target == null) Initialize(property);
 
             if (property.TryGetAttribute<SpaceAttribute>(out var spaceAttribute))
                 EditorGUILayout.Space(spaceAttribute.height);
-            
 
+            position.height = LineHeight;
+            DrawHeader(position, label);
+
+            if(!_foldout) return;
+
+            position.y += LineHeight * 2;
+            DrawItems(position);
+        }
+
+        private void DrawHeader(Rect position, GUIContent label)
+        {
             var foldoutRect = position.Narrowed(ButtonWidth);
             if (_target.Count > 0)
             {
@@ -42,9 +59,8 @@ namespace BCIEssentials.Editor
                 _foldout = false;
             }
 
-            Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
-            buttonRect.x += position.width - ButtonWidth;
-            GUI.Button(buttonRect, AddButtonContent, AddButtonStyle);
+            Rect buttonRect = GetRightButtonRect(position);
+            GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton);
 
             Rect itemCountRect = buttonRect.Resized(60f, LineHeight);
             itemCountRect.x -= 60f;
@@ -53,6 +69,46 @@ namespace BCIEssentials.Editor
                 0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
             };
             GUI.Label(itemCountRect, itemCountLabel);
+        }
+
+        private void DrawItems(Rect position)
+        {
+            int listIndex = 0;
+            foreach (IndexedKeyBind binding in _target)
+            {
+                int index = binding.Index;
+                Rect indexRect = position
+                    .HorizontalSlice(0, 0.2f)
+                    .Narrowed(ItemSpacing.x);
+
+                EditorGUI.BeginChangeCheck();
+                index = EditorGUI.IntField(indexRect, index);
+                if (EditorGUI.EndChangeCheck())
+                    _target[listIndex].Index = index;
+
+                KeyCode keyCode = binding;
+                Rect keyCodeRect = position
+                    .HorizontalSlice(0.2f)
+                    .Narrowed(ButtonWidth + ItemSpacing.x);
+
+                EditorGUI.BeginChangeCheck();
+                keyCode = GUIInputFields.KeyCodeField(keyCodeRect, keyCode);
+                if (EditorGUI.EndChangeCheck())
+                    _target[listIndex].BoundKey = keyCode;
+
+                Rect buttonRect = GetRightButtonRect(position);
+                GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton);
+
+                position.y += LineHeight + ItemSpacing.y;
+                listIndex++;
+            }
+        }
+
+        private Rect GetRightButtonRect(Rect position)
+        {
+            Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
+            buttonRect.x += position.width - ButtonWidth;
+            return buttonRect;
         }
 
         private void Initialize(SerializedProperty property)
@@ -73,18 +129,17 @@ namespace BCIEssentials.Editor
         public static Rect Resized(this Rect r, float width, float height)
         => new Rect(r.position, new (width, height));
 
-        public static Rect WithWidth(this Rect r, float width)
-        => new Rect(r.position, new (width, r.height));
-        public static Rect WithHeight(this Rect r, float height)
-        => new Rect(r.position, new (r.width, height));
+        public static Rect HorizontalSlice(this Rect r, float start, float end = 1)
+        {
+            Rect result = new (r);
+            result.x += r.width * start;
+            result.width *= end - start;
+            return result;
+        }
 
         public static Rect Narrowed(this Rect r, float delta)
-        => r.Widened(-delta);
-        public static Rect Widened(this Rect r, float delta)
         => new(r.position, new (r.width - delta, r.height));
-        public static Rect Shortened(this Rect r, float delta)
-        => r.Heightened(delta);
-        public static Rect Heightened(this Rect r, float delta)
-        => new(r.position, new(r.width, r.height + delta));
+        public static Rect Widened(this Rect r, float delta)
+        => new(r.position, new (r.width + delta, r.height));
     }
 }
