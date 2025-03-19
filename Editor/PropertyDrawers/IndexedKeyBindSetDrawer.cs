@@ -9,7 +9,10 @@ namespace BCIEssentials.Editor
     public class IndexedKeyBindSetDrawer: PropertyDrawer
     {
         const float ButtonWidth = 20f;
-        readonly float LineHeight = EditorGUIUtility.singleLineHeight;
+        static readonly float LineHeight = EditorGUIUtility.singleLineHeight;
+
+        static readonly GUIContent AddButtonContent
+        = new GUIContent(EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
 
         private IndexedKeyBindSet _target;
         private bool _foldout;
@@ -36,7 +39,11 @@ namespace BCIEssentials.Editor
 
             Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
             buttonRect.x += position.width - ButtonWidth;
-            GUI.Button(buttonRect, "+");
+
+            GUIStyle style = new(EditorStyles.miniButton);
+            style.padding = new RectOffset(2, 2, 2, 2);
+            
+            GUI.Button(buttonRect, AddButtonContent, style);
         }
 
         private void Initialize(SerializedProperty property)
