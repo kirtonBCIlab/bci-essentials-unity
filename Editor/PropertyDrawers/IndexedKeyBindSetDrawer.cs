@@ -13,6 +13,11 @@ namespace BCIEssentials.Editor
 
         static readonly GUIContent AddButtonContent
         = new GUIContent(EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
+        static readonly GUIStyle AddButtonStyle
+        = new(EditorStyles.miniButton)
+        {
+            padding = new RectOffset(2, 2, 2, 2)
+        };
 
         private IndexedKeyBindSet _target;
         private bool _foldout;
@@ -39,11 +44,15 @@ namespace BCIEssentials.Editor
 
             Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
             buttonRect.x += position.width - ButtonWidth;
+            GUI.Button(buttonRect, AddButtonContent, AddButtonStyle);
 
-            GUIStyle style = new(EditorStyles.miniButton);
-            style.padding = new RectOffset(2, 2, 2, 2);
-            
-            GUI.Button(buttonRect, AddButtonContent, style);
+            Rect itemCountRect = buttonRect.Resized(60f, LineHeight);
+            itemCountRect.x -= 60f;
+            string itemCountLabel = _target.Count switch
+            {
+                0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
+            };
+            GUI.Label(itemCountRect, itemCountLabel);
         }
 
         private void Initialize(SerializedProperty property)
