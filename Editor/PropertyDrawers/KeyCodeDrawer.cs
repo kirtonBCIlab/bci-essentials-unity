@@ -9,6 +9,11 @@ namespace BCIEssentials.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            Rect labelPosition = position;
+            labelPosition.xMax -= position.width / 2;
+            EditorGUI.LabelField(labelPosition, label);
+            
+            position.xMin += position.width / 2;
             property.enumValueIndex = (int)KeyCodeField(position, (KeyCode)property.enumValueIndex);
         }
 
