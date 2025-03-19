@@ -49,7 +49,7 @@ namespace BCIEssentials.Controllers
 
 
     [Serializable]
-    public class KeyBind
+    public struct KeyBind
     {
         public KeyCode BoundKey;
         public KeyBind(KeyCode keyCode) { BoundKey = keyCode; }
@@ -61,8 +61,11 @@ namespace BCIEssentials.Controllers
     }
 
     [Serializable]
-    public class IndexedKeyBindSet: Dictionary<int, KeyBind>
+    public class IndexedKeyBindSet: List<(int, KeyBind)>
     {
+        public void Add(int index, KeyCode keyCode)
+        => Add((index, keyCode));
+
         public void Process(Action<int> onPressed)
         {
             foreach ((int index, KeyBind binding) in this)
