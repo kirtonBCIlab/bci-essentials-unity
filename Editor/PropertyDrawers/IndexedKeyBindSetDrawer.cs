@@ -9,13 +9,18 @@ namespace BCIEssentials.Editor
     public class IndexedKeyBindSetDrawer: PropertyDrawer
     {
         const float ButtonWidth = 20f;
+        const float ItemCountLabelWidth = 48f;
         static readonly Vector2 ItemSpacing = new(4f, 2f);
         static readonly float LineHeight = EditorGUIUtility.singleLineHeight;
 
         static readonly GUIContent AddButtonContent
-        = new GUIContent(EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
+        = new (EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
         static readonly GUIContent RemoveButtonContent
-        = new GUIContent(EditorGUIUtility.IconContent("d_winbtn_win_close@2x"));
+        = new (EditorGUIUtility.IconContent("d_winbtn_win_close@2x"));
+
+        static readonly GUIStyle FoldoutHeaderStyle
+        = new (EditorStyles.foldoutHeader)
+        { clipping = TextClipping.Clip };
 
         private IndexedKeyBindSet _target;
         private bool _foldout;
@@ -48,10 +53,15 @@ namespace BCIEssentials.Editor
 
         private void DrawHeader(Rect position, GUIContent label)
         {
-            var foldoutRect = position.Narrowed(ButtonWidth);
+            var foldoutRect = position.Narrowed(
+                ButtonWidth + ItemCountLabelWidth + ItemSpacing.x
+            );
             if (_target.Count > 0)
             {
-                _foldout = EditorGUI.Foldout(foldoutRect, _foldout, label, true);
+                _foldout = EditorGUI.BeginFoldoutHeaderGroup(
+                    foldoutRect, _foldout, label, FoldoutHeaderStyle
+                );
+                EditorGUI.EndFoldoutHeaderGroup();
             }
             else
             {
@@ -62,13 +72,14 @@ namespace BCIEssentials.Editor
             Rect buttonRect = GetRightButtonRect(position);
             GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton);
 
-            Rect itemCountRect = buttonRect.Resized(60f, LineHeight);
-            itemCountRect.x -= 60f;
+            Rect itemCountRect = buttonRect
+                .Resized(ItemCountLabelWidth, LineHeight);
+            itemCountRect.x -= ItemCountLabelWidth;
             string itemCountLabel = _target.Count switch
             {
                 0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
             };
-            GUI.Label(itemCountRect, itemCountLabel);
+            GUI.Label(itemCountRect, itemCountLabel, EditorStyles.miniLabel);
         }
 
         private void DrawItems(Rect position)
