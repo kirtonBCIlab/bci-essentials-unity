@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    using System.Collections.Generic;
     using Controllers;
 
     [CustomPropertyDrawer(typeof(IndexedKeyBindSet))]
@@ -11,6 +10,7 @@ namespace BCIEssentials.Editor
     {
         const float ButtonWidth = 20f;
         const float ItemCountLabelWidth = 48f;
+        const float NormalizedIndexFieldSize = 0.25f;
         static readonly Vector2 ItemSpacing = new(4f, 2f);
         static readonly float LineHeight = EditorGUIUtility.singleLineHeight;
         static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
@@ -95,14 +95,14 @@ namespace BCIEssentials.Editor
 
             if (_foldout)
             {
-                position.y += LineHeight * 1.2f;
+                position.y += ColumnHeaderSpacing;
                 Rect indexHeaderRect = position
-                    .HorizontalSlice(0, 0.2f)
+                    .HorizontalSlice(0, NormalizedIndexFieldSize)
                     .Narrowed(ItemSpacing.x);
                 GUI.Label(indexHeaderRect, "Index");
 
                 Rect keyCodeHeaderRect = position
-                    .HorizontalSlice(0.2f)
+                    .HorizontalSlice(NormalizedIndexFieldSize)
                     .Narrowed(ButtonWidth + ItemSpacing.x);
                 GUI.Label(keyCodeHeaderRect, "KeyCode");
             }
@@ -116,7 +116,7 @@ namespace BCIEssentials.Editor
             {
                 int index = binding.Index;
                 Rect indexRect = position
-                    .HorizontalSlice(0, 0.2f)
+                    .HorizontalSlice(0, NormalizedIndexFieldSize)
                     .Narrowed(ItemSpacing.x);
 
                 EditorGUI.BeginChangeCheck();
@@ -126,7 +126,7 @@ namespace BCIEssentials.Editor
 
                 KeyCode keyCode = binding;
                 Rect keyCodeRect = position
-                    .HorizontalSlice(0.2f)
+                    .HorizontalSlice(NormalizedIndexFieldSize)
                     .Narrowed(ButtonWidth + ItemSpacing.x);
 
                 EditorGUI.BeginChangeCheck();
