@@ -8,7 +8,7 @@ namespace BCIEssentials.Controllers
     {
         public KeyBind ToggleStimulusRunBinding = KeyCode.S;
 
-        [FoldoutGroup("Start Training")]
+        [FoldoutGroup("Training")]
         public KeyBind StartAutomatedTrainingBinding = KeyCode.T;
         public KeyBind StartIterativeTrainingBinding = KeyCode.I;
         public KeyBind StartUserTrainingBinding = KeyCode.U;

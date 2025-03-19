@@ -13,6 +13,8 @@ namespace BCIEssentials.Editor
         {
             Rect labelPosition = position;
             labelPosition.xMax -= position.width / 2;
+
+            label.text = TrimSuffix(label.text, "Binding");
             EditorGUI.LabelField(labelPosition, label);
 
             SerializedProperty boundKeyProperty = property.FindPropertyRelative(nameof(KeyBind.BoundKey));
@@ -83,6 +85,13 @@ namespace BCIEssentials.Editor
             
             string displayString = isEditing? "Press a Key to Bind" : valueString;
             style.Draw(position, displayString, isHover, isEditing, isEditing, isEditing);
+        }
+
+        private static string TrimSuffix(string s, string suffix)
+        {
+            if (s.EndsWith(suffix))
+                return s[..s.IndexOf(suffix)];
+            return s;
         }
     }
 }
