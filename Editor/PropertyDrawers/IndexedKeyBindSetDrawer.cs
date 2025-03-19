@@ -31,7 +31,7 @@ namespace BCIEssentials.Editor
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (_target == null) Initialize(property);
+            GetTarget(property);
 
             float height = LineHeight;
 
@@ -45,7 +45,7 @@ namespace BCIEssentials.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (_target == null) Initialize(property);
+            GetTarget(property);
 
             if (property.TryGetAttribute<SpaceAttribute>(out var spaceAttribute))
                 EditorGUILayout.Space(spaceAttribute.height);
@@ -157,7 +157,7 @@ namespace BCIEssentials.Editor
             return buttonRect;
         }
 
-        private void Initialize(SerializedProperty property)
+        private void GetTarget(SerializedProperty property)
         {
             object targetObject = property.serializedObject.targetObject;
             _target = fieldInfo.GetValue(targetObject) as IndexedKeyBindSet;

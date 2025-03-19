@@ -6,25 +6,37 @@ namespace BCIEssentials.Controllers
 {
     public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
     {
-        public KeyBind ToggleStimulusRunBinding = KeyCode.S;
+        public KeyBind ToggleStimulusRunBinding;
 
         [Space(8)]
-        public KeyBind StartAutomatedTrainingBinding = KeyCode.T;
-        public KeyBind StartIterativeTrainingBinding = KeyCode.I;
-        public KeyBind StartUserTrainingBinding = KeyCode.U;
-        public KeyBind StartSingleTrainingBinding = KeyCode.Semicolon;
-        public KeyBind UpdateClassifierBinding = KeyCode.Backspace;
+        public KeyBind StartAutomatedTrainingBinding;
+        public KeyBind StartIterativeTrainingBinding;
+        public KeyBind StartUserTrainingBinding;
+        public KeyBind StartSingleTrainingBinding;
+        public KeyBind UpdateClassifierBinding;
 
         [Space(12)]
-        public IndexedKeyBindSet ObjectSelectionBindings
-        = new IndexedKeyBindSet {
-            {0, KeyCode.Alpha0}, {1, KeyCode.Alpha1},
-            {2, KeyCode.Alpha2}, {3, KeyCode.Alpha3},
-            {4, KeyCode.Alpha4}, {5, KeyCode.Alpha5},
-            {6, KeyCode.Alpha6}, {7, KeyCode.Alpha7},
-            {8, KeyCode.Alpha8}, {9, KeyCode.Alpha9},
-        };
+        public IndexedKeyBindSet ObjectSelectionBindings;
 
+
+        private void Reset()
+        {
+            ToggleStimulusRunBinding = KeyCode.S;
+            StartAutomatedTrainingBinding = KeyCode.T;
+            StartIterativeTrainingBinding = KeyCode.I;
+            StartUserTrainingBinding = KeyCode.U;
+            StartSingleTrainingBinding = KeyCode.Semicolon;
+            UpdateClassifierBinding = KeyCode.Backspace;
+
+            ObjectSelectionBindings = new IndexedKeyBindSet
+            {
+                {0, KeyCode.Alpha0}, {1, KeyCode.Alpha1},
+                {2, KeyCode.Alpha2}, {3, KeyCode.Alpha3},
+                {4, KeyCode.Alpha4}, {5, KeyCode.Alpha5},
+                {6, KeyCode.Alpha6}, {7, KeyCode.Alpha7},
+                {8, KeyCode.Alpha8}, {9, KeyCode.Alpha9},
+            };
+        }
 
         private void Update()
         {
