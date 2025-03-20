@@ -5,6 +5,19 @@ namespace BCIEssentials.Editor
 {
     public static partial class GUIInputFields
     {
+        const float NormalizedLabelSize = 0.6f;
+        const float FieldSpacing = 4f;
+
+        public static KeyCode KeyCodeField(Rect position, string label, KeyCode value)
+        {
+            (Rect labelPosition, Rect valueFieldPosition)
+            = position.SplitHorizontally(NormalizedLabelSize, FieldSpacing);
+            label = label.TrimSuffix("Binding");
+            EditorGUI.LabelField(labelPosition, label);
+
+            return KeyCodeField(valueFieldPosition, value);
+        }
+
         public static KeyCode KeyCodeField(Rect position, KeyCode currentValue)
         {
             int keyboardControlId = GUIUtility.GetControlID(FocusType.Keyboard);
@@ -51,7 +64,7 @@ namespace BCIEssentials.Editor
             return currentValue;
         }
 
-        public static void DrawKeyCodeField
+        private static void DrawKeyCodeField
         (
             Rect position, KeyCode displayValue,
             bool isEditing = false
