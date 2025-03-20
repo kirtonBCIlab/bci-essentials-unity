@@ -7,34 +7,42 @@ namespace BCIEssentials.Tests.Utilities
     {
         public class Properties
         {
-            public LSLMarkerWriter _lslMarkerStream;
-            public LSLResponseProvider _lslResponseStream;
-            public bool? _dontDestroyActiveInstance;
+            public LSLMarkerWriter _markerWriter;
+            public LSLResponseProvider _responseProvider;
+            public bool? _persistBetweenScenes;
         }
 
-        public static T AssignInspectorProperties<T>(this T component, Properties properties) where T : BCIController
+        public static BCIControllerInstance AssignInspectorProperties(this BCIControllerInstance controllerInstance, Properties properties)
         {
-            if (properties == null)
-            {
-                return component;
-            }
-            
-            if (properties._lslMarkerStream != null)
-            {
-                ReflectionHelpers.SetField(component, nameof(properties._lslMarkerStream), properties._lslMarkerStream);
-            }
-            
-            if (properties._lslResponseStream != null)
-            {
-                ReflectionHelpers.SetField(component, nameof(properties._lslResponseStream), properties._lslResponseStream);
-            }
-            
-            if (properties._dontDestroyActiveInstance != null)
-            {
-                ReflectionHelpers.SetField(component, nameof(properties._dontDestroyActiveInstance), properties._dontDestroyActiveInstance);
+            if (properties == null) {
+                return controllerInstance;
             }
 
-            return component;
+            if (properties._markerWriter != null) {
+                ReflectionHelpers.SetField(
+                    controllerInstance,
+                    nameof(properties._markerWriter),
+                    properties._markerWriter
+                );
+            }
+            
+            if (properties._responseProvider != null) {
+                ReflectionHelpers.SetField(
+                    controllerInstance,
+                    nameof(properties._responseProvider),
+                    properties._responseProvider
+                );
+            }
+            
+            if (properties._persistBetweenScenes != null) {
+                ReflectionHelpers.SetField(
+                    controllerInstance,
+                    nameof(properties._persistBetweenScenes),
+                    properties._persistBetweenScenes
+                );
+            }
+            
+            return controllerInstance;
         }
     }
 }

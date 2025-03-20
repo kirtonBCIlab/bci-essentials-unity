@@ -15,7 +15,7 @@ namespace BCIEssentials.Tests
 {
     public class BCIControllerTests : PlayModeTestRunnerBase
     {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private GameObject _testControllerObject;
 
         [UnitySetUp]
@@ -23,7 +23,7 @@ namespace BCIEssentials.Tests
         {
             yield return base.TestSetup();
 
-            _testController = CreateController();
+            _testController = CreateControllerInstance();
             _testControllerObject = _testController.gameObject;
         }
 
@@ -37,31 +37,9 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenAwakeAndNoMarkerStreamPresent_ThenControllerDisabled()
-        {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLMarkerWriter).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLMarkerWriter>());
-
-            _testController.gameObject.SetActive(true);
-
-            Assert.IsFalse(_testController.enabled);
-        }
-
-        [Test]
-        public void WhenAwakeAndNoResponseStreamPresent_ThenControllerDisabled()
-        {
-            LogAssert.ExpectAnyContains(LogType.Error, typeof(LSLResponseProvider).ToString());
-            Object.DestroyImmediate(_testController.GetComponent<LSLResponseProvider>());
-
-            _testController.gameObject.SetActive(true);
-
-            Assert.IsFalse(_testController.enabled);
-        }
-
-        [Test]
         public void WhenAwakeAndAControllerInstanceExists_ThenControllerIsNotInstance()
         {
-            var existingController = CreateController();
+            var existingController = CreateControllerInstance();
             existingController.gameObject.SetActive(true);
 
             _testController.gameObject.SetActive(true);
@@ -76,7 +54,7 @@ namespace BCIEssentials.Tests
         {
             _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
-                _dontDestroyActiveInstance = true
+                _persistBetweenScenes = true
             }).gameObject.SetActive(true);
 
             yield return LoadEmptySceneAsync();
@@ -89,7 +67,7 @@ namespace BCIEssentials.Tests
         {
             _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
-                _dontDestroyActiveInstance = false
+                _persistBetweenScenes = false
             }).gameObject.SetActive(true);
 
             yield return LoadEmptySceneAsync();
@@ -102,8 +80,10 @@ namespace BCIEssentials.Tests
         {
             _testController.AssignInspectorProperties(new BCIControllerExtensions.Properties
             {
-                _dontDestroyActiveInstance = false
+                _persistBetweenScenes = false
             }).gameObject.SetActive(true);
+
+            UnityEngine.Assertions.Assert.IsNotNull(BCIController.Instance);
 
             yield return LoadEmptySceneAsync();
 
@@ -113,11 +93,13 @@ namespace BCIEssentials.Tests
         [UnityTest]
         public IEnumerator WhenDestroyedAndNotInstance_ThenInstanceNotNull()
         {
-            CreateController(new BCIControllerExtensions.Properties
+            CreateControllerInstance(new BCIControllerExtensions.Properties
             {
-                _dontDestroyActiveInstance = true
+                _persistBetweenScenes = true
             }, true);
             _testController.gameObject.SetActive(true);
+
+            UnityEngine.Assertions.Assert.IsNotNull(BCIController.Instance);
 
             yield return LoadEmptySceneAsync();
 
@@ -291,30 +273,5 @@ namespace BCIEssentials.Tests
             Assert.IsNull(BCIController.Instance.ActiveBehavior);
             Assert.IsFalse(BCIController.HasBehaviorForType(BCIBehaviorType.P300));
         }
-
-        [Test]
-        public void WhenHotKeysEnabled_ThenKeyBindingsRegistered()
-        {
-            _testController.Initialize();
-            var enable = true;
-            BCIController.EnableDisableHotkeys(enable);
-            Assert.IsTrue(_testController._keyBindings.Count != 0);
-        }
-
-        [Test]
-        public void WhenHotKeysDisabled_ThenKeyBindingsCleared()
-        {
-            _testController.Initialize();
-            var enable = false;
-            BCIController.EnableDisableHotkeys(enable);
-            Assert.IsTrue(_testController._keyBindings.Count == 0);
-        }
-
-
-
-         //   if (enable == false)
-        // {
-          //      Assert.IsFalse(_testController._keyBindings.length != 0);
-            //}
-        }
     }
+}
