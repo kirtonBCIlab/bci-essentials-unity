@@ -58,6 +58,31 @@ namespace BCIEssentials.Editor
             DrawItems(position);
         }
 
+
+        private void GetTarget(SerializedProperty property)
+        {
+            _arrayProperty = property.FindPropertyRelative(
+                nameof(IndexedKeyBindSet.Bindings)
+            );
+
+            Object targetObject = property.serializedObject.targetObject;
+            _prefsKey = $"{targetObject.name}/{property.propertyPath}";
+        }
+
+        private void SetAndSaveFoldout(bool value)
+        {
+            _foldout = value;
+            EditorPrefs.SetBool(_prefsKey, value);
+        }
+
+        private Rect GetRightButtonRect(Rect position)
+        {
+            Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
+            buttonRect.x += position.width - ButtonWidth;
+            return buttonRect;
+        }
+
+
         private void DrawHeader(Rect position, GUIContent label)
         {
             _foldout = EditorPrefs.GetBool(_prefsKey);
@@ -90,64 +115,54 @@ namespace BCIEssentials.Editor
                 SetAndSaveFoldout(true);
             }
 
-            Rect itemCountRect = buttonRect
-                .Resized(ItemCountLabelWidth, LineHeight);
-            itemCountRect.x -= ItemCountLabelWidth;
-            string itemCountLabel = ItemCount switch
-            {
-                0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
-            };
-            GUI.Label(itemCountRect, itemCountLabel, EditorStyles.miniLabel);
+            DrawItemCountLabel(position);
 
             if (_foldout)
             {
-                position.y += ColumnHeaderSpacing;
-                Rect indexHeaderRect = position
-                    .HorizontalSlice(0, NormalizedIndexFieldSize)
-                    .Narrowed(ItemSpacing.x);
-                GUI.Label(indexHeaderRect, "Index");
-
-                Rect keyCodeHeaderRect = position
-                    .HorizontalSlice(NormalizedIndexFieldSize)
-                    .Narrowed(ButtonWidth + ItemSpacing.x);
-                GUI.Label(keyCodeHeaderRect, "KeyCode");
+                DrawColumnHeaders(position);
             }
         }
+
+
+        private void DrawItemCountLabel(Rect position)
+        {
+            position = GetRightButtonRect(position)
+                .Resized(ItemCountLabelWidth, LineHeight);
+            position.x -= ItemCountLabelWidth;
+
+            string label = ItemCount switch
+            {
+                0 => "Empty",
+                1 => "1 Item",
+                int n => $"{n} Items"
+            };
+
+            GUI.Label(position, label, EditorStyles.miniLabel);
+        }
+        
+        private void DrawColumnHeaders(Rect position)
+        {
+            position.y += ColumnHeaderSpacing;
+
+            Rect indexHeaderRect = position
+                .HorizontalSlice(0, NormalizedIndexFieldSize)
+                .Narrowed(ItemSpacing.x);
+            GUI.Label(indexHeaderRect, "Index");
+
+            Rect keyCodeHeaderRect = position
+                .HorizontalSlice(NormalizedIndexFieldSize)
+                .Narrowed(ButtonWidth + ItemSpacing.x);
+            GUI.Label(keyCodeHeaderRect, "KeyCode");
+        }
+
 
         private void DrawItems(Rect position)
         {
             int? itemToDelete = null;
             for (int i = 0; i < ItemCount; i++)
             {
-                SerializedProperty indexProperty
-                = GetElementIndexProperty(i);
-
-                int index = indexProperty.intValue;
-                Rect indexRect = position
-                    .HorizontalSlice(0, NormalizedIndexFieldSize)
-                    .Narrowed(ItemSpacing.x);
-
-                EditorGUI.BeginChangeCheck();
-                index = EditorGUI.IntField(indexRect, index);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    indexProperty.intValue = index;
-                }
-
-                SerializedProperty keyCodeProperty
-                = GetElementKeyCodeProperty(i);
-
-                KeyCode keyCode = (KeyCode)keyCodeProperty.enumValueFlag;
-                Rect keyCodeRect = position
-                    .HorizontalSlice(NormalizedIndexFieldSize)
-                    .Narrowed(ButtonWidth + ItemSpacing.x);
-
-                EditorGUI.BeginChangeCheck();
-                keyCode = GUIInputFields.KeyCodeField(keyCodeRect, keyCode);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    keyCodeProperty.enumValueFlag = (int)keyCode;
-                }
+                DrawArrayElementIndexField(i, position);
+                DrawArrayElementKeyCodeField(i, position);
 
                 Rect buttonRect = GetRightButtonRect(position);
                 if (GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton))
@@ -162,33 +177,47 @@ namespace BCIEssentials.Editor
             {
                 _arrayProperty.DeleteArrayElementAtIndex(itemToDelete.Value);
                 if (ItemCount == 0)
-                {
                     SetAndSaveFoldout(false);
-                }
             }
         }
 
-        private Rect GetRightButtonRect(Rect position)
+
+        private void DrawArrayElementIndexField
+        (int arrayIndex, Rect elementRect)
         {
-            Rect buttonRect = position.Resized(ButtonWidth, LineHeight);
-            buttonRect.x += position.width - ButtonWidth;
-            return buttonRect;
+            SerializedProperty indexProperty
+            = GetElementIndexProperty(arrayIndex);
+
+            int index = indexProperty.intValue;
+            Rect indexRect = elementRect
+                .HorizontalSlice(0, NormalizedIndexFieldSize)
+                .Narrowed(ItemSpacing.x);
+
+            EditorGUI.BeginChangeCheck();
+            index = EditorGUI.IntField(indexRect, index);
+            if (EditorGUI.EndChangeCheck())
+            {
+                indexProperty.intValue = index;
+            }
         }
 
-        private void GetTarget(SerializedProperty property)
+        private void DrawArrayElementKeyCodeField
+        (int arrayIndex, Rect elementRect)
         {
-            _arrayProperty = property.FindPropertyRelative(
-                nameof(IndexedKeyBindSet.Bindings)
-            );
+            SerializedProperty keyCodeProperty
+            = GetElementKeyCodeProperty(arrayIndex);
 
-            Object targetObject = property.serializedObject.targetObject;
-            _prefsKey = $"{targetObject.name}/{property.propertyPath}";
-        }
+            KeyCode keyCode = (KeyCode)keyCodeProperty.enumValueFlag;
+            Rect keyCodeRect = elementRect
+                .HorizontalSlice(NormalizedIndexFieldSize)
+                .Narrowed(ButtonWidth + ItemSpacing.x);
 
-        private void SetAndSaveFoldout(bool value)
-        {
-            _foldout = value;
-            EditorPrefs.SetBool(_prefsKey, value);
+            EditorGUI.BeginChangeCheck();
+            keyCode = GUIInputFields.KeyCodeField(keyCodeRect, keyCode);
+            if (EditorGUI.EndChangeCheck())
+            {
+                keyCodeProperty.enumValueFlag = (int)keyCode;
+            }
         }
 
 
