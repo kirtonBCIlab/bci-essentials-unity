@@ -25,7 +25,8 @@ namespace BCIEssentials.Editor
         { clipping = TextClipping.Clip };
 
 
-        private IndexedKeyBindSet _target;
+        private int ItemCount => _arrayProperty.arraySize;
+        private SerializedProperty _arrayProperty;
         private string _prefsKey;
         private bool _foldout;
 
@@ -39,7 +40,7 @@ namespace BCIEssentials.Editor
             if (_foldout)
             {
                 height += ColumnHeaderSpacing;
-                height += (LineHeight + ItemSpacing.y) * _target.Count;
+                height += (LineHeight + ItemSpacing.y) * ItemCount;
             }
             return height;
         }
@@ -65,7 +66,7 @@ namespace BCIEssentials.Editor
                 ButtonWidth + ItemCountLabelWidth + ItemSpacing.x
             );
             EditorGUI.BeginChangeCheck();
-            if (_target.Count > 0)
+            if (ItemCount > 0)
             {
                 _foldout = EditorGUI.BeginFoldoutHeaderGroup(
                     foldoutRect, _foldout, label, FoldoutHeaderStyle
@@ -85,14 +86,14 @@ namespace BCIEssentials.Editor
             Rect buttonRect = GetRightButtonRect(position);
             if (GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton))
             {
-                _target.Add(_target.Count, KeyCode.None);
+                _arrayProperty.InsertArrayElementAtIndex(ItemCount);
                 SetAndSaveFoldout(true);
             }
 
             Rect itemCountRect = buttonRect
                 .Resized(ItemCountLabelWidth, LineHeight);
             itemCountRect.x -= ItemCountLabelWidth;
-            string itemCountLabel = _target.Count switch
+            string itemCountLabel = ItemCount switch
             {
                 0 => "Empty", 1 => "1 Item", int n => $"{n} Items"
             };
@@ -115,11 +116,13 @@ namespace BCIEssentials.Editor
 
         private void DrawItems(Rect position)
         {
-            int listIndex = 0;
             int? itemToDelete = null;
-            foreach (IndexedKeyBind binding in _target)
+            for (int i = 0; i < ItemCount; i++)
             {
-                int index = binding.Index;
+                SerializedProperty indexProperty
+                = GetElementIndexProperty(i);
+
+                int index = indexProperty.intValue;
                 Rect indexRect = position
                     .HorizontalSlice(0, NormalizedIndexFieldSize)
                     .Narrowed(ItemSpacing.x);
@@ -127,9 +130,14 @@ namespace BCIEssentials.Editor
                 EditorGUI.BeginChangeCheck();
                 index = EditorGUI.IntField(indexRect, index);
                 if (EditorGUI.EndChangeCheck())
-                    _target[listIndex].Index = index;
+                {
+                    indexProperty.intValue = index;
+                }
 
-                KeyCode keyCode = binding;
+                SerializedProperty keyCodeProperty
+                = GetElementKeyCodeProperty(i);
+
+                KeyCode keyCode = (KeyCode)keyCodeProperty.enumValueFlag;
                 Rect keyCodeRect = position
                     .HorizontalSlice(NormalizedIndexFieldSize)
                     .Narrowed(ButtonWidth + ItemSpacing.x);
@@ -137,20 +145,23 @@ namespace BCIEssentials.Editor
                 EditorGUI.BeginChangeCheck();
                 keyCode = GUIInputFields.KeyCodeField(keyCodeRect, keyCode);
                 if (EditorGUI.EndChangeCheck())
-                    _target[listIndex].BoundKey = keyCode;
+                {
+                    keyCodeProperty.enumValueFlag = (int)keyCode;
+                }
 
                 Rect buttonRect = GetRightButtonRect(position);
                 if (GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton))
-                    itemToDelete = listIndex;
+                {
+                    itemToDelete = i;
+                }
 
                 position.y += LineHeight + ItemSpacing.y;
-                listIndex++;
             }
 
             if (itemToDelete.HasValue)
             {
-                _target.RemoveAt(itemToDelete.Value);
-                if (_target.Count == 0)
+                _arrayProperty.DeleteArrayElementAtIndex(itemToDelete.Value);
+                if (ItemCount == 0)
                 {
                     SetAndSaveFoldout(false);
                 }
@@ -166,15 +177,11 @@ namespace BCIEssentials.Editor
 
         private void GetTarget(SerializedProperty property)
         {
+            _arrayProperty = property.FindPropertyRelative(
+                nameof(IndexedKeyBindSet.Bindings)
+            );
+
             Object targetObject = property.serializedObject.targetObject;
-            _target = fieldInfo.GetValue(targetObject) as IndexedKeyBindSet;
-
-            if (_target == null)
-            {
-                targetObject = new();
-                fieldInfo.SetValue(targetObject, _target);
-            }
-
             _prefsKey = $"{targetObject.name}/{property.propertyPath}";
         }
 
@@ -183,5 +190,23 @@ namespace BCIEssentials.Editor
             _foldout = value;
             EditorPrefs.SetBool(_prefsKey, value);
         }
+
+
+        private SerializedProperty GetElementIndexProperty(int arrayIndex)
+        => GetPropertyFromArrayEntry(
+            arrayIndex, nameof(IndexedKeyBind.Index)
+        );
+        private SerializedProperty GetElementKeyCodeProperty(int arrayIndex)
+        => GetPropertyFromArrayEntry(
+            arrayIndex, nameof(IndexedKeyBind.BoundKey)
+        );
+
+        private SerializedProperty GetPropertyFromArrayEntry
+        (int arrayIndex, string propertyName)
+        => GetArrayElementProperty(arrayIndex)
+            .FindPropertyRelative(propertyName);
+        private SerializedProperty GetArrayElementProperty
+        (int arrayIndex)
+        => _arrayProperty.GetArrayElementAtIndex(arrayIndex);
     }
 }

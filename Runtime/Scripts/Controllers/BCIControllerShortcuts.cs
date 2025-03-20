@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace BCIEssentials.Controllers
@@ -29,13 +28,13 @@ namespace BCIEssentials.Controllers
             UpdateClassifierBinding = KeyCode.Backspace;
 
             ObjectSelectionBindings = new IndexedKeyBindSet
-            {
-                {0, KeyCode.Alpha0}, {1, KeyCode.Alpha1},
-                {2, KeyCode.Alpha2}, {3, KeyCode.Alpha3},
-                {4, KeyCode.Alpha4}, {5, KeyCode.Alpha5},
-                {6, KeyCode.Alpha6}, {7, KeyCode.Alpha7},
-                {8, KeyCode.Alpha8}, {9, KeyCode.Alpha9},
-            };
+            (
+                new(0, KeyCode.Alpha0), new(1, KeyCode.Alpha1),
+                new(2, KeyCode.Alpha2), new(3, KeyCode.Alpha3),
+                new(4, KeyCode.Alpha4), new(5, KeyCode.Alpha5),
+                new(6, KeyCode.Alpha6), new(7, KeyCode.Alpha7),
+                new(8, KeyCode.Alpha8), new(9, KeyCode.Alpha9)
+            );
         }
 
         private void Update()
@@ -77,18 +76,21 @@ namespace BCIEssentials.Controllers
     {
         public int Index;
         public IndexedKeyBind(int index, KeyCode keyCode)
-        : base(keyCode) { Index = index; }
+        : base(keyCode) => Index = index;
     }
 
     [Serializable]
-    public class IndexedKeyBindSet: List<IndexedKeyBind>
+    public class IndexedKeyBindSet
     {
-        public void Add(int index, KeyCode keyCode)
-        => Add(new (index, keyCode));
+        public IndexedKeyBind[] Bindings;
+
+        public IndexedKeyBindSet
+        (params IndexedKeyBind[] bindings)
+        => Bindings = bindings;
 
         public void Process(Action<int> onPressed)
         {
-            foreach (IndexedKeyBind binding in this)
+            foreach (IndexedKeyBind binding in Bindings)
             {
                 if (binding.WasPressedThisFrame)
                     onPressed(binding.Index);
