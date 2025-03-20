@@ -29,11 +29,11 @@ namespace BCIEssentials.Controllers
 
             ObjectSelectionBindings = new IndexedKeyBindSet
             (
-                new(0, KeyCode.Alpha0), new(1, KeyCode.Alpha1),
-                new(2, KeyCode.Alpha2), new(3, KeyCode.Alpha3),
-                new(4, KeyCode.Alpha4), new(5, KeyCode.Alpha5),
-                new(6, KeyCode.Alpha6), new(7, KeyCode.Alpha7),
-                new(8, KeyCode.Alpha8), new(9, KeyCode.Alpha9)
+                (0, KeyCode.Alpha0), (1, KeyCode.Alpha1),
+                (2, KeyCode.Alpha2), (3, KeyCode.Alpha3),
+                (4, KeyCode.Alpha4), (5, KeyCode.Alpha5),
+                (6, KeyCode.Alpha6), (7, KeyCode.Alpha7),
+                (8, KeyCode.Alpha8), (9, KeyCode.Alpha9)
             );
         }
 
@@ -84,9 +84,23 @@ namespace BCIEssentials.Controllers
     {
         public IndexedKeyBind[] Bindings;
 
+        public IndexedKeyBind this[int index]
+        {
+            get => Bindings[index];
+            set => Bindings[index] = value;
+        }
+
         public IndexedKeyBindSet
-        (params IndexedKeyBind[] bindings)
-        => Bindings = bindings;
+        (params (int, KeyCode)[] tuples)
+        {
+            int count = tuples.Length;
+            Bindings = new IndexedKeyBind[count];
+            for (int i = 0; i < count; i++)
+            {
+                (int index, KeyCode keyCode) = tuples[i];
+                Bindings[i] = new(index, keyCode);
+            }
+        }
 
         public void Process(Action<int> onPressed)
         {
