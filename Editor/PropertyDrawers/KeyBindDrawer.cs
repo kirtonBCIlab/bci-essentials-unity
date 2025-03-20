@@ -14,9 +14,15 @@ namespace BCIEssentials.Editor
             = property.FindPropertyRelative(nameof(KeyBind.BoundKey));
 
             KeyCode value = (KeyCode)boundKeyProperty.enumValueFlag;
+
+            string labelText = label.text;
+            if (property.TryGetAttribute<InspectorNameAttribute>(out var nameAttribute))
+            {
+                labelText = nameAttribute.displayName;
+            }
             
             EditorGUI.BeginChangeCheck();
-            value = GUIInputFields.KeyCodeField(position, label.text, value);
+            value = GUIInputFields.KeyCodeField(position, labelText, value);
             if (EditorGUI.EndChangeCheck())
             {
                 boundKeyProperty.enumValueFlag = (int)value;
