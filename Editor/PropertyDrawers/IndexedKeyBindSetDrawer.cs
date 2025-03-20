@@ -47,9 +47,6 @@ namespace BCIEssentials.Editor
         {
             GetTarget(property);
 
-            if (property.TryGetAttribute<SpaceAttribute>(out var spaceAttribute))
-                EditorGUILayout.Space(spaceAttribute.height);
-
             position.height = LineHeight;
             DrawHeader(position, label);
 
