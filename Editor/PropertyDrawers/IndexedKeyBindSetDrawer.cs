@@ -86,6 +86,7 @@ namespace BCIEssentials.Editor
         private void DrawHeader(Rect position, GUIContent label)
         {
             _foldout = EditorPrefs.GetBool(_prefsKey);
+            label.text = label.text.TrimSuffix("Bindings");
 
             var foldoutRect = position.Narrowed(
                 ButtonWidth + ItemCountLabelWidth + ItemSpacing.x
