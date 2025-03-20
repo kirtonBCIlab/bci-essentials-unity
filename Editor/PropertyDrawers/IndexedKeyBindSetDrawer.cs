@@ -26,6 +26,7 @@ namespace BCIEssentials.Editor
 
 
         private IndexedKeyBindSet _target;
+        private string _prefsKey;
         private bool _foldout;
 
 
@@ -58,9 +59,12 @@ namespace BCIEssentials.Editor
 
         private void DrawHeader(Rect position, GUIContent label)
         {
+            _foldout = EditorPrefs.GetBool(_prefsKey);
+
             var foldoutRect = position.Narrowed(
                 ButtonWidth + ItemCountLabelWidth + ItemSpacing.x
             );
+            EditorGUI.BeginChangeCheck();
             if (_target.Count > 0)
             {
                 _foldout = EditorGUI.BeginFoldoutHeaderGroup(
@@ -73,12 +77,16 @@ namespace BCIEssentials.Editor
                 EditorGUI.LabelField(foldoutRect, label);
                 _foldout = false;
             }
+            if (EditorGUI.EndChangeCheck())
+            {
+                SetAndSaveFoldout(_foldout);
+            }
 
             Rect buttonRect = GetRightButtonRect(position);
             if (GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton))
             {
                 _target.Add(_target.Count, KeyCode.None);
-                _foldout = true;
+                SetAndSaveFoldout(true);
             }
 
             Rect itemCountRect = buttonRect
@@ -143,7 +151,9 @@ namespace BCIEssentials.Editor
             {
                 _target.RemoveAt(itemToDelete.Value);
                 if (_target.Count == 0)
-                    _foldout = false;
+                {
+                    SetAndSaveFoldout(false);
+                }
             }
         }
 
@@ -156,7 +166,7 @@ namespace BCIEssentials.Editor
 
         private void GetTarget(SerializedProperty property)
         {
-            object targetObject = property.serializedObject.targetObject;
+            Object targetObject = property.serializedObject.targetObject;
             _target = fieldInfo.GetValue(targetObject) as IndexedKeyBindSet;
 
             if (_target == null)
@@ -164,6 +174,14 @@ namespace BCIEssentials.Editor
                 targetObject = new();
                 fieldInfo.SetValue(targetObject, _target);
             }
+
+            _prefsKey = $"{targetObject.name}/{property.propertyPath}";
+        }
+
+        private void SetAndSaveFoldout(bool value)
+        {
+            _foldout = value;
+            EditorPrefs.SetBool(_prefsKey, value);
         }
     }
 
