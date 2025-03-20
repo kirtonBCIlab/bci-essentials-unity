@@ -45,14 +45,10 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
         
-        [FoldoutGroup("System Properties and Targets")]
+        [Header("System Properties and Targets")]
         [SerializeField, Min(-1)]
         [Tooltip("The applications target frame rate [Hz]. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         protected int targetFrameRate = 60;
-
-        [SerializeField, EndFoldoutGroup]
-        [Tooltip("Enable BCIController Hotkeys")]
-        public bool _hotkeysEnabled = true;
 
         [Header("Stimulus Presenting Objects")]
         [Tooltip("Provide an initial set of SPO.")]
@@ -226,7 +222,6 @@ namespace BCIEssentials.ControllerBehaviors
         public void RegisterWithControllerInstance(bool setAsActive = false)
         {
             BCIController.RegisterBehavior(this, setAsActive);
-            BCIController.EnableDisableHotkeys(_hotkeysEnabled);
         }
 
         /// <summary>
