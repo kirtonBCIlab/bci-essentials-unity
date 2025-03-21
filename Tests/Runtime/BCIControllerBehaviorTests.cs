@@ -40,7 +40,7 @@ namespace BCIEssentials.Tests
         public void WhenRegisterWithControllerInstance_ThenBehaviorRegistered()
         {
             _testControllerObject.SetActive(true);
-            _behavior.RegisterWithControllerInstance();
+            _behavior.RegisterWithController();
 
             Assert.IsTrue(BCIController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
@@ -50,7 +50,7 @@ namespace BCIEssentials.Tests
         {
             _testController.Initialize();
 
-            _behavior.UnregisterFromControllerInstance();
+            _behavior.UnregisterFromController();
 
             Assert.IsFalse(BCIController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
@@ -286,7 +286,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
-            _behavior.RegisterWithControllerInstance(true);
+            _behavior.RegisterWithController(true);
 
             _testMarkerStream = _testController.GetComponent<LSLMarkerWriter>();
 
@@ -351,7 +351,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
-            _behavior.RegisterWithControllerInstance(true);
+            _behavior.RegisterWithController(true);
 
             _spos = new List<SPO>
             {
