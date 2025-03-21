@@ -21,38 +21,39 @@ namespace BCIEssentials.Controllers
         public static void NotifyInstanceCreated
         (BCIControllerInstance createdInstance)
         {
-            if (!_quitMessageConnected) {
+            if (!_quitMessageConnected)
+            {
                 Application.quitting += () =>
                     _applicationIsQuitting = true;
                 _quitMessageConnected = true;
             }
 
-            if (Instance == null) {
-                Instance = createdInstance;
-            }
+            if (Instance == null) Instance = createdInstance;
         }
 
         public static void NotifyInstanceDestroyed
         (BCIControllerInstance destroyedInstance)
         {
-            if (Instance == destroyedInstance) {
-                Instance = null;
-            }
+            if (Instance == destroyedInstance) Instance = null;
         }
 
         
         public static void ChangeBehavior(BCIBehaviorType behaviorType)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.ChangeBehavior(behaviorType);
         }
 
         public static bool RegisterBehavior(BCIControllerBehavior behavior, bool setAsActive = false)
         {
-            if (Instance == null) {
+            if (Instance == null)
+            {
                 Instance = FindObjectOfType<BCIControllerInstance>();
 
-                if (Instance == null) {
+                if (Instance == null)
+                {
                     Debug.Log("No BCI Controller Instance set, creating one...");
                     Instance = CreateInstance();
                 }
@@ -63,19 +64,26 @@ namespace BCIEssentials.Controllers
         public static void UnregisterBehavior(BCIControllerBehavior behavior)
         {
             if (_applicationIsQuitting) return;
-            ThrowExceptionIfInstanceNull();
+
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.UnregisterBehavior(behavior);
         }
 
         public static bool HasBehaviorForType(BCIBehaviorType type)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             return Instance.HasBehaviorForType(type);
         }
         
         public static bool HasBehaviorOfType<T>() where T : BCIControllerBehavior
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             return Instance.HasBehaviorOfType<T>();
         }
 
@@ -96,7 +104,9 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public static void StartStopStimulus()
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.StartStopStimulus();
         }
         
@@ -109,7 +119,9 @@ namespace BCIEssentials.Controllers
         /// </param>
         public static void StartStimulusRun(bool sendConstantMarkers = true)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.StartStimulusRun(sendConstantMarkers);
         }
 
@@ -118,7 +130,9 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public static void StopStimulusRun()
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.StopStimulusRun();
         }
 
@@ -129,7 +143,9 @@ namespace BCIEssentials.Controllers
         /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
         public static void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.SelectSPO(objectIndex, stopStimulusRun);
         }
         
@@ -140,7 +156,9 @@ namespace BCIEssentials.Controllers
         /// <param name="objectIndex"></param>
         public static void SelectSPOAtEndOfRun(int objectIndex)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.SelectSPOAtEndOfRun(objectIndex);
         }
 
@@ -153,7 +171,9 @@ namespace BCIEssentials.Controllers
         /// </param>
         public static void StartTraining(BCITrainingType trainingType)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.StartTraining(trainingType);
         }
 
@@ -167,32 +187,28 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public static void StopTraining()
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.StopTraining();
         }
 
         public static void UpdateClassifier()
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.UpdateClassifier();
         }
 
         public static void PassBessyPythonMessage(string message)
         {
-            ThrowExceptionIfInstanceNull();
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
             Instance.PassBessyPythonMessage(message);
         }
 
         #endregion
-        
-
-        private static void ThrowExceptionIfInstanceNull()
-        {
-            if (Instance == null) {
-                throw new NullReferenceException(
-                    "No BCI Controller Instance set"
-                );
-            }
-        }
     }
 }

@@ -21,8 +21,7 @@ namespace BCIEssentials.Controllers
         public BCIControllerBehavior ActiveBehavior
         { get; private set; }
 
-        private Dictionary
-        <BCIBehaviorType, BCIControllerBehavior>
+        private Dictionary<BCIBehaviorType, BCIControllerBehavior>
         _registeredBehaviors = new();
 
 
@@ -33,9 +32,7 @@ namespace BCIEssentials.Controllers
             gameObject.FindOrCreateComponent(ref _markerWriter);
             gameObject.FindOrCreateComponent(ref _responseProvider);
 
-            if (_persistBetweenScenes) {
-                DontDestroyOnLoad(gameObject);
-            }
+            if (_persistBetweenScenes) DontDestroyOnLoad(gameObject);
 
             BCIController.NotifyInstanceCreated(this);
         }
@@ -49,9 +46,7 @@ namespace BCIEssentials.Controllers
             BCIBehaviorType behaviorType
         )
         {
-            if (ActiveBehavior != null) {
-                ActiveBehavior.CleanUp();
-            }
+            if (ActiveBehavior != null) ActiveBehavior.CleanUp();
 
             if (_registeredBehaviors.TryGetValue
                 (behaviorType, out var requestedBehavior)
@@ -75,17 +70,13 @@ namespace BCIEssentials.Controllers
             bool setAsActive = false
         )
         {
-            if (behavior == null) {
-                Debug.LogError("Controller Behavior is null");
-                return false;
-            }
+            if (behavior == null)
+            throw new ArgumentNullException(nameof(behavior));
 
             if (_registeredBehaviors.TryAdd
                 (behavior.BehaviorType, behavior)
             ) {
-                if (setAsActive) {
-                    ChangeBehavior(behavior.BehaviorType);
-                }
+                if (setAsActive) ChangeBehavior(behavior.BehaviorType);
                 return true;
             }
 
@@ -101,16 +92,13 @@ namespace BCIEssentials.Controllers
             BCIControllerBehavior behavior
         )
         {
-            if (behavior == null) {
-                return;
-            }
+            if (behavior == null)
+            throw new ArgumentNullException(nameof(behavior));
 
             if (!_registeredBehaviors.TryGetValue
                 (behavior.BehaviorType, out var foundBehavior)
                 || foundBehavior != behavior
-            ) {
-                return;
-            }
+            ) return;
 
             _registeredBehaviors.Remove(behavior.BehaviorType);
             Debug.Log(
@@ -118,7 +106,8 @@ namespace BCIEssentials.Controllers
                 + behavior.BehaviorType
             );
 
-            if (ActiveBehavior == behavior) {
+            if (ActiveBehavior == behavior)
+            {
                 ActiveBehavior.CleanUp();
                 ActiveBehavior = null;
                 Debug.Log("The active behavior was also removed.");
@@ -141,7 +130,9 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public void StartStopStimulus()
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.StartStopStimulusRun();
         }
 
@@ -154,7 +145,9 @@ namespace BCIEssentials.Controllers
         /// </param>
         public void StartStimulusRun(bool sendConstantMarkers = true)
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.StartStimulusRun(sendConstantMarkers);
         }
 
@@ -163,7 +156,9 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public void StopStimulusRun()
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.StopStimulusRun();
         }
 
@@ -174,7 +169,9 @@ namespace BCIEssentials.Controllers
         /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
         public void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.SelectSPO(objectIndex, stopStimulusRun);
         }
         
@@ -185,7 +182,9 @@ namespace BCIEssentials.Controllers
         /// <param name="objectIndex"></param>
         public void SelectSPOAtEndOfRun(int objectIndex)
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.SelectSPOAtEndOfRun(objectIndex);
         }
 
@@ -198,7 +197,9 @@ namespace BCIEssentials.Controllers
         /// </param>
         public void StartTraining(BCITrainingType trainingType)
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.StartTraining(trainingType);
         }
         
@@ -212,32 +213,28 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public void StopTraining()
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.StopTraining();
         }
 
         public void UpdateClassifier()
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.UpdateClassifier();
         }
 
         public void PassBessyPythonMessage(string message)
         {
-            ThrowExceptionIfActiveBehaviorNull();
+            if (ActiveBehavior == null)
+            throw new NullReferenceException("No Active Behavior set");
+
             ActiveBehavior.PassBessyPythonMessage(message);
         }
 
         #endregion
-
-
-        private void ThrowExceptionIfActiveBehaviorNull()
-        {
-            if (ActiveBehavior == null) {
-                throw new NullReferenceException(
-                    "No Active Behaviour set"
-                );
-            }
-        }
     }
 }
