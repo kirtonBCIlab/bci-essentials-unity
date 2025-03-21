@@ -66,7 +66,10 @@ namespace BCIEssentials.Controllers
             if (_applicationIsQuitting) return;
 
             if (Instance == null)
-            throw new NullReferenceException("No BCI Controller Instance set");
+            {
+                Debug.LogWarning("No Instance to unregister from");
+                return;
+            }
 
             Instance.UnregisterBehavior(behavior);
         }
