@@ -14,10 +14,19 @@ namespace BCIEssentials.Controllers
         public static BCIControllerBehavior ActiveBehavior
         => Instance == null? null: Instance.ActiveBehavior;
 
+        private static bool _quitMessageConnected;
+        private static bool _applicationIsQuitting;
+
 
         public static void NotifyInstanceCreated
         (BCIControllerInstance createdInstance)
         {
+            if (!_quitMessageConnected) {
+                Application.quitting += () =>
+                    _applicationIsQuitting = true;
+                _quitMessageConnected = true;
+            }
+
             if (Instance == null) {
                 Instance = createdInstance;
             }
@@ -30,6 +39,7 @@ namespace BCIEssentials.Controllers
                 Instance = null;
             }
         }
+
         
         public static void ChangeBehavior(BCIBehaviorType behaviorType)
         {
@@ -51,11 +61,9 @@ namespace BCIEssentials.Controllers
         }
 
         public static void UnregisterBehavior(BCIControllerBehavior behavior)
-        {            
-            if (Instance == null) {
-                Debug.Log("No BCI Controller Instance Set");
-                return;
-            }
+        {
+            if (_applicationIsQuitting) return;
+            ThrowExceptionIfInstanceNull();
             Instance.UnregisterBehavior(behavior);
         }
 
