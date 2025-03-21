@@ -38,7 +38,11 @@ namespace BCIEssentials.Controllers
         }
 
         private void OnDestroy()
-        => BCIController.NotifyInstanceDestroyed(this);
+        {
+            if (ActiveBehavior != null) ActiveBehavior.CleanUp();
+
+            BCIController.NotifyInstanceDestroyed(this);
+        }
 
 
         public void ChangeBehavior
