@@ -27,7 +27,7 @@ namespace BCIEssentials.Controllers
             {
                 Debug.LogWarning(
                     "Controller Instance target is unset"
-                    + ", shortcuts will not function."
+                    + ", shortcuts will target static controller."
                 );
             }
         }
@@ -36,6 +36,7 @@ namespace BCIEssentials.Controllers
         {
             if (Target == null)
             {
+                base.Update();
                 return;
             }
 
