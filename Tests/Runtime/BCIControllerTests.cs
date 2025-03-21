@@ -122,13 +122,11 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenRegisterBehaviorAndNullBehavior_ThenNoBehaviorRegistered()
+        public void WhenRegisterBehaviorAndNullBehavior_ThenThrow()
         {
-            UnityEngine.TestTools.LogAssert.Expect(LogType.Error, "Controller Behavior is null");
-
-            var registered = BCIController.RegisterBehavior(null);
-
-            Assert.IsFalse(registered);
+            Assert.Throws<ArgumentNullException>(
+                () => BCIController.RegisterBehavior(null)
+            );
         }
 
         [Test]
@@ -180,12 +178,14 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenUnregisterBehaviorAndBehaviorIsNull_ThenNoBehaviorUnregistered()
+        public void WhenUnregisterBehaviorAndBehaviorIsNull_ThenThrows()
         {
             _testController.Initialize();
             var behavior = AddComponent<EmptyBCIControllerBehavior>(b => BCIController.RegisterBehavior(b));
 
-            BCIController.UnregisterBehavior(null);
+            Assert.Throws<ArgumentNullException>(
+                () => BCIController.UnregisterBehavior(null)
+            );
             var wasRegistered = BCIController.RegisterBehavior(behavior);
 
             Assert.IsFalse(wasRegistered);
