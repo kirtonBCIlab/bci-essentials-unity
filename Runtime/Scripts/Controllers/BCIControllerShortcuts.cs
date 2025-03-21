@@ -41,7 +41,7 @@ namespace BCIEssentials.Controllers
             );
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (ToggleStimulusRunBinding.WasPressedThisFrame)
                 BCIController.StartStopStimulus();
