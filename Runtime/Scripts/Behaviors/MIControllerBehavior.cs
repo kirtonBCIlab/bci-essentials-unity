@@ -154,9 +154,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        // Why is this public when the other training overrides are protected?
-        //TODO: Figure out why protected here isn't working, but is for other training types
-        public override IEnumerator WhileDoSingleTraining()
+        protected override IEnumerator WhileDoSingleTraining()
         {
             PopulateObjectList();
 

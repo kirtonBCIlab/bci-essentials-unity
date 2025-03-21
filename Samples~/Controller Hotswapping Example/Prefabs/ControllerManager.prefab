@@ -46,11 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
+  _selfRegistrationTarget: {fileID: 6897392274894495390}
   SPOTag: BCI
   _spoFactory: {fileID: 11400000, guid: 742b42676bf053442b2d98c4ba8f2b18, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  _hotkeysEnabled: 1
   windowLength: 2
   interWindowInterval: 0
   numTrainingSelections: 9
@@ -109,11 +109,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
+  _selfRegistrationTarget: {fileID: 6897392274894495390}
   SPOTag: BCI
   _spoFactory: {fileID: 11400000, guid: b49306ce22f5a9d4d848717eb04761c0, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 165
-  _hotkeysEnabled: 1
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 12
@@ -131,7 +131,7 @@ MonoBehaviour:
   - 15
   - 18
   - 20
-  realFreqFlash: []
+  realFlashingFrequencies: []
 --- !u!1 &1649985292535673242
 GameObject:
   m_ObjectHideFlags: 0
@@ -141,9 +141,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1649985292535673238}
-  - component: {fileID: 5532972415090187197}
-  - component: {fileID: 8178904105061118666}
-  - component: {fileID: 2566001631052182581}
+  - component: {fileID: 6897392274894495390}
+  - component: {fileID: 8746289089906344843}
   m_Layer: 0
   m_Name: ControllerManager
   m_TagString: Untagged
@@ -169,7 +168,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5532972415090187197
+--- !u!114 &6897392274894495390
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -178,13 +177,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649985292535673242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffa8dfff27ddf714abcbba57f76469d1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1ad019470cb93764ebe74ce7a8a760f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lslMarkerStream: {fileID: 8178904105061118666}
-  _lslResponseStream: {fileID: 2566001631052182581}
-  _dontDestroyActiveInstance: 1
---- !u!114 &8178904105061118666
+  _markerWriter: {fileID: 0}
+  _responseProvider: {fileID: 0}
+  _persistBetweenScenes: 0
+--- !u!114 &8746289089906344843
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,28 +192,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649985292535673242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a8771d2f5118f04290065e4181ccc69, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a87290c50443fd478300848cc424dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StreamName: UnityMarkerStream
-  StreamType: LSL_Marker_Strings
-  PrintLogs: 0
---- !u!114 &2566001631052182581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649985292535673242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 991f28f423ad3d945a7c6b50090b8ad0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamType: BCI
-  _openOnStart: 0
-  PrintLogs: 0
-  PollingPeriod: 0.1
+  ToggleStimulusRunBinding:
+    BoundKey: 115
+  StartAutomatedTrainingBinding:
+    BoundKey: 116
+  StartIterativeTrainingBinding:
+    BoundKey: 105
+  StartUserTrainingBinding:
+    BoundKey: 117
+  StartSingleTrainingBinding:
+    BoundKey: 59
+  UpdateClassifierBinding:
+    BoundKey: 8
+  ObjectSelectionBindings:
+    Bindings:
+    - BoundKey: 48
+      Index: 0
+    - BoundKey: 49
+      Index: 1
+    - BoundKey: 50
+      Index: 2
+    - BoundKey: 51
+      Index: 3
+    - BoundKey: 52
+      Index: 4
+    - BoundKey: 53
+      Index: 5
+    - BoundKey: 54
+      Index: 6
+    - BoundKey: 55
+      Index: 7
+    - BoundKey: 56
+      Index: 8
+    - BoundKey: 57
+      Index: 9
+  Target: {fileID: 6897392274894495390}
 --- !u!1 &1649985293060537292
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,11 +276,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
+  _selfRegistrationTarget: {fileID: 6897392274894495390}
   SPOTag: BCI
   _spoFactory: {fileID: 11400000, guid: f10aba30caad32345985da46bd8337b6, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  _hotkeysEnabled: 1
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 5
@@ -281,12 +296,9 @@ MonoBehaviour:
   numFlashesUpperLimit: 12
   onTime: 0.1
   offTime: 0.075
-  singleFlash: 1
-  contextAwareSingleFlash: 0
-  multiFlash: 0
-  rowColumn: 0
-  checkerboard: 0
-  contextAwareMultiFlash: 0
+  flashPlurality: 0
+  singleFlashPattern: 0
+  multiFlashPattern: 0
   numFlashRows: 5
   numFlashColumns: 6
   timeDebug: 0
