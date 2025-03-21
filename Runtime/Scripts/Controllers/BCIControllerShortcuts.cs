@@ -5,7 +5,8 @@ namespace BCIEssentials.Controllers
 {
     /// <summary>
     /// Implements editable keyboard shortcuts for BCI Controller methods.
-    /// <br/>Targets static methods, which use the first
+    /// <br/>Targets methods on a specified controller instance,
+    /// otherwise defaults to static methods which use the first
     /// living controller instance or one created on demand.
     /// </summary>
     public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
@@ -25,6 +26,9 @@ namespace BCIEssentials.Controllers
         public KeyBind UpdateClassifierBinding;
 
         public IndexedKeyBindSet ObjectSelectionBindings;
+        
+        [Space]
+        public BCIControllerInstance Target;
 
 
         private void Reset()
@@ -44,27 +48,53 @@ namespace BCIEssentials.Controllers
                 (6, KeyCode.Alpha6), (7, KeyCode.Alpha7),
                 (8, KeyCode.Alpha8), (9, KeyCode.Alpha9)
             );
+
+            if (Target == null)
+                Target = GetComponent<BCIControllerInstance>();
         }
 
         protected virtual void Update()
         {
-            if (ToggleStimulusRunBinding.WasPressedThisFrame)
-                BCIController.StartStopStimulus();
+            if (Target != null)
+            {
+                ProcessShortcuts(
+                    new (KeyBind, Action)[] {
+                        (ToggleStimulusRunBinding, Target.StartStopStimulus),
+                        (StartAutomatedTrainingBinding, Target.StartAutomatedTraining),
+                        (StartUserTrainingBinding, Target.StartUserTraining),
+                        (StartIterativeTrainingBinding, Target.StartIterativeTraining),
+                        (StartSingleTrainingBinding, Target.StartSingleTraining),
+                        (UpdateClassifierBinding, Target.UpdateClassifier)
+                    },
+                    Target.SelectSPOAtEndOfRun
+                );
+            }
+            else
+            {
+                ProcessShortcuts(
+                    new (KeyBind, Action)[] {
+                        (ToggleStimulusRunBinding, BCIController.StartStopStimulus),
+                        (StartAutomatedTrainingBinding, BCIController.StartAutomatedTraining),
+                        (StartUserTrainingBinding, BCIController.StartUserTraining),
+                        (StartIterativeTrainingBinding, BCIController.StartIterativeTraining),
+                        (StartSingleTrainingBinding, BCIController.StartSingleTraining),
+                        (UpdateClassifierBinding, BCIController.UpdateClassifier)
+                    },
+                    BCIController.SelectSPOAtEndOfRun
+                );
+            }
+        }
 
-            if (StartAutomatedTrainingBinding.WasPressedThisFrame)
-                BCIController.StartAutomatedTraining();
-            if (StartUserTrainingBinding.WasPressedThisFrame)
-                BCIController.StartUserTraining();
-            if (StartIterativeTrainingBinding.WasPressedThisFrame)
-                BCIController.StartIterativeTraining();
-            if (StartSingleTrainingBinding.WasPressedThisFrame)
-                BCIController.StartSingleTraining();
-            
-            if (UpdateClassifierBinding.WasPressedThisFrame)
-                BCIController.UpdateClassifier();
+        private void ProcessShortcuts(
+            (KeyBind, Action)[] shortcuts,
+            Action<int> objectSelectionMethod
+        )
+        {
+            foreach ((KeyBind keyBind, Action method) in shortcuts)
+                if (keyBind.WasPressedThisFrame) method();
 
-            ObjectSelectionBindings.Process(BCIController.SelectSPOAtEndOfRun);
-        }       
+            ObjectSelectionBindings.Process(objectSelectionMethod);
+        }
     }
 
 

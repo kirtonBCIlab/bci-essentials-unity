@@ -140,7 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1649985292535673238}
   - component: {fileID: 6897392274894495390}
-  - component: {fileID: 5375719014500543753}
+  - component: {fileID: 8746289089906344843}
   m_Layer: 0
   m_Name: ControllerManager
   m_TagString: Untagged
@@ -181,7 +181,7 @@ MonoBehaviour:
   _markerWriter: {fileID: 0}
   _responseProvider: {fileID: 0}
   _persistBetweenScenes: 0
---- !u!114 &5375719014500543753
+--- !u!114 &8746289089906344843
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649985292535673242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16a89289a18f38344bebb8d867776a66, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a87290c50443fd478300848cc424dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ToggleStimulusRunBinding:
