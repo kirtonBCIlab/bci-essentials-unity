@@ -5,14 +5,18 @@ using BCIEssentials.Controllers;
 namespace BCIEssentials.Editor
 {
     [CustomEditor(typeof(BCIControllerInstance))]
-    public class BCIControllerInstanceInspector : UnityEditor.Editor
+    public class BCIControllerInstanceInspector : ExtendedAttributeInspector
     {
-        public override void OnInspectorGUI()
+        public override void DrawInspector()
         {
-            base.OnInspectorGUI();
+            var controllerInstance = GetTargetAs<BCIControllerInstance>();
 
-            BCIControllerInstance controllerInstance
-            = target as BCIControllerInstance;
+            if (
+                IsFieldReferenceNull("_markerWriter") ||
+                IsFieldReferenceNull("_responseProvider")
+            ) DrawNotice("missing stream component(s) will be created on demand");
+
+            base.DrawInspector();
 
             BCIBehaviorType behaviorType = BCIBehaviorType.Unset;
             if (controllerInstance.ActiveBehavior != null)

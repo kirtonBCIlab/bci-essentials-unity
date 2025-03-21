@@ -1,32 +1,17 @@
 using UnityEditor;
 using BCIEssentials.Controllers;
-using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
     [CustomEditor(typeof(BCIControllerShortcuts))]
     public class BCIControllerShortcutsInspector : ExtendedAttributeInspector
     {
-        public override void OnInspectorGUI()
+        public override void DrawInspector()
         {
-            BCIControllerShortcuts shortcutsComponent
-            = target as BCIControllerShortcuts;
+            if (GetTargetAs<BCIControllerShortcuts>().Target == null)
+                DrawNotice("targetting static controller methods");
 
-            if (shortcutsComponent.Target == null)
-            {
-                GUIStyle infoLabelStyle = new(EditorStyles.miniBoldLabel)
-                {
-                    alignment = TextAnchor.UpperCenter,
-                    margin = new(0, 0, 0, 12)
-                };
-
-                GUILayout.Label(
-                    "- targetting static controller methods -",
-                    infoLabelStyle
-                );
-            }
-
-            base.OnInspectorGUI();
+            base.DrawInspector();
         }
     }
 }

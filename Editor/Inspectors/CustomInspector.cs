@@ -31,26 +31,46 @@ namespace BCIEssentials.Editor
         }
 
         public abstract void DrawInspector();
+
+
+        protected T GetTargetAs<T>()
+        where T: Component
+        => target as T;
         
 
         protected void DrawHeader
         (
             string headerText,
             int fontSize = 12,
-            float topMargin = 20
+            int topMargin = 20
         )
         {
-            DrawSpace(topMargin);
-            GUIStyle style = EditorStyles.boldLabel;
-            int previousFontSize = style.fontSize;
-            style.fontSize = fontSize;
-            GUILayout.Label(headerText, style);
-            style.fontSize = previousFontSize;
+            GUIStyle headerStyle = new(EditorStyles.boldLabel)
+            {
+                fontSize = fontSize,
+                margin = new(0, 0, topMargin, 0)
+            };
+            GUILayout.Label(headerText, headerStyle);
         }
 
         protected void DrawSpace(float pixels)
         {
             if (pixels > 0) GUILayout.Space(pixels);
+        }
+
+        protected void DrawNotice
+        (
+            string label,
+            int bottomMargin = 12
+        )
+        {
+            GUIStyle noticeStyle = new(EditorStyles.miniBoldLabel)
+            {
+                alignment = TextAnchor.UpperCenter,
+                margin = new(0, 0, 0, bottomMargin),
+                wordWrap = true
+            };
+            GUILayout.Label(label, noticeStyle);
         }
 
 
@@ -140,6 +160,9 @@ namespace BCIEssentials.Editor
             return foldout;
         }
         
+
+        protected bool IsFieldReferenceNull(string propertyPath)
+        => GetProperty(propertyPath).objectReferenceValue == null;
 
         protected SerializedProperty GetProperty(string propertyPath)
         => serializedObject.FindProperty(propertyPath);
