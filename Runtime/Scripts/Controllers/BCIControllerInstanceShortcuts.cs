@@ -2,6 +2,11 @@ using UnityEngine;
 
 namespace BCIEssentials.Controllers
 {
+    /// <summary>
+    /// Implements editable keyboard shortcuts for BCI Controller methods.
+    /// <br/>Targets methods on a specified controller instance,
+    /// defaulting to a component on the same object
+    /// </summary>
     public class BCIControllerInstanceShortcuts: BCIControllerShortcuts
     {
         [Space]

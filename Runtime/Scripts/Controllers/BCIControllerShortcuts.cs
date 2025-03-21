@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace BCIEssentials.Controllers
 {
+    /// <summary>
+    /// Implements editable keyboard shortcuts for BCI Controller methods.
+    /// <br/>Targets static methods, which use the first
+    /// living controller instance or one created on demand.
+    /// </summary>
     public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
     {
         public KeyBind ToggleStimulusRunBinding;
