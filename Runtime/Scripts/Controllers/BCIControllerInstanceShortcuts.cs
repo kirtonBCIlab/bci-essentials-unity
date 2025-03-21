@@ -8,10 +8,32 @@ namespace BCIEssentials.Controllers
         public BCIControllerInstance Target;
 
         private void OnValidate()
-        => Target = GetComponent<BCIControllerInstance>();
+        {
+            if (Target == null)
+            {
+                Target = GetComponent<BCIControllerInstance>();
+            }
+        }
+
+
+        private void Start()
+        {
+            if (Target == null)
+            {
+                Debug.LogWarning(
+                    "Controller Instance target is unset"
+                    + ", shortcuts will not function."
+                );
+            }
+        }
 
         protected override void Update()
         {
+            if (Target == null)
+            {
+                return;
+            }
+
             if (ToggleStimulusRunBinding.WasPressedThisFrame)
                 Target.StartStopStimulus();
 
