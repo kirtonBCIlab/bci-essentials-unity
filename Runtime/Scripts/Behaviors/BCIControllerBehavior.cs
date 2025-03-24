@@ -30,11 +30,12 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to set as active behavior when self registering.")]
         private bool _selfRegisterAsActive;
 
-        [Space(12)]
+
+        [FoldoutGroup("Stimulus Presenting Objects")]
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         public string SPOTag = "BCI";
 
-        [Header("Default SPO Setup")]
+        [Header("Factory Setup")]
         [SerializeField]
         [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
         [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
@@ -44,6 +45,13 @@ namespace BCIEssentials.ControllerBehaviors
         [ShowIf("_spoFactory")]
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
+
+        [SerializeField, Space]
+        [InspectorName("Selectable Objects")]
+        [Tooltip("Provide an initial set of SPO.")]
+        protected List<SPO> _selectableSPOs = new();
+        protected int SPOCount => _selectableSPOs.Count;
+
         
         [FoldoutGroup("System Properties and Targets")]
         [SerializeField, Min(-1)]
@@ -53,11 +61,6 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField, EndFoldoutGroup]
         [Tooltip("Enable BCIController Hotkeys")]
         public bool _hotkeysEnabled = true;
-
-        [Header("Stimulus Presenting Objects")]
-        [Tooltip("Provide an initial set of SPO.")]
-        protected List<SPO> _selectableSPOs = new();
-        protected int SPOCount => _selectableSPOs.Count;
 
         private int __uniqueID = 1;
 
