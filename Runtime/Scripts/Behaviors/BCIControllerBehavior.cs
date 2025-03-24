@@ -37,11 +37,13 @@ namespace BCIEssentials.ControllerBehaviors
         [EndFoldoutGroup]
         private BCIControllerInstance _selfRegistrationTarget;
 
-        [Space(12)]
+
+
+        [FoldoutGroup("Stimulus Presenting Objects")]
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         public string SPOTag = "BCI";
 
-        [Header("Default SPO Setup")]
+        [Header("Factory Setup")]
         [SerializeField]
         [ContextMenuItem("Set up SPOs", "SetUpSPOs")]
         [ContextMenuItem("Remove Fabricated SPOs", "CleanUpSPOs")]
@@ -51,16 +53,19 @@ namespace BCIEssentials.ControllerBehaviors
         [ShowIf("_spoFactory")]
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
+
+        [SerializeField, Space]
+        [InspectorName("Selectable Objects")]
+        [Tooltip("Provide an initial set of SPO.")]
+        protected List<SPO> _selectableSPOs = new();
+        protected int SPOCount => _selectableSPOs.Count;
+
         
         [Header("System Properties and Targets")]
         [SerializeField, Min(-1)]
         [Tooltip("The applications target frame rate [Hz]. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
         protected int targetFrameRate = 60;
 
-        [Header("Stimulus Presenting Objects")]
-        [Tooltip("Provide an initial set of SPO.")]
-        protected List<SPO> _selectableSPOs = new();
-        protected int SPOCount => _selectableSPOs.Count;
 
         private int __uniqueID = 1;
 
