@@ -403,23 +403,6 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         /// <summary>
-        /// Obsolete Method.
-        /// <para>Use <see cref="PopulateObjectList(BCIEssentials.Controllers.SpoPopulationMethod)"/></para>
-        /// </summary>
-        /// <param name="populationMethod">method serializable to <see cref="SpoPopulationMethod"/></param>
-        [Obsolete]
-        public void PopulateObjectList(string populationMethod)
-        {
-            if (!Enum.TryParse(populationMethod, out SpoPopulationMethod method))
-            {
-                Debug.LogError($"Unable to convert {populationMethod} to a valid method");
-                return;
-            }
-
-            PopulateObjectList(method);
-        }
-
-        /// <summary>
         /// Select an object from <see cref="SelectableSPOs"/>.
         /// </summary>
         /// <param name="objectIndex">The index value of the object to select.</param>
