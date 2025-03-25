@@ -1,5 +1,6 @@
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
@@ -74,17 +75,25 @@ namespace BCIEssentials.Editor
             if (!IsTraversingFoldoutGroup) return;
             string label = currentFoldoutGroupAttribute.Label;
 
-            if (!foldoutGroupToggles.ContainsKey(label))
-                foldoutGroupToggles.Add(label, false);
+            string prefsKey = $"{target.name}/{label}";
+            bool foldout = EditorPrefs.GetBool(prefsKey, false);
 
-            foldoutGroupToggles[label]
-            = DrawPropertiesInFoldoutGroup(
+            if (!foldoutGroupToggles.ContainsKey(label))
+                foldoutGroupToggles.Add(label, foldout);
+
+            foldout = DrawPropertiesInFoldoutGroup(
                 foldoutGroupToggles[label],
                 label, currentFoldoutGroupProperties,
                 currentFoldoutGroupAttribute.FontSize,
                 currentFoldoutGroupAttribute.TopMargin,
                 currentFoldoutGroupAttribute.BottomMargin
             );
+
+            if (foldout != foldoutGroupToggles[label])
+            {
+                foldoutGroupToggles[label] = foldout;
+                EditorPrefs.SetBool(prefsKey, foldout);
+            }
         }
 
         private void ClearCurrentFoldoutGroup()
