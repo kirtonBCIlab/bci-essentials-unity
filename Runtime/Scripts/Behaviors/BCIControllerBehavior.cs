@@ -362,44 +362,49 @@ namespace BCIEssentials.ControllerBehaviors
         /// Populate the <see cref="SelectableSPOs"/> using a particular method.
         /// </summary>
         /// <param name="populationMethod">Method of population to use</param>
-        public virtual void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public virtual void PopulateObjectList
+        (SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             switch (populationMethod)
             {
                 case SpoPopulationMethod.Predefined:
-                    //Use the current contents of object list
                     break;
-                case SpoPopulationMethod.Children:
-                    Debug.LogWarning("Populating by children is not yet implemented");
+                case SpoPopulationMethod.Tag:
+                    _selectableSPOs = GetSelectableSPOsByTag(ref __uniqueID);
+
+                    _objectIDtoSPODict.Clear();
+                    _selectableSPOs.ForEach(spo =>
+                        _objectIDtoSPODict.Add(spo.ObjectID, spo)
+                    );
                     break;
                 default:
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs.Clear();
-                    _objectIDtoSPODict.Clear(); 
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
-                    foreach (var taggedGO in taggedGOs)
-                    {
-                        if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
-                        {
-                            continue;
-                        }
-
-                        // Check if the object has a unique ObjectID, 
-                        // if not assign it a unique ID
-                        if (taggedGO.GetComponent<SPO>().ObjectID == -100)
-                        {
-                            taggedGO.GetComponent<SPO>().ObjectID = __uniqueID;
-                            __uniqueID++;
-                        }
-
-                        _selectableSPOs.Add(spo);
-                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
-                        //Print out the Dictionary Pairs
-                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
-                        spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
-                    }
+                    Debug.LogWarning($"Populating using {populationMethod} is not implemented");
                     break;
             }
+        }
+
+        protected List<SPO> GetSelectableSPOsByTag(ref int id)
+        {
+            var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
+            List<SPO> validSPOs = new();
+
+            foreach (var taggedGO in taggedGOs)
+            {
+                if (!taggedGO.TryGetComponent(out SPO spo)) continue;
+                if(!spo.Selectable) continue;
+
+                // Check if the object has a unique ObjectID, 
+                // if not assign it a unique ID
+                if (spo.ObjectID == -100)
+                {
+                    spo.ObjectID = id++;
+                }
+
+                validSPOs.Add(spo);
+                spo.SelectablePoolIndex = validSPOs.Count - 1;
+            }
+
+            return validSPOs;
         }
 
         /// <summary>

@@ -939,49 +939,25 @@ namespace BCIEssentials.ControllerBehaviors
         /// aware" selection of SPOs.
         /// </summary>
         /// <param name="populationMethod">Method of population to use</param>
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.GraphBP)
+        public override void PopulateObjectList
+        (SpoPopulationMethod populationMethod = SpoPopulationMethod.GraphBP)
         {
             switch (populationMethod)
             {
-                case SpoPopulationMethod.Predefined:
-                    //Use the current contents of object list
-                    break;
-                case SpoPopulationMethod.Children:
-                    Debug.LogWarning("Populating by children is not yet implemented");
-                    break;
-                default:
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs.Clear();
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
-                    foreach (var taggedGO in taggedGOs)
-                    {
-                        if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
-                        {
-                            continue;
-                        }
-
-                        // Check if the object has a unique ObjectID, 
-                        // if not assign it a unique ID
-                        if (taggedGO.GetComponent<SPO>().ObjectID == -100)
-                        {
-                            taggedGO.GetComponent<SPO>().ObjectID = __uniqueP300ID;
-                            __uniqueP300ID++;
-                        }
-
-                        _selectableSPOs.Add(spo);
-                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
-                        //Print out the Dictionary Pairs
-                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
-                        spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
-                    }
-                    break;
                 case SpoPopulationMethod.GraphBP:
                     _selectableSPOs.Clear();
-                    
                     //First, get all game objects in the world visible by the camera, including the UI.
                     // This will populate the _selectableSPOs list
-                    _validGOs = GetGameSPOsInCameraView();                   
-                    
+                    _validGOs = GetGameSPOsInCameraView();
+                    break;
+                case SpoPopulationMethod.Tag:
+                    _selectableSPOs = GetSelectableSPOsByTag(ref __uniqueP300ID);
+                    _selectableSPOs.ForEach(spo =>
+                        _objectIDtoSPODict.Add(spo.ObjectID, spo)
+                    );
+                    break;
+                default:
+                    base.PopulateObjectList(populationMethod);
                     break;
             }
         }
