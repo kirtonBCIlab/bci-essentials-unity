@@ -571,7 +571,7 @@ namespace BCIEssentials.Tests
             mainCamera.transform.position = new Vector3(0, 0, -10);
 
             // Act
-            var result = _behavior.GetGameSPOsInCameraView();
+            var result = _behavior.GetSPOGameObjectsInCameraViewByTag();
 
             // Assert
             Assert.AreEqual(visibleSPOs.Count, result.Count, "The number of visible SPOs should match the expected count.");

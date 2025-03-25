@@ -9,6 +9,7 @@ using BCIEssentials.Utilities;
 using UnityEditor.SceneManagement;
 using System.IO;
 using UnityEditor;
+using System.Linq;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -370,12 +371,11 @@ namespace BCIEssentials.ControllerBehaviors
                 case SpoPopulationMethod.Predefined:
                     break;
                 case SpoPopulationMethod.Tag:
-                    _selectableSPOs = GetSelectableSPOsByTag(ref __uniqueID);
+                    _selectableSPOs = GetSelectableSPOsByTag();
+                    AssignIDsToSelectableSPOs(ref __uniqueID);
 
                     _objectIDtoSPODict.Clear();
-                    _selectableSPOs.ForEach(spo =>
-                        _objectIDtoSPODict.Add(spo.ObjectID, spo)
-                    );
+                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 default:
                     Debug.LogWarning($"Populating using {populationMethod} is not implemented");
@@ -383,29 +383,40 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected List<SPO> GetSelectableSPOsByTag(ref int id)
+        protected List<SPO> GetSelectableSPOsByTag()
         {
             var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
-            List<SPO> validSPOs = new();
+            List<SPO> result = new();
 
             foreach (var taggedGO in taggedGOs)
             {
-                if (!taggedGO.TryGetComponent(out SPO spo)) continue;
-                if(!spo.Selectable) continue;
-
-                // Check if the object has a unique ObjectID, 
-                // if not assign it a unique ID
-                if (spo.ObjectID == -100)
-                {
-                    spo.ObjectID = id++;
-                }
-
-                validSPOs.Add(spo);
-                spo.SelectablePoolIndex = validSPOs.Count - 1;
+                if (
+                    taggedGO.TryGetComponent(out SPO spo)
+                    && spo.Selectable
+                )
+                result.Add(spo);
             }
-
-            return validSPOs;
+            return result;
         }
+
+        protected void AssignIDsToSelectableSPOs(ref int idTracker)
+        {
+            int poolIndex = 0;
+            foreach (SPO spo in _selectableSPOs)
+            {
+                if (spo.ObjectID == -100) spo.ObjectID = idTracker++;
+                spo.SelectablePoolIndex = poolIndex++;
+            }
+        }
+
+        protected void AppendSelectableSPOsToObjectIDDictionary()
+        => _selectableSPOs.ForEach(spo => {
+            if (!_objectIDtoSPODict.ContainsKey(spo.ObjectID))
+            {
+                _objectIDtoSPODict.Add(spo.ObjectID, spo);
+            }
+        });
+
 
         /// <summary>
         /// Select an object from <see cref="SelectableSPOs"/>.
