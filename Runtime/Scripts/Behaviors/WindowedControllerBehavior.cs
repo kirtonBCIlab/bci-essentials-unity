@@ -43,7 +43,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected virtual void SendWindowMarker(int trainingIndex = -1) {}
+        protected abstract void SendWindowMarker(int trainingIndex = -1);
 
         protected override IEnumerator WaitForStimulusToComplete()
         {
