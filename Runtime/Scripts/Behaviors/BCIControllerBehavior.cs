@@ -194,6 +194,7 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _sendMarkers);
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _waitToSelect);
+            StopCoroutineReference(ref _training);
         }
 
 
