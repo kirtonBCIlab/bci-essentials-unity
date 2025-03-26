@@ -71,61 +71,20 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator WhileDoUserTraining()
         {
-            numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-            Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-
             blockOutGoingLSL = true;
 
-            // Generate the target list
             PopulateObjectList();
-            Debug.Log("User Training");
 
             // Get a random training target
             trainTarget = randNumFlashes.Next(0, _selectableSPOs.Count - 1);
+            Debug.Log($"Running User Training on option {trainTarget}");
 
-            // Turn on train target
-
-            _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-            // Go through the training sequence
-            yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
-
-            if (trainTargetPersistent == false)
-            {
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-            }
-
-            yield return new WaitForSecondsRealtime(0.5f);
-
-            // Start stimulus and wait for the trial to end
-            StartStimulusRun();
-            yield return StartCoroutine(WaitForStimulusToComplete());
-            yield return new WaitForSecondsRealtime(postStimulusBuffer);
-
-            // If sham feedback is true, then show it
-            if (shamFeedback)
-            {
-                _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
-            }
-
-            // Turn off train target
-            yield return new WaitForSecondsRealtime(0.5f);
-
-            if (trainTargetPersistent == true)
-            {
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-            }
-
-            // Take a break
-            yield return new WaitForSecondsRealtime(trainBreak);
-
-            trainTarget = -1;
+            SPO targetObject = _selectableSPOs[trainTarget];
+            yield return RunTrainingRound(targetObject);
 
             Debug.Log("User Training Complete");
 
             blockOutGoingLSL = false;
-
-            yield return null;
         }
 
         protected override IEnumerator OnStimulusRunBehavior()
