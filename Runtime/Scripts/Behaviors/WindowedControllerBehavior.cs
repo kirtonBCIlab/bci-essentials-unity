@@ -51,5 +51,19 @@ namespace BCIEssentials.ControllerBehaviors
                 (windowLength + interWindowInterval) * numTrainWindows
             );
         }
+
+        protected IEnumerator DisplayFeedbackWhileWaitingForStimulusToComplete
+        (SPO feedbackTarget)
+        {
+            for (int i = 0; i < numTrainWindows; i++)
+            {
+                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+
+                if (shamFeedback)
+                {
+                    feedbackTarget.Select();
+                }
+            }
+        }
     }
 }

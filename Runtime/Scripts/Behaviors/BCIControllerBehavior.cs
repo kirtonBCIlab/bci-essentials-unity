@@ -77,8 +77,6 @@ namespace BCIEssentials.ControllerBehaviors
         [StartFoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
-        [Tooltip("Before training starts, pause for this amount of time [sec]")]
-        public float pauseBeforeTraining = 2;
         [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
         public float trainTargetPresentationTime = 3f;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
@@ -596,29 +594,40 @@ namespace BCIEssentials.ControllerBehaviors
             OutStream.PushTrainingCompleteMarker();
         }
 
-        protected virtual IEnumerator RunTrainingRound(SPO targetObject)
+
+        protected IEnumerator RunTrainingRound(SPO targetObject)
+        => RunTrainingRound(WaitForStimulusToComplete(), targetObject);
+        protected IEnumerator RunTrainingRound
+        (
+            IEnumerator stimulusDelayRoutine,
+            SPO targetObject,
+            bool enableShamFeedback = true,
+            bool forceTrainTargetPersistence = false
+        )
         {
             targetObject.OnTrainTarget();
             yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
 
-            if (trainTargetPersistent == false)
+            bool shouldPersistTrainTarget
+            = trainTargetPersistent || forceTrainTargetPersistence;
+            if (!shouldPersistTrainTarget)
             {
                 targetObject.OffTrainTarget();
             }
 
             yield return new WaitForSecondsRealtime(preStimulusBuffer);
             StartStimulusRun();
-            yield return WaitForStimulusToComplete();
+            yield return stimulusDelayRoutine;
             StopStimulusRun();
             yield return new WaitForSecondsRealtime(postStimulusBuffer);
 
-            if (shamFeedback)
+            if (shamFeedback && enableShamFeedback)
             {
                 targetObject.Select();
                 yield return new WaitForSecondsRealtime(shamFeedbackBuffer);
             }
 
-            if (trainTargetPersistent == true)
+            if (shouldPersistTrainTarget)
             {
                 targetObject.OffTrainTarget();
             }

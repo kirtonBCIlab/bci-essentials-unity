@@ -1,6 +1,7 @@
 using System.Collections;
 using BCIEssentials.Controllers;
 using BCIEssentials.Utilities;
+using BCIEssentials.StimulusObjects;
 using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
@@ -43,13 +44,10 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList();
 
             int numOptions = _selectableSPOs.Count;
-
-            // Create a random non repeating array 
             int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
             LogArrayValues(trainArray);
 
-            yield return 0;
-
+            yield return null;
 
             // Loop for each training target
             for (int i = 0; i < numTrainingSelections; i++)
@@ -66,52 +64,20 @@ namespace BCIEssentials.ControllerBehaviors
                     }
                 }
 
-                // Get the target from the array
                 trainTarget = trainArray[i];
+                int targetID = _selectableSPOs[trainTarget].ObjectID; 
+                Debug.Log($"Running training selection {i} on object with ID {targetID}");
 
-                // 
-                Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+                SPO targetObject = _selectableSPOs[trainTarget];
+                yield return RunTrainingRound(
+                    DisplayFeedbackWhileWaitingForStimulusToComplete(targetObject),
+                    _selectableSPOs[trainTarget], false, true
+                );
 
-                // Turn on train target
-                _selectableSPOs[trainTarget].OnTrainTarget();
-
-                // Go through the training sequence
-                yield return new WaitForSecondsRealtime(pauseBeforeTraining);
-
-
-                StartStimulusRun();
-                for (int j = 0; j < (numTrainWindows - 1); j++)
-                {
-                    yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-                    if (shamFeedback)
-                    {
-                        _selectableSPOs[trainTarget].Select();
-                    }
-                }
-
-                StopStimulusRun();
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-
-                // Turn off train target
-                _selectableSPOs[trainTarget].OffTrainTarget();
-
-                // Reset objects
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-
-                trainTarget = -1;
                 selectionCounter++;
             }
 
-            // Send marker
             OutStream.PushTrainingCompleteMarker();
-
-            yield return 0;
-
         }
 
         protected override void SendWindowMarker(int trainingIndex = -1)
