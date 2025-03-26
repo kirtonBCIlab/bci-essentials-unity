@@ -13,12 +13,12 @@ namespace BCIEssentials.ControllerBehaviors
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.Unset;
         
         [Header("Iterative Training")]
-        [ShowWithFoldoutGroup("Training Properties")]
+        [AppendToFoldoutGroup("Training Properties")]
         [SerializeField]
         [Tooltip("How many selections to make before creating the classifier")]
         private int numSelectionsBeforeTraining = 3;
 
-        [ShowWithFoldoutGroup("Training Properties")]
+        [AppendToFoldoutGroup("Training Properties")]
         [SerializeField]
         [Tooltip("How many selections to make before updating the classifier")]
         private int numSelectionsBetweenTraining = 3;

@@ -32,7 +32,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected int targetFrameRate = 60;
 
 
-        [FoldoutGroup("Controller Registration")]
+        [StartFoldoutGroup("Controller Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
@@ -49,7 +49,7 @@ namespace BCIEssentials.ControllerBehaviors
         private BCIControllerInstance _selfRegistrationTarget;
 
 
-        [FoldoutGroup("Stimulus Presenting Objects")]
+        [StartFoldoutGroup("Stimulus Presenting Objects")]
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         public string SPOTag = "BCI";
 
@@ -73,7 +73,7 @@ namespace BCIEssentials.ControllerBehaviors
         private int __uniqueID = 1;
 
 
-        [FoldoutGroup("Training Properties")]
+        [StartFoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
         [Tooltip("Before training starts, pause for this amount of time [sec]")]

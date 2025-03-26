@@ -12,11 +12,11 @@ namespace BCIEssentials.ControllerBehaviors
     public abstract class WindowedControllerBehavior: BCIControllerBehavior
     {
 
-        [ShowWithFoldoutGroup("Training Properties")]
+        [AppendToFoldoutGroup("Training Properties")]
         [Tooltip("The number of windows used in each training iteration")]
         public int numTrainWindows = 3;
 
-        [FoldoutGroup("Signal Properties")]
+        [StartFoldoutGroup("Signal Properties")]
         [Tooltip("The length of the processing window [sec]")]
         public float windowLength = 1.0f;
         [EndFoldoutGroup]

@@ -18,11 +18,11 @@ namespace BCIEssentials.ControllerBehaviors
         public enum SingleFlashPattern {Random, ContextAware}
         public enum MultiFlashPattern {RowColumn, Checkerboard, ContextAware}
 
-        [ShowWithFoldoutGroup("Training Properties")]
+        [AppendToFoldoutGroup("Training Properties")]
         [Tooltip("The time between the end of a sequence and making a selection [sec]")]
         public float trainBufferTime = 0f;
         
-        [FoldoutGroup("P300 Pattern Flashing Properties")]
+        [StartFoldoutGroup("P300 Pattern Flashing Properties")]
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
         public Random randNumFlashes = new Random();
@@ -34,7 +34,7 @@ namespace BCIEssentials.ControllerBehaviors
         public float offTime = 0.075f;
 
 
-        [FoldoutGroup("Stimulus Flash Paradigms")]
+        [StartFoldoutGroup("Stimulus Flash Paradigms")]
         [Tooltip("Whether to flash multiple SPOs at a time or just one")]
         public FlashPlurality flashPlurality;
 
@@ -58,7 +58,7 @@ namespace BCIEssentials.ControllerBehaviors
         public int numFlashColumns = 6;
 
 
-        [FoldoutGroup("Debugging Parameters", 12, 20)]
+        [StartFoldoutGroup("Debugging Parameters", 12, 20)]
         public bool timeDebug = false;
         [EndFoldoutGroup]
         private bool blockOutGoingLSL = false;

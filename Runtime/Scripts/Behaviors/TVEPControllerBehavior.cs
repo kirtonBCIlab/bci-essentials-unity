@@ -9,7 +9,7 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
-        [FoldoutGroup("Stimulus Frequency")]
+        [StartFoldoutGroup("Stimulus Frequency")]
         [SerializeField]
         [Tooltip("User-defined target stimulus frequency [Hz]")]
         private float requestedFlashingFrequency;

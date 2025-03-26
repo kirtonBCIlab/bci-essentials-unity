@@ -13,7 +13,7 @@ namespace BCIEssentials.Editor
             FoldoutGroup currentFoldoutGroup = null;
 
             serializedObject.ForEachProperty(property => {
-                if (property.TryGetAttribute<FoldoutGroupAttribute>(out var foldoutAttribute))
+                if (property.TryGetAttribute<StartFoldoutGroupAttribute>(out var foldoutAttribute))
                 {
                     currentFoldoutGroup = new(foldoutAttribute, property);
                     parsedFields.Add(currentFoldoutGroup);
@@ -94,7 +94,7 @@ namespace BCIEssentials.Editor
             out FoldoutGroup group
         )
         {
-            if (property.TryGetAttribute<ShowWithFoldoutGroupAttribute>(out var showWithGroupAttribute))
+            if (property.TryGetAttribute<AppendToFoldoutGroupAttribute>(out var showWithGroupAttribute))
             {
                 string groupLabel = showWithGroupAttribute.GroupLabel;
                 group = (FoldoutGroup)fieldList.Find
@@ -128,14 +128,14 @@ namespace BCIEssentials.Editor
 
         public class FoldoutGroup: ParsedField
         {
-            public FoldoutGroupAttribute Attribute;
+            public StartFoldoutGroupAttribute Attribute;
             public string Label => Attribute.Label;
 
             public List<SerializedProperty> Properties;
 
             public FoldoutGroup
             (
-                FoldoutGroupAttribute attribute,
+                StartFoldoutGroupAttribute attribute,
                 SerializedProperty leadingProperty
             )
             {

@@ -13,13 +13,13 @@ namespace BCIEssentials
 
     public class InspectorReadOnlyAttribute : PropertyAttribute { }
 
-    public class FoldoutGroupAttribute : PropertyAttribute
+    public class StartFoldoutGroupAttribute : PropertyAttribute
     {
         public string Label;
         public int FontSize;
         public float TopMargin, BottomMargin;
 
-        public FoldoutGroupAttribute
+        public StartFoldoutGroupAttribute
         (
             string label, int fontSize = 14,
             float topMargin = 12, float bottomMargin = 0
@@ -31,17 +31,17 @@ namespace BCIEssentials
             BottomMargin = bottomMargin;
         }
 
-        public bool IsSiblingTo(FoldoutGroupAttribute a)
+        public bool IsSiblingTo(StartFoldoutGroupAttribute a)
         => a != null && Label == a.Label;
     }
 
     public class EndFoldoutGroupAttribute: PropertyAttribute {}
 
-    public class ShowWithFoldoutGroupAttribute: PropertyAttribute
+    public class AppendToFoldoutGroupAttribute: PropertyAttribute
     {
         public string GroupLabel;
 
-        public ShowWithFoldoutGroupAttribute(string groupLabel)
+        public AppendToFoldoutGroupAttribute(string groupLabel)
         {
             GroupLabel = groupLabel;
         }
