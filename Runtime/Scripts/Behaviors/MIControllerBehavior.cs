@@ -143,7 +143,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Take a break
                 yield return new WaitForSecondsRealtime(trainBreak);
 
-                trainTarget = 99;
+                trainTarget = -1;
                 selectionCounter++;
             }
 
@@ -271,7 +271,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
             }
-                OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
+            OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
         }
     }
 }

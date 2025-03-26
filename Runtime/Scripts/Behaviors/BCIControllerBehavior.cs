@@ -98,9 +98,10 @@ namespace BCIEssentials.ControllerBehaviors
         public bool shamFeedback = false;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
-        [EndFoldoutGroup]
-        [Tooltip("The target object to train on, defaulted to a random high number")]
-        public int trainTarget = 99;
+        [Tooltip("Index of the object targetted for training,\n"
+            + "defaulted to no target (-1)"
+        ), EndFoldoutGroup]
+        public int trainTarget = -1;
 
         #endregion
         
@@ -643,7 +644,7 @@ namespace BCIEssentials.ControllerBehaviors
                     _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
                 }
 
-                trainTarget = 99;
+                trainTarget = -1;
 
                 // Take a break
                 yield return new WaitForSecondsRealtime(trainBreak);

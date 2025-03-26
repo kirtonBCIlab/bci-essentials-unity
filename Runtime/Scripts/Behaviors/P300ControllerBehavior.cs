@@ -149,7 +149,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Take a break
                 yield return new WaitForSecondsRealtime(trainBreak);
 
-                trainTarget = 99;
+                trainTarget = -1;
             }
 
             OutStream.PushTrainingCompleteMarker();
@@ -206,7 +206,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Take a break
             yield return new WaitForSecondsRealtime(trainBreak);
 
-            trainTarget = 99;
+            trainTarget = -1;
 
             Debug.Log("User Training Complete");
 

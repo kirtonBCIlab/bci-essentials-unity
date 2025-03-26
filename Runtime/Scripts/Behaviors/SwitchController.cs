@@ -103,7 +103,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Take a break
                 yield return new WaitForSecondsRealtime(trainBreak);
 
-                trainTarget = 99;
+                trainTarget = -1;
                 selectionCounter++;
             }
 
