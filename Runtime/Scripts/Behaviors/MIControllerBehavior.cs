@@ -234,7 +234,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            if (trainingIndex > 0 && trainingIndex < SPOCount)
+            if (trainingIndex >= 0 && trainingIndex < SPOCount)
             {
                 trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
             }
