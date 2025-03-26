@@ -65,39 +65,33 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            while (StimulusRunning)
-            {
-                string markerString=  "";
+            string markerString;
                 
-                if(!_offMessages)
-                {
-                    markerString = new TVEPEventMarker
-                    (
-                        SPOCount, windowLength,
-                        new[] {realFreqFlash}, trainingIndex
-                    ).MarkerString;
-                }
-
-                if(_offMessages)
-                {
-                    markerString = "Stimulus Off";
-                }
-
-                if(_restingState && _open)
-                {
-                    markerString = "Resting state, eyes open";
-                }
-                if(_restingState && _closed)
-                {
-                    markerString = "Resting state, eyes closed";
-                }
-
-                OutStream.PushString(markerString);
-
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
+            if(_offMessages)
+            {
+                markerString = "Stimulus Off";
             }
+            else
+            {
+                markerString = new TVEPEventMarker
+                (
+                    SPOCount, windowLength,
+                    new[] {realFreqFlash}, trainingIndex
+                ).MarkerString;
+            }
+
+            if(_restingState && _open)
+            {
+                markerString = "Resting state, eyes open";
+            }
+            if(_restingState && _closed)
+            {
+                markerString = "Resting state, eyes closed";
+            }
+
+            OutStream.PushString(markerString);
         }
         
 

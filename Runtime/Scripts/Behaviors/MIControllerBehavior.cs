@@ -265,17 +265,13 @@ namespace BCIEssentials.ControllerBehaviors
             OutStream.PushTrainingCompleteMarker();
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            // Make the marker string, this will change based on the paradigm
-            while (StimulusRunning)
+            if (trainingIndex > 0 && trainingIndex < SPOCount)
             {
-                // Send the marker
-                OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+                trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
             }
+                OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
         }
     }
 }

@@ -309,7 +309,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Not required for P300
             if (sendConstantMarkers)
             {
-                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
+                StopStartCoroutine(ref _sendMarkers, RunSendWindowMarkers(trainTarget));
             }
         }
 
@@ -489,16 +489,18 @@ namespace BCIEssentials.ControllerBehaviors
         
         #region Markers
 
-        protected virtual IEnumerator SendMarkers(int trainingIndex = 99)
+        private IEnumerator RunSendWindowMarkers(int trainingIndex = 99)
         {
             while (StimulusRunning)
             {
                 // Send the marker
-                // OutStream.PushMarker(...);
+                if (OutStream != null) SendWindowMarker(trainingIndex);
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
             }
         }
+
+        protected virtual void SendWindowMarker(int trainingIndex = -1) {}
 
         public virtual void StartReceivingMarkers()
         {

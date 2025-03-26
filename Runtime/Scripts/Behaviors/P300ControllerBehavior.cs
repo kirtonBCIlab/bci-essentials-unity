@@ -1118,12 +1118,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
             return screenPositions;
         }
-        
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            // Do nothing, markers are are temporally bound to stimulus and are therefore sent from stimulus coroutine
-            yield return null;
-        }
 
         // Turn the stimulus on
         public override void StartStimulusRun(bool sendConstantMarkers = true)

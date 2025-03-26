@@ -37,18 +37,11 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            // Make the marker string, this will change based on the paradigm
-            while (StimulusRunning)
-            {
-                // Send the marker
-                OutStream.PushTVEPMarker(SPOCount, windowLength, new[] {realFlashingFrequency}, trainingIndex);
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-            }
-        }
+        protected override void SendWindowMarker(int trainingIndex = -1)
+        => OutStream.PushTVEPMarker(
+            SPOCount, windowLength,
+            new[] {realFlashingFrequency}, trainingIndex
+        );
 
         protected override IEnumerator OnStimulusRunBehavior()
         {

@@ -114,17 +114,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            // Make the marker string, this will change based on the paradigm
-            while (StimulusRunning)
-            {
-                // Send the marker
-                OutStream.PushSwitchMarker(SPOCount, windowLength, trainingIndex);
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-            }
-        }
+        protected override void SendWindowMarker(int trainingIndex = -1)
+        => OutStream.PushSwitchMarker(SPOCount, windowLength, trainingIndex);
     }
 }
