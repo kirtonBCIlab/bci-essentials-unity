@@ -45,71 +45,11 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual void SendWindowMarker(int trainingIndex = -1) {}
 
-                
-        // Do training
-        protected override IEnumerator WhileDoAutomatedTraining()
+        protected override IEnumerator WaitForStimulusToComplete()
         {
-            // Generate the target list
-            PopulateObjectList();
-
-            // Get number of selectable objects by counting the objects in the objectList
-            int numOptions = _selectableSPOs.Count;
-
-            // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
-            LogArrayValues(trainArray);
-
-            yield return new WaitForSecondsRealtime(0.001f);
-
-            // Loop for each training target
-            for (int i = 0; i < numTrainingSelections; i++)
-            {
-                // Get the target from the array
-                trainTarget = trainArray[i];
-
-                // 
-                Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
-
-                // Turn on train target
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-
-                yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
-
-                if (trainTargetPersistent == false)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                // Go through the training sequence
-                //yield return new WaitForSecondsRealtime(3f);
-
-                StartStimulusRun();
-                yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-                StopStimulusRun();
-
-                // Turn off train target
-                if (trainTargetPersistent == true)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-
-                // If sham feedback is true, then show it
-                if (shamFeedback)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
-                }
-
-                trainTarget = -1;
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-            }
-
-            OutStream.PushTrainingCompleteMarker();
+            yield return new WaitForSecondsRealtime(
+                (windowLength + interWindowInterval) * numTrainWindows
+            );
         }
     }
 }

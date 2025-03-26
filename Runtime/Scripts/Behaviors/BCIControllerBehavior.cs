@@ -81,12 +81,19 @@ namespace BCIEssentials.ControllerBehaviors
         public float pauseBeforeTraining = 2;
         [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
         public float trainTargetPresentationTime = 3f;
-        [Tooltip("Rest time between training windows [sec]")]
-        public float trainBreak = 1f;
-        [Tooltip("If true, the train target will pretend to be selected")]
-        public bool shamFeedback = false;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
+        [Tooltip("Time between target presentation and stimulus sequence")]
+        public float preStimulusBuffer = 0.5f;
+        [Tooltip("Time between the end of a sequence and pretend selection (sham feedback) [s]")]
+        public float postStimulusBuffer = 0f;
+        [Tooltip("If true, the train target will pretend to be selected")]
+        public bool shamFeedback = false;
+        [ShowIf("shamFeedback")]
+        [Tooltip("Time allotted for the display of sham feedback [s]")]
+        public float shamFeedbackBuffer = 0.5f;
+        [Tooltip("Rest time between training windows [sec]")]
+        public float trainBreak = 1f;
         [Tooltip("Index of the object targetted for training,\n"
             + "defaulted to no target (-1)"
         ), EndFoldoutGroup]
@@ -565,11 +572,59 @@ namespace BCIEssentials.ControllerBehaviors
             StopTraining();
         }
 
+        // Do training
         protected virtual IEnumerator WhileDoAutomatedTraining()
         {
-            Debug.Log("No Automated training available for this paradigm");
+            PopulateObjectList();
+            
+            int numOptions = _selectableSPOs.Count;
+            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions - 1);
+            LogArrayValues(trainArray);
 
             yield return null;
+
+            // Loop for each training target
+            for (int i = 0; i < numTrainingSelections; i++)
+            {
+                trainTarget = trainArray[i];
+                Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
+
+                SPO targetObject = _selectableSPOs[trainTarget];
+                yield return RunTrainingRound(targetObject);
+            }
+
+            OutStream.PushTrainingCompleteMarker();
+        }
+
+        protected virtual IEnumerator RunTrainingRound(SPO targetObject)
+        {
+            targetObject.OnTrainTarget();
+            yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
+
+            if (trainTargetPersistent == false)
+            {
+                targetObject.OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(preStimulusBuffer);
+            StartStimulusRun();
+            yield return WaitForStimulusToComplete();
+            StopStimulusRun();
+            yield return new WaitForSecondsRealtime(postStimulusBuffer);
+
+            if (shamFeedback)
+            {
+                targetObject.Select();
+                yield return new WaitForSecondsRealtime(shamFeedbackBuffer);
+            }
+
+            if (trainTargetPersistent == true)
+            {
+                targetObject.OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(trainBreak);
+            trainTarget = -1;
         }
 
 
@@ -620,7 +675,7 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
-        protected IEnumerator WaitForStimulusToComplete()
+        protected virtual IEnumerator WaitForStimulusToComplete()
         {
             while (StimulusRunning)
             {

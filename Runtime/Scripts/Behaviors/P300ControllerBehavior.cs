@@ -18,10 +18,7 @@ namespace BCIEssentials.ControllerBehaviors
         public enum SingleFlashPattern {Random, ContextAware}
         public enum MultiFlashPattern {RowColumn, Checkerboard, ContextAware}
 
-        [AppendToFoldoutGroup("Training Properties")]
-        [Tooltip("The time between the end of a sequence and making a selection [sec]")]
-        public float trainBufferTime = 0f;
-        
+
         [StartFoldoutGroup("P300 Pattern Flashing Properties")]
         public int numFlashesLowerLimit = 9;
         public int numFlashesUpperLimit = 12;
@@ -72,88 +69,11 @@ namespace BCIEssentials.ControllerBehaviors
         private int lastTourEndNode = -100;
 
 
-
-        protected override IEnumerator WhileDoAutomatedTraining()
+        protected override IEnumerator RunTrainingRound(SPO targetObject)
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-
-            // Generate the target list
-            PopulateObjectList();
-
-            // Get number of selectable objects by counting the objects in the objectList
-            int numOptions = _selectableSPOs.Count;
-
-            // See how performant the Fisher-Yates shuffle is
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
-            LogArrayValues(trainArray);
-            watch.Stop();
-            Debug.Log("Fisher-Yates shuffle took " + watch.ElapsedMilliseconds.ToString() + " milliseconds");
-            // int[] weightedTrainArray = ArrayUtilities.GenerateWeightedArray(numTrainingSelections, 0, numOptions-1);
-            // LogArrayValues(weightedTrainArray);
-            // int[] fisherArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
-            // LogArrayValues(fisherArray);
-
-            yield return null;
-
-            //System.Random randNumFlashes = new System.Random();
-
-            // Loop for each training target
-            for (int i = 0; i < numTrainingSelections; i++)
-            {
-                numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-                Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-
-                // Get the target from the array
-                trainTarget = trainArray[i];
-
-                // 
-                Debug.Log("Running training selection " + i.ToString() + " on option " +
-                          trainTarget.ToString());
-
-                // Turn on train target
-
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-                // Go through the training sequence
-                yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
-
-                if (trainTargetPersistent == false)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                // Start stimulus and wait for it to complete
-                StartStimulusRun();
-                yield return StartCoroutine(WaitForStimulusToComplete());
-                yield return new WaitForSecondsRealtime(trainBufferTime);
-
-                // If sham feedback is true, then show it
-                if (shamFeedback)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
-                }
-
-                // Turn off train target
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                if (trainTargetPersistent == true)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-
-                trainTarget = -1;
-            }
-
-            OutStream.PushTrainingCompleteMarker();
-
+            return base.RunTrainingRound(targetObject);
         }
 
         protected override IEnumerator WhileDoUserTraining()
@@ -187,7 +107,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Start stimulus and wait for the trial to end
             StartStimulusRun();
             yield return StartCoroutine(WaitForStimulusToComplete());
-            yield return new WaitForSecondsRealtime(trainBufferTime);
+            yield return new WaitForSecondsRealtime(postStimulusBuffer);
 
             // If sham feedback is true, then show it
             if (shamFeedback)
