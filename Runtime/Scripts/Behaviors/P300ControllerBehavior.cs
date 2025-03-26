@@ -69,13 +69,6 @@ namespace BCIEssentials.ControllerBehaviors
         private int lastTourEndNode = -100;
 
 
-        protected override IEnumerator RunTrainingRound(SPO targetObject)
-        {
-            numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-            Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-            return base.RunTrainingRound(targetObject);
-        }
-
         protected override IEnumerator WhileDoUserTraining()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
