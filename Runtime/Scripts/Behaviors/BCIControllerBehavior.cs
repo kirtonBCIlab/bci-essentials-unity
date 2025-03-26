@@ -83,14 +83,14 @@ namespace BCIEssentials.ControllerBehaviors
         public float trainTargetPresentationTime = 3f;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
-        [Tooltip("Time between target presentation and stimulus sequence")]
+        [Tooltip("Time between target presentation and stimulus sequence [sec]")]
         public float preStimulusBuffer = 0.5f;
-        [Tooltip("Time between the end of a sequence and pretend selection (sham feedback) [s]")]
+        [Tooltip("Time between the end of a sequence and pretend selection (sham feedback) [sec]")]
         public float postStimulusBuffer = 0f;
         [Tooltip("If true, the train target will pretend to be selected")]
         public bool shamFeedback = false;
         [ShowIf("shamFeedback")]
-        [Tooltip("Time allotted for the display of sham feedback [s]")]
+        [Tooltip("Time allotted for the display of sham feedback [sec]")]
         public float shamFeedbackBuffer = 0.5f;
         [Tooltip("Rest time between training windows [sec]")]
         public float trainBreak = 1f;
