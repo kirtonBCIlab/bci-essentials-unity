@@ -13,7 +13,8 @@ using BCIEssentials.Utilities;
 namespace BCIEssentials.ControllerBehaviors
 {
     /// <summary>
-    /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
+    /// Base class for any implementation of a BCI paradigm
+    /// to be used by a <see cref="BCIController"/>
     /// </summary>
     public abstract class BCIControllerBehavior : MonoBehaviourUsingExtendedAttributes
     {
