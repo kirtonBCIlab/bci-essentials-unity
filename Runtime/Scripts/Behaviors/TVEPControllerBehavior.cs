@@ -5,7 +5,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class TVEPControllerBehavior : BCIControllerBehavior
+    public class TVEPControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 

@@ -5,7 +5,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : BCIControllerBehavior
+    public class SSVEPControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         

@@ -312,8 +312,8 @@ namespace BCIEssentials.Tests
             var markerListener = AddComponent<LSLRawStreamReader>();
             markerListener.OpenStreamByName(_testMarkerStream.StreamName);
 
-            _behavior.StartStimulusRun(false);
-            _behavior.StartStimulusRun(false);
+            _behavior.StartStimulusRun();
+            _behavior.StartStimulusRun();
             yield return new WaitForSecondsRealtime(0.5f);
             var responses = markerListener.PullAllSamples();
 

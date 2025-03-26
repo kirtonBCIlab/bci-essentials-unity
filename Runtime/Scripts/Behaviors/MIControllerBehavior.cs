@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class MIControllerBehavior : BCIControllerBehavior
+    public class MIControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
 
@@ -29,39 +29,6 @@ namespace BCIEssentials.ControllerBehaviors
             if (_selectableSPOs.Count > 2)
             {
                 Debug.LogWarning("Warning: Selecting between more than 2 objects!");
-            }
-        }
-
-        public override void StartStimulusRun(bool sendConstantMarkers = true)
-        {
-            if (StimulusRunning)
-            {
-                StopStimulusRun();
-            }
-            
-            StimulusRunning = true;
-            LastSelectedSPO = null;
-            
-            // Send the marker to start
-            OutStream.PushTrialStartedMarker();
-
-            StartReceivingMarkers();
-            PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
-
-            // Not required for P300
-            if (sendConstantMarkers)
-            {
-                // If trainTarget == -1, then we are trying to classify, pass -1 along
-                if (trainTarget == 99)
-                {
-                    StopStartCoroutine(ref _sendMarkers, SendMarkers(-1));
-                }
-                // Otherwise, pass the objectID of the target
-                else
-                {
-                    StopStartCoroutine(ref _sendMarkers, SendMarkers(_selectableSPOs[trainTarget].ObjectID));
-                }
             }
         }
 

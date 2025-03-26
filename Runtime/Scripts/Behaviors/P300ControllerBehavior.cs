@@ -128,7 +128,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(0.5f);
 
                 // Start stimulus and wait for it to complete
-                StartStimulusRun(false);
+                StartStimulusRun();
                 yield return StartCoroutine(WaitForStimulusToComplete());
                 yield return new WaitForSecondsRealtime(trainBufferTime);
 
@@ -185,7 +185,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return new WaitForSecondsRealtime(0.5f);
 
             // Start stimulus and wait for the trial to end
-            StartStimulusRun(false);
+            StartStimulusRun();
             yield return StartCoroutine(WaitForStimulusToComplete());
             yield return new WaitForSecondsRealtime(trainBufferTime);
 
@@ -1119,43 +1119,15 @@ namespace BCIEssentials.ControllerBehaviors
             return screenPositions;
         }
 
-        // Turn the stimulus on
-        public override void StartStimulusRun(bool sendConstantMarkers = true)
+        protected override void SendTrialStartedMarker()
         {
-            StimulusRunning = true;
-            
-            StimulusRunning = true;
-            LastSelectedSPO = null;
-            
-            // Send the marker to start
-            if (blockOutGoingLSL == false)
-            {
-                OutStream.PushTrialStartedMarker();
-            }
-
-            StartReceivingMarkers();
-            PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
-
-            // Not required for P300
-            if (sendConstantMarkers)
-            {
-                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
-            }
+            if (!blockOutGoingLSL) base.SendTrialStartedMarker();
         }
 
-        public override void StopStimulusRun()
+        protected override void SendTrialEndsMarker()
         {
-            // End thhe stimulus Coroutine
-            StimulusRunning = false;
-            
-            // Send the marker to end
-            if (blockOutGoingLSL == false)
-            {
-                OutStream.PushTrialEndsMarker();
-            }
+            if (!blockOutGoingLSL) base.SendTrialEndsMarker();
         }
-
 
 
         #region Experimental Calculations

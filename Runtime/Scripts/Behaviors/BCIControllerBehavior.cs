@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using System.IO;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
-using UnityEditor.SceneManagement;
-using System.IO;
-using UnityEditor;
-using System.Linq;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -22,6 +21,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
+
+        #region Inspector Properties
 
         [SerializeField, Min(-1)]
         [Tooltip("The applications target frame rate [Hz].\n"
@@ -69,25 +70,12 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
 
-
         private int __uniqueID = 1;
 
-        #region Refactorable Properties
 
-        //StimulusOn/Off + sending Markers
-        [FoldoutGroup("Signal Properties")]
-        [Tooltip("The length of the processing window [sec]")]
-        //TODO: Rename this more appropriately to our Epoch/scheme
-        public float windowLength = 1.0f;
-        [Tooltip("The interval between processing windows [sec]")]
-        public float interWindowInterval = 0f;
-
-        //Training
         [FoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
-        [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
-        public int numTrainWindows = 3;
         [Tooltip("Before training starts, pause for this amount of time [sec]")]
         public float pauseBeforeTraining = 2;
         [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
@@ -286,11 +274,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
-        /// <param name="sendConstantMarkers">
-        /// If true will also write to the marker stream until
-        /// the stimulus run ends or the number of markers sent equals <see cref="trainTarget"/>.
         /// </param>
-        public virtual void StartStimulusRun(bool sendConstantMarkers = true)
+        public virtual void StartStimulusRun()
         {
             if (StimulusRunning)
             {
@@ -301,17 +286,11 @@ namespace BCIEssentials.ControllerBehaviors
             LastSelectedSPO = null;
             
             // Send the marker to start
-            OutStream?.PushTrialStartedMarker();
+            SendTrialStartedMarker();
 
             StartReceivingMarkers();
             PopulateObjectList();
             StopStartCoroutine(ref _runStimulus, RunStimulus());
-
-            // Not required for P300
-            if (sendConstantMarkers)
-            {
-                StopStartCoroutine(ref _sendMarkers, RunSendWindowMarkers(trainTarget));
-            }
         }
 
         /// <summary>
@@ -322,7 +301,7 @@ namespace BCIEssentials.ControllerBehaviors
             StimulusRunning = false;
 
             // Send the marker to end
-            OutStream?.PushTrialEndsMarker();
+            SendTrialEndsMarker();
         }
         
         protected virtual IEnumerator RunStimulus()
@@ -490,18 +469,15 @@ namespace BCIEssentials.ControllerBehaviors
         
         #region Markers
 
-        private IEnumerator RunSendWindowMarkers(int trainingIndex = 99)
+        protected virtual void SendTrialStartedMarker()
         {
-            while (StimulusRunning)
-            {
-                // Send the marker
-                if (OutStream != null) SendWindowMarker(trainingIndex);
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-            }
+            if (OutStream != null) OutStream.PushTrialStartedMarker();
         }
 
-        protected virtual void SendWindowMarker(int trainingIndex = -1) {}
+        protected virtual void SendTrialEndsMarker()
+        {
+            if (OutStream != null) OutStream.PushTrialEndsMarker();
+        }
 
         public virtual void StartReceivingMarkers()
         {
@@ -586,72 +562,14 @@ namespace BCIEssentials.ControllerBehaviors
 
             StopTraining();
         }
-        
-        // Do training
+
         protected virtual IEnumerator WhileDoAutomatedTraining()
         {
-            // Generate the target list
-            PopulateObjectList();
+            Debug.Log("No Automated training available for this paradigm");
 
-            // Get number of selectable objects by counting the objects in the objectList
-            int numOptions = _selectableSPOs.Count;
-
-            // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
-            LogArrayValues(trainArray);
-
-            yield return new WaitForSecondsRealtime(0.001f);
-
-            // Loop for each training target
-            for (int i = 0; i < numTrainingSelections; i++)
-            {
-                // Get the target from the array
-                trainTarget = trainArray[i];
-
-                // 
-                Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
-
-                // Turn on train target
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-
-                yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
-
-                if (trainTargetPersistent == false)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                // Go through the training sequence
-                //yield return new WaitForSecondsRealtime(3f);
-
-                StartStimulusRun();
-                yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-                StopStimulusRun();
-
-                // Turn off train target
-                if (trainTargetPersistent == true)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-
-                // If sham feedback is true, then show it
-                if (shamFeedback)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
-                }
-
-                trainTarget = -1;
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-            }
-
-            OutStream.PushTrainingCompleteMarker();
+            yield return null;
         }
+
 
         protected virtual IEnumerator WhileDoUserTraining()
         {

@@ -9,7 +9,7 @@ using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class StimulusPresentationControllerBehavior : BCIControllerBehavior
+    public class StimulusPresentationControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 

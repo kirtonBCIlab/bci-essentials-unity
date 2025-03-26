@@ -8,7 +8,7 @@ namespace BCIEssentials.ControllerBehaviors
     /// <summary>
     /// Adds Switch functionality to <see cref="BCIControllerBehavior"/>
     /// </summary>
-    public class SwitchControllerBehavior : BCIControllerBehavior
+    public class SwitchControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.Unset;
         
