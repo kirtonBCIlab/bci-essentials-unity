@@ -55,15 +55,10 @@ namespace BCIEssentials.ControllerBehaviors
         public int numFlashColumns = 6;
 
 
-        [StartFoldoutGroup("Debugging Parameters", 12, 20)]
-        public bool timeDebug = false;
-        [EndFoldoutGroup]
         private bool blockOutGoingLSL = false;
 
         //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.
         private int __uniqueP300ID = 0;
-
-        public SpoPopulationMethod myPopMethod = SpoPopulationMethod.GraphBP;
 
         private List<GameObject> _validGOs = new List<GameObject>();
         private int lastTourEndNode = -100;
