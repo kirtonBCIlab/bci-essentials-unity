@@ -167,34 +167,13 @@ namespace BCIEssentials.ControllerBehaviors
             for (int i = 0; i < stimOrder.Length; i++)
             {
                 int activeIndex = stimOrder[i];
-                GameObject currentObject = _selectableSPOs[activeIndex]?.gameObject;
-
-                // Turn on
-                currentObject.GetComponent<SPO>().StartStimulus();
-
-                // Send marker
-                if (!blockOutGoingLSL)
-                {
-                    OutStream.PushSingleFlashP300Marker
-                    (
-                        SPOCount, activeIndex, trainTarget
-                    );
-                }
-
-                // Wait
-                yield return new WaitForSecondsRealtime(onTime);
-
-                // Turn off
-                currentObject.GetComponent<SPO>().StopStimulus();
-
-                // Wait
-                yield return new WaitForSecondsRealtime(offTime);
+                SPO flashingObject = _selectableSPOs[activeIndex];
+                yield return RunSingleFlash(flashingObject, activeIndex);
             }
         }
         
         private IEnumerator ContextAwareSingleFlashRoutine()
         {
-
             int totalFlashes = numFlashesPerObjectPerSelection;          
 
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
@@ -203,50 +182,32 @@ namespace BCIEssentials.ControllerBehaviors
                 //Refresh the List of available SPO Objects. This will update the _validGOs list.
                 PopulateObjectList();
                 //Now get the Graph set for the TSP
-                //Debug.Log("Getting the GraphBP For Context Aware Single Flash, updating each loop");
                 int[] stimOrder = CalculateGraphTSP(_validGOs);
 
                 for (int i = 0; i < stimOrder.Length; i++)
                 {
                     int activeIndex = stimOrder[i];
-                    SPO currentObject = _selectableSPOs[activeIndex]?.gameObject?.GetComponent<SPO>();
-
-                    string markerString = "p300,s," + _selectableSPOs.Count.ToString();
-
-                    if (trainTarget <= _selectableSPOs.Count)
-                    {
-                        markerString = markerString + "," + trainTarget.ToString();
-                    }
-                    else
-                    {
-                        markerString = markerString + "," + "-1";
-                    }
+                    SPO activeObject = _selectableSPOs[activeIndex];
                     Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                    markerString = markerString + "," + currentObject.GetComponent<SPO>().ObjectID.ToString();
-
-                    // Turn on
-                    currentObject.StartStimulus();
-
-                    // Send marker
-                    if (!blockOutGoingLSL)
-                    {
-                        Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                        OutStream.PushSingleFlashP300Marker
-                        (
-                            SPOCount, currentObject.ObjectID, trainTarget
-                        );
-                    }
-
-                    // Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    // Turn off
-                    currentObject.StopStimulus();
-
-                    // Wait
-                    yield return new WaitForSecondsRealtime(offTime);
+                    yield return RunSingleFlash(activeObject, activeObject.ObjectID);
                 }
             }
+        }
+
+        private IEnumerator RunSingleFlash(SPO flashingObject, int markerId)
+        {
+            flashingObject.StartStimulus();
+
+            if (OutStream != null && !blockOutGoingLSL)
+            {
+                OutStream.PushSingleFlashP300Marker(
+                    SPOCount, markerId, trainTarget
+                );
+            }
+
+            yield return new WaitForSecondsRealtime(onTime);
+            flashingObject.StopStimulus();
+            yield return new WaitForSecondsRealtime(offTime);
         }
 
         
