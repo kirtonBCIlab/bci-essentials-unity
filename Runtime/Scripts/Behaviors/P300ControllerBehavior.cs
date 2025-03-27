@@ -147,15 +147,9 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator RunSingleFlash(SPO flashingObject, int markerId)
         {
             flashingObject.StartStimulus();
-
-            if (OutStream != null && !blockOutGoingLSL)
-            {
-                OutStream.PushSingleFlashP300Marker(
-                    SPOCount, markerId, trainTarget
-                );
-            }
-
+            WriteSingleFlashMarker(markerId);
             yield return new WaitForSecondsRealtime(onTime);
+
             flashingObject.StopStimulus();
             yield return new WaitForSecondsRealtime(offTime);
         }
@@ -223,16 +217,6 @@ namespace BCIEssentials.ControllerBehaviors
             return newMatrix;
         }
 
-        private void WriteMultiFlashMarker(IEnumerable<int> objToFlash)
-        {
-            if (OutStream != null && !blockOutGoingLSL)
-            {
-                OutStream.PushMultiFlashP300Marker
-                (
-                    SPOCount, objToFlash, trainTarget
-                );
-            }
-        }
 
         private IEnumerator RowColFlashRoutine()
         {
@@ -609,11 +593,33 @@ namespace BCIEssentials.ControllerBehaviors
                 _selectableSPOs[i].StartStimulus();
 
             WriteMultiFlashMarker(objectsToFlash);
-
             yield return new WaitForSecondsRealtime(onTime);
+
             foreach(int i in objectsToFlash)
                 _selectableSPOs[i].StopStimulus();
             yield return new WaitForSecondsRealtime(offTime);
+        }
+
+
+        private void WriteSingleFlashMarker(int objectIndex)
+        {
+            if (OutStream != null && !blockOutGoingLSL)
+            {
+                OutStream.PushSingleFlashP300Marker(
+                    SPOCount, objectIndex, trainTarget
+                );
+            }
+        }
+
+        private void WriteMultiFlashMarker(IEnumerable<int> flashedObjects)
+        {
+            if (OutStream != null && !blockOutGoingLSL)
+            {
+                OutStream.PushMultiFlashP300Marker
+                (
+                    SPOCount, flashedObjects, trainTarget
+                );
+            }
         }
 
 
