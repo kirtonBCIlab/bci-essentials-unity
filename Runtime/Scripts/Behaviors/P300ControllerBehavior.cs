@@ -173,6 +173,7 @@ namespace BCIEssentials.ControllerBehaviors
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
+                PopulateObjectList();
                 //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
                 var (subset1,subset2) = CalculateGraphPartition(_validGOs);
 
