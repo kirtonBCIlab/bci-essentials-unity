@@ -222,7 +222,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         private IEnumerator RowColFlashRoutine()
         {
-            int[,] rcMatrix = Initialize2DMultiFlash();
+            int[,] rcMatrix = InitializeFlashingIndexGrid();
             int numRows = rcMatrix.GetLength(0);
             int numColumns = rcMatrix.GetLength(1);
             int count = 0;
@@ -263,30 +263,25 @@ namespace BCIEssentials.ControllerBehaviors
         //TODO: Need to fix Checkerboard Flashing while I'm here
         private IEnumerator CheckerboardFlashRoutine()
         {
-            // For multi flash selection, create virtual rows and columns
-            // int numSelections = _selectableSPOs.Count;
-            // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-            // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
-
-            // int[,] rcMatrix = new int[numColumns, numRows];
-            int[,] rcMatrix = Initialize2DMultiFlash();
+            int[,] rcMatrix = InitializeFlashingIndexGrid();
             int numColumns = rcMatrix.GetLength(0);
             int numRows = rcMatrix.GetLength(1);
             // get the size of the black/white matrices
-            double maxBWsize = Math.Ceiling((numRows * numColumns) / 2f);
+            double maxBWsize = Math.Ceiling(numRows * numColumns / 2f);
 
             // get the number of rows and columns
             int bwCols = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
-            int bwRows = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
+            int bwRows = bwCols;
             // check if cbRows needs to match cbCols or if we can remove a row
-            if (maxBWsize < ((bwRows * bwCols) - bwRows))
+            while (maxBWsize < ((bwRows * bwCols) - bwRows))
             {
-                bwRows = bwRows - 1;
+                bwRows--;
             }
 
             Random rnd = new();
-            (int[,] blackMat, int[,] whiteMat)
-            = GenerateCheckerboardMatrices(bwRows, bwCols, rnd.Next);
+            
+            (int[,] blackMat, int[,] whiteMat) =
+                GenerateCheckerboardMatrices(bwRows, bwCols, rnd.Next);
 
             // for flash count
             for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
@@ -347,18 +342,12 @@ namespace BCIEssentials.ControllerBehaviors
             );
         }
         
-        private int[,] Initialize2DMultiFlash()
+        private int[,] InitializeFlashingIndexGrid()
         {
-                // For multi flash selection, create virtual rows and columns
-                //There is some bug with setting this for the row column flashing, but it works for checkerboard. 
-                // Commenting it out for now.
-                // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-                // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
-                int numColumns = numFlashColumns;
-                int numRows = numFlashRows;
-
-                int[,] rcMatrix = new int[numRows, numColumns];
-                return rcMatrix;
+            // For multi flash selection, create virtual rows and columns
+            // Possible to do programmatically if certain conditions are met
+            // such as checking for use of an SPOGridFactory
+            return new int[numFlashRows, numFlashColumns];
         }
 
         private IEnumerator RunMultiFlash(int[] objectsToFlash)
