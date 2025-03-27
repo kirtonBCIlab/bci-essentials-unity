@@ -284,50 +284,9 @@ namespace BCIEssentials.ControllerBehaviors
                 bwRows = bwRows - 1;
             }
 
-            int realBWSize = bwCols * bwRows;
-
-            int[] blackList = new int[realBWSize];
-            int[] whiteList = new int[realBWSize];
-
-            Debug.Log("There are " + bwRows.ToString() + " rows and "
-                + bwCols.ToString() + " columns in the BW matrices");
-
-            //This isn't actually shuffling between each target. Need to include it in the loop.
-            Random rnd = new Random();
-            int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
-
-
-            bool IndexIsBlack(int index)
-            {
-                if (numColumns % 2 == 1)
-                    return index % 2 == 0;
-                else
-                {
-                    int numR = index / numColumns;
-                    return ((index - (numR % 2)) % 2) == 0;
-                };
-            }
-            bool IndexIsWhite(int i) => !IndexIsBlack(i);
-
-            blackList.Fill(-1);
-            blackList.FillFrom(
-                shuffledArray.Where(IndexIsBlack).ToArray()
-            );
-
-            whiteList.Fill(-1);
-            whiteList.FillFrom(
-                shuffledArray.Where(IndexIsWhite).ToArray()
-            );
-
-            // Print the white and black indices
-            Debug.Log("blacks");
-            LogArrayValues(blackList);
-            Debug.Log("whites");
-            LogArrayValues(whiteList);
-
-            // reshape the black and white arrays to 2D
-            int[,] blackMat = blackList.To2D(bwRows, bwCols);
-            int[,] whiteMat = whiteList.To2D(bwRows, bwCols);
+            Random rnd = new();
+            (int[,] blackMat, int[,] whiteMat)
+            = GenerateCheckerboardMatrices(bwRows, bwCols, rnd.Next);
 
             // for flash count
             for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
@@ -337,7 +296,55 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return blackMat.RunForEachColumn(RunMultiFlash);
                 yield return whiteMat.RunForEachColumn(RunMultiFlash);
             }
+        }
 
+        private (int[,] blackMatrix, int[,] whiteMatrix) GenerateCheckerboardMatrices
+        (
+            int rows, int columns,
+            Func<int> getRandomNumber,
+            bool printLogs = false
+        )
+        {
+            bool IndexIsBlack(int index)
+            {
+                if (columns % 2 == 1)
+                    return index % 2 == 0;
+                else
+                {
+                    int rowNumber = index / columns;
+                    return ((index - (rowNumber % 2)) % 2) == 0;
+                };
+            }
+            bool IndexIsWhite(int i) => !IndexIsBlack(i);
+
+            var objectIndexes = Enumerable.Range(0, _selectableSPOs.Count);
+            int[] shuffledArray = objectIndexes.OrderBy(_ => getRandomNumber).ToArray();
+
+            int[] blackList = new int[rows * columns];
+            blackList.Fill(-1);
+            blackList.FillFrom(
+                shuffledArray.Where(IndexIsBlack).ToArray()
+            );
+
+            int[] whiteList = new int[rows * columns];
+            whiteList.Fill(-1);
+            whiteList.FillFrom(
+                shuffledArray.Where(IndexIsWhite).ToArray()
+            );
+
+            if (printLogs)
+            {
+                // Print the white and black indices
+                Debug.Log("blacks");
+                LogArrayValues(blackList);
+                Debug.Log("whites");
+                LogArrayValues(whiteList);
+            }
+
+            return (
+                blackList.To2D(rows, columns),
+                whiteList.To2D(rows, columns)
+            );
         }
         
         private int[,] Initialize2DMultiFlash()
