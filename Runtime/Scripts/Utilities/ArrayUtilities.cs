@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -299,6 +300,42 @@ namespace BCIEssentials.Utilities
             }
 
             return sb.ToString();
+        }
+
+        #endregion
+
+        #region Extensions
+
+        public static int[] GetRow(this int[,] ar, int index)
+        => Enumerable.Range(0, ar.GetLength(1))
+        .Select(x => ar[index, x]).ToArray();
+
+        public static int[] GetColumn(this int [,] ar, int index)
+        => Enumerable.Range(0, ar.GetLength(0))
+        .Select(x => ar[x, index]).ToArray();
+
+        public static IEnumerator RunForEachRow
+        (
+            this int[,] ar, Func<int[], IEnumerator> rowMethod
+        )
+        {
+            for (int i = 0; i < ar.GetLength(0); i++)
+            {
+                int[] row = ar.GetRow(i);
+                yield return rowMethod(row);
+            }
+        }
+
+        public static IEnumerator RunForEachColumn
+        (
+            this int[,] ar, Func<int[], IEnumerator> columnMethod
+        )
+        {
+            for (int j = 0; j < ar.GetLength(1); j++)
+            {
+                int[] column = ar.GetColumn(j);
+                yield return columnMethod(column);
+            }
         }
 
         #endregion

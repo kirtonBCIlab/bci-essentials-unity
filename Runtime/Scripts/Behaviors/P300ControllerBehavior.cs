@@ -182,17 +182,13 @@ namespace BCIEssentials.ControllerBehaviors
                 
                 //Flash through the rows of randMat1 first, then randMat2.
                 //Off time is included in these coroutines.
-                yield return StartCoroutine(FlashRowsSubsets(randMat1));
-                yield return StartCoroutine(FlashRowsSubsets(randMat2));
-                yield return StartCoroutine(FlashColsSubsets(randMat1));
-                yield return StartCoroutine(FlashColsSubsets(randMat2));
+                yield return randMat1.RunForEachRow(RunMultiFlash);
+                yield return randMat2.RunForEachRow(RunMultiFlash);
+                yield return randMat1.RunForEachColumn(RunMultiFlash);
+                yield return randMat2.RunForEachColumn(RunMultiFlash);
 
                 //Now shuffle!
             }
-
-
-            yield return null;
-
         }
 
         private int[,] SubsetToRandomMatrix(int[] subset)
@@ -231,68 +227,9 @@ namespace BCIEssentials.ControllerBehaviors
             return newMatrix;
         }
 
-        private IEnumerator FlashRowsSubsets(int[,] subset1)
+        private void WriteMultiFlashMarker(IEnumerable<int> objToFlash)
         {
-            for (int i = 0; i < subset1.GetLength(0); i++)
-            {
-                List<int> objToFlash = new List<int>();
-
-                for (int j = 0; j < subset1.GetLength(1); j++)
-                {
-                    if (subset1[i,j] != -100)
-                    {
-                        //Add the object to the list of objects to flash for marker writing
-                        objToFlash.Add(subset1[i,j]);
-                        _selectableSPOs[subset1[i,j]]?.StartStimulus();
-                    }
-                }
-                //Write the marker for the objects to flash
-                WriteMultiFlashMarker(objToFlash);
-                yield return new WaitForSecondsRealtime(onTime);
-                for (int j = 0; j < subset1.GetLength(1); j++)
-                {
-                    if (subset1[i,j] != -100)
-                    {
-                        _selectableSPOs[subset1[i,j]]?.StopStimulus();
-                    }
-                }
-                yield return new WaitForSecondsRealtime(offTime);
-            }
-        }
-
-        private IEnumerator FlashColsSubsets(int[,] subset1)
-        {
-            for (int i = 0; i < subset1.GetLength(1); i++)
-            {
-                //Create empty list to flash
-                List<int> objToFlash = new List<int>();
-
-                for (int j = 0; j < subset1.GetLength(0); j++)
-                {
-                    if (subset1[j,i] != -100)
-                    {
-                        //Add the object to the list of objects to flash for marker writing
-                        objToFlash.Add(subset1[j,i]);
-                        _selectableSPOs[subset1[j,i]]?.StartStimulus();
-                    }
-                }
-                //Write the marker for the objects to flash
-                WriteMultiFlashMarker(objToFlash);
-                yield return new WaitForSecondsRealtime(onTime);
-                for (int j = 0; j < subset1.GetLength(0); j++)
-                {
-                    if (subset1[j,i] != -100)
-                    {
-                        _selectableSPOs[subset1[j,i]]?.StopStimulus();
-                    }
-                }
-                yield return new WaitForSecondsRealtime(offTime);
-            }
-        }
-
-        private void WriteMultiFlashMarker(List<int> objToFlash)
-        {
-            if (blockOutGoingLSL == false)
+            if (OutStream != null && !blockOutGoingLSL)
             {
                 OutStream.PushMultiFlashP300Marker
                 (
@@ -720,6 +657,23 @@ namespace BCIEssentials.ControllerBehaviors
                 int[,] rcMatrix = new int[numRows, numColumns];
                 return rcMatrix;
         }
+
+        private IEnumerator RunMultiFlash(int[] objectsToFlash)
+        {
+            objectsToFlash = objectsToFlash.Where
+            (x => x >= 0 && x < SPOCount).ToArray();
+
+            foreach (int i in objectsToFlash)
+                _selectableSPOs[i].StartStimulus();
+
+            WriteMultiFlashMarker(objectsToFlash);
+
+            yield return new WaitForSecondsRealtime(onTime);
+            foreach(int i in objectsToFlash)
+                _selectableSPOs[i].StopStimulus();
+            yield return new WaitForSecondsRealtime(offTime);
+        }
+
 
         /// <summary>
         /// Populate the <see cref="SelectableSPOs"/> using a particular method.
