@@ -306,6 +306,17 @@ namespace BCIEssentials.Utilities
 
         #region Extensions
 
+        public static void Fill<T>
+        (
+            this T[] array, T value
+        ) => Array.Fill(array, value);
+
+        public static void FillFrom<T>
+        (
+            this T[] array, T[] source
+        ) => Array.Copy(source, array, source.Length);
+
+
         public static int[] GetRow(this int[,] ar, int index)
         => Enumerable.Range(0, ar.GetLength(1))
         .Select(x => ar[index, x]).ToArray();

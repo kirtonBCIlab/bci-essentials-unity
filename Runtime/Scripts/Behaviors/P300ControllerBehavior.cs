@@ -272,7 +272,7 @@ namespace BCIEssentials.ControllerBehaviors
             int[,] rcMatrix = Initialize2DMultiFlash();
             int numColumns = rcMatrix.GetLength(0);
             int numRows = rcMatrix.GetLength(1);
-                                // get the size of the black/white matrices
+            // get the size of the black/white matrices
             double maxBWsize = Math.Ceiling((numRows * numColumns) / 2f);
 
             // get the number of rows and columns
@@ -289,75 +289,35 @@ namespace BCIEssentials.ControllerBehaviors
             int[] blackList = new int[realBWSize];
             int[] whiteList = new int[realBWSize];
 
-            int blackCount = 0;
-            int whiteCount = 0;
-
-            Debug.Log("There are " + bwRows.ToString() + " rows and " + bwCols.ToString() +
-                        " columns in the BW matrices");
+            Debug.Log("There are " + bwRows.ToString() + " rows and "
+                + bwCols.ToString() + " columns in the BW matrices");
 
             //This isn't actually shuffling between each target. Need to include it in the loop.
             Random rnd = new Random();
             int[] shuffledArray = Enumerable.Range(0, _selectableSPOs.Count).OrderBy(c => rnd.Next()).ToArray();
 
-            // assign from CB to BW
-            for (int i = 0; i < _selectableSPOs.Count; i++)
-            {
 
-                // if there is an odd number of columns
+            bool IndexIsBlack(int index)
+            {
                 if (numColumns % 2 == 1)
+                    return index % 2 == 0;
+                else
                 {
-                    //evens assigned to black
-                    if (shuffledArray[i] % 2 == 0)
-                    {
-                        blackList[blackCount] = shuffledArray[i];
-                        blackCount++;
-                    }
-                    //odds assigned to white
-                    else
-                    {
-                        whiteList[whiteCount] = shuffledArray[i];
-                        whiteCount++;
-                    }
-                }
-
-                // if there is an even number of columns
-                if (numColumns % 2 == 0)
-                {
-                    //assigned to black
-                    int numR = shuffledArray[i] / numColumns;
-                    // print("to place" + shuffledArray[i].ToString());
-                    // print("row number" + numR.ToString());
-
-                    if (((shuffledArray[i] - (numR % 2)) % 2) == 0)
-                    {
-                        blackList[blackCount] = shuffledArray[i];
-                        // print(shuffledArray[i] + " is black");
-                        blackCount++;
-                    }
-                    //assigned to white
-                    else
-                    {
-                        whiteList[whiteCount] = shuffledArray[i];
-                        // print(shuffledArray[i] + " is white");
-                        whiteCount++;
-                    }
-                }
-
+                    int numR = index / numColumns;
+                    return ((index - (numR % 2)) % 2) == 0;
+                };
             }
+            bool IndexIsWhite(int i) => !IndexIsBlack(i);
 
-            // set the remaining values to 99
-            while (whiteCount < realBWSize)
-            {
-                whiteList[whiteCount] = 99;
-                whiteCount++;
-            }
+            blackList.Fill(-1);
+            blackList.FillFrom(
+                shuffledArray.Where(IndexIsBlack).ToArray()
+            );
 
-            // set the remaining values to 99
-            while (blackCount < realBWSize)
-            {
-                blackList[blackCount] = 99;
-                blackCount++;
-            }
+            whiteList.Fill(-1);
+            whiteList.FillFrom(
+                shuffledArray.Where(IndexIsWhite).ToArray()
+            );
 
             // Print the white and black indices
             Debug.Log("blacks");
