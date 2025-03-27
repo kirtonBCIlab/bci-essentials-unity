@@ -91,71 +91,26 @@ namespace BCIEssentials.ControllerBehaviors
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
-            // numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
-            // UnityEngine.Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
 
-            switch (flashPlurality)
+            yield return flashPlurality switch
             {
-                case FlashPlurality.Single:
-                    switch (singleFlashPattern)
-                    {
-                        case SingleFlashPattern.Random:
-                            //This may not be the right way to do this.
-                            Coroutine single_flashCR
-                            = Stop_Coroutines_Then_Start_New_Coroutine(
-                                ref _runStimulus, SingleFlashRoutine()
-                            );
-                            yield return single_flashCR;
-                            //Old method
-                            //StopStartCoroutine(ref _runStimulus, SingleFlashRoutine());
-                        break;
-                        case SingleFlashPattern.ContextAware:
-                            //This may not be the right way to do this.
-                            Coroutine single_context_flashCR
-                            = Stop_Coroutines_Then_Start_New_Coroutine(
-                                ref _runStimulus,  ContextAwareSingleFlashRoutine()
-                            );
-                            yield return single_context_flashCR;
-                            //Old method
-                            //StopStartCoroutine(ref _runStimulus, ContextAwareSingleFlashRoutine());
-                        break;
-                    }
-                break;
-                case FlashPlurality.Multiple:
-                    switch (multiFlashPattern)
-                    {
-                        case MultiFlashPattern.RowColumn:
-                            //StopStartCoroutine(ref _runStimulus, RowColFlashRoutine());
-                            Coroutine rc_flashCR
-                            = Stop_Coroutines_Then_Start_New_Coroutine(
-                                ref _runStimulus, RowColFlashRoutine()
-                            );
-                            yield return rc_flashCR;
-                        break;
-                        case MultiFlashPattern.Checkerboard:
-                            //StopStartCoroutine(ref _runStimulus, CheckerboardFlashRoutine());
-                            Coroutine cb_flashCR
-                            = Stop_Coroutines_Then_Start_New_Coroutine(
-                                ref _runStimulus, CheckerboardFlashRoutine()
-                            );
-                            yield return cb_flashCR;
-                        break;
-                        case MultiFlashPattern.ContextAware:
-                            //StopStartCoroutine(ref _runStimulus, ContextAwareMultiFlashRoutine());
-                            Coroutine context_multi_flashCR
-                            = Stop_Coroutines_Then_Start_New_Coroutine(
-                                ref _runStimulus, ContextAwareMultiFlashRoutine()
-                            );
-                            yield return context_multi_flashCR;
-                        break;
-                    }
-                break;
-            }
-
-            //This is what is causing the issue with the "Trial Ends" marker being sent too early I think.
-            StopStimulusRun();
+                FlashPlurality.Single=> singleFlashPattern switch
+                {
+                    SingleFlashPattern.Random => SingleFlashRoutine(),
+                    SingleFlashPattern.ContextAware => ContextAwareSingleFlashRoutine(),
+                    _  => null
+                },
+                FlashPlurality.Multiple => multiFlashPattern switch
+                {
+                    MultiFlashPattern.RowColumn => RowColFlashRoutine(),
+                    MultiFlashPattern.Checkerboard => CheckerboardFlashRoutine(),
+                    MultiFlashPattern.ContextAware => ContextAwareMultiFlashRoutine(),
+                    _ => null
+                },
+                _ => null
+            };
             
-            yield return null;
+            StopStimulusRun();
         }
 
         //TODO There is a bug where this is sending "Trial Ended" before the last flash is sent.
