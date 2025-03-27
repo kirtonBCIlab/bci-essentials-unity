@@ -317,6 +317,24 @@ namespace BCIEssentials.Utilities
         ) => Array.Copy(source, array, source.Length);
 
 
+        public static T[,] To2D<T>
+        (
+            this T[] array, int rows, int columns
+        )
+        {
+            T[,] result = new T[rows, columns];
+            int sourceIndex = 0;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    result[i, j] = array[sourceIndex++];
+                }
+            }
+            return result;
+        }
+
+
         public static int[] GetRow(this int[,] ar, int index)
         => Enumerable.Range(0, ar.GetLength(1))
         .Select(x => ar[index, x]).ToArray();

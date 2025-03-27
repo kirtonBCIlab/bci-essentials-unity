@@ -326,21 +326,8 @@ namespace BCIEssentials.ControllerBehaviors
             LogArrayValues(whiteList);
 
             // reshape the black and white arrays to 2D
-            int[,] blackMat = new int[bwRows, bwCols];
-            int[,] whiteMat = new int[bwRows, bwCols];
-
-            int count = 0;
-            for (int i = 0; i < bwRows; i++)
-            {
-                for (int j = 0; j < bwCols; j++)
-                {
-                    print(count.ToString());
-                    blackMat[i, j] = blackList[count];
-                    whiteMat[i, j] = whiteList[count];
-
-                    count++;
-                }
-            }
+            int[,] blackMat = blackList.To2D(bwRows, bwCols);
+            int[,] whiteMat = whiteList.To2D(bwRows, bwCols);
 
             // for flash count
             for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
