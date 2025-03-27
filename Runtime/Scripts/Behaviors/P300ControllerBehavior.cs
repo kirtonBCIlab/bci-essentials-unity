@@ -240,12 +240,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         private IEnumerator RowColFlashRoutine()
         {
-            // // For multi flash selection, create virtual rows and columns
-            // int numSelections = _selectableSPOs.Count;
-            // int numColumns = (int)Math.Ceiling(Math.Sqrt((float)numSelections));
-            // int numRows = (int)Math.Ceiling((float)numSelections / (float)numColumns);
-
-            // int[,] rcMatrix = new int[numColumns, numRows];
             int[,] rcMatrix = Initialize2DMultiFlash();
             int numRows = rcMatrix.GetLength(0);
             int numColumns = rcMatrix.GetLength(1);
@@ -255,9 +249,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < numColumns; j++)
                 {
                     if (count <= _selectableSPOs.Count)
-                        rcMatrix[i, j] = count;
-                    //print(i.ToString() + j.ToString() + count.ToString());
-                    count++;
+                        rcMatrix[i, j] = count++;
                 }
             }
 
@@ -271,63 +263,17 @@ namespace BCIEssentials.ControllerBehaviors
 
             for (int i = 0; i < totalColumnFlashes; i++)
             {
-                // Turn on column 
+                // Flash column 
                 int columnIndex = columnStimOrder[i];
-                List<int> flashingObjects = new();
-                for (int n = 0; n < numRows; n++)
-                {
-                    int objectIndex = rcMatrix[n, columnIndex];
-                    _selectableSPOs[objectIndex]?.StartStimulus();
-                    flashingObjects.Add(objectIndex);
-                }
-
-                // Send marker
-                WriteMultiFlashMarker(flashingObjects);
-
-                //Wait
-                yield return new WaitForSecondsRealtime(onTime);
-
-                //Turn off column
-                for (int n = 0; n < numRows; n++)
-                {
-                    _selectableSPOs[rcMatrix[n, columnIndex]]?.StopStimulus();
-                }
-
-                //Wait
-                yield return new WaitForSecondsRealtime(offTime);
+                int[] column = rcMatrix.GetColumn(columnIndex);
+                yield return RunMultiFlash(column);
 
                 // Flash row if available
                 if (i <= totalRowFlashes)
                 {
-                    // Turn on row
                     int rowIndex = rowStimOrder[i];
-                    flashingObjects.Clear();
-                    for (int m = 0; m < numColumns; m++)
-                    {
-                        int objectIndex = rcMatrix[rowIndex, m];
-                        //Turn on row
-                        _selectableSPOs[objectIndex]?.StartStimulus();
-
-                        //Add to marker
-                        flashingObjects.Add(objectIndex);
-                    }
-
-                    //Send Marker
-                    if (blockOutGoingLSL == false)
-                    WriteMultiFlashMarker(flashingObjects);
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(onTime);
-
-                    //Turn off Row
-                    for (int m = 0; m < numColumns; m++)
-                    {
-                        _selectableSPOs[rcMatrix[rowIndex, m]].StopStimulus();
-                    }
-
-
-                    //Wait
-                    yield return new WaitForSecondsRealtime(offTime);
+                    int[] row = rcMatrix.GetRow(rowIndex);
+                    yield return RunMultiFlash(row);
                 }
             }
         }
