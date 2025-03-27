@@ -11,12 +11,12 @@ namespace BCIEssentials.ControllerBehaviors
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
 
         [Header("Iterative Training")]
-        [AppendToFoldoutGroup("Training Properties")]
+        [SerializeField, AppendToFoldoutGroup("Training Properties")]
         [Tooltip("How many selections to make before creating the classifier")]
-        public int numSelectionsBeforeTraining = 3;
-        [AppendToFoldoutGroup("Training Properties")]
+        protected int numSelectionsBeforeTraining = 3;
+        [SerializeField, AppendToFoldoutGroup("Training Properties")]
         [Tooltip("How many selections to make before updating the classifier")]
-        public int numSelectionsBetweenTraining = 3;
+        protected int numSelectionsBetweenTraining = 3;
 
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
@@ -172,11 +172,6 @@ namespace BCIEssentials.ControllerBehaviors
                 StopStimulusRun();
             }
 
-        }
-
-        public override void SelectSPOAtEndOfRun(int objectIndex)
-        {
-            base.SelectSPOAtEndOfRun(objectIndex);
         }
 
         public override void UpdateClassifier()
