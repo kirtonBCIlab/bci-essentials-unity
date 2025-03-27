@@ -424,28 +424,6 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        private void WriteSingleFlashMarker(int objectIndex)
-        {
-            if (OutStream != null && !blockOutGoingLSL)
-            {
-                OutStream.PushSingleFlashP300Marker(
-                    SPOCount, objectIndex, trainTarget
-                );
-            }
-        }
-
-        private void WriteMultiFlashMarker(IEnumerable<int> flashedObjects)
-        {
-            if (OutStream != null && !blockOutGoingLSL)
-            {
-                OutStream.PushMultiFlashP300Marker
-                (
-                    SPOCount, flashedObjects, trainTarget
-                );
-            }
-        }
-
-
         /// <summary>
         /// Populate the <see cref="SelectableSPOs"/> using a particular method.
         /// This extends the typical BCI Controller Behavior to enable "context
@@ -499,6 +477,27 @@ namespace BCIEssentials.ControllerBehaviors
             return visibleGOs;
         }
 
+
+        private void WriteSingleFlashMarker(int objectIndex)
+        {
+            if (OutStream != null && !blockOutGoingLSL)
+            {
+                OutStream.PushSingleFlashP300Marker(
+                    SPOCount, objectIndex, trainTarget
+                );
+            }
+        }
+
+        private void WriteMultiFlashMarker(IEnumerable<int> flashedObjects)
+        {
+            if (OutStream != null && !blockOutGoingLSL)
+            {
+                OutStream.PushMultiFlashP300Marker
+                (
+                    SPOCount, flashedObjects, trainTarget
+                );
+            }
+        }
 
         protected override void SendTrialStartedMarker()
         {
