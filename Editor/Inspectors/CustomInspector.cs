@@ -23,7 +23,7 @@ namespace BCIEssentials.Editor
                 )
             )
             {
-                DrawHeader("Properties Unhandled By Custom Inspector:", 40);
+                DrawHeader("Properties Unhandled By Custom Inspector:", 16, 40);
                 DrawPropertiesExcluding(serializedObject, _handledProperties.ToArray());
             }
 

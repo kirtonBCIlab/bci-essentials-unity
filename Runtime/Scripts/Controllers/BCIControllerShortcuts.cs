@@ -13,7 +13,7 @@ namespace BCIEssentials.Controllers
     {
         public KeyBind ToggleStimulusRunBinding;
 
-        [FoldoutGroup("Training", 12, 8, 8)]
+        [StartFoldoutGroup("Training", 12, 8, 8)]
         [InspectorName("Start Automated")]
         public KeyBind StartAutomatedTrainingBinding;
         [InspectorName("Start Iterative")]
