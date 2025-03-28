@@ -264,24 +264,15 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator RunCheckerboardFlashRoutine()
         {
             int[,] rcMatrix = InitializeFlashingIndexGrid();
-            int numColumns = rcMatrix.GetLength(0);
-            int numRows = rcMatrix.GetLength(1);
-            // get the size of the black/white matrices
-            double maxBWsize = Math.Ceiling(numRows * numColumns / 2f);
-
-            // get the number of rows and columns
-            int bwCols = (int)Math.Ceiling(Math.Sqrt(maxBWsize));
-            int bwRows = bwCols;
-            // check if cbRows needs to match cbCols or if we can remove a row
-            while (maxBWsize < ((bwRows * bwCols) - bwRows))
-            {
-                bwRows--;
-            }
+            int gridWidth = rcMatrix.GetWidth();
+            int gridHeight = rcMatrix.GetHeight();
 
             Random rnd = new();
             
-            (int[,] blackMat, int[,] whiteMat) =
-                GenerateCheckerboardMatrices(bwRows, bwCols, rnd.Next);
+            (int[,] blackMat, int[,] whiteMat)
+            = GenerateCheckerboardMatrices(
+                gridWidth, gridHeight, rnd.Next, true
+            );
 
             // for flash count
             for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
@@ -295,33 +286,38 @@ namespace BCIEssentials.ControllerBehaviors
 
         private (int[,] blackMatrix, int[,] whiteMatrix) GenerateCheckerboardMatrices
         (
-            int rows, int columns,
+            int gridWidth, int gridHeight,
             Func<int> getRandomNumber,
             bool printLogs = false
         )
         {
             bool IndexIsBlack(int index)
             {
-                if (columns % 2 == 1)
+                if (gridWidth % 2 == 1)
                     return index % 2 == 0;
                 else
                 {
-                    int rowNumber = index / columns;
+                    int rowNumber = index / gridWidth;
                     return ((index - (rowNumber % 2)) % 2) == 0;
                 };
             }
             bool IndexIsWhite(int i) => !IndexIsBlack(i);
 
-            var objectIndexes = Enumerable.Range(0, _selectableSPOs.Count);
-            int[] shuffledArray = objectIndexes.OrderBy(_ => getRandomNumber).ToArray();
+            (int bwMatrixWidth, int bwMatrixHeight)
+            = GetBWMatrixShape(gridWidth, gridHeight, printLogs);
 
-            int[] blackList = new int[rows * columns];
+            int bwMatrixArea = bwMatrixWidth * bwMatrixHeight;
+
+            var objectIndexes = Enumerable.Range(0, _selectableSPOs.Count);
+            int[] shuffledArray = objectIndexes.OrderBy(_ => getRandomNumber()).ToArray();
+
+            int[] blackList = new int[bwMatrixArea];
             blackList.Fill(-1);
             blackList.FillFrom(
                 shuffledArray.Where(IndexIsBlack).ToArray()
             );
 
-            int[] whiteList = new int[rows * columns];
+            int[] whiteList = new int[bwMatrixArea];
             whiteList.Fill(-1);
             whiteList.FillFrom(
                 shuffledArray.Where(IndexIsWhite).ToArray()
@@ -337,9 +333,35 @@ namespace BCIEssentials.ControllerBehaviors
             }
 
             return (
-                blackList.To2D(rows, columns),
-                whiteList.To2D(rows, columns)
+                blackList.To2D(bwMatrixHeight, bwMatrixWidth),
+                whiteList.To2D(bwMatrixHeight, bwMatrixWidth)
             );
+        }
+
+        private (int width, int height) GetBWMatrixShape
+        (
+            int gridWidth, int gridHeight,
+            bool printLogs = false
+        )
+        {
+            double maxArea = Math.Ceiling(gridWidth * gridHeight / 2f);
+
+            int width = (int)Math.Ceiling(Math.Sqrt(maxArea));
+            int height = width;
+            // check if cbRows needs to match cbCols or if we can remove a row
+            while (maxArea < (height * (width - 1)))
+            {
+                height--;
+            }
+
+            if (printLogs)
+            {
+                Debug.Log(
+                    $"There are {height} rows and {width}"
+                    + $" columns in the BW matrices"
+                );
+            }
+            return (width, height);
         }
         
         private int[,] InitializeFlashingIndexGrid()
