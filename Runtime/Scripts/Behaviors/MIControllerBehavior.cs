@@ -32,7 +32,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override IEnumerator WhileDoIterativeTraining()
+        protected override IEnumerator RunIterativeTrainingRoutine()
         {
             // Generate the target list
             PopulateObjectList();
@@ -74,7 +74,7 @@ namespace BCIEssentials.ControllerBehaviors
             OutStream.PushTrainingCompleteMarker();
         }
 
-        protected override IEnumerator WhileDoSingleTraining()
+        protected override IEnumerator RunSingleTrainingRoutine()
         {
             PopulateObjectList();
 

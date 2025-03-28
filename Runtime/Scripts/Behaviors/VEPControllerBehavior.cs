@@ -35,7 +35,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected abstract void SetRealFrequency(int index, float value);
 
 
-        protected override IEnumerator OnStimulusRunBehavior()
+        protected override IEnumerator RunStimulusRoutine()
         {
             // Add duty cycle
             // Generate the flashing
@@ -67,7 +67,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected override IEnumerator OnStimulusRunComplete()
+        protected override IEnumerator RunStimulusCompletionRoutine()
         {
             foreach (var spo in _selectableSPOs)
             {

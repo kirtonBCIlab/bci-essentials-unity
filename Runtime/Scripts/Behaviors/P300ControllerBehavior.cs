@@ -66,7 +66,7 @@ namespace BCIEssentials.ControllerBehaviors
         private int lastTourEndNode = -100;
 
 
-        protected override IEnumerator WhileDoUserTraining()
+        protected override IEnumerator RunUserTrainingRoutine()
         {
             blockOutGoingLSL = true;
 
@@ -84,7 +84,7 @@ namespace BCIEssentials.ControllerBehaviors
             blockOutGoingLSL = false;
         }
 
-        protected override IEnumerator OnStimulusRunBehavior()
+        protected override IEnumerator RunStimulusRoutine()
         {
             numFlashesPerObjectPerSelection = randNumFlashes.Next(numFlashesLowerLimit, numFlashesUpperLimit);
             Debug.Log("Number of flashes is " + numFlashesPerObjectPerSelection.ToString());
@@ -93,15 +93,15 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 FlashPlurality.Single=> singleFlashPattern switch
                 {
-                    SingleFlashPattern.Random => SingleFlashRoutine(),
-                    SingleFlashPattern.ContextAware => ContextAwareSingleFlashRoutine(),
+                    SingleFlashPattern.Random => RunSingleFlashRoutine(),
+                    SingleFlashPattern.ContextAware => RunContextAwareSingleFlashRoutine(),
                     _  => null
                 },
                 FlashPlurality.Multiple => multiFlashPattern switch
                 {
-                    MultiFlashPattern.RowColumn => RowColFlashRoutine(),
-                    MultiFlashPattern.Checkerboard => CheckerboardFlashRoutine(),
-                    MultiFlashPattern.ContextAware => ContextAwareMultiFlashRoutine(),
+                    MultiFlashPattern.RowColumn => RunRowColFlashRoutine(),
+                    MultiFlashPattern.Checkerboard => RunCheckerboardFlashRoutine(),
+                    MultiFlashPattern.ContextAware => RunContextAwareMultiFlashRoutine(),
                     _ => null
                 },
                 _ => null
@@ -111,7 +111,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         //TODO There is a bug where this is sending "Trial Ended" before the last flash is sent.
-        private IEnumerator SingleFlashRoutine()
+        private IEnumerator RunSingleFlashRoutine()
         {
             int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
             int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
@@ -124,7 +124,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
         
-        private IEnumerator ContextAwareSingleFlashRoutine()
+        private IEnumerator RunContextAwareSingleFlashRoutine()
         {
             int totalFlashes = numFlashesPerObjectPerSelection;          
 
@@ -149,7 +149,7 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator RunSingleFlash(SPO flashingObject, int markerId)
         {
             flashingObject.StartStimulus();
-            WriteSingleFlashMarker(markerId);
+            SendSingleFlashMarker(markerId);
             yield return new WaitForSecondsRealtime(onTime);
 
             flashingObject.StopStimulus();
@@ -157,7 +157,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         
-        private IEnumerator ContextAwareMultiFlashRoutine()
+        private IEnumerator RunContextAwareMultiFlashRoutine()
         {
             //Total number of flashes for each grouping of objects.
             int totalFlashes = numFlashesPerObjectPerSelection;
@@ -220,7 +220,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        private IEnumerator RowColFlashRoutine()
+        private IEnumerator RunRowColFlashRoutine()
         {
             int[,] rcMatrix = InitializeFlashingIndexGrid();
             int numRows = rcMatrix.GetLength(0);
@@ -261,7 +261,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
         
         //TODO: Need to fix Checkerboard Flashing while I'm here
-        private IEnumerator CheckerboardFlashRoutine()
+        private IEnumerator RunCheckerboardFlashRoutine()
         {
             int[,] rcMatrix = InitializeFlashingIndexGrid();
             int numColumns = rcMatrix.GetLength(0);
@@ -358,7 +358,7 @@ namespace BCIEssentials.ControllerBehaviors
             foreach (int i in objectsToFlash)
                 _selectableSPOs[i].StartStimulus();
 
-            WriteMultiFlashMarker(objectsToFlash);
+            SendMultiFlashMarker(objectsToFlash);
             yield return new WaitForSecondsRealtime(onTime);
 
             foreach(int i in objectsToFlash)
@@ -421,7 +421,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        private void WriteSingleFlashMarker(int objectIndex)
+        private void SendSingleFlashMarker(int objectIndex)
         {
             if (OutStream != null && !blockOutGoingLSL)
             {
@@ -431,7 +431,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        private void WriteMultiFlashMarker(IEnumerable<int> flashedObjects)
+        private void SendMultiFlashMarker(IEnumerable<int> flashedObjects)
         {
             if (OutStream != null && !blockOutGoingLSL)
             {

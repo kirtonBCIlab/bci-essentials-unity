@@ -47,7 +47,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             //set first frequency
             setFreqFlash = 9.6f;
-            OnStimulusRunComplete();
+            RunStimulusCompletionRoutine();
             PopulateObjectList();
         }
 
@@ -95,7 +95,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
         
 
-        protected override IEnumerator OnStimulusRunBehavior()
+        protected override IEnumerator RunStimulusRoutine()
         {
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
@@ -122,7 +122,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected override IEnumerator OnStimulusRunComplete()
+        protected override IEnumerator RunStimulusCompletionRoutine()
         {
             foreach (var spo in _selectableSPOs)
             {
@@ -140,13 +140,13 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 setFreqFlash = 16f;
                 //need to call these methods so all of the appropriate flashing variables are updated 
-                OnStimulusRunComplete();
+                RunStimulusCompletionRoutine();
                 PopulateObjectList();
             }
             else if (j == 3)
             {
                 setFreqFlash = 36f;
-                OnStimulusRunComplete();
+                RunStimulusCompletionRoutine();
                 PopulateObjectList();
             }
             else if (j == 6)
@@ -169,7 +169,7 @@ namespace BCIEssentials.ControllerBehaviors
                     else if (l == 5)
                         SetMaterial(6);
 
-                    OnStimulusRunComplete();
+                    RunStimulusCompletionRoutine();
                     PopulateObjectList();
                 }
             }
@@ -226,7 +226,7 @@ namespace BCIEssentials.ControllerBehaviors
                         //the number that i is less than is the amount of seconds to flash for 
                         //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
                         {
-                            yield return OnStimulusRunBehavior();
+                            yield return RunStimulusRoutine();
                         }
 
                         //rotate the camera away from the stimuli objects when they are off

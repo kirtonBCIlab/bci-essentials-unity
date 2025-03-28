@@ -315,10 +315,10 @@ namespace BCIEssentials.ControllerBehaviors
         {
             while (StimulusRunning)
             {
-                yield return OnStimulusRunBehavior();
+                yield return RunStimulusRoutine();
             }
 
-            yield return OnStimulusRunComplete();
+            yield return RunStimulusCompletionRoutine();
             
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
@@ -328,7 +328,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// Behavior to invoke during a stimulus run.
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerator OnStimulusRunBehavior()
+        protected virtual IEnumerator RunStimulusRoutine()
         {
             yield break;
         }
@@ -337,7 +337,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// Behavior that is run after a stimulus run has ended.
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerator OnStimulusRunComplete()
+        protected virtual IEnumerator RunStimulusCompletionRoutine()
         {
             yield break;
         }
@@ -450,7 +450,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <param name="objectIndex"></param>
         public virtual void SelectSPOAtEndOfRun(int objectIndex)
         {
-            StopStartCoroutine(ref _waitToSelect, InvokeAfterStimulusRun(() =>
+            StopStartCoroutine(ref _waitToSelect, RunInvokeAfterStimulusRun(() =>
             {
                 if (LastSelectedSPO != null)
                 {
@@ -462,7 +462,7 @@ namespace BCIEssentials.ControllerBehaviors
             }));
         }
 
-        protected IEnumerator InvokeAfterStimulusRun(Action action)
+        protected IEnumerator RunInvokeAfterStimulusRun(Action action)
         {
             while (StimulusRunning)
             {
@@ -524,18 +524,18 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 case BCITrainingType.Automated:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoAutomatedTraining();
+                    trainingBehavior = RunAutomatedTrainingRoutine();
                     break;
                 case BCITrainingType.Iterative:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoIterativeTraining();
+                    trainingBehavior = RunIterativeTrainingRoutine();
                     break;
                 case BCITrainingType.User:
-                    trainingBehavior = WhileDoUserTraining();
+                    trainingBehavior = RunUserTrainingRoutine();
                     break;
                 case BCITrainingType.Single:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoSingleTraining();
+                    trainingBehavior = RunSingleTrainingRoutine();
                     break;
                 default:
                 case BCITrainingType.None:
@@ -545,7 +545,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             if (trainingBehavior != null)
             {
-                StopStartCoroutine(ref _training, RunControllerTraining(trainingType, trainingBehavior));
+                StopStartCoroutine(ref _training, RunTraining(trainingType, trainingBehavior));
             }
         }
 
@@ -558,7 +558,7 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _training);
         }
 
-        private IEnumerator RunControllerTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)
+        private IEnumerator RunTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)
         {
             CurrentTrainingType = trainingType;
 
@@ -571,7 +571,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         // Do training
-        protected virtual IEnumerator WhileDoAutomatedTraining()
+        protected virtual IEnumerator RunAutomatedTrainingRoutine()
         {
             PopulateObjectList();
             
@@ -637,7 +637,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        protected virtual IEnumerator WhileDoUserTraining()
+        protected virtual IEnumerator RunUserTrainingRoutine()
         {
             Debug.Log("No user training available for this paradigm");
 
@@ -645,14 +645,14 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        protected virtual IEnumerator WhileDoIterativeTraining()
+        protected virtual IEnumerator RunIterativeTrainingRoutine()
         {
             Debug.Log("No iterative training available for this controller");
 
             yield return null;
         }
 
-        protected virtual IEnumerator WhileDoSingleTraining()
+        protected virtual IEnumerator RunSingleTrainingRoutine()
         {
             //TODO: Implement a way to handle default null targetObject
             Debug.Log("No single training available for this controller");
