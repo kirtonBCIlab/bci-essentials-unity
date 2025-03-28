@@ -335,11 +335,17 @@ namespace BCIEssentials.Utilities
         }
 
 
-        public static int[] GetRow(this int[,] ar, int index)
+        public static T[] GetRow<T>
+        (
+            this T[,] ar, int index
+        )
         => Enumerable.Range(0, ar.GetWidth())
         .Select(x => ar[index, x]).ToArray();
 
-        public static int[] GetColumn(this int [,] ar, int index)
+        public static T[] GetColumn<T>
+        (
+            this T[,] ar, int index
+        )
         => Enumerable.Range(0, ar.GetHeight())
         .Select(x => ar[x, index]).ToArray();
 
@@ -349,26 +355,26 @@ namespace BCIEssentials.Utilities
         public static int GetHeight<T>
         (this T[,] ar) => ar.GetLength(0);
 
-        public static IEnumerator RunForEachRow
+        public static IEnumerator RunForEachRow<T>
         (
-            this int[,] ar, Func<int[], IEnumerator> rowMethod
+            this T[,] ar, Func<T[], IEnumerator> rowMethod
         )
         {
             for (int i = 0; i < ar.GetHeight(); i++)
             {
-                int[] row = ar.GetRow(i);
+                T[] row = ar.GetRow(i);
                 yield return rowMethod(row);
             }
         }
 
-        public static IEnumerator RunForEachColumn
+        public static IEnumerator RunForEachColumn<T>
         (
-            this int[,] ar, Func<int[], IEnumerator> columnMethod
+            this T[,] ar, Func<T[], IEnumerator> columnMethod
         )
         {
             for (int j = 0; j < ar.GetWidth(); j++)
             {
-                int[] column = ar.GetColumn(j);
+                T[] column = ar.GetColumn(j);
                 yield return columnMethod(column);
             }
         }
