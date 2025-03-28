@@ -115,6 +115,44 @@ namespace BCIEssentials.Utilities
             return lpPart.LaplaceGP(objectWeights);
         }
 
+
+        public static int[,] SubsetToRandomMatrix(int[] subset)
+        {
+            // Debug.Log("Original Subset" + string.Join(",",subset));
+            int[] permutationArray = ArrayUtilities.GenerateRNRA_FisherYates(subset.Length,0,subset.Length-1);
+            int[] subsetPermutated = new int[subset.Length];
+            //Apply the permutation to the subset
+            for (int i = 0; i < subset.Length; i++)
+            {
+                subsetPermutated[i] = subset[permutationArray[i]];
+            }
+            // Debug.Log("Shuffled Subset" + string.Join(",",subsetPermutated));
+            var numRows = (int)Mathf.Floor(Mathf.Sqrt(subset.Length));
+            var numCols = (int)Mathf.Ceil((float)subset.Length / (float)numRows);
+            var newMatrix = new int[numRows, numCols];
+
+            for (int i = 0; i < numRows; i++)
+            {
+                for (int j = 0; j < numCols; j++)
+                {
+                    int index = i * numCols + j;
+                    if (index < subset.Length)
+                    {
+                        newMatrix[i, j] = subsetPermutated[index];
+                    }
+                    else
+                    {
+                        newMatrix[i, j] = -100;
+                    }
+
+                }
+            } 
+
+            // Debug.Log("New Matrix:\n" + ArrayUtilities.FormatMatrix(newMatrix));
+            return newMatrix;
+        }
+
+
         public static List<Vector2> CalculateOffsetFromCamera
         (
             List<GameObject> goList,
