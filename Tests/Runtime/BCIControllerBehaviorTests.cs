@@ -13,14 +13,13 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using LogAssert = BCIEssentials.Tests.Utilities.LogAssert;
 using Object = UnityEngine.Object;
 
 namespace BCIEssentials.Tests
 {
     public class BCIControllerBehaviorTests : PlayModeTestRunnerBase
     {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private GameObject _testControllerObject;
         private BCIControllerBehavior _behavior;
 
@@ -30,7 +29,7 @@ namespace BCIEssentials.Tests
             LogTestName();
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController();
+            _testController = CreateControllerInstance();
             _testControllerObject = _testController.gameObject;
             _behavior = _testControllerObject.AddComponent<EmptyBCIControllerBehavior>();
 
@@ -41,19 +40,9 @@ namespace BCIEssentials.Tests
         public void WhenRegisterWithControllerInstance_ThenBehaviorRegistered()
         {
             _testControllerObject.SetActive(true);
-            _behavior.RegisterWithControllerInstance();
+            _behavior.RegisterWithController();
 
             Assert.IsTrue(BCIController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
-        }
-
-        [Test]
-        public void WhenNoControllerInstanceAndRegisterBehavior_ThenCompletesWithError()
-        {
-            LogAssert.ExpectStartingWith(LogType.Error, "No BCI Controller instance set");
-
-            _behavior.RegisterWithControllerInstance();
-
-            Assert.IsFalse(BCIController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
 
         [Test]
@@ -61,7 +50,7 @@ namespace BCIEssentials.Tests
         {
             _testController.Initialize();
 
-            _behavior.UnregisterFromControllerInstance();
+            _behavior.UnregisterFromController();
 
             Assert.IsFalse(BCIController.HasBehaviorOfType<EmptyBCIControllerBehavior>());
         }
@@ -186,12 +175,6 @@ namespace BCIEssentials.Tests
             );
         }
 
-        [Test]
-        public void WhenInitialized_HotKeysEnabled()
-        {
-            _testController.Initialize();
-            Assert.IsTrue(_behavior._hotkeysEnabled);
-        }
 
         [UnityTest]
         public IEnumerator WhenCleanUp_ThenFactoryObjectsDestroyed()
@@ -290,7 +273,7 @@ namespace BCIEssentials.Tests
 
     public class BCIControllerBehaviorTests_StimulusRunTests : PlayModeTestRunnerBase
     {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private BCIControllerBehavior _behavior;
         private LSLMarkerWriter _testMarkerStream;
 
@@ -299,11 +282,11 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(setActive: true);
+            _testController = CreateControllerInstance(setActive: true);
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
-            _behavior.RegisterWithControllerInstance(true);
+            _behavior.RegisterWithController(true);
 
             _testMarkerStream = _testController.GetComponent<LSLMarkerWriter>();
 
@@ -354,7 +337,7 @@ namespace BCIEssentials.Tests
 
     public class BCIControllerBehaviorTests_SelectObjectTests : PlayModeTestRunnerBase
     {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private GameObject _testControllerObject;
         private BCIControllerBehavior _behavior;
         private List<SPO> _spos;
@@ -364,11 +347,11 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(setActive: true);
+            _testController = CreateControllerInstance(setActive: true);
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
-            _behavior.RegisterWithControllerInstance(true);
+            _behavior.RegisterWithController(true);
 
             _spos = new List<SPO>
             {
@@ -449,7 +432,7 @@ namespace BCIEssentials.Tests
 
     public class BCIControllerBehaviorTests_TrainingTests : PlayModeTestRunnerBase
     {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private BCIControllerBehavior _behavior;
         private List<SPO> _spos;
 
@@ -458,7 +441,7 @@ namespace BCIEssentials.Tests
         {
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController(setActive: true);
+            _testController = CreateControllerInstance(setActive: true);
             _testController.Initialize();
             
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
@@ -545,7 +528,7 @@ namespace BCIEssentials.Tests
 
         public class BCIP300ControllerBehavior_SpoGraphTests : PlayModeTestRunnerBase
      {
-        private BCIController _testController;
+        private BCIControllerInstance _testController;
         private GameObject _testControllerObject;
         private P300ControllerBehavior _behavior;
         private const string MyTag = "BCI";
@@ -556,7 +539,7 @@ namespace BCIEssentials.Tests
             LogTestName();
             yield return LoadDefaultSceneAsync();
 
-            _testController = CreateController();
+            _testController = CreateControllerInstance();
             _testControllerObject = _testController.gameObject;
             _behavior = _testControllerObject.AddComponent<P300ControllerBehavior>();
 

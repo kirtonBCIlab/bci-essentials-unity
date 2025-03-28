@@ -1,229 +1,101 @@
-using System.Collections.Generic;
-using System.Collections;
-using BCIEssentials.LSLFramework;
 using BCIEssentials.ControllerBehaviors;
-using BCIEssentials.StimulusObjects;
 using UnityEngine;
-using UnityEngine.Events;
+using System;
+
+using static UnityEngine.Object;
 
 namespace BCIEssentials.Controllers
 {
-    public class BCIController : MonoBehaviour
+    public static class BCIController
     {
-        [SerializeField] private LSLMarkerWriter _lslMarkerStream;
-        [SerializeField] private LSLResponseProvider _lslResponseStream;
-        
-        [Space]
-        [SerializeField] private bool _dontDestroyActiveInstance;
+        public static BCIControllerInstance Instance
+        { get; private set; }
 
-        public static BCIController Instance { get; private set; }
-        public BCIControllerBehavior ActiveBehavior { get; private set; }
+        public static BCIControllerBehavior ActiveBehavior
+        => Instance == null? null: Instance.ActiveBehavior;
 
-        public Dictionary<KeyCode, UnityAction> _keyBindings = new();
-        private Dictionary<BCIBehaviorType, BCIControllerBehavior> _registeredBehaviors = new();
-       //public bool _hotkeysEnabled {get; private set;}
+        private static bool _quitMessageConnected;
+        private static bool _applicationIsQuitting;
 
-        private void Awake()
+
+        public static void NotifyInstanceCreated
+        (BCIControllerInstance createdInstance)
         {
-            Initialize();
+            if (!_quitMessageConnected)
+            {
+                Application.quitting += () =>
+                    _applicationIsQuitting = true;
+                _quitMessageConnected = true;
+            }
+
+            if (Instance == null) Instance = createdInstance;
         }
 
-        public void Initialize()
+        public static void NotifyInstanceDestroyed
+        (BCIControllerInstance destroyedInstance)
         {
-            if (_lslMarkerStream == null && !TryGetComponent(out _lslMarkerStream))
-            {
-                Debug.LogError($"No component of type {typeof(LSLMarkerWriter)} found");
-                enabled = false;
-                return;
-            }
-
-            if (_lslResponseStream == null && !TryGetComponent(out _lslResponseStream))
-            {
-                Debug.LogError($"No component of type {typeof(LSLResponseProvider)} found");
-                enabled = false;
-                return;
-            }
-
-            if (Instance != null)
-            {
-                Debug.Log("An existing controller instance is already assigned.");
-                return;
-            }
-
-            Instance = this;
-
-            if (_dontDestroyActiveInstance)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+            if (Instance == destroyedInstance) Instance = null;
         }
 
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-        }
-
-        private void Update()
-        {
-            //Check for key inputs
-            foreach (var (keyCode, action) in _keyBindings)
-            {
-                if (Input.GetKeyDown(keyCode))
-                {
-                    action?.Invoke();
-                }
-            }
-        }
-
-        private void RegisterKeyBindings()
-        {
-            _keyBindings.TryAdd(KeyCode.S, StartStopStimulus);
-
-            //TODO: Refactor out training
-            _keyBindings.TryAdd(KeyCode.T, () => { StartTraining(BCITrainingType.Automated);});
-            _keyBindings.TryAdd(KeyCode.I, () => { StartTraining(BCITrainingType.Iterative);});
-            _keyBindings.TryAdd(KeyCode.U, () => { StartTraining(BCITrainingType.User);});
-            _keyBindings.TryAdd(KeyCode.Semicolon, () => { StartTraining(BCITrainingType.Single);});
-            _keyBindings.TryAdd(KeyCode.Backspace, () => {UpdateClassifier();});
-
-            //Register Object Selection
-            _keyBindings.TryAdd(KeyCode.Alpha0, () => { SelectSPOAtEndOfRun(0); });
-            _keyBindings.TryAdd(KeyCode.Alpha1, () => { SelectSPOAtEndOfRun(1); });
-            _keyBindings.TryAdd(KeyCode.Alpha2, () => { SelectSPOAtEndOfRun(2); });
-            _keyBindings.TryAdd(KeyCode.Alpha3, () => { SelectSPOAtEndOfRun(3); });
-            _keyBindings.TryAdd(KeyCode.Alpha4, () => { SelectSPOAtEndOfRun(4); });
-            _keyBindings.TryAdd(KeyCode.Alpha5, () => { SelectSPOAtEndOfRun(5); });
-            _keyBindings.TryAdd(KeyCode.Alpha6, () => { SelectSPOAtEndOfRun(6); });
-            _keyBindings.TryAdd(KeyCode.Alpha7, () => { SelectSPOAtEndOfRun(7); });
-            _keyBindings.TryAdd(KeyCode.Alpha8, () => { SelectSPOAtEndOfRun(8); });
-            _keyBindings.TryAdd(KeyCode.Alpha9, () => { SelectSPOAtEndOfRun(9); });
-        }
-
-        public static void EnableDisableHotkeys(bool _registerKeyBindings)
-        {
-             if (Instance == null)
-            {
-                Debug.Log("No BCI Controller instance set.");
-                return;
-            }
-
-            if(_registerKeyBindings == true)
-            {
-                Instance.RegisterKeyBindings();
-            }
-            else
-            {
-                Instance._keyBindings.Clear();
-            }
-        }
         
         public static void ChangeBehavior(BCIBehaviorType behaviorType)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.CleanUp();
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
 
-            if (Instance._registeredBehaviors.TryGetValue(behaviorType, out var requestedBehavior))
-            {
-                Instance.ActiveBehavior = requestedBehavior;
-                Instance.ActiveBehavior.Initialize(Instance._lslMarkerStream, Instance._lslResponseStream);
-                Debug.Log($"New BCI Controller active of type {behaviorType}");
-            }
-            else
-            {
-                Debug.LogError($"Unable to find a registered behavior for type {behaviorType}]");
-            }
+            Instance.ChangeBehavior(behaviorType);
         }
 
         public static bool RegisterBehavior(BCIControllerBehavior behavior, bool setAsActive = false)
         {
-            if (behavior == null)
-            {
-                Debug.LogError("Controller Behavior is null");
-                return false;
-            }
-
             if (Instance == null)
             {
-                Debug.LogError("No BCI Controller instance set.");
-                return false;
-            }
+                Instance = FindObjectOfType<BCIControllerInstance>();
 
-            if (Instance._registeredBehaviors.TryAdd(behavior.BehaviorType, behavior))
-            {
-                if (setAsActive)
+                if (Instance == null)
                 {
-                    ChangeBehavior(behavior.BehaviorType);
+                    Debug.Log("No BCI Controller Instance set, creating one...");
+                    Instance = CreateInstance();
                 }
-
-                return true;
             }
-
-            Debug.LogWarning($"Was unable to register a new controller behavior for type {behavior.BehaviorType}");
-            return false;
+            return Instance.RegisterBehavior(behavior, setAsActive);
         }
 
         public static void UnregisterBehavior(BCIControllerBehavior behavior)
         {
-            if (behavior == null)
-            {
-                return;
-            }
-            
+            if (_applicationIsQuitting) return;
+
             if (Instance == null)
             {
-                Debug.Log("No BCI Controller instance set.");
+                Debug.LogWarning("No Instance to unregister from");
                 return;
             }
 
-            if (!Instance._registeredBehaviors.TryGetValue(behavior.BehaviorType, out var foundBehavior) ||
-                foundBehavior != behavior)
-            {
-                return;
-            }
-
-            Instance._registeredBehaviors.Remove(behavior.BehaviorType);
-            Debug.Log($"Unregistered behavior for type {behavior.BehaviorType}");
-            
-            if (Instance.ActiveBehavior == behavior)
-            {
-                Instance.ActiveBehavior = null;
-                Debug.Log("The active behavior was also removed.");
-            }
+            Instance.UnregisterBehavior(behavior);
         }
 
         public static bool HasBehaviorForType(BCIBehaviorType type)
         {
             if (Instance == null)
-            {
-                Debug.Log("No BCI Controller instance set.");
-                return false;
-            }
-            
-            return Instance._registeredBehaviors.ContainsKey(type);
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            return Instance.HasBehaviorForType(type);
         }
         
         public static bool HasBehaviorOfType<T>() where T : BCIControllerBehavior
         {
             if (Instance == null)
-            {
-                Debug.Log("No BCI Controller instance set.");
-                return false;
-            }
-            
-            foreach (var value in Instance._registeredBehaviors.Values)
-            {
-                if (value is T)
-                {
-                    return true;
-                }
-            }
-            
-            return false;
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            return Instance.HasBehaviorOfType<T>();
+        }
+
+
+        private static BCIControllerInstance CreateInstance()
+        {
+            GameObject instanceHost = new("BCI Controller Instance");
+            DontDestroyOnLoad(instanceHost);
+            return instanceHost.AddComponent<BCIControllerInstance>();
         }
 
 
@@ -235,12 +107,10 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public static void StartStopStimulus()
         {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
 
-            Instance.ActiveBehavior.StartStopStimulusRun();
+            Instance.StartStopStimulus();
         }
         
         /// <summary>
@@ -252,10 +122,10 @@ namespace BCIEssentials.Controllers
         /// </param>
         public static void StartStimulusRun(bool sendConstantMarkers = true)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.StartStimulusRun(sendConstantMarkers);
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.StartStimulusRun(sendConstantMarkers);
         }
 
         /// <summary>
@@ -263,12 +133,10 @@ namespace BCIEssentials.Controllers
         /// </summary>
         public static void StopStimulusRun()
         {
-            if (Instance.ActiveBehavior == null)
-            {
-                return;
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
 
-            Instance.ActiveBehavior.StopStimulusRun();
+            Instance.StopStimulusRun();
         }
 
         /// <summary>
@@ -278,10 +146,10 @@ namespace BCIEssentials.Controllers
         /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
         public static void SelectSPO(int objectIndex, bool stopStimulusRun = false)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.SelectSPO(objectIndex, stopStimulusRun);
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.SelectSPO(objectIndex, stopStimulusRun);
         }
         
         /// <summary>
@@ -291,10 +159,10 @@ namespace BCIEssentials.Controllers
         /// <param name="objectIndex"></param>
         public static void SelectSPOAtEndOfRun(int objectIndex)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.SelectSPOAtEndOfRun(objectIndex);
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.SelectSPOAtEndOfRun(objectIndex);
         }
 
         /// <summary>
@@ -306,45 +174,42 @@ namespace BCIEssentials.Controllers
         /// </param>
         public static void StartTraining(BCITrainingType trainingType)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.StartTraining(trainingType);
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.StartTraining(trainingType);
         }
+
+        public static void StartAutomatedTraining() => StartTraining(BCITrainingType.Automated);
+        public static void StartUserTraining() => StartTraining(BCITrainingType.User);
+        public static void StartIterativeTraining() => StartTraining(BCITrainingType.Iterative);
+        public static void StartSingleTraining() => StartTraining(BCITrainingType.Single);
 
         /// <summary>
         /// Stops the current training run.
         /// </summary>
         public static void StopTraining()
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.StopTraining();
-            }
-        }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
 
-        public static void WhileDoSingleTraining()
-        {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.StartCoroutine(Instance.ActiveBehavior.WhileDoSingleTraining());
-            }
+            Instance.StopTraining();
         }
 
         public static void UpdateClassifier()
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.UpdateClassifier();
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.UpdateClassifier();
         }
 
         public static void PassBessyPythonMessage(string message)
         {
-            if (Instance.ActiveBehavior != null)
-            {
-                Instance.ActiveBehavior.PassBessyPythonMessage(message);
-            }
+            if (Instance == null)
+            throw new NullReferenceException("No BCI Controller Instance set");
+
+            Instance.PassBessyPythonMessage(message);
         }
 
         #endregion

@@ -21,7 +21,16 @@ namespace BCIEssentials.ControllerBehaviors
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
-        [Header("Controller Registration")]
+
+        [SerializeField, Min(-1)]
+        [Tooltip("The applications target frame rate [Hz].\n"
+            + "0 results in no override being applied.\n"
+            + "-1 or higher than 0 is still applied."
+        )]
+        protected int targetFrameRate = 60;
+
+
+        [FoldoutGroup("Controller Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
@@ -30,10 +39,23 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to set as active behavior when self registering.")]
         private bool _selfRegisterAsActive;
 
+        [SerializeField, ShowIf("_selfRegister")]
+        [Tooltip("Controller Instance with which to register.\n"
+            + "Defaults to dynamic global controller."
+        )]
+        [EndFoldoutGroup]
+        private BCIControllerInstance _selfRegistrationTarget;
+
 
         [FoldoutGroup("Stimulus Presenting Objects")]
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         public string SPOTag = "BCI";
+
+        [SerializeField]
+        [InspectorName("Selectable Objects")]
+        [Tooltip("Provide an initial set of SPO.")]
+        protected List<SPO> _selectableSPOs = new();
+        protected int SPOCount => _selectableSPOs.Count;
 
         [Header("Factory Setup")]
         [SerializeField]
@@ -46,21 +68,6 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
 
-        [SerializeField, Space]
-        [InspectorName("Selectable Objects")]
-        [Tooltip("Provide an initial set of SPO.")]
-        protected List<SPO> _selectableSPOs = new();
-        protected int SPOCount => _selectableSPOs.Count;
-
-        
-        [FoldoutGroup("System Properties and Targets")]
-        [SerializeField, Min(-1)]
-        [Tooltip("The applications target frame rate [Hz]. 0 results in no override being applied. -1 or higher than 0 is still applied.")]
-        protected int targetFrameRate = 60;
-
-        [SerializeField, EndFoldoutGroup]
-        [Tooltip("Enable BCIController Hotkeys")]
-        public bool _hotkeysEnabled = true;
 
         private int __uniqueID = 1;
 
@@ -142,7 +149,11 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (_selfRegister)
             {
-                RegisterWithControllerInstance(_selfRegisterAsActive);
+                if (_selfRegistrationTarget != null) { 
+                    RegisterWithControllerInstance
+                        (_selfRegistrationTarget, _selfRegisterAsActive);
+                }
+                else RegisterWithController(_selfRegisterAsActive);
             }
         }
 
@@ -150,7 +161,11 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (_selfRegister)
             {
-                UnregisterFromControllerInstance();
+                if (_selfRegistrationTarget != null) {
+                    UnregisterFromControllerInstance
+                        (_selfRegistrationTarget);
+                }
+                else UnregisterFromController();
             }
         }
 
@@ -171,10 +186,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Application.targetFrameRate = targetFrameRate; 
             }
             
-            if (FactorySetupRequired)
-            {
-                SetUpSPOs();
-            }
+            if (FactorySetupRequired) SetUpSPOs();
         }
 
         /// <summary>
@@ -222,23 +234,32 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         /// <summary>
-        /// Register this behavior with the active <see cref="BCIController.Instance"/>.
-        /// <param name="setAsActive">If true will attempt to set itself as active behavior.</param>
-
+        /// Register this behavior with the dynamic global <see cref="BCIController"/>.
         /// </summary>
-        public void RegisterWithControllerInstance(bool setAsActive = false)
-        {
-            BCIController.RegisterBehavior(this, setAsActive);
-            BCIController.EnableDisableHotkeys(_hotkeysEnabled);
-        }
+        public void RegisterWithController(bool setAsActive = false)
+        => BCIController.RegisterBehavior(this, setAsActive);
+        /// <summary>
+        /// Register this behavior with a specific <see cref="BCIControllerInstance"/>
+        /// </summary>
+        public void RegisterWithControllerInstance
+        (
+            BCIControllerInstance controllerInstance, bool setAsActive = false
+        )
+        => controllerInstance.RegisterBehavior(this, setAsActive);
 
         /// <summary>
-        /// Unregister this behavior from the active <see cref="BCIController.Instance"/>.
+        /// Unregister this behavior from the dynamic global <see cref="BCIController"/>.
         /// </summary>
-        public void UnregisterFromControllerInstance()
-        {
-            BCIController.UnregisterBehavior(this);
-        }
+        public void UnregisterFromController()
+        => BCIController.UnregisterBehavior(this);
+        /// <summary>
+        /// Unregister this behavior from a specific <see cref="BCIControllerInstance"/>
+        /// </summary>
+        public void UnregisterFromControllerInstance
+        (
+            BCIControllerInstance controllerInstance
+        )
+        => controllerInstance.UnregisterBehavior(this);
 
         #endregion
 
@@ -637,7 +658,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        //TODO: Figure out why protected IS working, but isn't for other training types
+
         protected virtual IEnumerator WhileDoIterativeTraining()
         {
             Debug.Log("No iterative training available for this controller");
@@ -645,8 +666,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        //TODO: Figure out why protected here isn't working, but is for other training types
-        public virtual IEnumerator WhileDoSingleTraining()
+        protected virtual IEnumerator WhileDoSingleTraining()
         {
             //TODO: Implement a way to handle default null targetObject
             Debug.Log("No single training available for this controller");

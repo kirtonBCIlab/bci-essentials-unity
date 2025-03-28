@@ -41,7 +41,7 @@ namespace BCIEssentials.Tests.Utilities
             Debug.Log($"<color=green>Test Started: '{CurrentTestName}'</color>");
         }
 
-        protected static BCIController CreateController(BCIControllerExtensions.Properties inspectorProperties = null,
+        protected static BCIControllerInstance CreateControllerInstance(BCIControllerExtensions.Properties inspectorProperties = null,
             bool setActive = false)
         {
             var gameObject = new GameObject();
@@ -50,7 +50,7 @@ namespace BCIEssentials.Tests.Utilities
             gameObject.AddComponent<LSLMarkerWriter>();
             gameObject.AddComponent<LSLResponseProvider>().PollingPeriod = 0.02f;
 
-            var controller = gameObject.AddComponent<BCIController>();
+            var controller = gameObject.AddComponent<BCIControllerInstance>();
             controller.AssignInspectorProperties(inspectorProperties);
 
             if (setActive)
