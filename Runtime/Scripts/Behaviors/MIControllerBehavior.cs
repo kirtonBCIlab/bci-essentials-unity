@@ -21,6 +21,17 @@ namespace BCIEssentials.ControllerBehaviors
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
 
+
+        public override void MakeSelection(int classIndex, bool stopStimulusRun = false)
+        {
+            base.MakeSelection(classIndex, stopStimulusRun);
+            Debug.LogWarning(
+                "You should override this method in an inherited class " +
+                "as object selection is neither deterministic by index " +
+                "between trials nor relevant to the paradigm."
+            );
+        }
+
         public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             base.PopulateObjectList(populationMethod);

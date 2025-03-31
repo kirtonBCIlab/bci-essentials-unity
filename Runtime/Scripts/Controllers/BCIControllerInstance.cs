@@ -161,29 +161,34 @@ namespace BCIEssentials.Controllers
         }
 
         /// <summary>
-        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/>.
+        /// Select a stimulus object or class
         /// </summary>
-        /// <param name="objectIndex">The index value of the object to select.</param>
-        /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
-        public void SelectSPO(int objectIndex, bool stopStimulusRun = false)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select <i>(0-indexed)</i>
+        /// </param>
+        /// <param name="stopStimulusRun">
+        /// If true will end the current stimulus run
+        /// </param>
+        public void MakeSelection(int selectionIndex, bool stopStimulusRun = false)
         {
             if (ActiveBehavior == null)
             throw new NullReferenceException("No Active Behavior set");
 
-            ActiveBehavior.SelectSPO(objectIndex, stopStimulusRun);
+            ActiveBehavior.MakeSelection(selectionIndex, stopStimulusRun);
         }
-        
+
         /// <summary>
-        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/> if no objects were
-        /// selected during a stimulus run.
+        /// Make a selection at the end of a stimulus if no other was made
         /// </summary>
-        /// <param name="objectIndex"></param>
-        public void SelectSPOAtEndOfRun(int objectIndex)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select <i>(0-indexed)</i>
+        /// </param>
+        public void MakeSelectionAtEndOfRun(int selectionIndex)
         {
             if (ActiveBehavior == null)
             throw new NullReferenceException("No Active Behavior set");
 
-            ActiveBehavior.SelectSPOAtEndOfRun(objectIndex);
+            ActiveBehavior.MakeSelectionAtEndOfRun(selectionIndex);
         }
 
         /// <summary>
