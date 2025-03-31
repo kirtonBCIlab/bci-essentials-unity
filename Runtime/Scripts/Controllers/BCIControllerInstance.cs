@@ -143,16 +143,10 @@ namespace BCIEssentials.Controllers
         /// <summary>
         /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
-        /// <param name="sendConstantMarkers">
-        /// If true will also write to the marker stream until
-        /// the stimulus run ends or the number of markers sent equals <see cref="ActiveBehavior.trainTarget"/>.
-        /// </param>
-        public void StartStimulusRun(bool sendConstantMarkers = true)
+        public void StartStimulusRun()
         {
             if (ActiveBehavior == null)
             throw new NullReferenceException("No Active Behavior set");
-
-            ActiveBehavior.StartStimulusRun(sendConstantMarkers);
         }
 
         /// <summary>

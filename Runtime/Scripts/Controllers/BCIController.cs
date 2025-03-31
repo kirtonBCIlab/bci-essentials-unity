@@ -116,16 +116,12 @@ namespace BCIEssentials.Controllers
         /// <summary>
         /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
-        /// <param name="sendConstantMarkers">
-        /// If true will also write to the marker stream until
-        /// the stimulus run ends or the number of markers sent equals <see cref="ActiveBehavior.trainTarget"/>.
-        /// </param>
-        public static void StartStimulusRun(bool sendConstantMarkers = true)
+        public static void StartStimulusRun()
         {
             if (Instance == null)
             throw new NullReferenceException("No BCI Controller Instance set");
 
-            Instance.StartStimulusRun(sendConstantMarkers);
+            Instance.StartStimulusRun();
         }
 
         /// <summary>

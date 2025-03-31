@@ -312,8 +312,8 @@ namespace BCIEssentials.Tests
             var markerListener = AddComponent<LSLRawStreamReader>();
             markerListener.OpenStreamByName(_testMarkerStream.StreamName);
 
-            _behavior.StartStimulusRun(false);
-            _behavior.StartStimulusRun(false);
+            _behavior.StartStimulusRun();
+            _behavior.StartStimulusRun();
             yield return new WaitForSecondsRealtime(0.5f);
             var responses = markerListener.PullAllSamples();
 
@@ -571,7 +571,7 @@ namespace BCIEssentials.Tests
             mainCamera.transform.position = new Vector3(0, 0, -10);
 
             // Act
-            var result = _behavior.GetGameSPOsInCameraView();
+            var result = _behavior.GetSPOGameObjectsInCameraViewByTag();
 
             // Assert
             Assert.AreEqual(visibleSPOs.Count, result.Count, "The number of visible SPOs should match the expected count.");

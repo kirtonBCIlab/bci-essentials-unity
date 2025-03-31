@@ -1,19 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using System.IO;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
-using UnityEditor.SceneManagement;
-using System.IO;
-using UnityEditor;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     /// <summary>
-    /// This is the SPO Controller base class for an object-oriented design (OOD) approach to SSVEP BCI
+    /// Base class for any implementation of a BCI paradigm
+    /// to be used by a <see cref="BCIController"/>
     /// </summary>
     public abstract class BCIControllerBehavior : MonoBehaviourUsingExtendedAttributes
     {
@@ -21,6 +22,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// The type of BCI behavior implemented.
         /// </summary>
         public abstract BCIBehaviorType BehaviorType { get; }
+
+        #region Inspector Properties
 
         [SerializeField, Min(-1)]
         [Tooltip("The applications target frame rate [Hz].\n"
@@ -30,7 +33,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected int targetFrameRate = 60;
 
 
-        [FoldoutGroup("Controller Registration")]
+        [StartFoldoutGroup("Controller Registration")]
         [SerializeField]
         [Tooltip("Register and Unregister with the BCI Controller instance using Start and OnDestroy")]
         private bool _selfRegister = true;
@@ -47,7 +50,7 @@ namespace BCIEssentials.ControllerBehaviors
         private BCIControllerInstance _selfRegistrationTarget;
 
 
-        [FoldoutGroup("Stimulus Presenting Objects")]
+        [StartFoldoutGroup("Stimulus Presenting Objects")]
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         public string SPOTag = "BCI";
 
@@ -68,38 +71,31 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
 
-
         private int __uniqueID = 1;
 
-        #region Refactorable Properties
 
-        //StimulusOn/Off + sending Markers
-        [FoldoutGroup("Signal Properties")]
-        [Tooltip("The length of the processing window [sec]")]
-        //TODO: Rename this more appropriately to our Epoch/scheme
-        public float windowLength = 1.0f;
-        [Tooltip("The interval between processing windows [sec]")]
-        public float interWindowInterval = 0f;
-
-        //Training
-        [FoldoutGroup("Training Properties")]
+        [StartFoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
         public int numTrainingSelections;
-        [Tooltip("The number of windows used in each training iteration. This does nothing for P300.")]
-        public int numTrainWindows = 3;
-        [Tooltip("Before training starts, pause for this amount of time [sec]")]
-        public float pauseBeforeTraining = 2;
         [Tooltip("The time the target is displayed for, before the sequence begins [sec]")]
         public float trainTargetPresentationTime = 3f;
-        [Tooltip("Rest time between training windows [sec]")]
-        public float trainBreak = 1f;
-        [Tooltip("If true, the train target will pretend to be selected")]
-        public bool shamFeedback = false;
         [Tooltip("If true, the train target will remain in the 'target displayed' state")]
         public bool trainTargetPersistent = false;
-        [EndFoldoutGroup]
-        [Tooltip("The target object to train on, defaulted to a random high number")]
-        public int trainTarget = 99;
+        [Tooltip("Time between target presentation and stimulus sequence [sec]")]
+        public float preStimulusBuffer = 0.5f;
+        [Tooltip("Time between the end of a sequence and pretend selection (sham feedback) [sec]")]
+        public float postStimulusBuffer = 0f;
+        [Tooltip("If true, the train target will pretend to be selected")]
+        public bool shamFeedback = false;
+        [ShowIf("shamFeedback")]
+        [Tooltip("Time allotted for the display of sham feedback [sec]")]
+        public float shamFeedbackBuffer = 0.5f;
+        [Tooltip("Rest time between training windows [sec]")]
+        public float trainBreak = 1f;
+        [Tooltip("Index of the object targetted for training,\n"
+            + "defaulted to no target (-1)"
+        ), EndFoldoutGroup]
+        public int trainTarget = -1;
 
         #endregion
         
@@ -129,16 +125,13 @@ namespace BCIEssentials.ControllerBehaviors
         public BCITrainingType CurrentTrainingType { get; private set; }
         
         
-        protected LSLMarkerWriter OutStream;
-        protected LSLResponseProvider InStream;
+        protected LSLMarkerWriter MarkerWriter;
+        protected LSLResponseProvider ResponseProvider;
 
-        protected Coroutine _receiveMarkers;
-        protected Coroutine _sendMarkers;
-        
-        protected Coroutine _runStimulus;
-        protected Coroutine _waitToSelect;
 
-        protected Coroutine _training;
+        private Coroutine _stimulusCoroutine;
+        private Coroutine _selectAfterRunCoroutine;
+        private Coroutine _trainingCoroutine;
 
         protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
@@ -146,6 +139,11 @@ namespace BCIEssentials.ControllerBehaviors
         #region Life Cycle Methods
 
         protected virtual void Start()
+        => ExecuteSelfRegistration();
+        protected virtual void OnDestroy()
+        => CleanUpSelfRegistration();
+
+        protected void ExecuteSelfRegistration()
         {
             if (_selfRegister)
             {
@@ -157,7 +155,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        private void OnDestroy()
+        protected void CleanUpSelfRegistration()
         {
             if (_selfRegister)
             {
@@ -176,8 +174,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// <param name="lslResponseStream">The stream to poll for markers.</param>
         public void Initialize(LSLMarkerWriter lslMarkerStream, LSLResponseProvider lslResponseStream)
         {
-            OutStream = lslMarkerStream;
-            InStream = lslResponseStream;
+            MarkerWriter = lslMarkerStream;
+            ResponseProvider = lslResponseStream;
 
             //A value of -1 is the default
             //A value of 0 can break stimulus effects
@@ -196,13 +194,13 @@ namespace BCIEssentials.ControllerBehaviors
         public void CleanUp()
         {
             CleanUpSPOs();
-            InStream?.CloseStream();
+            ResponseProvider?.CloseStream();
 
             StimulusRunning = false;
-            StopCoroutineReference(ref _receiveMarkers);
-            StopCoroutineReference(ref _sendMarkers);
-            StopCoroutineReference(ref _runStimulus);
-            StopCoroutineReference(ref _waitToSelect);
+            CleanUpAfterStimulusRun();
+            StopCoroutineReference(ref _stimulusCoroutine);
+            StopCoroutineReference(ref _selectAfterRunCoroutine);
+            StopCoroutineReference(ref _trainingCoroutine);
         }
 
 
@@ -284,11 +282,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
-        /// <param name="sendConstantMarkers">
-        /// If true will also write to the marker stream until
-        /// the stimulus run ends or the number of markers sent equals <see cref="trainTarget"/>.
         /// </param>
-        public virtual void StartStimulusRun(bool sendConstantMarkers = true)
+        public void StartStimulusRun()
         {
             if (StimulusRunning)
             {
@@ -299,57 +294,51 @@ namespace BCIEssentials.ControllerBehaviors
             LastSelectedSPO = null;
             
             // Send the marker to start
-            OutStream?.PushTrialStartedMarker();
+            SendTrialStartedMarker();
 
             StartReceivingMarkers();
             PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
-
-            // Not required for P300
-            if (sendConstantMarkers)
-            {
-                StopStartCoroutine(ref _sendMarkers, SendMarkers(trainTarget));
-            }
+            StopStartCoroutine(ref _stimulusCoroutine, RunStimulus());
         }
 
         /// <summary>
         /// Stops the current stimulus run.
         /// </summary>
-        public virtual void StopStimulusRun()
+        public void StopStimulusRun()
         {
             StimulusRunning = false;
+            CleanUpAfterStimulusRun();
 
             // Send the marker to end
-            OutStream?.PushTrialEndsMarker();
+            SendTrialEndsMarker();
         }
         
-        protected virtual IEnumerator RunStimulus()
+        private IEnumerator RunStimulus()
         {
+            SetupUpForStimulusRun();
             while (StimulusRunning)
             {
-                yield return OnStimulusRunBehavior();
+                yield return RunStimulusRoutine();
             }
-
-            yield return OnStimulusRunComplete();
-            
-            StopCoroutineReference(ref _runStimulus);
-            StopCoroutineReference(ref _sendMarkers);
+            CleanUpAfterStimulusRun();
+            StopCoroutineReference(ref _stimulusCoroutine);
         }
+
+        /// <summary>
+        /// Called before the start of a stimulus run
+        /// </summary>
+        protected virtual void SetupUpForStimulusRun() {}
+        
+        /// <summary>
+        /// Called after a stimulus run has ended
+        /// </summary>
+        protected virtual void CleanUpAfterStimulusRun() {}
 
         /// <summary>
         /// Behavior to invoke during a stimulus run.
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerator OnStimulusRunBehavior()
-        {
-            yield break;
-        }
-
-        /// <summary>
-        /// Behavior that is run after a stimulus run has ended.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator OnStimulusRunComplete()
+        protected virtual IEnumerator RunStimulusRoutine()
         {
             yield break;
         }
@@ -362,62 +351,60 @@ namespace BCIEssentials.ControllerBehaviors
         /// Populate the <see cref="SelectableSPOs"/> using a particular method.
         /// </summary>
         /// <param name="populationMethod">Method of population to use</param>
-        public virtual void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public virtual void PopulateObjectList
+        (SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             switch (populationMethod)
             {
                 case SpoPopulationMethod.Predefined:
-                    //Use the current contents of object list
                     break;
-                case SpoPopulationMethod.Children:
-                    Debug.LogWarning("Populating by children is not yet implemented");
+                case SpoPopulationMethod.Tag:
+                    _selectableSPOs = GetSelectableSPOsByTag();
+                    AssignIDsToSelectableSPOs(ref __uniqueID);
+
+                    _objectIDtoSPODict.Clear();
+                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 default:
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs.Clear();
-                    _objectIDtoSPODict.Clear(); 
-                    var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
-                    foreach (var taggedGO in taggedGOs)
-                    {
-                        if (!taggedGO.TryGetComponent<SPO>(out var spo) || !spo.Selectable)
-                        {
-                            continue;
-                        }
-
-                        // Check if the object has a unique ObjectID, 
-                        // if not assign it a unique ID
-                        if (taggedGO.GetComponent<SPO>().ObjectID == -100)
-                        {
-                            taggedGO.GetComponent<SPO>().ObjectID = __uniqueID;
-                            __uniqueID++;
-                        }
-
-                        _selectableSPOs.Add(spo);
-                        _objectIDtoSPODict.Add(taggedGO.GetComponent<SPO>().ObjectID, spo);
-                        //Print out the Dictionary Pairs
-                        Debug.Log("ObjectID: " + taggedGO.GetComponent<SPO>().ObjectID + " SPO: " + spo);
-                        spo.SelectablePoolIndex = _selectableSPOs.Count - 1;
-                    }
+                    Debug.LogWarning($"Populating using {populationMethod} is not implemented");
                     break;
             }
         }
 
-        /// <summary>
-        /// Obsolete Method.
-        /// <para>Use <see cref="PopulateObjectList(BCIEssentials.Controllers.SpoPopulationMethod)"/></para>
-        /// </summary>
-        /// <param name="populationMethod">method serializable to <see cref="SpoPopulationMethod"/></param>
-        [Obsolete]
-        public void PopulateObjectList(string populationMethod)
+        protected List<SPO> GetSelectableSPOsByTag()
         {
-            if (!Enum.TryParse(populationMethod, out SpoPopulationMethod method))
-            {
-                Debug.LogError($"Unable to convert {populationMethod} to a valid method");
-                return;
-            }
+            var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
+            List<SPO> result = new();
 
-            PopulateObjectList(method);
+            foreach (var taggedGO in taggedGOs)
+            {
+                if (
+                    taggedGO.TryGetComponent(out SPO spo)
+                    && spo.Selectable
+                )
+                result.Add(spo);
+            }
+            return result;
         }
+
+        protected void AssignIDsToSelectableSPOs(ref int idTracker)
+        {
+            int poolIndex = 0;
+            foreach (SPO spo in _selectableSPOs)
+            {
+                if (spo.ObjectID == -100) spo.ObjectID = idTracker++;
+                spo.SelectablePoolIndex = poolIndex++;
+            }
+        }
+
+        protected void AppendSelectableSPOsToObjectIDDictionary()
+        => _selectableSPOs.ForEach(spo => {
+            if (!_objectIDtoSPODict.ContainsKey(spo.ObjectID))
+            {
+                _objectIDtoSPODict.Add(spo.ObjectID, spo);
+            }
+        });
+
 
         /// <summary>
         /// Select an object from <see cref="SelectableSPOs"/>.
@@ -464,7 +451,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <param name="objectIndex"></param>
         public virtual void SelectSPOAtEndOfRun(int objectIndex)
         {
-            StopStartCoroutine(ref _waitToSelect, InvokeAfterStimulusRun(() =>
+            StopStartCoroutine(ref _selectAfterRunCoroutine, RunInvokeAfterStimulusRun(() =>
             {
                 if (LastSelectedSPO != null)
                 {
@@ -472,11 +459,11 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 
                 SelectSPO(objectIndex);
-                _waitToSelect = null;
+                _selectAfterRunCoroutine = null;
             }));
         }
 
-        protected IEnumerator InvokeAfterStimulusRun(Action action)
+        protected IEnumerator RunInvokeAfterStimulusRun(Action action)
         {
             while (StimulusRunning)
             {
@@ -490,21 +477,20 @@ namespace BCIEssentials.ControllerBehaviors
         
         #region Markers
 
-        protected virtual IEnumerator SendMarkers(int trainingIndex = 99)
+        protected virtual void SendTrialStartedMarker()
         {
-            while (StimulusRunning)
-            {
-                // Send the marker
-                // OutStream.PushMarker(...);
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-            }
+            if (MarkerWriter != null) MarkerWriter.PushTrialStartedMarker();
+        }
+
+        protected virtual void SendTrialEndsMarker()
+        {
+            if (MarkerWriter != null) MarkerWriter.PushTrialEndsMarker();
         }
 
         public virtual void StartReceivingMarkers()
         {
-            InStream.UnsubscribePredictions(OnPredictionReceived);
-            InStream.SubscribePredictions(OnPredictionReceived);
+            ResponseProvider.UnsubscribePredictions(OnPredictionReceived);
+            ResponseProvider.SubscribePredictions(OnPredictionReceived);
         }
 
         protected virtual void OnPredictionReceived(LSLPredictionResponse prediction)
@@ -514,7 +500,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void StopReceivingMarkers()
         {
-            InStream.UnsubscribePredictions(OnPredictionReceived);
+            ResponseProvider.UnsubscribePredictions(OnPredictionReceived);
         }
         #endregion
 
@@ -539,18 +525,18 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 case BCITrainingType.Automated:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoAutomatedTraining();
+                    trainingBehavior = RunAutomatedTrainingRoutine();
                     break;
                 case BCITrainingType.Iterative:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoIterativeTraining();
+                    trainingBehavior = RunIterativeTrainingRoutine();
                     break;
                 case BCITrainingType.User:
-                    trainingBehavior = WhileDoUserTraining();
+                    trainingBehavior = RunUserTrainingRoutine();
                     break;
                 case BCITrainingType.Single:
                     StartReceivingMarkers();
-                    trainingBehavior = WhileDoSingleTraining();
+                    trainingBehavior = RunSingleTrainingRoutine();
                     break;
                 default:
                 case BCITrainingType.None:
@@ -560,7 +546,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             if (trainingBehavior != null)
             {
-                StopStartCoroutine(ref _training, RunControllerTraining(trainingType, trainingBehavior));
+                StopStartCoroutine(ref _trainingCoroutine, RunTraining(trainingType, trainingBehavior));
             }
         }
 
@@ -570,10 +556,10 @@ namespace BCIEssentials.ControllerBehaviors
         public void StopTraining()
         {
             CurrentTrainingType = BCITrainingType.None;
-            StopCoroutineReference(ref _training);
+            StopCoroutineReference(ref _trainingCoroutine);
         }
 
-        private IEnumerator RunControllerTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)
+        private IEnumerator RunTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)
         {
             CurrentTrainingType = trainingType;
 
@@ -584,74 +570,75 @@ namespace BCIEssentials.ControllerBehaviors
 
             StopTraining();
         }
-        
+
         // Do training
-        protected virtual IEnumerator WhileDoAutomatedTraining()
+        protected virtual IEnumerator RunAutomatedTrainingRoutine()
         {
-            // Generate the target list
             PopulateObjectList();
-
-            // Get number of selectable objects by counting the objects in the objectList
+            
             int numOptions = _selectableSPOs.Count;
-
-            // Create a random non repeating array 
-            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
+            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions - 1);
             LogArrayValues(trainArray);
 
-            yield return new WaitForSecondsRealtime(0.001f);
+            yield return null;
 
             // Loop for each training target
             for (int i = 0; i < numTrainingSelections; i++)
             {
-                // Get the target from the array
                 trainTarget = trainArray[i];
-
-                // 
                 Debug.Log("Running training selection " + i.ToString() + " on option " + trainTarget.ToString());
 
-                // Turn on train target
-                _selectableSPOs[trainTarget].GetComponent<SPO>().OnTrainTarget();
-
-
-                yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
-
-                if (trainTargetPersistent == false)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                // Go through the training sequence
-                //yield return new WaitForSecondsRealtime(3f);
-
-                StartStimulusRun();
-                yield return new WaitForSecondsRealtime((windowLength + interWindowInterval) * (float)numTrainWindows);
-                StopStimulusRun();
-
-                // Turn off train target
-                if (trainTargetPersistent == true)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().OffTrainTarget();
-                }
-
-
-                // If sham feedback is true, then show it
-                if (shamFeedback)
-                {
-                    _selectableSPOs[trainTarget].GetComponent<SPO>().Select();
-                }
-
-                trainTarget = 99;
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
+                SPO targetObject = _selectableSPOs[trainTarget];
+                yield return RunTrainingRound(targetObject);
             }
 
-            OutStream.PushTrainingCompleteMarker();
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected virtual IEnumerator WhileDoUserTraining()
+
+        protected IEnumerator RunTrainingRound(SPO targetObject)
+        => RunTrainingRound(WaitForStimulusToComplete(), targetObject);
+        protected IEnumerator RunTrainingRound
+        (
+            IEnumerator stimulusDelayRoutine,
+            SPO targetObject,
+            bool enableShamFeedback = true,
+            bool forceTrainTargetPersistence = false
+        )
+        {
+            targetObject.OnTrainTarget();
+            yield return new WaitForSecondsRealtime(trainTargetPresentationTime);
+
+            bool shouldPersistTrainTarget
+            = trainTargetPersistent || forceTrainTargetPersistence;
+            if (!shouldPersistTrainTarget)
+            {
+                targetObject.OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(preStimulusBuffer);
+            StartStimulusRun();
+            yield return stimulusDelayRoutine;
+            StopStimulusRun();
+            yield return new WaitForSecondsRealtime(postStimulusBuffer);
+
+            if (shamFeedback && enableShamFeedback)
+            {
+                targetObject.Select();
+                yield return new WaitForSecondsRealtime(shamFeedbackBuffer);
+            }
+
+            if (shouldPersistTrainTarget)
+            {
+                targetObject.OffTrainTarget();
+            }
+
+            yield return new WaitForSecondsRealtime(trainBreak);
+            trainTarget = -1;
+        }
+
+
+        protected virtual IEnumerator RunUserTrainingRoutine()
         {
             Debug.Log("No user training available for this paradigm");
 
@@ -659,14 +646,14 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
 
-        protected virtual IEnumerator WhileDoIterativeTraining()
+        protected virtual IEnumerator RunIterativeTrainingRoutine()
         {
             Debug.Log("No iterative training available for this controller");
 
             yield return null;
         }
 
-        protected virtual IEnumerator WhileDoSingleTraining()
+        protected virtual IEnumerator RunSingleTrainingRoutine()
         {
             //TODO: Implement a way to handle default null targetObject
             Debug.Log("No single training available for this controller");
@@ -698,24 +685,12 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
-        protected IEnumerator WaitForStimulusToComplete()
+        protected virtual IEnumerator WaitForStimulusToComplete()
         {
             while (StimulusRunning)
             {
                 yield return null;
             }
-        }
-
-        //This is a different Stop start Coroutine Method, that is used to return a coroutine reference. Might be better to use this one, but needs testing.
-        protected Coroutine Stop_Coroutines_Then_Start_New_Coroutine(ref Coroutine reference_coroutine, IEnumerator routine)
-        {
-            if (reference_coroutine != null)
-            {
-                StopCoroutine(reference_coroutine);
-            }
-
-            reference_coroutine = StartCoroutine(routine);
-            return reference_coroutine;
         }
 
         protected void StopCoroutineReference(ref Coroutine reference)
@@ -730,7 +705,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void PassBessyPythonMessage(string message)
         {
-            OutStream.PushString(message);
+            MarkerWriter.PushString(message);
         }
 
         #endregion

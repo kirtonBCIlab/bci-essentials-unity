@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class MIControllerBehavior : BCIControllerBehavior
+    public class MIControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
 
         [Header("Iterative Training")]
-        [ShowWithFoldoutGroup("Training Properties")]
+        [SerializeField, AppendToFoldoutGroup("Training Properties")]
         [Tooltip("How many selections to make before creating the classifier")]
-        public int numSelectionsBeforeTraining = 3;
-        [ShowWithFoldoutGroup("Training Properties")]
+        protected int numSelectionsBeforeTraining = 3;
+        [SerializeField, AppendToFoldoutGroup("Training Properties")]
         [Tooltip("How many selections to make before updating the classifier")]
-        public int numSelectionsBetweenTraining = 3;
+        protected int numSelectionsBetweenTraining = 3;
 
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
@@ -32,129 +32,49 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        public override void StartStimulusRun(bool sendConstantMarkers = true)
-        {
-            if (StimulusRunning)
-            {
-                StopStimulusRun();
-            }
-            
-            StimulusRunning = true;
-            LastSelectedSPO = null;
-            
-            // Send the marker to start
-            OutStream.PushTrialStartedMarker();
-
-            StartReceivingMarkers();
-            PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
-
-            // Not required for P300
-            if (sendConstantMarkers)
-            {
-                // If trainTarget == -1, then we are trying to classify, pass -1 along
-                if (trainTarget == 99)
-                {
-                    StopStartCoroutine(ref _sendMarkers, SendMarkers(-1));
-                }
-                // Otherwise, pass the objectID of the target
-                else
-                {
-                    StopStartCoroutine(ref _sendMarkers, SendMarkers(_selectableSPOs[trainTarget].ObjectID));
-                }
-            }
-        }
-
-        protected override IEnumerator WhileDoIterativeTraining()
+        protected override IEnumerator RunIterativeTrainingRoutine()
         {
             // Generate the target list
             PopulateObjectList();
 
             int numOptions = _selectableSPOs.Count;
-
-            // Create a random non repeating array 
-            int[] trainArray = new int[numTrainingSelections];
-            trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions-1);
+            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(numTrainingSelections, 0, numOptions - 1);
             LogArrayValues(trainArray);
 
-            yield return 0;
-
+            yield return null;
 
             // Loop for each training target
             for (int i = 0; i < numTrainingSelections; i++)
             {
-
                 if (selectionCounter >= numSelectionsBeforeTraining)
                 {
-                    if (updateCounter == 0)
+                    if (updateCounter == 0 || selectionCounter >=
+                        numSelectionsBeforeTraining + updateCounter * numSelectionsBetweenTraining)
                     {
                         // update the classifier
                         Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        OutStream.PushUpdateClassifierMarker();
-                        updateCounter++;
-                    }
-                    else if (selectionCounter >=
-                             numSelectionsBeforeTraining + (updateCounter * numSelectionsBetweenTraining))
-                    {
-                        // update the classifier
-                        Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        OutStream.PushUpdateClassifierMarker();
+                        MarkerWriter.PushUpdateClassifierMarker();
                         updateCounter++;
                     }
                 }
 
-                // Get the target from the array
                 trainTarget = trainArray[i];
-
-                // Get the index of the target object
                 int targetID = _selectableSPOs[trainTarget].ObjectID; 
+                Debug.Log($"Running training selection {i} on object with ID {targetID}");
 
-                // 
-                Debug.Log($"Running training selection {i} on option {targetID}");
+                SPO targetObject = _selectableSPOs[trainTarget];
+                yield return RunTrainingRound(
+                    DisplayFeedbackWhileWaitingForStimulusToComplete(targetObject),
+                    _selectableSPOs[trainTarget], false, true
+                );
 
-                // Turn on train target
-                _selectableSPOs[trainTarget].OnTrainTarget();
-
-                // Go through the training sequence
-                yield return new WaitForSecondsRealtime(pauseBeforeTraining);
-
-
-                StartStimulusRun();
-                for (int j = 0; j < (numTrainWindows - 1); j++)
-                {
-                    yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
-
-                    if (shamFeedback)
-                    {
-                        _selectableSPOs[trainTarget].Select();
-                    }
-                }
-
-                StopStimulusRun();
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-
-                // Turn off train target
-                _selectableSPOs[trainTarget].OffTrainTarget();
-
-                // Reset objects
-
-                // Take a break
-                yield return new WaitForSecondsRealtime(trainBreak);
-
-                trainTarget = 99;
                 selectionCounter++;
             }
 
-            // Send marker
-            OutStream.PushTrainingCompleteMarker();
-
-            yield return 0;
-
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected override IEnumerator WhileDoSingleTraining()
+        protected override IEnumerator RunSingleTrainingRoutine()
         {
             PopulateObjectList();
 
@@ -183,7 +103,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    OutStream.PushMIMarker(1, windowLength, targetID);
+                    MarkerWriter.PushMIMarker(1, windowLength, targetID);
 
                     yield return new WaitForSecondsRealtime(windowLength);
 
@@ -201,7 +121,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.LogError("No target object specified for single training");
             }
 
-            OutStream.PushTrialEndsMarker();
+            MarkerWriter.PushTrialEndsMarker();
 
             yield return null;
         }
@@ -254,28 +174,19 @@ namespace BCIEssentials.ControllerBehaviors
 
         }
 
-        public override void SelectSPOAtEndOfRun(int objectIndex)
-        {
-            base.SelectSPOAtEndOfRun(objectIndex);
-        }
-
         public override void UpdateClassifier()
         {
             Debug.Log("Updating the classifier");
-            OutStream.PushTrainingCompleteMarker();
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            // Make the marker string, this will change based on the paradigm
-            while (StimulusRunning)
+            if (trainingIndex >= 0 && trainingIndex < SPOCount)
             {
-                // Send the marker
-                OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
-
-                // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+                trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
             }
+            MarkerWriter.PushMIMarker(SPOCount, windowLength, trainingIndex);
         }
     }
 }

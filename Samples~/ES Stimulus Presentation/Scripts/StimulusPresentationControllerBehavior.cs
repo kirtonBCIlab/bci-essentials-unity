@@ -9,7 +9,7 @@ using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class StimulusPresentationControllerBehavior : BCIControllerBehavior
+    public class StimulusPresentationControllerBehavior : WindowedControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
@@ -47,7 +47,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             //set first frequency
             setFreqFlash = 9.6f;
-            OnStimulusRunComplete();
+            CleanUpAfterStimulusRun();
             PopulateObjectList();
         }
 
@@ -65,43 +65,37 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            while (StimulusRunning)
-            {
-                string markerString=  "";
+            string markerString;
                 
-                if(!_offMessages)
-                {
-                    markerString = new TVEPEventMarker
-                    (
-                        SPOCount, windowLength,
-                        new[] {realFreqFlash}, trainingIndex
-                    ).MarkerString;
-                }
-
-                if(_offMessages)
-                {
-                    markerString = "Stimulus Off";
-                }
-
-                if(_restingState && _open)
-                {
-                    markerString = "Resting state, eyes open";
-                }
-                if(_restingState && _closed)
-                {
-                    markerString = "Resting state, eyes closed";
-                }
-
-                OutStream.PushString(markerString);
-
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
+            if(_offMessages)
+            {
+                markerString = "Stimulus Off";
             }
+            else
+            {
+                markerString = new TVEPEventMarker
+                (
+                    SPOCount, windowLength,
+                    new[] {realFreqFlash}, trainingIndex
+                ).MarkerString;
+            }
+
+            if(_restingState && _open)
+            {
+                markerString = "Resting state, eyes open";
+            }
+            if(_restingState && _closed)
+            {
+                markerString = "Resting state, eyes closed";
+            }
+
+            MarkerWriter.PushString(markerString);
         }
         
 
-        protected override IEnumerator OnStimulusRunBehavior()
+        private IEnumerator RunFlashingRoutine()
         {
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
@@ -128,7 +122,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected override IEnumerator OnStimulusRunComplete()
+        protected override void CleanUpAfterStimulusRun()
         {
             foreach (var spo in _selectableSPOs)
             {
@@ -137,7 +131,6 @@ namespace BCIEssentials.ControllerBehaviors
                     spo.StopStimulus();
                 }
             }
-            yield return null;
         }
 
         public void StopStimulusRun(int j, int l)
@@ -146,13 +139,11 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 setFreqFlash = 16f;
                 //need to call these methods so all of the appropriate flashing variables are updated 
-                OnStimulusRunComplete();
                 PopulateObjectList();
             }
             else if (j == 3)
             {
                 setFreqFlash = 36f;
-                OnStimulusRunComplete();
                 PopulateObjectList();
             }
             else if (j == 6)
@@ -175,13 +166,12 @@ namespace BCIEssentials.ControllerBehaviors
                     else if (l == 5)
                         SetMaterial(6);
 
-                    OnStimulusRunComplete();
                     PopulateObjectList();
                 }
             }
         }
             
-        protected override IEnumerator RunStimulus()
+        protected override IEnumerator RunStimulusRoutine()
         {
             //setup variables for camera rotation 
             var _rotateAway = Vector3.zero;
@@ -232,7 +222,7 @@ namespace BCIEssentials.ControllerBehaviors
                         //the number that i is less than is the amount of seconds to flash for 
                         //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
                         {
-                            yield return OnStimulusRunBehavior();
+                            yield return RunFlashingRoutine();
                         }
 
                         //rotate the camera away from the stimuli objects when they are off
@@ -317,11 +307,10 @@ namespace BCIEssentials.ControllerBehaviors
                     _closed = false;
 
                     StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-                    StopCoroutineReference(ref _runStimulus);
+                    break;
                 }
             }
-                StopCoroutineReference(ref _runStimulus);
-                StopCoroutineReference(ref _sendMarkers);
+            StimulusRunning = false;
         }
 
 

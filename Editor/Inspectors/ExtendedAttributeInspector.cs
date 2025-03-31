@@ -7,43 +7,45 @@ namespace BCIEssentials.Editor
     [CustomEditor(typeof(MonoBehaviourUsingExtendedAttributes), true)]
     public class ExtendedAttributeInspector: CustomInspector
     {
-        Dictionary<string, bool> foldoutGroupToggles = new();
-
-        bool IsTraversingFoldoutGroup
-        => currentFoldoutGroupAttribute != null;
-        FoldoutGroupAttribute currentFoldoutGroupAttribute;
-        List<SerializedProperty> currentFoldoutGroupProperties;
-
-
         public override void DrawInspector()
         {
-            currentFoldoutGroupAttribute = null;
-            currentFoldoutGroupProperties = new();
+            List<ParsedField> parsedFields = new();
+            FoldoutGroup currentFoldoutGroup = null;
 
             serializedObject.ForEachProperty(property => {
-                if (property.TryGetAttribute<FoldoutGroupAttribute>(out var foldoutAttribute))
+                if (property.TryGetAttribute<StartFoldoutGroupAttribute>(out var foldoutAttribute))
                 {
-                    DrawCurrentFoldoutGroupIfItExists();
-                    currentFoldoutGroupAttribute = foldoutAttribute;
-                    currentFoldoutGroupProperties = new() {property};
+                    currentFoldoutGroup = new(foldoutAttribute, property);
+                    parsedFields.Add(currentFoldoutGroup);
                 }
-                else if (IsTraversingFoldoutGroup)
+                else if (currentFoldoutGroup != null)
                 {
-                    currentFoldoutGroupProperties.Add(property);
+                    currentFoldoutGroup.AddProperty(property);
                     if (property.TryGetAttribute<EndFoldoutGroupAttribute>(out _))
                     {
-                        DrawCurrentFoldoutGroupIfItExists();
-                        ClearCurrentFoldoutGroup();
+                        currentFoldoutGroup = null;
                     }
                 }
                 else
                 {
-                    DrawProperty(property);
+                    if (TryFindMatchingGroup(property, parsedFields, out FoldoutGroup group))
+                    {
+                        group.AddProperty(property);
+                    }
+                    else parsedFields.Add(new SingleProperty(property));
                 }
             });
 
-            DrawCurrentFoldoutGroupIfItExists();
-            ClearCurrentFoldoutGroup();
+            foreach (ParsedField field in parsedFields)
+            switch (field)
+            {
+                case SingleProperty single:
+                    DrawProperty(single.Property);
+                break;
+                case FoldoutGroup group:
+                    DrawFoldoutGroup(group);
+                break;
+            }
         }
 
 
@@ -55,13 +57,6 @@ namespace BCIEssentials.Editor
                 foreach(ShowIfAttribute attribute in showIfAttributes)
                     shouldHideProperty |= !attribute.ShouldShow(serializedObject);
             }
-            
-            if (property.TryGetAttribute<ShowWithFoldoutGroupAttribute>(out var showWithGroupAttribute))
-            {
-                string groupLabel = showWithGroupAttribute.GroupLabel;
-                if (foldoutGroupToggles.ContainsKey(groupLabel))
-                    shouldHideProperty |= !foldoutGroupToggles[groupLabel];
-            }
 
             if (shouldHideProperty)
                 HideProperty(property);
@@ -70,36 +65,93 @@ namespace BCIEssentials.Editor
         }
 
 
-        private void DrawCurrentFoldoutGroupIfItExists()
+        private void DrawFoldoutGroup(FoldoutGroup group)
         {
-            if (!IsTraversingFoldoutGroup) return;
-            string label = currentFoldoutGroupAttribute.Label;
+            string label = group.Label;
 
             string prefsKey = $"{target.name}/{label}";
-            bool foldout = EditorPrefs.GetBool(prefsKey, false);
+            bool savedFoldoutState = EditorPrefs.GetBool(prefsKey, false);
 
-            if (!foldoutGroupToggles.ContainsKey(label))
-                foldoutGroupToggles.Add(label, foldout);
+            (int fontSize, float topMargin, float bottomMargin)
+            = group.GetStyleAttributes();
 
-            foldout = DrawPropertiesInFoldoutGroup(
-                foldoutGroupToggles[label],
-                label, currentFoldoutGroupProperties,
-                currentFoldoutGroupAttribute.FontSize,
-                currentFoldoutGroupAttribute.TopMargin,
-                currentFoldoutGroupAttribute.BottomMargin
+            bool foldoutState = DrawPropertiesInFoldoutGroup(
+                savedFoldoutState, label, group.Properties,
+                fontSize, topMargin, bottomMargin
             );
 
-            if (foldout != foldoutGroupToggles[label])
+            if (foldoutState != savedFoldoutState)
             {
-                foldoutGroupToggles[label] = foldout;
-                EditorPrefs.SetBool(prefsKey, foldout);
+                EditorPrefs.SetBool(prefsKey, foldoutState);
             }
         }
 
-        private void ClearCurrentFoldoutGroup()
+
+        private bool TryFindMatchingGroup
+        (
+            SerializedProperty property,
+            List<ParsedField> fieldList,
+            out FoldoutGroup group
+        )
         {
-            currentFoldoutGroupAttribute = null;
-            currentFoldoutGroupProperties.Clear();
+            if (property.TryGetAttribute<AppendToFoldoutGroupAttribute>(out var showWithGroupAttribute))
+            {
+                string groupLabel = showWithGroupAttribute.GroupLabel;
+                group = (FoldoutGroup)fieldList.Find
+                (
+                    ParsedField => ParsedField is FoldoutGroup group
+                    && group.Label == groupLabel
+                );
+                if (group != null) return true;
+                else
+                Debug.LogWarning(
+                    $"Failed to find matching foldout group {groupLabel}"
+                    + $" for property {property.name}"
+                );
+            }
+            group = null;
+            return false;
+        }
+
+
+        public abstract class ParsedField {}
+
+        public class SingleProperty: ParsedField
+        {
+            public SerializedProperty Property;
+
+            public SingleProperty
+            (
+                SerializedProperty property
+            ) { Property = property; }
+        }
+
+        public class FoldoutGroup: ParsedField
+        {
+            public StartFoldoutGroupAttribute Attribute;
+            public string Label => Attribute.Label;
+
+            public List<SerializedProperty> Properties;
+
+            public FoldoutGroup
+            (
+                StartFoldoutGroupAttribute attribute,
+                SerializedProperty leadingProperty
+            )
+            {
+                Attribute = attribute;
+                Properties = new() {leadingProperty};
+            }
+
+            public void AddProperty(SerializedProperty property)
+            => Properties.Add(property);
+
+            public (int, float, float) GetStyleAttributes()
+            => (
+                Attribute.FontSize,
+                Attribute.TopMargin,
+                Attribute.BottomMargin
+            );
         }
     }
 }
