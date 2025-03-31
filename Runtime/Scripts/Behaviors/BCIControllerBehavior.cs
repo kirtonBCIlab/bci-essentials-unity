@@ -139,6 +139,11 @@ namespace BCIEssentials.ControllerBehaviors
         #region Life Cycle Methods
 
         protected virtual void Start()
+        => ExecuteSelfRegistration();
+        protected virtual void OnDestroy()
+        => CleanUpSelfRegistration();
+
+        protected void ExecuteSelfRegistration()
         {
             if (_selfRegister)
             {
@@ -150,7 +155,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        private void OnDestroy()
+        protected void CleanUpSelfRegistration()
         {
             if (_selfRegister)
             {
