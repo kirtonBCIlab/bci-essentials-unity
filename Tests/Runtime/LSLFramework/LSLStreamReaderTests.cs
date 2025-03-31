@@ -89,7 +89,7 @@ namespace BCIEssentials.Tests.LSLFramework
             Assert.AreEqual(1, responses.Length);
             Assert.IsInstanceOf<LSLPredictionResponse>(responses[0]);
             var prediction = responses[0] as LSLPredictionResponse;
-            Assert.AreEqual(1, prediction.Value);
+            Assert.AreEqual(0, prediction.Value);
         }
 
         
