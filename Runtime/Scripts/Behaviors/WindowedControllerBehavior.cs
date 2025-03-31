@@ -43,7 +43,7 @@ namespace BCIEssentials.ControllerBehaviors
             while (StimulusRunning)
             {
                 // Send the marker
-                if (OutStream != null) SendWindowMarker(trainingIndex);
+                if (MarkerWriter != null) SendWindowMarker(trainingIndex);
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
             }

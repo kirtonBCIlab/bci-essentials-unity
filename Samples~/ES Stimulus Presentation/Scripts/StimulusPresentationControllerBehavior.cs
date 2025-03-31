@@ -91,7 +91,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "Resting state, eyes closed";
             }
 
-            OutStream.PushString(markerString);
+            MarkerWriter.PushString(markerString);
         }
         
 

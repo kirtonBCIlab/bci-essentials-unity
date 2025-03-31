@@ -125,8 +125,8 @@ namespace BCIEssentials.ControllerBehaviors
         public BCITrainingType CurrentTrainingType { get; private set; }
         
         
-        protected LSLMarkerWriter OutStream;
-        protected LSLResponseProvider InStream;
+        protected LSLMarkerWriter MarkerWriter;
+        protected LSLResponseProvider ResponseProvider;
 
 
         protected Coroutine _runStimulus;
@@ -169,8 +169,8 @@ namespace BCIEssentials.ControllerBehaviors
         /// <param name="lslResponseStream">The stream to poll for markers.</param>
         public void Initialize(LSLMarkerWriter lslMarkerStream, LSLResponseProvider lslResponseStream)
         {
-            OutStream = lslMarkerStream;
-            InStream = lslResponseStream;
+            MarkerWriter = lslMarkerStream;
+            ResponseProvider = lslResponseStream;
 
             //A value of -1 is the default
             //A value of 0 can break stimulus effects
@@ -189,7 +189,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void CleanUp()
         {
             CleanUpSPOs();
-            InStream?.CloseStream();
+            ResponseProvider?.CloseStream();
 
             StimulusRunning = false;
             CleanUpAfterStimulusRun();
@@ -474,18 +474,18 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual void SendTrialStartedMarker()
         {
-            if (OutStream != null) OutStream.PushTrialStartedMarker();
+            if (MarkerWriter != null) MarkerWriter.PushTrialStartedMarker();
         }
 
         protected virtual void SendTrialEndsMarker()
         {
-            if (OutStream != null) OutStream.PushTrialEndsMarker();
+            if (MarkerWriter != null) MarkerWriter.PushTrialEndsMarker();
         }
 
         public virtual void StartReceivingMarkers()
         {
-            InStream.UnsubscribePredictions(OnPredictionReceived);
-            InStream.SubscribePredictions(OnPredictionReceived);
+            ResponseProvider.UnsubscribePredictions(OnPredictionReceived);
+            ResponseProvider.SubscribePredictions(OnPredictionReceived);
         }
 
         protected virtual void OnPredictionReceived(LSLPredictionResponse prediction)
@@ -495,7 +495,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void StopReceivingMarkers()
         {
-            InStream.UnsubscribePredictions(OnPredictionReceived);
+            ResponseProvider.UnsubscribePredictions(OnPredictionReceived);
         }
         #endregion
 
@@ -587,7 +587,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return RunTrainingRound(targetObject);
             }
 
-            OutStream.PushTrainingCompleteMarker();
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
 
@@ -700,7 +700,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public void PassBessyPythonMessage(string message)
         {
-            OutStream.PushString(message);
+            MarkerWriter.PushString(message);
         }
 
         #endregion

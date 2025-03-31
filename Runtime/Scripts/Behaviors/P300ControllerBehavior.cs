@@ -324,9 +324,9 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void SendSingleFlashMarker(int objectIndex)
         {
-            if (OutStream != null && !blockOutGoingLSL)
+            if (MarkerWriter != null && !blockOutGoingLSL)
             {
-                OutStream.PushSingleFlashP300Marker(
+                MarkerWriter.PushSingleFlashP300Marker(
                     SPOCount, objectIndex, trainTarget
                 );
             }
@@ -334,9 +334,9 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void SendMultiFlashMarker(IEnumerable<int> flashedObjects)
         {
-            if (OutStream != null && !blockOutGoingLSL)
+            if (MarkerWriter != null && !blockOutGoingLSL)
             {
-                OutStream.PushMultiFlashP300Marker
+                MarkerWriter.PushMultiFlashP300Marker
                 (
                     SPOCount, flashedObjects, trainTarget
                 );

@@ -53,7 +53,7 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         // update the classifier
                         Debug.Log($"Updating the classifier after {selectionCounter} selections");
-                        OutStream.PushUpdateClassifierMarker();
+                        MarkerWriter.PushUpdateClassifierMarker();
                         updateCounter++;
                     }
                 }
@@ -71,7 +71,7 @@ namespace BCIEssentials.ControllerBehaviors
                 selectionCounter++;
             }
 
-            OutStream.PushTrainingCompleteMarker();
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
         protected override IEnumerator RunSingleTrainingRoutine()
@@ -103,7 +103,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    OutStream.PushMIMarker(1, windowLength, targetID);
+                    MarkerWriter.PushMIMarker(1, windowLength, targetID);
 
                     yield return new WaitForSecondsRealtime(windowLength);
 
@@ -121,7 +121,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.LogError("No target object specified for single training");
             }
 
-            OutStream.PushTrialEndsMarker();
+            MarkerWriter.PushTrialEndsMarker();
 
             yield return null;
         }
@@ -177,7 +177,7 @@ namespace BCIEssentials.ControllerBehaviors
         public override void UpdateClassifier()
         {
             Debug.Log("Updating the classifier");
-            OutStream.PushTrainingCompleteMarker();
+            MarkerWriter.PushTrainingCompleteMarker();
         }
 
         protected override void SendWindowMarker(int trainingIndex = -1)
@@ -186,7 +186,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
             }
-            OutStream.PushMIMarker(SPOCount, windowLength, trainingIndex);
+            MarkerWriter.PushMIMarker(SPOCount, windowLength, trainingIndex);
         }
     }
 }
