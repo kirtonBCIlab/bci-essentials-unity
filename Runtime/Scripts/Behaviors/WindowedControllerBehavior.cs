@@ -23,19 +23,19 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("The interval between processing windows [sec]")]
         public float interWindowInterval = 0f;
         
-        protected Coroutine _sendMarkers;
+        private Coroutine _windowMarkerCoroutine;
 
 
         protected override void SetupUpForStimulusRun()
         {
-            StopStartCoroutine(ref _sendMarkers,
+            StopStartCoroutine(ref _windowMarkerCoroutine,
                 RunSendWindowMarkers(trainTarget)
             );
         }
 
         protected override void CleanUpAfterStimulusRun()
         {
-            StopCoroutineReference(ref _sendMarkers);
+            StopCoroutineReference(ref _windowMarkerCoroutine);
         }
         
         private IEnumerator RunSendWindowMarkers(int trainingIndex = 99)

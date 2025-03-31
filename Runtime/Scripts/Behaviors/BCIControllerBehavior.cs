@@ -129,9 +129,9 @@ namespace BCIEssentials.ControllerBehaviors
         protected LSLResponseProvider ResponseProvider;
 
 
-        protected Coroutine _runStimulus;
-        protected Coroutine _waitToSelect;
-        protected Coroutine _training;
+        private Coroutine _stimulusCoroutine;
+        private Coroutine _selectAfterRunCoroutine;
+        private Coroutine _trainingCoroutine;
 
         protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
@@ -193,9 +193,9 @@ namespace BCIEssentials.ControllerBehaviors
 
             StimulusRunning = false;
             CleanUpAfterStimulusRun();
-            StopCoroutineReference(ref _runStimulus);
-            StopCoroutineReference(ref _waitToSelect);
-            StopCoroutineReference(ref _training);
+            StopCoroutineReference(ref _stimulusCoroutine);
+            StopCoroutineReference(ref _selectAfterRunCoroutine);
+            StopCoroutineReference(ref _trainingCoroutine);
         }
 
 
@@ -293,7 +293,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             StartReceivingMarkers();
             PopulateObjectList();
-            StopStartCoroutine(ref _runStimulus, RunStimulus());
+            StopStartCoroutine(ref _stimulusCoroutine, RunStimulus());
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return RunStimulusRoutine();
             }
             CleanUpAfterStimulusRun();
-            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _stimulusCoroutine);
         }
 
         /// <summary>
@@ -446,7 +446,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <param name="objectIndex"></param>
         public virtual void SelectSPOAtEndOfRun(int objectIndex)
         {
-            StopStartCoroutine(ref _waitToSelect, RunInvokeAfterStimulusRun(() =>
+            StopStartCoroutine(ref _selectAfterRunCoroutine, RunInvokeAfterStimulusRun(() =>
             {
                 if (LastSelectedSPO != null)
                 {
@@ -454,7 +454,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 
                 SelectSPO(objectIndex);
-                _waitToSelect = null;
+                _selectAfterRunCoroutine = null;
             }));
         }
 
@@ -541,7 +541,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             if (trainingBehavior != null)
             {
-                StopStartCoroutine(ref _training, RunTraining(trainingType, trainingBehavior));
+                StopStartCoroutine(ref _trainingCoroutine, RunTraining(trainingType, trainingBehavior));
             }
         }
 
@@ -551,7 +551,7 @@ namespace BCIEssentials.ControllerBehaviors
         public void StopTraining()
         {
             CurrentTrainingType = BCITrainingType.None;
-            StopCoroutineReference(ref _training);
+            StopCoroutineReference(ref _trainingCoroutine);
         }
 
         private IEnumerator RunTraining(BCITrainingType trainingType, IEnumerator trainingBehavior)

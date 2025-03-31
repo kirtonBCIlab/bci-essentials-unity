@@ -307,7 +307,7 @@ namespace BCIEssentials.ControllerBehaviors
                     _closed = false;
 
                     StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-                    StopCoroutineReference(ref _runStimulus);
+                    break;
                 }
             }
             StimulusRunning = false;
