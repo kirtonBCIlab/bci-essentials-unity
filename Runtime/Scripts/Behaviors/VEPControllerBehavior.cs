@@ -67,7 +67,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected override IEnumerator RunStimulusCompletionRoutine()
+        protected override void CleanUpAfterStimulusRun()
         {
             foreach (var spo in _selectableSPOs)
             {
@@ -76,8 +76,6 @@ namespace BCIEssentials.ControllerBehaviors
                     spo.StopStimulus();
                 }
             }
-
-            yield return null;
         }
     }
 }

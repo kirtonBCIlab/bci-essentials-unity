@@ -128,12 +128,9 @@ namespace BCIEssentials.ControllerBehaviors
         protected LSLMarkerWriter OutStream;
         protected LSLResponseProvider InStream;
 
-        protected Coroutine _receiveMarkers;
-        protected Coroutine _sendMarkers;
-        
+
         protected Coroutine _runStimulus;
         protected Coroutine _waitToSelect;
-
         protected Coroutine _training;
 
         protected Dictionary<int, SPO> _objectIDtoSPODict = new();
@@ -195,8 +192,7 @@ namespace BCIEssentials.ControllerBehaviors
             InStream?.CloseStream();
 
             StimulusRunning = false;
-            StopCoroutineReference(ref _receiveMarkers);
-            StopCoroutineReference(ref _sendMarkers);
+            CleanUpAfterStimulusRun();
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _waitToSelect);
             StopCoroutineReference(ref _training);
@@ -282,7 +278,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// Start a new stimulus run. Will end an active stimulus run if present.
         /// </summary>
         /// </param>
-        public virtual void StartStimulusRun()
+        public void StartStimulusRun()
         {
             if (StimulusRunning)
             {
@@ -303,41 +299,41 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Stops the current stimulus run.
         /// </summary>
-        public virtual void StopStimulusRun()
+        public void StopStimulusRun()
         {
             StimulusRunning = false;
+            CleanUpAfterStimulusRun();
 
             // Send the marker to end
             SendTrialEndsMarker();
         }
         
-        protected virtual IEnumerator RunStimulus()
+        private IEnumerator RunStimulus()
         {
+            SetupUpForStimulusRun();
             while (StimulusRunning)
             {
                 yield return RunStimulusRoutine();
             }
-
-            yield return RunStimulusCompletionRoutine();
-            
+            CleanUpAfterStimulusRun();
             StopCoroutineReference(ref _runStimulus);
-            StopCoroutineReference(ref _sendMarkers);
         }
+
+        /// <summary>
+        /// Called before the start of a stimulus run
+        /// </summary>
+        protected virtual void SetupUpForStimulusRun() {}
+        
+        /// <summary>
+        /// Called after a stimulus run has ended
+        /// </summary>
+        protected virtual void CleanUpAfterStimulusRun() {}
 
         /// <summary>
         /// Behavior to invoke during a stimulus run.
         /// </summary>
         /// <returns></returns>
         protected virtual IEnumerator RunStimulusRoutine()
-        {
-            yield break;
-        }
-
-        /// <summary>
-        /// Behavior that is run after a stimulus run has ended.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator RunStimulusCompletionRoutine()
         {
             yield break;
         }
