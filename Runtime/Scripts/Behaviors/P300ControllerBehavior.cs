@@ -223,23 +223,24 @@ namespace BCIEssentials.ControllerBehaviors
                 }
             }
         }
-        
-        //TODO: Need to fix Checkerboard Flashing while I'm here
+
+
         private IEnumerator RunCheckerboardFlashRoutine()
         {
             int[,] rcMatrix = InitializeFlashingIndexGrid();
             BlackWhiteMatrixFactory bwMatrixFactory = new(rcMatrix);
-            
-            (int[,] blackMat, int[,] whiteMat)
-            = bwMatrixFactory.CreateShuffledMatrices();
 
-            // for flash count
+            int[,] blackMatrix, whiteMatrix;
+            (blackMatrix, whiteMatrix) = bwMatrixFactory.CreateShuffledMatrices();
+
             for (int f = 0; f < numFlashesPerObjectPerSelection; f++)
             {
-                yield return blackMat.RunForEachRow(RunMultiFlash);
-                yield return whiteMat.RunForEachRow(RunMultiFlash);
-                yield return blackMat.RunForEachColumn(RunMultiFlash);
-                yield return whiteMat.RunForEachColumn(RunMultiFlash);
+                yield return blackMatrix.RunForEachRow(RunMultiFlash);
+                yield return whiteMatrix.RunForEachRow(RunMultiFlash);
+                yield return blackMatrix.RunForEachColumn(RunMultiFlash);
+                yield return whiteMatrix.RunForEachColumn(RunMultiFlash);
+
+                (blackMatrix, whiteMatrix) = bwMatrixFactory.CreateShuffledMatrices();
             }
         }
         
