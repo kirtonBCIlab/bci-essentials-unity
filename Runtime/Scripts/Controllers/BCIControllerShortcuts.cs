@@ -25,7 +25,7 @@ namespace BCIEssentials.Controllers
         [EndFoldoutGroup, Space(6)]
         public KeyBind UpdateClassifierBinding;
 
-        public IndexedKeyBindSet ObjectSelectionBindings;
+        public IndexedKeyBindSet SelectionBindings;
         
         [Space]
         public BCIControllerInstance Target;
@@ -40,7 +40,7 @@ namespace BCIEssentials.Controllers
             StartSingleTrainingBinding = KeyCode.Semicolon;
             UpdateClassifierBinding = KeyCode.Backspace;
 
-            ObjectSelectionBindings = new IndexedKeyBindSet
+            SelectionBindings = new IndexedKeyBindSet
             (
                 (0, KeyCode.Alpha0), (1, KeyCode.Alpha1),
                 (2, KeyCode.Alpha2), (3, KeyCode.Alpha3),
@@ -66,7 +66,7 @@ namespace BCIEssentials.Controllers
                         (StartSingleTrainingBinding, Target.StartSingleTraining),
                         (UpdateClassifierBinding, Target.UpdateClassifier)
                     },
-                    Target.SelectSPOAtEndOfRun
+                    Target.MakeSelectionAtEndOfRun
                 );
             }
             else
@@ -80,20 +80,20 @@ namespace BCIEssentials.Controllers
                         (StartSingleTrainingBinding, BCIController.StartSingleTraining),
                         (UpdateClassifierBinding, BCIController.UpdateClassifier)
                     },
-                    BCIController.SelectSPOAtEndOfRun
+                    BCIController.MakeSelectionAtEndOfRun
                 );
             }
         }
 
         private void ProcessShortcuts(
             (KeyBind, Action)[] shortcuts,
-            Action<int> objectSelectionMethod
+            Action<int> selectionMethod
         )
         {
             foreach ((KeyBind keyBind, Action method) in shortcuts)
                 if (keyBind.WasPressedThisFrame) method();
 
-            ObjectSelectionBindings.Process(objectSelectionMethod);
+            SelectionBindings.Process(selectionMethod);
         }
     }
 
