@@ -59,9 +59,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         private bool blockOutGoingLSL = false;
 
-        //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.
-        private int __uniqueP300ID = 0;
-
         private List<GameObject> _validGOs = new List<GameObject>();
         private int lastTourEndNode = -100;
 
@@ -116,11 +113,9 @@ namespace BCIEssentials.ControllerBehaviors
             int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
             int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
 
-            for (int i = 0; i < stimOrder.Length; i++)
+            foreach (int stimIndex in stimOrder)
             {
-                int activeIndex = stimOrder[i];
-                SPO flashingObject = _selectableSPOs[activeIndex];
-                yield return RunSingleFlash(flashingObject, activeIndex);
+                yield return RunSingleFlash(stimIndex);
             }
         }
         
@@ -136,20 +131,18 @@ namespace BCIEssentials.ControllerBehaviors
                 //Now get the Graph set for the TSP
                 int[] stimOrder = CalculateGraphTSP(_validGOs, ref lastTourEndNode);
 
-                for (int i = 0; i < stimOrder.Length; i++)
+                foreach (int stimIndex in stimOrder)
                 {
-                    int activeIndex = stimOrder[i];
-                    SPO activeObject = _selectableSPOs[activeIndex];
-                    Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                    yield return RunSingleFlash(activeObject, activeObject.ObjectID);
+                    yield return RunSingleFlash(stimIndex);
                 }
             }
         }
 
-        private IEnumerator RunSingleFlash(SPO flashingObject, int markerId)
+        private IEnumerator RunSingleFlash(int activeIndex)
         {
+            SPO flashingObject = _selectableSPOs[activeIndex];
             flashingObject.StartStimulus();
-            SendSingleFlashMarker(markerId);
+            SendSingleFlashMarker(activeIndex);
             yield return new WaitForSecondsRealtime(onTime);
 
             flashingObject.StopStimulus();
@@ -286,14 +279,9 @@ namespace BCIEssentials.ControllerBehaviors
                     _selectableSPOs = _validGOs.Select(
                         validGO => validGO.GetComponent<SPO>()
                     ).ToList();
-
-                    AssignIDsToSelectableSPOs(ref __uniqueP300ID);
-                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs = GetSelectableSPOsByTag();
-                    AssignIDsToSelectableSPOs(ref __uniqueP300ID);
-                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 default:
                     base.PopulateObjectList(populationMethod);
@@ -352,44 +340,5 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (!blockOutGoingLSL) base.SendTrialEndsMarker();
         }
-
-
-        #region Experimental Calculations
-        public override void SelectSPO(int objectID, bool stopStimulusRun = false)
-        {
-            var objectCount = _selectableSPOs.Count;
-            if (objectCount == 0)
-            {
-                Debug.Log("No Objects to select");
-                return;
-            }
-
-            if (_objectIDtoSPODict.ContainsKey(objectID))
-            {
-                var spo = _objectIDtoSPODict[objectID];
-                if (spo == null)
-                {
-                    Debug.LogWarning("SPO is now null and can't be selected");
-                    return;
-                }
-
-                spo.Select();
-                LastSelectedSPO = spo;
-                Debug.Log($"SPO '{spo.gameObject.name}' selected.");
-
-                if (stopStimulusRun)
-                {
-                    StopStimulusRun();
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Invalid Selection. Must be in the objectID dictionary");
-                return;
-            }
-        }
-
-        #endregion
-
     }
 }

@@ -71,8 +71,6 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
 
-        private int __uniqueID = 1;
-
 
         [StartFoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
@@ -132,8 +130,6 @@ namespace BCIEssentials.ControllerBehaviors
         private Coroutine _stimulusCoroutine;
         private Coroutine _selectAfterRunCoroutine;
         private Coroutine _trainingCoroutine;
-
-        protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
 
         #region Life Cycle Methods
@@ -360,10 +356,6 @@ namespace BCIEssentials.ControllerBehaviors
                     break;
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs = GetSelectableSPOsByTag();
-                    AssignIDsToSelectableSPOs(ref __uniqueID);
-
-                    _objectIDtoSPODict.Clear();
-                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 default:
                     Debug.LogWarning($"Populating using {populationMethod} is not implemented");
@@ -386,24 +378,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
             return result;
         }
-
-        protected void AssignIDsToSelectableSPOs(ref int idTracker)
-        {
-            int poolIndex = 0;
-            foreach (SPO spo in _selectableSPOs)
-            {
-                if (spo.ObjectID == -100) spo.ObjectID = idTracker++;
-                spo.SelectablePoolIndex = poolIndex++;
-            }
-        }
-
-        protected void AppendSelectableSPOsToObjectIDDictionary()
-        => _selectableSPOs.ForEach(spo => {
-            if (!_objectIDtoSPODict.ContainsKey(spo.ObjectID))
-            {
-                _objectIDtoSPODict.Add(spo.ObjectID, spo);
-            }
-        });
 
 
         /// <summary>
