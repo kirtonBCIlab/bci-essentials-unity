@@ -29,6 +29,6 @@ namespace BCIEssentials.ControllerBehaviors
         protected override float GetRequestedFrequency(int index)
         => requestedFlashingFrequencies[index];
         protected override void SetRealFrequency(int index, float value)
-        => requestedFlashingFrequencies[index] = value;
+        => realFlashingFrequencies[index] = value;
     }
 }
