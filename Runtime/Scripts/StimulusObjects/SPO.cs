@@ -107,5 +107,17 @@ namespace BCIEssentials.StimulusObjects
             transform.localScale = new Vector3(objectScale.x / scaleValue, objectScale.y / scaleValue,
                     objectScale.z / scaleValue);
         }
+
+        public virtual void DefaultColorEffectOn()
+        {
+            Renderer renderer = GetComponent<Renderer>();
+            renderer.material.color = Color.yellow;
+        }
+
+        public virtual void DefaultColorEffectOff()
+        {
+            Renderer renderer = GetComponent<Renderer>();
+            renderer.material.color = Color.white;
+        }
     }
 }
