@@ -105,5 +105,11 @@ namespace BCIEssentials.ControllerBehaviors
             this IEnumerable<Transform> caller
         )
         => caller.Select(t => t.gameObject).ToArray();
+
+        public static List<GameObject> SelectGameObjects
+        (
+            this IEnumerable<Component> caller
+        )
+        => caller.Select(c => c.gameObject).ToList();
     }
 }
