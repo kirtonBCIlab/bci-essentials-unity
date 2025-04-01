@@ -14,18 +14,26 @@ namespace BCIEssentials.ControllerBehaviors
             bool includeInactive = false
         )
         {
-            SPO[] spos = scope switch {
+            SPO[] spos = scope switch
+            {
                 SPOPopulationScope.Children
-                    => caller.GetComponentsInChildren<SPO>(includeInactive),
+                    => caller.GetComponentsInChildren<SPO>(includeInactive)
+                ,
                 SPOPopulationScope.ChildrenOfParent
-                    => caller.GetComponentsInSiblings<SPO>(includeInactive),
+                    => caller.transform.parent switch
+                    {
+                        null => Object.FindObjectsOfType<SPO>(includeInactive)
+                        ,
+                        _ => caller.GetComponentsInChildrenOfParent<SPO>(includeInactive)
+                    }
+                ,
                 _
                     => Object.FindObjectsOfType<SPO>(includeInactive)
             };
             return spos.Where(spo => spo.Selectable).ToList();
         }
 
-        public static T[] GetComponentsInSiblings<T>
+        public static T[] GetComponentsInChildrenOfParent<T>
         (
             this MonoBehaviour caller,
             bool includeInactive = false
@@ -39,11 +47,19 @@ namespace BCIEssentials.ControllerBehaviors
             SPOPopulationScope scope = SPOPopulationScope.Global
         )
         {
-            GameObject[] taggedObjects = scope switch {
+            GameObject[] taggedObjects = scope switch
+            {
                 SPOPopulationScope.Children
-                    => caller.GetChildObjectsWithTag(spoTag),
+                    => caller.GetChildObjectsWithTag(spoTag)
+                ,
                 SPOPopulationScope.ChildrenOfParent
-                    => caller.GetSiblingObjectsWithTag(spoTag),
+                    => caller.transform.parent switch
+                    {
+                        null => GameObject.FindGameObjectsWithTag(spoTag)
+                        ,
+                        _ => caller.transform.parent.GetChildObjectsWithTag(spoTag)
+                    }
+                ,
                 _
                     => GameObject.FindGameObjectsWithTag(spoTag)
             };
@@ -62,13 +78,13 @@ namespace BCIEssentials.ControllerBehaviors
         (
             this MonoBehaviour caller, string tag
         )
-        => caller.transform.GetChildrenWithTag(tag).SelectGameObjects();
+        => caller.transform.GetChildObjectsWithTag(tag);
 
-        public static GameObject[] GetSiblingObjectsWithTag
+        public static GameObject[] GetChildObjectsWithTag
         (
-            this MonoBehaviour caller, string tag
+            this Transform caller, string tag
         )
-        => caller.transform.parent.GetChildrenWithTag(tag).SelectGameObjects();
+        => caller.GetChildrenWithTag(tag).SelectGameObjects();
 
         public static List<Transform> GetChildrenWithTag
         (
