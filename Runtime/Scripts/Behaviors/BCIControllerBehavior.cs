@@ -51,9 +51,11 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         [StartFoldoutGroup("Stimulus Presenting Objects")]
+        [DisplayName("Population Method")]
         [Tooltip("Programmatic method used to dynamically fetch a list of selectable objects every stimulus run")]
         public SPOPopulationMethod ObjectListPopulationMethod = SPOPopulationMethod.Type;
 
+        [DisplayName("Population Scope")]
         [ShowIf(nameof(ObjectListPopulationMethod),
             (int)SPOPopulationMethod.Type, (int)SPOPopulationMethod.Tag
         )]
