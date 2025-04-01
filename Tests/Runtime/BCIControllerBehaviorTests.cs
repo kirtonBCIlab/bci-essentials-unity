@@ -373,60 +373,46 @@ namespace BCIEssentials.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
-        public void WhenSelectSPO_ThenSPOSelected(int spoIndex)
+        public void WhenMakeSelection_ThenSelectionMade(int spoIndex)
         {
-            _behavior.SelectSPO(spoIndex);
+            _behavior.MakeSelection(spoIndex);
 
-            Assert.AreEqual(_spos[spoIndex], _behavior.LastSelectedSPO);
-        }
-
-        //Setup test to check if the SPO Object ID is correctly unique for objects when PopulateObject method is used
-        [UnityTest]
-        public IEnumerator WhenPopulateObjectList_PopulateUniqueSPOIDs()
-        {
-            //Assert that the SPOs have same ID before Populating Object LIst
-            Assert.AreEqual(_spos[0].ObjectID, _spos[1].ObjectID);
-
-            _behavior.PopulateObjectList();
-            yield return null;
-            //Assert now that the SPO IDs are unique
-            Assert.AreNotEqual(_spos[0].ObjectID, _spos[1].ObjectID);
-
+            Assert.AreEqual(spoIndex, _behavior.LastSelectedIndex);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAndStopStimulusRun_ThenSPOSelectedAndStimulusRunEnded()
+        public IEnumerator WhenMakeSelectionAndStopStimulusRun_ThenSelectionMadeAndStimulusRunEnded()
         {
             _behavior.StartStimulusRun();
             yield return null;
-            _behavior.SelectSPO(0, true);
+            _behavior.MakeSelection(0, true);
 
             Assert.False(_behavior.StimulusRunning);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAtEndOfRun_ThenSPOSelected()
+        public IEnumerator WhenMakeSelectionAtEndOfRun_ThenSelectionMade()
         {
             _behavior.StartStimulusRun();
-            _behavior.SelectSPOAtEndOfRun(0);
+            _behavior.MakeSelectionAtEndOfRun(0);
             yield return null;
             _behavior.StopStimulusRun();
             yield return null;
 
-            Assert.AreEqual(_spos[0], _behavior.LastSelectedSPO);
+            Assert.AreEqual(0, _behavior.LastSelectedIndex);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAtEndOfRunAndSpoSelectedDuringRun_ThenSpoSelectedNotSelected()
+        public IEnumerator WhenMakeSelectionAtEndOfRunAndSelectionMadeDuringRun_ThenRunningSelectionHolds()
         {
             _behavior.StartStimulusRun();
             yield return null;
-            _behavior.SelectSPOAtEndOfRun(0);
+            _behavior.MakeSelectionAtEndOfRun(0);
             yield return null;
-            _behavior.SelectSPO(1);
+            _behavior.MakeSelection(1);
             _behavior.StopStimulusRun();
 
-            UnityEngine.Assertions.Assert.AreEqual(_spos[1], _behavior.LastSelectedSPO);
+            UnityEngine.Assertions.Assert.AreEqual(1, _behavior.LastSelectedIndex);
         }
     }
 

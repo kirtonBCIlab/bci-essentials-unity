@@ -145,15 +145,20 @@ namespace BCIEssentials.LSLFramework
     public class LSLPing: SingleChannelLSLResponse {}
 
     /// <summary>
-    /// Prediction/Selection response from bci-essentials python back end
+    /// Prediction/Selection response from bci-essentials python back end.
+    /// <br/><i>(0-indexed)</i>
     /// </summary>
     public class LSLPredictionResponse: SingleChannelLSLResponse
     {
+        /// <summary>
+        /// Index of object or class to select <i>(0-indexed)</i>
+        /// </summary>
         public int Value {get; protected set;}
 
         protected override void ParseBody(string body)
         {
             Value = int.Parse(body);
+            if (Value > 0) Value--;
         }
     }
 }

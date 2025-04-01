@@ -71,8 +71,6 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("Whether to automatically trigger the setup factory when initialized")]
         public bool FactorySetupRequired;
 
-        private int __uniqueID = 1;
-
 
         [StartFoldoutGroup("Training Properties")]
         [Tooltip("The number of training iterations")]
@@ -110,9 +108,9 @@ namespace BCIEssentials.ControllerBehaviors
         public List<SPO> SelectableSPOs => _selectableSPOs;
         
         /// <summary>
-        /// The 
+        /// Index of selection made during the most recently started run
         /// </summary>
-        public SPO LastSelectedSPO { get; protected set; }
+        public int? LastSelectedIndex { get; protected set; }
 
         /// <summary>
         /// If the behavior is currently running a training session.
@@ -130,10 +128,8 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         private Coroutine _stimulusCoroutine;
-        private Coroutine _selectAfterRunCoroutine;
+        private Coroutine _delayedSelectionCoroutine;
         private Coroutine _trainingCoroutine;
-
-        protected Dictionary<int, SPO> _objectIDtoSPODict = new();
 
 
         #region Life Cycle Methods
@@ -199,7 +195,7 @@ namespace BCIEssentials.ControllerBehaviors
             StimulusRunning = false;
             CleanUpAfterStimulusRun();
             StopCoroutineReference(ref _stimulusCoroutine);
-            StopCoroutineReference(ref _selectAfterRunCoroutine);
+            StopCoroutineReference(ref _delayedSelectionCoroutine);
             StopCoroutineReference(ref _trainingCoroutine);
         }
 
@@ -291,7 +287,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             
             StimulusRunning = true;
-            LastSelectedSPO = null;
+            LastSelectedIndex = null;
             
             // Send the marker to start
             SendTrialStartedMarker();
@@ -360,10 +356,6 @@ namespace BCIEssentials.ControllerBehaviors
                     break;
                 case SpoPopulationMethod.Tag:
                     _selectableSPOs = GetSelectableSPOsByTag();
-                    AssignIDsToSelectableSPOs(ref __uniqueID);
-
-                    _objectIDtoSPODict.Clear();
-                    AppendSelectableSPOsToObjectIDDictionary();
                     break;
                 default:
                     Debug.LogWarning($"Populating using {populationMethod} is not implemented");
@@ -387,47 +379,32 @@ namespace BCIEssentials.ControllerBehaviors
             return result;
         }
 
-        protected void AssignIDsToSelectableSPOs(ref int idTracker)
-        {
-            int poolIndex = 0;
-            foreach (SPO spo in _selectableSPOs)
-            {
-                if (spo.ObjectID == -100) spo.ObjectID = idTracker++;
-                spo.SelectablePoolIndex = poolIndex++;
-            }
-        }
-
-        protected void AppendSelectableSPOsToObjectIDDictionary()
-        => _selectableSPOs.ForEach(spo => {
-            if (!_objectIDtoSPODict.ContainsKey(spo.ObjectID))
-            {
-                _objectIDtoSPODict.Add(spo.ObjectID, spo);
-            }
-        });
-
 
         /// <summary>
-        /// Select an object from <see cref="SelectableSPOs"/>.
+        /// Select a stimulus object or class, selecting
+        /// from <see cref="SelectableSPOs"/> by default.
         /// </summary>
-        /// <param name="objectIndex">The index value of the object to select.</param>
-        /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
-        public virtual void SelectSPO(int objectIndex, bool stopStimulusRun = false)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select.
+        /// </param>
+        /// <param name="stopStimulusRun">
+        /// If true will end the current stimulus run.
+        /// </param>
+        public virtual void MakeSelection(int selectionIndex, bool stopStimulusRun = false)
         {
-            var objectCount = _selectableSPOs.Count;
-            if (objectCount == 0)
+            if (SPOCount == 0)
             {
                 Debug.Log("No Objects to select");
                 return;
             }
 
-            if (objectIndex < 0 || objectIndex >= objectCount)
+            if (selectionIndex < 0 || selectionIndex >= SPOCount)
             {
-                Debug.LogWarning($"Invalid Selection. Must be or be between 0 and {_selectableSPOs.Count}");
+                Debug.LogWarning($"Invalid Selection. Must be between (0 and {SPOCount}]");
                 return;
             }
 
-            var spo = _selectableSPOs[objectIndex];
-            // var spo = _objectIDtoSPODict[objectIndex]; //TODO: Implement this for ObjectID selection
+            var spo = _selectableSPOs[selectionIndex];
             if (spo == null)
             {
                 Debug.LogWarning("SPO is now null and can't be selected");
@@ -435,7 +412,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             
             spo.Select();
-            LastSelectedSPO = spo;
+            LastSelectedIndex = selectionIndex;
             Debug.Log($"SPO '{spo.gameObject.name}' selected.");
 
             if (stopStimulusRun)
@@ -445,21 +422,22 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         /// <summary>
-        /// Select an object from <see cref="SelectableSPOs"/> if no objects were
-        /// selected during a stimulus run.
+        /// Make a selection at the end of a stimulus if no other was made
         /// </summary>
-        /// <param name="objectIndex"></param>
-        public virtual void SelectSPOAtEndOfRun(int objectIndex)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select <i>(0-indexed)</i>
+        /// </param>
+        public virtual void MakeSelectionAtEndOfRun(int selectionIndex)
         {
-            StopStartCoroutine(ref _selectAfterRunCoroutine, RunInvokeAfterStimulusRun(() =>
+            StopStartCoroutine(ref _delayedSelectionCoroutine, RunInvokeAfterStimulusRun(() =>
             {
-                if (LastSelectedSPO != null)
+                if (LastSelectedIndex.HasValue)
                 {
                     return;
                 }
                 
-                SelectSPO(objectIndex);
-                _selectAfterRunCoroutine = null;
+                MakeSelection(selectionIndex);
+                _delayedSelectionCoroutine = null;
             }));
         }
 
@@ -487,15 +465,15 @@ namespace BCIEssentials.ControllerBehaviors
             if (MarkerWriter != null) MarkerWriter.PushTrialEndsMarker();
         }
 
-        public virtual void StartReceivingMarkers()
+        private void StartReceivingMarkers()
         {
             ResponseProvider.UnsubscribePredictions(OnPredictionReceived);
             ResponseProvider.SubscribePredictions(OnPredictionReceived);
         }
 
-        protected virtual void OnPredictionReceived(LSLPredictionResponse prediction)
+        private void OnPredictionReceived(LSLPredictionResponse prediction)
         {
-            SelectSPO(prediction.Value);
+            MakeSelection(prediction.Value);
         }
 
         public void StopReceivingMarkers()
