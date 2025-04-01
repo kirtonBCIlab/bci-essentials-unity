@@ -59,7 +59,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         private bool blockOutGoingLSL = false;
 
-        private List<GameObject> _validGOs = new List<GameObject>();
         private int lastTourEndNode = -100;
 
 
@@ -121,20 +120,20 @@ namespace BCIEssentials.ControllerBehaviors
         
         private IEnumerator RunContextAwareSingleFlashRoutine()
         {
-            int totalFlashes = numFlashesPerObjectPerSelection;          
+            int totalFlashes = numFlashesPerObjectPerSelection;       
+            List<SPO> unfilteredSPOList = _selectableSPOs.ToList();   
 
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                //Refresh the List of available SPO Objects. This will update the _validGOs list.
-                PopulateObjectList();
-                //Now get the Graph set for the TSP
-                int[] stimOrder = CalculateGraphTSP(_validGOs, ref lastTourEndNode);
+                List<GameObject> visibleObjects = FilterSPOListByVisibility();
+                int[] stimOrder = CalculateGraphTSP(visibleObjects, ref lastTourEndNode);
 
                 foreach (int stimIndex in stimOrder)
                 {
                     yield return RunSingleFlash(stimIndex);
                 }
+                _selectableSPOs = unfilteredSPOList;
             }
         }
 
@@ -154,12 +153,12 @@ namespace BCIEssentials.ControllerBehaviors
         {
             //Total number of flashes for each grouping of objects.
             int totalFlashes = numFlashesPerObjectPerSelection;
+            List<SPO> unfilteredSPOList = _selectableSPOs.ToList();
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                PopulateObjectList();
-                //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
-                var (subset1,subset2) = CalculateGraphPartition(_validGOs);
+                List<GameObject> visibleObjects = FilterSPOListByVisibility();
+                var (subset1,subset2) = CalculateGraphPartition(visibleObjects);
 
                 //Turn the subsets into randomized matrices,
                 int[,] randMat1 = SubsetToRandomMatrix(subset1);
@@ -172,6 +171,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return randMat1.RunForEachColumn(RunMultiFlash);
                 yield return randMat2.RunForEachColumn(RunMultiFlash);
 
+                _selectableSPOs = unfilteredSPOList;
                 //Now shuffle!
             }
         }
@@ -261,42 +261,13 @@ namespace BCIEssentials.ControllerBehaviors
             yield return new WaitForSecondsRealtime(offTime);
         }
 
-
-        /// <summary>
-        /// Populate the <see cref="SelectableSPOs"/> using a particular method.
-        /// This extends the typical BCI Controller Behavior to enable "context
-        /// aware" selection of SPOs.
-        /// </summary>
-        /// <param name="populationMethod">Method of population to use</param>
-        public override void PopulateObjectList
-        (SpoPopulationMethod populationMethod = SpoPopulationMethod.GraphBP)
-        {
-            switch (populationMethod)
-            {
-                case SpoPopulationMethod.GraphBP:
-                    //First, get all game objects in the world
-                    //visible by the camera, including the UI.
-                    _validGOs = GetSPOGameObjectsInCameraViewByTag();
-                    _selectableSPOs = _validGOs.Select(
-                        validGO => validGO.GetComponent<SPO>()
-                    ).ToList();
-                    break;
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs = GetSelectableSPOsByTag();
-                    break;
-                default:
-                    base.PopulateObjectList(populationMethod);
-                    break;
-            }
-        }
-
-        //This is the non-multi-camera version of the function
-        public List<GameObject> GetSPOGameObjectsInCameraViewByTag()
+        
+        protected List<GameObject> FilterSPOListByVisibility()
         {
             Camera mainCamera = Camera.main;
-            List<GameObject> visibleGOs = new List<GameObject>();
+            List<SPO> visibleSPOs = new();
 
-            foreach (SPO spo in GetSelectableSPOsByTag())
+            foreach (SPO spo in _selectableSPOs)
             {
                 if (
                     (spo.TryGetComponent(out CanvasRenderer canvasRenderer)
@@ -305,9 +276,10 @@ namespace BCIEssentials.ControllerBehaviors
                     (spo.TryGetComponent(out Renderer renderer)
                     && renderer.IsVisibleFrom(mainCamera))
                 )
-                visibleGOs.Add(spo.gameObject);
+                visibleSPOs.Add(spo);
             }
-            return visibleGOs;
+            _selectableSPOs = visibleSPOs;
+            return visibleSPOs.Select(spo => gameObject).ToList();
         }
 
 
