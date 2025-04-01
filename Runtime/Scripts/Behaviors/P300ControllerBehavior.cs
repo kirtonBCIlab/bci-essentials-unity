@@ -125,7 +125,7 @@ namespace BCIEssentials.ControllerBehaviors
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                List<SPO> visibleSPOs = GetVisibilityFilteredSPOList();
+                List<SPO> visibleSPOs = GetCameraVisibleSPOs();
                 var visibleGameObjects = visibleSPOs.SelectGameObjects();
                 int[] stimOrder = CalculateGraphTSP(visibleGameObjects, ref lastTourEndNode);
 
@@ -160,7 +160,7 @@ namespace BCIEssentials.ControllerBehaviors
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                List<SPO> visibleSPOs = GetVisibilityFilteredSPOList();
+                List<SPO> visibleSPOs = GetCameraVisibleSPOs();
                 var visibleGameObjects = visibleSPOs.SelectGameObjects();
                 var (subset1,subset2) = CalculateGraphPartition(visibleGameObjects);
 
@@ -274,7 +274,7 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         
-        protected List<SPO> GetVisibilityFilteredSPOList()
+        public List<SPO> GetCameraVisibleSPOs()
         {
             Camera mainCamera = Camera.main;
             List<SPO> visibleSPOs = new();
