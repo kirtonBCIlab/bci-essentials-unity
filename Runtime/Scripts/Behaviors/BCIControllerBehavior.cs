@@ -108,7 +108,7 @@ namespace BCIEssentials.ControllerBehaviors
         public List<SPO> SelectableSPOs => _selectableSPOs;
         
         /// <summary>
-        /// The 
+        /// Index of selection made during the most recently started run
         /// </summary>
         public int? LastSelectedIndex { get; protected set; }
 
