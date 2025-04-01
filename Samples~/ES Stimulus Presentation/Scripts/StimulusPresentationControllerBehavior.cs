@@ -51,9 +51,8 @@ namespace BCIEssentials.ControllerBehaviors
             PopulateObjectList();
         }
 
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        protected override void UpdateObjectListConfiguration()
         {
-            base.PopulateObjectList(populationMethod);
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;

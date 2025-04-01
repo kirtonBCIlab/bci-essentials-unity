@@ -13,11 +13,8 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_on_count = new int[99];
 
 
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        protected override void UpdateObjectListConfiguration()
         {
-            base.PopulateObjectList(populationMethod);
-            InitializeFrequencies();
-
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;
@@ -29,8 +26,7 @@ namespace BCIEssentials.ControllerBehaviors
                 SetRealFrequency(i, targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
             }
         }
-
-        protected virtual void InitializeFrequencies() {}
+        
         protected abstract float GetRequestedFrequency(int index);
         protected abstract void SetRealFrequency(int index, float value);
 

@@ -32,12 +32,10 @@ namespace BCIEssentials.ControllerBehaviors
             );
         }
 
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        protected override void UpdateObjectListConfiguration()
         {
-            base.PopulateObjectList(populationMethod);
-
             // Warn about the number of objects to be selected from, if greater than 2
-            if (_selectableSPOs.Count > 2)
+            if (SPOCount > 2)
             {
                 Debug.LogWarning("Warning: Selecting between more than 2 objects!");
             }
