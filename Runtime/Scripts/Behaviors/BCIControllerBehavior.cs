@@ -51,14 +51,22 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         [StartFoldoutGroup("Stimulus Presenting Objects")]
+        [Tooltip("Programmatic method used to dynamically fetch a list of selectable objects every stimulus run")]
+        public SPOPopulationMethod ObjectListPopulationMethod = SPOPopulationMethod.Type;
+
+        [ShowIf(nameof(ObjectListPopulationMethod),
+            (int)SPOPopulationMethod.Type, (int)SPOPopulationMethod.Tag
+        )]
+        public SPOPopulationScope ObjectListPopulationScope = SPOPopulationScope.Children;
+
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
+        [ShowIf(nameof(ObjectListPopulationMethod), (int)SPOPopulationMethod.Tag)]
         public string SPOTag = "BCI";
 
         [SerializeField]
-        [InspectorName("Selectable Objects")]
         [Tooltip("Provide an initial set of SPO.")]
         protected List<SPO> _selectableSPOs = new();
-        protected int SPOCount => _selectableSPOs.Count;
+
 
         [Header("Factory Setup")]
         [SerializeField]
@@ -106,6 +114,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// Available SPOs for selection during a Stimulus run
         /// </summary>
         public List<SPO> SelectableSPOs => _selectableSPOs;
+        public int SPOCount => _selectableSPOs.Count;
         
         /// <summary>
         /// Index of selection made during the most recently started run
@@ -203,13 +212,27 @@ namespace BCIEssentials.ControllerBehaviors
         [ContextMenu("Set Up SPOs")]
         protected void SetUpSPOs()
         {
-            _spoFactory?.CreateObjects(transform);
+            if (_spoFactory == null) return;
+            _spoFactory.CreateObjects(transform);
+
+            if (ObjectListPopulationMethod == SPOPopulationMethod.Factory)
+            {
+                SetObjectListAndUpdateConfiguration(
+                    _spoFactory.FabricatedObjects
+                );
+            }
         }
 
         [ContextMenu("Remove Fabricated SPOs")]
         protected void CleanUpSPOs()
         {
-            _spoFactory?.DestroyObjects();
+            if (_spoFactory == null) return;
+            _spoFactory.DestroyObjects();
+
+            if (ObjectListPopulationMethod == SPOPopulationMethod.Factory)
+            {
+                _selectableSPOs.Clear();
+            }
         }
 
         protected void CreateAndAssignSPOFactory()
@@ -220,6 +243,7 @@ namespace BCIEssentials.ControllerBehaviors
                 return;
             }
             _spoFactory = SPOGridFactory.CreateInstance(null, 3, 2, Vector2.one * 2);
+            ObjectListPopulationMethod = SPOPopulationMethod.Factory;
             string scenePath = EditorSceneManager.GetActiveScene().path;
             string folderPath = Path.GetDirectoryName(scenePath);
             string fileName = $"{name} SPO Factory.asset";
@@ -344,40 +368,37 @@ namespace BCIEssentials.ControllerBehaviors
         #region SPO Management
 
         /// <summary>
-        /// Populate the <see cref="SelectableSPOs"/> using a particular method.
+        /// Populate the <see cref="SelectableSPOs"/> using the
+        /// method and scope defined by inspector properties
         /// </summary>
-        /// <param name="populationMethod">Method of population to use</param>
-        public virtual void PopulateObjectList
-        (SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public void PopulateObjectList()
         {
-            switch (populationMethod)
+            switch (ObjectListPopulationMethod)
             {
-                case SpoPopulationMethod.Predefined:
+                case SPOPopulationMethod.Type:
+                    SetObjectListAndUpdateConfiguration(
+                        this.GetSelectableSPOsByType(
+                            ObjectListPopulationScope
+                        )
+                    );
                     break;
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs = GetSelectableSPOsByTag();
-                    break;
-                default:
-                    Debug.LogWarning($"Populating using {populationMethod} is not implemented");
+                case SPOPopulationMethod.Tag:
+                    SetObjectListAndUpdateConfiguration(
+                        this.GetSelectableSPOsByTag(
+                            SPOTag, ObjectListPopulationScope
+                        )
+                    );
                     break;
             }
         }
 
-        protected List<SPO> GetSelectableSPOsByTag()
+        private void SetObjectListAndUpdateConfiguration(List<SPO> newObjectList)
         {
-            var taggedGOs = GameObject.FindGameObjectsWithTag(SPOTag);
-            List<SPO> result = new();
-
-            foreach (var taggedGO in taggedGOs)
-            {
-                if (
-                    taggedGO.TryGetComponent(out SPO spo)
-                    && spo.Selectable
-                )
-                result.Add(spo);
-            }
-            return result;
+            _selectableSPOs = newObjectList;
+            UpdateObjectListConfiguration();
         }
+
+        protected virtual void UpdateObjectListConfiguration() {}
 
 
         /// <summary>
