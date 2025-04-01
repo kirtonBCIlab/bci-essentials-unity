@@ -31,11 +31,17 @@ namespace BCIEssentials.LSLFramework
 
     public abstract class EventMarker: ILSLMarker
     {
+        /// <summary>
+        /// Number of objects or classes in the trial
+        /// </summary>
         public int ObjectCount;
+        /// <summary>
+        /// Index of object, frequency, or class targetted for selection <i>(0-indexed)</i>
+        /// </summary>
         public int TrainingTarget;
 
         public virtual string MarkerString
-        => $"{ObjectCount},{TrainingTarget}";
+        => $"{ObjectCount},{(TrainingTarget < 0? -1: TrainingTarget + 1)}";
 
         public EventMarker
         (
@@ -52,6 +58,10 @@ namespace BCIEssentials.LSLFramework
 
     public abstract class WindowedEventMarker: EventMarker
     {
+        /// <summary>
+        /// Length of the processing Epoch <br/>
+        /// <b>Must remain constant between trials</b>
+        /// </summary>
         public float WindowLength;
 
         public override string MarkerString
@@ -77,6 +87,16 @@ namespace BCIEssentials.LSLFramework
         public override string MarkerString
         => $"mi,{base.MarkerString}";
 
+        /// <param name="objectCount">
+        /// Number of objects (classes) in the trial
+        /// </param>
+        /// <param name="windowLength">
+        /// Length of the processing Epoch <br/>
+        /// <b>Must remain constant between trials</b>
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of class targetted for training <i>(0-indexed)</i>
+        /// </param>
         public MIEventMarker
         (
             int objectCount, float windowLength,
@@ -96,6 +116,16 @@ namespace BCIEssentials.LSLFramework
         public override string MarkerString
         => $"switch,{base.MarkerString}";
 
+        /// <param name="objectCount">
+        /// Number of objects (classes) in the trial
+        /// </param>
+        /// <param name="windowLength">
+        /// Length of the processing Epoch <br/>
+        /// <b>Must remain constant between trials</b>
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of class targetted for training <i>(0-indexed)</i>
+        /// </param>
         public SwitchEventMarker
         (
             int objectCount, float windowLength,
@@ -108,6 +138,9 @@ namespace BCIEssentials.LSLFramework
 
     public abstract class VisualEvokedPotentialEventMarker: WindowedEventMarker
     {
+        /// <summary>
+        /// Flashing frequencies used by stimulus objects
+        /// </summary>
         public float[] Frequencies;
 
         public override string MarkerString
@@ -140,6 +173,19 @@ namespace BCIEssentials.LSLFramework
         public override string MarkerString
         => $"ssvep,{base.MarkerString}";
 
+        /// <param name="objectCount">
+        /// Number of objects (frequencies) in the trial
+        /// </param>
+        /// <param name="windowLength">
+        /// Length of the processing Epoch <br/>
+        /// <b>Must remain constant between trials</b>
+        /// </param>
+        /// <param name="frequencies">
+        /// Collection of flashing frequencies used by stimulus objects
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// </param>
         public SSVEPEventMarker
         (
             int objectCount, float windowLength,
@@ -163,6 +209,19 @@ namespace BCIEssentials.LSLFramework
         public override string MarkerString
         => $"tvep,{base.MarkerString}";
 
+        /// <param name="objectCount">
+        /// Number of objects (frequencies) in the trial
+        /// </param>
+        /// <param name="windowLength">
+        /// Length of the processing Epoch <br/>
+        /// <b>Must remain constant between trials</b>
+        /// </param>
+        /// <param name="frequencies">
+        /// Collection of flashing frequencies used by stimulus objects
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// </param>
         public TVEPEventMarker
         (
             int objectCount, float windowLength,
@@ -203,8 +262,15 @@ namespace BCIEssentials.LSLFramework
         public int ActiveObject;
 
         public override string MarkerString
-        => $"p300,s,{base.MarkerString},{ActiveObject}";
+        => $"p300,s,{base.MarkerString},{ActiveObject + 1}";
 
+        /// <param name="objectCount">Number of objects in the trial</param>
+        /// <param name="activeObject">
+        /// Index of object being flashed <i>(0-indexed)</i>
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object being targetted for training <i>(0-indexed)</i>
+        /// </param>
         public SingleFlashP300EventMarker
         (
             int objectCount, int activeObject,
@@ -230,9 +296,16 @@ namespace BCIEssentials.LSLFramework
         protected string ActiveObjectString
         => ActiveObjects switch {
             null or {Length: 0} => "",
-            _ => $",{string.Join(',', ActiveObjects)}"
+            _ => $",{string.Join(',', ActiveObjects.Select(x => ++x))}"
         };
 
+        /// <param name="objectCount">Number of objects in the trial</param>
+        /// <param name="activeObjects">
+        /// Collection of object indices being flashed together <i>(0-indexed)</i>
+        /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object targetted for training <i>(0-indexed)</i>
+        /// </param>
         public MultiFlashP300EventMarker
         (
             int objectCount, IEnumerable<int> activeObjects,

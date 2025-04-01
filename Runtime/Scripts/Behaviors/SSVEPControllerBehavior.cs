@@ -23,8 +23,11 @@ namespace BCIEssentials.ControllerBehaviors
         );
 
 
-        protected override void InitializeFrequencies()
-        => realFlashingFrequencies = new float[_selectableSPOs.Count];
+        protected override void UpdateObjectListConfiguration()
+        {
+            realFlashingFrequencies = new float[SPOCount];
+            base.UpdateObjectListConfiguration();
+        }
 
         protected override float GetRequestedFrequency(int index)
         => requestedFlashingFrequencies[index];

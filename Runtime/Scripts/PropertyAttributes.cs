@@ -99,4 +99,15 @@ namespace BCIEssentials
             };
         }
     }
+
+
+    public class DisplayNameAttribute : PropertyAttribute
+    {
+        public string Label;
+
+        public DisplayNameAttribute(string label)
+        {
+            Label = label;
+        }
+    }
 }
