@@ -57,7 +57,7 @@ namespace BCIEssentials.ControllerBehaviors
         [ShowIf(nameof(ObjectListPopulationMethod),
             (int)SPOPopulationMethod.Type, (int)SPOPopulationMethod.Tag
         )]
-        public SPOPopulationScope ObjectListPopulationScope = SPOPopulationScope.Children;
+        public SPOPopulationScope ObjectListPopulationScope = SPOPopulationScope.Global;
 
         [Tooltip("Engine Tag used to programmatically identify Stimulus Presenting Objects")]
         [ShowIf(nameof(ObjectListPopulationMethod), (int)SPOPopulationMethod.Tag)]
