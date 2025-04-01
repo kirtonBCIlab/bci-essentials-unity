@@ -120,28 +120,32 @@ namespace BCIEssentials.ControllerBehaviors
         
         private IEnumerator RunContextAwareSingleFlashRoutine()
         {
-            int totalFlashes = numFlashesPerObjectPerSelection;       
-            List<SPO> unfilteredSPOList = _selectableSPOs.ToList();   
+            int totalFlashes = numFlashesPerObjectPerSelection;
 
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                List<GameObject> visibleObjects = FilterSPOListByVisibility();
-                int[] stimOrder = CalculateGraphTSP(visibleObjects, ref lastTourEndNode);
+                List<SPO> visibleSPOs = GetVisibilityFilteredSPOList();
+                var visibleGameObjects = visibleSPOs.SelectGameObjects();
+                int[] stimOrder = CalculateGraphTSP(visibleGameObjects, ref lastTourEndNode);
 
                 foreach (int stimIndex in stimOrder)
                 {
-                    yield return RunSingleFlash(stimIndex);
+                    yield return RunSingleFlash(stimIndex, visibleSPOs);
                 }
-                _selectableSPOs = unfilteredSPOList;
             }
         }
 
-        private IEnumerator RunSingleFlash(int activeIndex)
+        protected IEnumerator RunSingleFlash(int activeIndex)
+        => RunSingleFlash(activeIndex, _selectableSPOs);
+        protected IEnumerator RunSingleFlash
+        (
+            int activeIndex, List<SPO> stimulusObjects
+        )
         {
-            SPO flashingObject = _selectableSPOs[activeIndex];
+            SPO flashingObject = stimulusObjects[activeIndex];
             flashingObject.StartStimulus();
-            SendSingleFlashMarker(activeIndex);
+            SendSingleFlashMarker(activeIndex, stimulusObjects.Count);
             yield return new WaitForSecondsRealtime(onTime);
 
             flashingObject.StopStimulus();
@@ -153,12 +157,15 @@ namespace BCIEssentials.ControllerBehaviors
         {
             //Total number of flashes for each grouping of objects.
             int totalFlashes = numFlashesPerObjectPerSelection;
-            List<SPO> unfilteredSPOList = _selectableSPOs.ToList();
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                List<GameObject> visibleObjects = FilterSPOListByVisibility();
-                var (subset1,subset2) = CalculateGraphPartition(visibleObjects);
+                List<SPO> visibleSPOs = GetVisibilityFilteredSPOList();
+                var visibleGameObjects = visibleSPOs.SelectGameObjects();
+                var (subset1,subset2) = CalculateGraphPartition(visibleGameObjects);
+
+                IEnumerator RunMultiFlashOnVisibleObjects(int[] flashingIndices)
+                => RunMultiFlash(flashingIndices, visibleSPOs);
 
                 //Turn the subsets into randomized matrices,
                 int[,] randMat1 = SubsetToRandomMatrix(subset1);
@@ -166,12 +173,11 @@ namespace BCIEssentials.ControllerBehaviors
                 
                 //Flash through the rows of randMat1 first, then randMat2.
                 //Off time is included in these coroutines.
-                yield return randMat1.RunForEachRow(RunMultiFlash);
-                yield return randMat2.RunForEachRow(RunMultiFlash);
-                yield return randMat1.RunForEachColumn(RunMultiFlash);
-                yield return randMat2.RunForEachColumn(RunMultiFlash);
+                yield return randMat1.RunForEachRow(RunMultiFlashOnVisibleObjects);
+                yield return randMat2.RunForEachRow(RunMultiFlashOnVisibleObjects);
+                yield return randMat1.RunForEachColumn(RunMultiFlashOnVisibleObjects);
+                yield return randMat2.RunForEachColumn(RunMultiFlashOnVisibleObjects);
 
-                _selectableSPOs = unfilteredSPOList;
                 //Now shuffle!
             }
         }
@@ -245,24 +251,30 @@ namespace BCIEssentials.ControllerBehaviors
             return new int[numFlashRows, numFlashColumns];
         }
 
-        private IEnumerator RunMultiFlash(int[] objectsToFlash)
+        protected IEnumerator RunMultiFlash(int[] objectsToFlash)
+        => RunMultiFlash(objectsToFlash, _selectableSPOs);
+        protected IEnumerator RunMultiFlash
+        (
+            int[] objectsToFlash, List<SPO> stimulusObjects
+        )
         {
+            int objectCount = stimulusObjects.Count;
             objectsToFlash = objectsToFlash.Where
-            (x => x >= 0 && x < SPOCount).ToArray();
+            (x => x >= 0 && x < objectCount).ToArray();
 
             foreach (int i in objectsToFlash)
-                _selectableSPOs[i].StartStimulus();
+                stimulusObjects[i].StartStimulus();
 
-            SendMultiFlashMarker(objectsToFlash);
+            SendMultiFlashMarker(objectsToFlash, objectCount);
             yield return new WaitForSecondsRealtime(onTime);
 
             foreach(int i in objectsToFlash)
-                _selectableSPOs[i].StopStimulus();
+                stimulusObjects[i].StopStimulus();
             yield return new WaitForSecondsRealtime(offTime);
         }
 
         
-        protected List<GameObject> FilterSPOListByVisibility()
+        protected List<SPO> GetVisibilityFilteredSPOList()
         {
             Camera mainCamera = Camera.main;
             List<SPO> visibleSPOs = new();
@@ -278,28 +290,33 @@ namespace BCIEssentials.ControllerBehaviors
                 )
                 visibleSPOs.Add(spo);
             }
-            _selectableSPOs = visibleSPOs;
-            return visibleSPOs.Select(spo => gameObject).ToList();
+            return visibleSPOs;
         }
 
 
-        private void SendSingleFlashMarker(int objectIndex)
+        private void SendSingleFlashMarker
+        (
+            int flashedObjectIndex, int objectCount
+        )
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
                 MarkerWriter.PushSingleFlashP300Marker(
-                    SPOCount, objectIndex, trainTarget
+                    objectCount, flashedObjectIndex, trainTarget
                 );
             }
         }
 
-        private void SendMultiFlashMarker(IEnumerable<int> flashedObjects)
+        private void SendMultiFlashMarker
+        (
+            IEnumerable<int> flashedObjectIndices, int objectCount
+        )
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
                 MarkerWriter.PushMultiFlashP300Marker
                 (
-                    SPOCount, flashedObjects, trainTarget
+                    objectCount, flashedObjectIndices, trainTarget
                 );
             }
         }
