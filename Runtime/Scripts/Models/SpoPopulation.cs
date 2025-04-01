@@ -2,9 +2,9 @@ namespace BCIEssentials.ControllerBehaviors
 {
     public enum SPOPopulationScope
     {
-        Children,
-        ChildrenOfParent,
         Global,
+        Children,
+        ChildrenOfParent
     }
 
     public enum SPOPopulationMethod
