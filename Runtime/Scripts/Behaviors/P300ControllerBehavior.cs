@@ -107,7 +107,7 @@ namespace BCIEssentials.ControllerBehaviors
                 _ => null
             };
             
-            StopStimulusRun();
+            StimulusRunning = false;
         }
 
         //TODO There is a bug where this is sending "Trial Ended" before the last flash is sent.
