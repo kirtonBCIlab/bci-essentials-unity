@@ -619,7 +619,7 @@ namespace BCIEssentials.ControllerBehaviors
             yield return new WaitForSecondsRealtime(preStimulusBuffer);
             StartStimulusRun();
             yield return stimulusDelayRoutine;
-            StopStimulusRun();
+            StimulusRunning = false;
             yield return new WaitForSecondsRealtime(postStimulusBuffer);
 
             if (shamFeedback && enableShamFeedback)
