@@ -51,11 +51,24 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected abstract void SendWindowMarker(int trainingIndex = -1);
 
+
+        protected override IEnumerator RunStimulusRoutine()
+        {
+            while (true)
+            {
+                UpdateStimulus();
+                yield return null;
+            }
+        }
+
+        protected virtual void UpdateStimulus() {}
+
         protected override IEnumerator WaitForStimulusToComplete()
         {
             yield return new WaitForSecondsRealtime(
                 (windowLength + interWindowInterval) * numTrainWindows
             );
+            StopStimulusRun();
         }
 
         protected IEnumerator DisplayFeedbackWhileWaitingForStimulusToComplete
