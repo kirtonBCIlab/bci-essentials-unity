@@ -67,6 +67,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override void CleanUpAfterStimulusRun()
         {
+            base.CleanUpAfterStimulusRun();
             foreach (var spo in _selectableSPOs)
             {
                 if (spo != null)

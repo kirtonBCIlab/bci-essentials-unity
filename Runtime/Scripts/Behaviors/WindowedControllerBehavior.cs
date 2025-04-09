@@ -40,7 +40,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         private IEnumerator RunSendWindowMarkers(int trainingIndex = 99)
         {
-            while (StimulusRunning)
+            while (true)
             {
                 // Send the marker
                 if (MarkerWriter != null) SendWindowMarker(trainingIndex);
