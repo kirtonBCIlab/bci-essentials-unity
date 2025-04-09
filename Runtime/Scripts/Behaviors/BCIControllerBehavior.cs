@@ -102,7 +102,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// If a stimulus run is currently taking place.
         /// </summary>
-        public bool StimulusRunning { get; protected set; }
+        public bool StimulusRunning { get; private set; }
         
         /// <summary>
         /// Available SPOs for selection during a Stimulus run
@@ -196,9 +196,9 @@ namespace BCIEssentials.ControllerBehaviors
             CleanUpSPOs();
             ResponseProvider?.CloseStream();
 
-            StimulusRunning = false;
             CleanUpAfterStimulusRun();
             StopCoroutineReference(ref _stimulusCoroutine);
+            StimulusRunning = false;
             StopCoroutineReference(ref _selectAfterRunCoroutine);
             StopCoroutineReference(ref _trainingCoroutine);
         }
@@ -290,7 +290,6 @@ namespace BCIEssentials.ControllerBehaviors
                 StopStimulusRun();
             }
             
-            StimulusRunning = true;
             LastSelectedSPO = null;
             
             // Send the marker to start
@@ -299,6 +298,7 @@ namespace BCIEssentials.ControllerBehaviors
             StartReceivingMarkers();
             PopulateObjectList();
             StopStartCoroutine(ref _stimulusCoroutine, RunStimulus());
+            StimulusRunning = true;
         }
 
         /// <summary>
@@ -306,22 +306,22 @@ namespace BCIEssentials.ControllerBehaviors
         /// </summary>
         public void StopStimulusRun()
         {
+            if (StimulusRunning)
+            {
+                SendTrialEndsMarker();
+            }
+            StopCoroutineReference(ref _stimulusCoroutine);
             StimulusRunning = false;
             CleanUpAfterStimulusRun();
-
-            // Send the marker to end
-            SendTrialEndsMarker();
         }
         
         private IEnumerator RunStimulus()
         {
             SetupUpForStimulusRun();
-            while (StimulusRunning)
-            {
-                yield return RunStimulusRoutine();
-            }
+            yield return RunStimulusRoutine();
+            StimulusRunning = false;
+            SendTrialEndsMarker();
             CleanUpAfterStimulusRun();
-            StopCoroutineReference(ref _stimulusCoroutine);
         }
 
         /// <summary>
@@ -619,7 +619,6 @@ namespace BCIEssentials.ControllerBehaviors
             yield return new WaitForSecondsRealtime(preStimulusBuffer);
             StartStimulusRun();
             yield return stimulusDelayRoutine;
-            StimulusRunning = false;
             yield return new WaitForSecondsRealtime(postStimulusBuffer);
 
             if (shamFeedback && enableShamFeedback)
