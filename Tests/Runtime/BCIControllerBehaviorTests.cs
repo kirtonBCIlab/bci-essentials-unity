@@ -32,6 +32,7 @@ namespace BCIEssentials.Tests
             _testController = CreateControllerInstance();
             _testControllerObject = _testController.gameObject;
             _behavior = _testControllerObject.AddComponent<EmptyBCIControllerBehavior>();
+            _behavior.ObjectListPopulationScope = SPOPopulationScope.Global;
 
             yield return null;
         }
@@ -212,6 +213,22 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
+        public void WhenPopulateObjectListWithTypeMethod_ThenObjectListPopulated()
+        {
+            var noComponent = new GameObject { tag = _behavior.SPOTag };
+            var noTag = AddSPOToScene("");
+            var falseIncludeMe = AddSPOToScene(includeMe: false);
+            var included = AddSPOToScene();
+
+            _behavior.ObjectListPopulationMethod = SPOPopulationMethod.Type;
+            _behavior.PopulateObjectList();
+
+            Assert.AreEqual(2, _behavior.SPOCount);
+            Assert.Contains(noTag, _behavior.SelectableSPOs);
+            Assert.Contains(included, _behavior.SelectableSPOs);
+        }
+
+        [Test]
         public void WhenPopulateObjectListWithTagMethod_ThenObjectListPopulated()
         {
             var noComponent = new GameObject { tag = _behavior.SPOTag };
@@ -219,11 +236,11 @@ namespace BCIEssentials.Tests
             var falseIncludeMe = AddSPOToScene(includeMe: false);
             var included = AddSPOToScene();
 
-            //Deliberate use of default
-            _behavior.PopulateObjectList(SpoPopulationMethod.Tag);
+            _behavior.ObjectListPopulationMethod = SPOPopulationMethod.Tag;
+            _behavior.PopulateObjectList();
 
-            Assert.AreEqual(1, _behavior.SelectableSPOs.Count);
-            UnityEngine.Assertions.Assert.AreEqual(included, _behavior.SelectableSPOs[0]);
+            Assert.AreEqual(1, _behavior.SPOCount);
+            Assert.Contains(included, _behavior.SelectableSPOs);
         }
 
         [Test]
@@ -240,7 +257,8 @@ namespace BCIEssentials.Tests
                 _selectableSPOs = existingSPOs
             });
 
-            _behavior.PopulateObjectList(SpoPopulationMethod.Children);
+            _behavior.ObjectListPopulationMethod = SPOPopulationMethod.PreDefined;
+            _behavior.PopulateObjectList();
 
             Assert.AreEqual(existingSPOs.Count, _behavior.SelectableSPOs.Count);
             UnityEngine.Assertions.Assert.AreEqual(existingSPOs[0], _behavior.SelectableSPOs[0]);
@@ -249,25 +267,18 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenPopulateObjectListWithChildrenMethod_ThenObjectListPopulatedWithExistingValues()
+        public void WhenPopulateObjectListWithChildrenMethod_ThenObjectListPopulated()
         {
-            var existingSPOs = new List<SPO>
-            {
-                AddSPOToScene(),
-                AddSPOToScene(),
-                AddSPOToScene()
-            };
-            _behavior.AssignInspectorProperties(new BCIControllerBehaviorExtensions.Properties
-            {
-                _selectableSPOs = existingSPOs
-            });
+            var childSPO = AddSPOToScene();
+            childSPO.transform.parent = _behavior.transform;
+            var floatingSPO = AddSPOToScene();
 
-            _behavior.PopulateObjectList(SpoPopulationMethod.Children);
+            _behavior.ObjectListPopulationMethod = SPOPopulationMethod.Type;
+            _behavior.ObjectListPopulationScope = SPOPopulationScope.Children;
+            _behavior.PopulateObjectList();
 
-            Assert.AreEqual(existingSPOs.Count, _behavior.SelectableSPOs.Count);
-            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[0], _behavior.SelectableSPOs[0]);
-            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[1], _behavior.SelectableSPOs[1]);
-            UnityEngine.Assertions.Assert.AreEqual(existingSPOs[2], _behavior.SelectableSPOs[2]);
+            Assert.AreEqual(1, _behavior.SPOCount);
+            Assert.Contains(childSPO, _behavior.SelectableSPOs);
         }
     }
 
@@ -351,6 +362,7 @@ namespace BCIEssentials.Tests
             _testController.Initialize();
 
             _behavior = AddComponent<EmptyBCIControllerBehavior>();
+            _behavior.ObjectListPopulationScope = SPOPopulationScope.Global;
             _behavior.RegisterWithController(true);
 
             _spos = new List<SPO>
@@ -373,60 +385,46 @@ namespace BCIEssentials.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
-        public void WhenSelectSPO_ThenSPOSelected(int spoIndex)
+        public void WhenMakeSelection_ThenSelectionMade(int spoIndex)
         {
-            _behavior.SelectSPO(spoIndex);
+            _behavior.MakeSelection(spoIndex);
 
-            Assert.AreEqual(_spos[spoIndex], _behavior.LastSelectedSPO);
-        }
-
-        //Setup test to check if the SPO Object ID is correctly unique for objects when PopulateObject method is used
-        [UnityTest]
-        public IEnumerator WhenPopulateObjectList_PopulateUniqueSPOIDs()
-        {
-            //Assert that the SPOs have same ID before Populating Object LIst
-            Assert.AreEqual(_spos[0].ObjectID, _spos[1].ObjectID);
-
-            _behavior.PopulateObjectList();
-            yield return null;
-            //Assert now that the SPO IDs are unique
-            Assert.AreNotEqual(_spos[0].ObjectID, _spos[1].ObjectID);
-
+            Assert.AreEqual(spoIndex, _behavior.LastSelectedIndex);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAndStopStimulusRun_ThenSPOSelectedAndStimulusRunEnded()
+        public IEnumerator WhenMakeSelectionAndStopStimulusRun_ThenSelectionMadeAndStimulusRunEnded()
         {
             _behavior.StartStimulusRun();
             yield return null;
-            _behavior.SelectSPO(0, true);
+            _behavior.MakeSelection(0, true);
 
             Assert.False(_behavior.StimulusRunning);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAtEndOfRun_ThenSPOSelected()
+        public IEnumerator WhenMakeSelectionAtEndOfRun_ThenSelectionMade()
         {
             _behavior.StartStimulusRun();
-            _behavior.SelectSPOAtEndOfRun(0);
+            _behavior.MakeSelectionAtEndOfRun(0);
             yield return null;
             _behavior.StopStimulusRun();
             yield return null;
 
-            Assert.AreEqual(_spos[0], _behavior.LastSelectedSPO);
+            Assert.AreEqual(0, _behavior.LastSelectedIndex);
         }
 
         [UnityTest]
-        public IEnumerator WhenSelectSPOAtEndOfRunAndSpoSelectedDuringRun_ThenSpoSelectedNotSelected()
+        public IEnumerator WhenMakeSelectionAtEndOfRunAndSelectionMadeDuringRun_ThenRunningSelectionHolds()
         {
             _behavior.StartStimulusRun();
             yield return null;
-            _behavior.SelectSPOAtEndOfRun(0);
+            _behavior.MakeSelectionAtEndOfRun(0);
             yield return null;
-            _behavior.SelectSPO(1);
+            _behavior.MakeSelection(1);
             _behavior.StopStimulusRun();
 
-            UnityEngine.Assertions.Assert.AreEqual(_spos[1], _behavior.LastSelectedSPO);
+            UnityEngine.Assertions.Assert.AreEqual(1, _behavior.LastSelectedIndex);
         }
     }
 
@@ -547,7 +545,7 @@ namespace BCIEssentials.Tests
         }
 
         [UnityTest]
-        public IEnumerator WhenGetGameSPOsInCameraView_ThenReturnsVisibleTaggedObjects()
+        public IEnumerator WhenGetCameraVisibleSPOs_ThenReturnsVisibleTaggedObjects()
         {
             // Arrange
             var visibleSPOs = new List<SPO>
@@ -571,17 +569,18 @@ namespace BCIEssentials.Tests
             mainCamera.transform.position = new Vector3(0, 0, -10);
 
             // Act
-            var result = _behavior.GetSPOGameObjectsInCameraViewByTag();
+            _behavior.PopulateObjectList();
+            List<SPO> result = _behavior.GetCameraVisibleSPOs();
 
             // Assert
             Assert.AreEqual(visibleSPOs.Count, result.Count, "The number of visible SPOs should match the expected count.");
 
             foreach (var spo in visibleSPOs)
             {
-                Assert.Contains(spo.gameObject, result, $"SPO {spo.name} should be included in the visible SPOs list.");
+                Assert.Contains(spo, result, $"SPO {spo.name} should be included in the SPO list.");
             }
 
-            Assert.IsFalse(result.Contains(invisibleSPO.gameObject), $"SPO {invisibleSPO.name} should not be included in the visible SPOs list.");
+            Assert.IsFalse(result.Contains(invisibleSPO), $"SPO {invisibleSPO.name} should not be included in the SPO list.");
 
             yield return null;
         }

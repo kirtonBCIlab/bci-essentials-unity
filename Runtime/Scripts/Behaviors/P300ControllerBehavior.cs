@@ -59,10 +59,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         private bool blockOutGoingLSL = false;
 
-        //I have updated the starting __uniqueP300ID to 0, as it was causing issues with the LSL markers at 1.
-        private int __uniqueP300ID = 0;
-
-        private List<GameObject> _validGOs = new List<GameObject>();
         private int lastTourEndNode = -100;
 
 
@@ -114,40 +110,40 @@ namespace BCIEssentials.ControllerBehaviors
             int totalFlashes = numFlashesPerObjectPerSelection * _selectableSPOs.Count;
             int[] stimOrder = ArrayUtilities.GenerateRNRA_FisherYates(totalFlashes, 0, _selectableSPOs.Count - 1);
 
-            for (int i = 0; i < stimOrder.Length; i++)
+            foreach (int stimIndex in stimOrder)
             {
-                int activeIndex = stimOrder[i];
-                SPO flashingObject = _selectableSPOs[activeIndex];
-                yield return RunSingleFlash(flashingObject, activeIndex);
+                yield return RunSingleFlash(stimIndex);
             }
         }
         
         private IEnumerator RunContextAwareSingleFlashRoutine()
         {
-            int totalFlashes = numFlashesPerObjectPerSelection;          
+            int totalFlashes = numFlashesPerObjectPerSelection;
 
             //Need to send over not the order, but the specific unique object ID for selection/parsing to make sure we don't care where it is in a list.
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                //Refresh the List of available SPO Objects. This will update the _validGOs list.
-                PopulateObjectList();
-                //Now get the Graph set for the TSP
-                int[] stimOrder = CalculateGraphTSP(_validGOs, ref lastTourEndNode);
+                List<SPO> visibleSPOs = GetCameraVisibleSPOs();
+                var visibleGameObjects = visibleSPOs.SelectGameObjects();
+                int[] stimOrder = CalculateGraphTSP(visibleGameObjects, ref lastTourEndNode);
 
-                for (int i = 0; i < stimOrder.Length; i++)
+                foreach (int stimIndex in stimOrder)
                 {
-                    int activeIndex = stimOrder[i];
-                    SPO activeObject = _selectableSPOs[activeIndex];
-                    Debug.LogWarning("MARKERS ARE BEING SENT FOR OBJECT IDS NOT OBJECT POSITIONS, SO THIS WILL NOT WORK WITH BESSY PYTHON JUST YET");
-                    yield return RunSingleFlash(activeObject, activeObject.ObjectID);
+                    yield return RunSingleFlash(stimIndex, visibleSPOs);
                 }
             }
         }
 
-        private IEnumerator RunSingleFlash(SPO flashingObject, int markerId)
+        protected IEnumerator RunSingleFlash(int activeIndex)
+        => RunSingleFlash(activeIndex, _selectableSPOs);
+        protected IEnumerator RunSingleFlash
+        (
+            int activeIndex, List<SPO> stimulusObjects
+        )
         {
+            SPO flashingObject = stimulusObjects[activeIndex];
             flashingObject.StartStimulus();
-            SendSingleFlashMarker(markerId);
+            SendSingleFlashMarker(activeIndex, stimulusObjects.Count);
             yield return new WaitForSecondsRealtime(onTime);
 
             flashingObject.StopStimulus();
@@ -162,9 +158,12 @@ namespace BCIEssentials.ControllerBehaviors
                       
             for (int jj = 0; jj < totalFlashes; jj++)
             {
-                PopulateObjectList();
-                //Debug.Log("Getting the graph partition for the Context-Aware MultiFlash, updating each loop");
-                var (subset1,subset2) = CalculateGraphPartition(_validGOs);
+                List<SPO> visibleSPOs = GetCameraVisibleSPOs();
+                var visibleGameObjects = visibleSPOs.SelectGameObjects();
+                var (subset1,subset2) = CalculateGraphPartition(visibleGameObjects);
+
+                IEnumerator RunMultiFlashOnVisibleObjects(int[] flashingIndices)
+                => RunMultiFlash(flashingIndices, visibleSPOs);
 
                 //Turn the subsets into randomized matrices,
                 int[,] randMat1 = SubsetToRandomMatrix(subset1);
@@ -172,10 +171,10 @@ namespace BCIEssentials.ControllerBehaviors
                 
                 //Flash through the rows of randMat1 first, then randMat2.
                 //Off time is included in these coroutines.
-                yield return randMat1.RunForEachRow(RunMultiFlash);
-                yield return randMat2.RunForEachRow(RunMultiFlash);
-                yield return randMat1.RunForEachColumn(RunMultiFlash);
-                yield return randMat2.RunForEachColumn(RunMultiFlash);
+                yield return randMat1.RunForEachRow(RunMultiFlashOnVisibleObjects);
+                yield return randMat2.RunForEachRow(RunMultiFlashOnVisibleObjects);
+                yield return randMat1.RunForEachColumn(RunMultiFlashOnVisibleObjects);
+                yield return randMat2.RunForEachColumn(RunMultiFlashOnVisibleObjects);
 
                 //Now shuffle!
             }
@@ -250,63 +249,35 @@ namespace BCIEssentials.ControllerBehaviors
             return new int[numFlashRows, numFlashColumns];
         }
 
-        private IEnumerator RunMultiFlash(int[] objectsToFlash)
+        protected IEnumerator RunMultiFlash(int[] objectsToFlash)
+        => RunMultiFlash(objectsToFlash, _selectableSPOs);
+        protected IEnumerator RunMultiFlash
+        (
+            int[] objectsToFlash, List<SPO> stimulusObjects
+        )
         {
+            int objectCount = stimulusObjects.Count;
             objectsToFlash = objectsToFlash.Where
-            (x => x >= 0 && x < SPOCount).ToArray();
+            (x => x >= 0 && x < objectCount).ToArray();
 
             foreach (int i in objectsToFlash)
-                _selectableSPOs[i].StartStimulus();
+                stimulusObjects[i].StartStimulus();
 
-            SendMultiFlashMarker(objectsToFlash);
+            SendMultiFlashMarker(objectsToFlash, objectCount);
             yield return new WaitForSecondsRealtime(onTime);
 
             foreach(int i in objectsToFlash)
-                _selectableSPOs[i].StopStimulus();
+                stimulusObjects[i].StopStimulus();
             yield return new WaitForSecondsRealtime(offTime);
         }
 
-
-        /// <summary>
-        /// Populate the <see cref="SelectableSPOs"/> using a particular method.
-        /// This extends the typical BCI Controller Behavior to enable "context
-        /// aware" selection of SPOs.
-        /// </summary>
-        /// <param name="populationMethod">Method of population to use</param>
-        public override void PopulateObjectList
-        (SpoPopulationMethod populationMethod = SpoPopulationMethod.GraphBP)
-        {
-            switch (populationMethod)
-            {
-                case SpoPopulationMethod.GraphBP:
-                    //First, get all game objects in the world
-                    //visible by the camera, including the UI.
-                    _validGOs = GetSPOGameObjectsInCameraViewByTag();
-                    _selectableSPOs = _validGOs.Select(
-                        validGO => validGO.GetComponent<SPO>()
-                    ).ToList();
-
-                    AssignIDsToSelectableSPOs(ref __uniqueP300ID);
-                    AppendSelectableSPOsToObjectIDDictionary();
-                    break;
-                case SpoPopulationMethod.Tag:
-                    _selectableSPOs = GetSelectableSPOsByTag();
-                    AssignIDsToSelectableSPOs(ref __uniqueP300ID);
-                    AppendSelectableSPOsToObjectIDDictionary();
-                    break;
-                default:
-                    base.PopulateObjectList(populationMethod);
-                    break;
-            }
-        }
-
-        //This is the non-multi-camera version of the function
-        public List<GameObject> GetSPOGameObjectsInCameraViewByTag()
+        
+        public List<SPO> GetCameraVisibleSPOs()
         {
             Camera mainCamera = Camera.main;
-            List<GameObject> visibleGOs = new List<GameObject>();
+            List<SPO> visibleSPOs = new();
 
-            foreach (SPO spo in GetSelectableSPOsByTag())
+            foreach (SPO spo in _selectableSPOs)
             {
                 if (
                     (spo.TryGetComponent(out CanvasRenderer canvasRenderer)
@@ -315,29 +286,35 @@ namespace BCIEssentials.ControllerBehaviors
                     (spo.TryGetComponent(out Renderer renderer)
                     && renderer.IsVisibleFrom(mainCamera))
                 )
-                visibleGOs.Add(spo.gameObject);
+                visibleSPOs.Add(spo);
             }
-            return visibleGOs;
+            return visibleSPOs;
         }
 
 
-        private void SendSingleFlashMarker(int objectIndex)
+        private void SendSingleFlashMarker
+        (
+            int flashedObjectIndex, int objectCount
+        )
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
                 MarkerWriter.PushSingleFlashP300Marker(
-                    SPOCount, objectIndex, trainTarget
+                    objectCount, flashedObjectIndex, trainTarget
                 );
             }
         }
 
-        private void SendMultiFlashMarker(IEnumerable<int> flashedObjects)
+        private void SendMultiFlashMarker
+        (
+            IEnumerable<int> flashedObjectIndices, int objectCount
+        )
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
                 MarkerWriter.PushMultiFlashP300Marker
                 (
-                    SPOCount, flashedObjects, trainTarget
+                    objectCount, flashedObjectIndices, trainTarget
                 );
             }
         }
@@ -351,44 +328,5 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (!blockOutGoingLSL) base.SendTrialEndsMarker();
         }
-
-
-        #region Experimental Calculations
-        public override void SelectSPO(int objectID, bool stopStimulusRun = false)
-        {
-            var objectCount = _selectableSPOs.Count;
-            if (objectCount == 0)
-            {
-                Debug.Log("No Objects to select");
-                return;
-            }
-
-            if (_objectIDtoSPODict.ContainsKey(objectID))
-            {
-                var spo = _objectIDtoSPODict[objectID];
-                if (spo == null)
-                {
-                    Debug.LogWarning("SPO is now null and can't be selected");
-                    return;
-                }
-
-                spo.Select();
-                LastSelectedSPO = spo;
-                Debug.Log($"SPO '{spo.gameObject.name}' selected.");
-
-                if (stopStimulusRun)
-                {
-                    StopStimulusRun();
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Invalid Selection. Must be in the objectID dictionary");
-                return;
-            }
-        }
-
-        #endregion
-
     }
 }

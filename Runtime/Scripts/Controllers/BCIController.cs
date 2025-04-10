@@ -136,29 +136,34 @@ namespace BCIEssentials.Controllers
         }
 
         /// <summary>
-        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/>.
+        /// Select a stimulus object or class as relevant to the active behaviour
         /// </summary>
-        /// <param name="objectIndex">The index value of the object to select.</param>
-        /// <param name="stopStimulusRun">If true will end the current stimulus run.</param>
-        public static void SelectSPO(int objectIndex, bool stopStimulusRun = false)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select <i>(0-indexed)</i>
+        /// </param>
+        /// <param name="stopStimulusRun">
+        /// If true will end the current stimulus run
+        /// </param>
+        public static void MakeSelection(int selectionIndex, bool stopStimulusRun = false)
         {
             if (Instance == null)
             throw new NullReferenceException("No BCI Controller Instance set");
 
-            Instance.SelectSPO(objectIndex, stopStimulusRun);
+            Instance.MakeSelection(selectionIndex, stopStimulusRun);
         }
-        
+
         /// <summary>
-        /// Select an object from <see cref="ActiveBehavior.SelectableSPOs"/> if no objects were
-        /// selected during a stimulus run.
+        /// Make a selection at the end of a stimulus if no other was made
         /// </summary>
-        /// <param name="objectIndex"></param>
-        public static void SelectSPOAtEndOfRun(int objectIndex)
+        /// <param name="selectionIndex">
+        /// The index value of the object/class to select <i>(0-indexed)</i>
+        /// </param>
+        public static void MakeSelectionAtEndOfRun(int selectionIndex)
         {
             if (Instance == null)
             throw new NullReferenceException("No BCI Controller Instance set");
 
-            Instance.SelectSPOAtEndOfRun(objectIndex);
+            Instance.MakeSelectionAtEndOfRun(selectionIndex);
         }
 
         /// <summary>
