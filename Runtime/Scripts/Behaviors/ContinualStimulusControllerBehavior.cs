@@ -12,14 +12,14 @@ namespace BCIEssentials.ControllerBehaviors
     {
 
         [AppendToFoldoutGroup("Training Properties")]
-        [Tooltip("The number of windows used in each training iteration")]
+        [Tooltip("The number of epochs used in each training iteration")]
         public int trainingEpochCount = 3;
 
         [StartFoldoutGroup("Signal Properties")]
-        [Tooltip("The length of the processing window [sec]")]
+        [Tooltip("The length of the processing epoch [sec]")]
         public float epochLength = 1.0f;
         [EndFoldoutGroup]
-        [Tooltip("The interval between processing windows [sec]")]
+        [Tooltip("The interval between processing epochs [sec]")]
         public float interEpochInterval = 0f;
         
         private Coroutine _epochMarkerCoroutine;
