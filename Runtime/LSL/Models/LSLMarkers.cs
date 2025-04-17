@@ -69,8 +69,8 @@ namespace BCIEssentials.LSLFramework
 
         public EpochEventMarker
         (
-            int objectCount, float epochLength,
-            int trainingTarget
+            int objectCount, int trainingTarget,
+            float epochLength
         ): base(objectCount, trainingTarget)
         {
             EpochLength = epochLength;
@@ -90,19 +90,19 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
+        /// <param name="trainingTarget">
+        /// Index of class targetted for training <i>(0-indexed)</i>
+        /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of class targetted for training <i>(0-indexed)</i>
-        /// </param>
         public MIEventMarker
         (
-            int objectCount, float epochLength,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            float epochLength
         )
-        : base(objectCount, epochLength, trainingTarget)
+        : base(objectCount, trainingTarget, epochLength)
         {}
     }
 
@@ -119,19 +119,19 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
+        /// <param name="trainingTarget">
+        /// Index of class targetted for training <i>(0-indexed)</i>
+        /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of class targetted for training <i>(0-indexed)</i>
-        /// </param>
         public SwitchEventMarker
         (
-            int objectCount, float epochLength,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            float epochLength
         )
-        : base(objectCount, epochLength, trainingTarget)
+        : base(objectCount, trainingTarget, epochLength)
         {}
     }
 
@@ -154,10 +154,9 @@ namespace BCIEssentials.LSLFramework
 
         public VisualEvokedPotentialEventMarker
         (
-            int objectCount, float epochLength,
-            float[] frequencies,
-            int trainingTarget = -1
-        ): base(objectCount, epochLength, trainingTarget)
+            int objectCount, int trainingTarget,
+            float epochLength,  float[] frequencies
+        ): base(objectCount, trainingTarget, epochLength)
         {
             Frequencies = frequencies;
         }
@@ -176,6 +175,9 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
@@ -183,19 +185,15 @@ namespace BCIEssentials.LSLFramework
         /// <param name="frequencies">
         /// Collection of flashing frequencies used by stimulus objects
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
-        /// </param>
         public SSVEPEventMarker
         (
-            int objectCount, float epochLength,
-            IEnumerable<float> frequencies,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            float epochLength, IEnumerable<float> frequencies
         )
         : base
         (
-            objectCount, epochLength,
-            frequencies.ToArray(), trainingTarget
+            objectCount, trainingTarget,
+            epochLength, frequencies.ToArray()
         ) {}
     }
 
@@ -212,6 +210,9 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
+        /// <param name="trainingTarget">
+        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
@@ -219,19 +220,15 @@ namespace BCIEssentials.LSLFramework
         /// <param name="frequencies">
         /// Collection of flashing frequencies used by stimulus objects
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
-        /// </param>
         public TVEPEventMarker
         (
-            int objectCount, float epochLength,
-            IEnumerable<float> frequencies,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            float epochLength, IEnumerable<float> frequencies
         )
         : base
         (
-            objectCount, epochLength,
-            frequencies.ToArray(), trainingTarget
+            objectCount, trainingTarget,
+            epochLength, frequencies.ToArray() 
         ) {}
     }
 
@@ -273,8 +270,8 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public SingleFlashP300EventMarker
         (
-            int objectCount, int activeObject,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            int activeObject
         ): base(objectCount, trainingTarget)
         {
             ActiveObject = activeObject;
@@ -300,16 +297,16 @@ namespace BCIEssentials.LSLFramework
         };
 
         /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="activeObjects">
-        /// Collection of object indices being flashed together <i>(0-indexed)</i>
-        /// </param>
         /// <param name="trainingTarget">
         /// Index of object targetted for training <i>(0-indexed)</i>
         /// </param>
+        /// <param name="activeObjects">
+        /// Collection of object indices being flashed together <i>(0-indexed)</i>
+        /// </param>
         public MultiFlashP300EventMarker
         (
-            int objectCount, IEnumerable<int> activeObjects,
-            int trainingTarget = -1
+            int objectCount, int trainingTarget,
+            IEnumerable<int> activeObjects
         )
         : base(objectCount, trainingTarget)
         {
