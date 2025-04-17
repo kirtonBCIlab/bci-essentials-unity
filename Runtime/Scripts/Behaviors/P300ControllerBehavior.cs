@@ -299,9 +299,12 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
-                MarkerWriter.PushSingleFlashP300Marker(
-                    objectCount, flashedObjectIndex, trainTarget
-                );
+                if (TrainingRunning)
+                    MarkerWriter.PushSingleFlashP300TrainingMarker
+                    (objectCount, trainTarget, flashedObjectIndex);
+                else
+                    MarkerWriter.PushSingleFlashP300ClassificationMarker
+                    (objectCount, flashedObjectIndex);
             }
         }
 
@@ -312,10 +315,12 @@ namespace BCIEssentials.ControllerBehaviors
         {
             if (MarkerWriter != null && !blockOutGoingLSL)
             {
-                MarkerWriter.PushMultiFlashP300Marker
-                (
-                    objectCount, flashedObjectIndices, trainTarget
-                );
+                if (TrainingRunning)
+                    MarkerWriter.PushMultiFlashP300TrainingMarker
+                    (objectCount, trainTarget, flashedObjectIndices);
+                else
+                    MarkerWriter.PushMultiFlashP300ClassificationMarker
+                    (objectCount, flashedObjectIndices);
             }
         }
 

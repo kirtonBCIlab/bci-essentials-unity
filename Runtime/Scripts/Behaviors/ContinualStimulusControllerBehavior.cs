@@ -42,13 +42,20 @@ namespace BCIEssentials.ControllerBehaviors
             while (true)
             {
                 // Send the marker
-                if (MarkerWriter != null) SendEpochMarker(trainingIndex);
+                if (MarkerWriter != null)
+                {
+                    if (TrainingRunning)
+                        SendTrainingMarker(trainingIndex);
+                    else
+                        SendClassificationMarker();
+                }
                 // Wait the epoch length + the inter-epoch interval
                 yield return new WaitForSecondsRealtime(epochLength + interEpochInterval);
             }
         }
 
-        protected abstract void SendEpochMarker(int trainingIndex = -1);
+        protected abstract void SendTrainingMarker(int trainingIndex);
+        protected abstract void SendClassificationMarker();
 
 
         protected override IEnumerator RunStimulusRoutine()

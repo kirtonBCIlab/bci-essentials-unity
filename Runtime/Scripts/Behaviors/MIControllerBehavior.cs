@@ -111,7 +111,7 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (trainingEpochCount); j++)
                 {
                     // Send the marker for the epoch
-                    MarkerWriter.PushMIMarker(1, epochLength, trainingIndex);
+                    MarkerWriter.PushMITrainingMarker(1, trainingIndex, epochLength);
 
                     yield return new WaitForSecondsRealtime(epochLength);
 
@@ -140,9 +140,10 @@ namespace BCIEssentials.ControllerBehaviors
             MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected override void SendEpochMarker(int trainingIndex = -1)
-        {
-            MarkerWriter.PushMIMarker(SPOCount, epochLength, trainingIndex);
-        }
+        protected override void SendTrainingMarker(int trainingIndex)
+        => MarkerWriter.PushMITrainingMarker(SPOCount, trainingIndex, epochLength);
+
+        protected override void SendClassificationMarker()
+        => MarkerWriter.PushMIClassificationMarker(SPOCount, epochLength);
     }
 }
