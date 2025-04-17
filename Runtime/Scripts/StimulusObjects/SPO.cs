@@ -19,14 +19,10 @@ namespace BCIEssentials.StimulusObjects
 
 
         [Header("Start stimulus presentation")]
-        [FormerlySerializedAs("StartStimulusEvent")]
         public UnityEvent OnStimulusTriggered = new();
 
         [Header("Stop stimulus presentation")]
-        [FormerlySerializedAs("StopStimulusEvent")]
         public UnityEvent OnStimulusEndTriggered = new();
-
-        [FormerlySerializedAs("OnSelectedEvent")]
         public UnityEvent OnSelected = new();
 
         public UnityEvent OnSetAsTrainingTarget = new();
