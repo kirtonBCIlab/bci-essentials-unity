@@ -56,24 +56,24 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class WindowedEventMarker: EventMarker
+    public abstract class EpochEventMarker: EventMarker
     {
         /// <summary>
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </summary>
-        public float WindowLength;
+        public float EpochLength;
 
         public override string MarkerString
-        => $"{base.MarkerString},{WindowLength.ToString("f2")}";
+        => $"{base.MarkerString},{EpochLength.ToString("f2")}";
 
-        public WindowedEventMarker
+        public EpochEventMarker
         (
             int objectCount, float epochLength,
             int trainingTarget
         ): base(objectCount, trainingTarget)
         {
-            WindowLength = epochLength;
+            EpochLength = epochLength;
         }
     }
 
@@ -82,7 +82,7 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "mi,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class MIEventMarker: WindowedEventMarker
+    public class MIEventMarker: EpochEventMarker
     {
         public override string MarkerString
         => $"mi,{base.MarkerString}";
@@ -111,7 +111,7 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "switch,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class SwitchEventMarker: WindowedEventMarker
+    public class SwitchEventMarker: EpochEventMarker
     {
         public override string MarkerString
         => $"switch,{base.MarkerString}";
@@ -136,7 +136,7 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class VisualEvokedPotentialEventMarker: WindowedEventMarker
+    public abstract class VisualEvokedPotentialEventMarker: EpochEventMarker
     {
         /// <summary>
         /// Flashing frequencies used by stimulus objects

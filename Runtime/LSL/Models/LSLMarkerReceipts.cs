@@ -112,15 +112,15 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class WindowedEventMarkerReceipt: EventMarkerReceipt
+    public abstract class EpochEventMarkerReceipt: EventMarkerReceipt
     {
-        public float WindowLength {get; protected set;}
+        public float EpochLength {get; protected set;}
 
         protected override void ParseBodySegments(string[] bodySegments)
         {
             ObjectCount = int.Parse(bodySegments[1]);
             TrainingTarget = int.Parse(bodySegments[2]);
-            WindowLength = float.Parse(bodySegments[3]);
+            EpochLength = float.Parse(bodySegments[3]);
         }
     }
 
@@ -129,17 +129,17 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "mi,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class MIEventMarkerReceipt: WindowedEventMarkerReceipt {}
+    public class MIEventMarkerReceipt: EpochEventMarkerReceipt {}
 
     /// <summary>
     /// Receipt for Switch event marker in the format:
     /// <br/><br/>
     /// "switch,{object count},{train target (-1 if n/a)},{window length}"
     /// </summary>
-    public class SwitchEventMarkerReceipt: WindowedEventMarkerReceipt {}
+    public class SwitchEventMarkerReceipt: EpochEventMarkerReceipt {}
 
 
-    public abstract class VisualEvokedPotentialEventMarkerReceipt: WindowedEventMarkerReceipt
+    public abstract class VisualEvokedPotentialEventMarkerReceipt: EpochEventMarkerReceipt
     {
         public float[] Frequencies {get; protected set;}
 
