@@ -309,7 +309,6 @@ namespace BCIEssentials.ControllerBehaviors
                     break;
                 }
             }
-            StimulusRunning = false;
         }
 
 
