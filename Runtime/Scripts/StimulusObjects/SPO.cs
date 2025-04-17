@@ -1,8 +1,7 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
-
-// Base class for the Stimulus Presenting Objects (SPOs)
 
 namespace BCIEssentials.StimulusObjects
 {
@@ -30,65 +29,64 @@ namespace BCIEssentials.StimulusObjects
 
 
         /// <summary>
+        /// Select this SPO.
+        /// </summary>
+        public void Select()
+        => TriggerEventAndRoutine
+        (OnSelected, RunSelectedRoutine);
+        protected virtual IEnumerator RunSelectedRoutine()
+        { yield return null; }
+
+        /// <summary>
         /// Request this SPO stimulus to begin.
         /// </summary>
-        /// <returns>The time at the beginning of this frame using <see cref="Time.time"/></returns>
-        public virtual float StartStimulus()
-        {
-            OnStimulusTriggered?.Invoke();
-
-            //Stimulus request time
-            return Time.time;
-        }
+        public void StartStimulus()
+        => TriggerEventAndRoutine
+        (OnStimulusTriggered, RunStartStimulusRoutine);
+        protected virtual IEnumerator RunStartStimulusRoutine()
+        { yield return null; }
 
         /// <summary>
         /// Request this SPO stimulus to end.
         /// </summary>
-        public virtual void StopStimulus()
-        {
-            OnStimulusEndTriggered?.Invoke();
-        }
+        public void StopStimulus()
+        => TriggerEventAndRoutine
+        (OnStimulusEndTriggered, RunStopStimulusRoutine);
+        protected virtual IEnumerator RunStopStimulusRoutine()
+        { yield return null; }
+
 
         /// <summary>
-        /// When this SPO has been selected.
+        /// Target this SPO for training.
         /// </summary>
-        public virtual void Select()
+        public void OnTrainTarget()
+        => TriggerEventAndRoutine
+        (OnSetAsTrainingTarget, RunTargetedRoutine);
+        protected virtual IEnumerator RunTargetedRoutine()
+        { yield return null; }
+
+        /// <summary>
+        /// Untarget this SPO
+        /// </summary>
+        public void OffTrainTarget()
+        => TriggerEventAndRoutine
+        (OnRemovedAsTrainingTarget, RunUntargetedRoutine);
+        protected virtual IEnumerator RunUntargetedRoutine()
+        { yield return null; }
+
+
+        private void TriggerEventAndRoutine
+        (
+            UnityEvent targetEvent,
+            Func<IEnumerator> targetRoutine
+        )
         {
-            OnSelected?.Invoke();
+            targetEvent?.Invoke();
+            StartCoroutine(targetRoutine());
         }
 
-        //TODO: Remove when refactored training out
-        // What to do when targeted for training selection
-        public virtual void OnTrainTarget()
-        {
-            try
-            {
-                //TODO - If it evaluates as null, try to invoke the default StartStimulus option.
-                OnSetAsTrainingTarget?.Invoke();
-            }
-            catch(UnassignedReferenceException e)
-            {
-                Debug.Log(e.Message);
-            }
 
-        }
-
-        // What to do when untargeted
-        public virtual void OffTrainTarget()
-        {
-            try
-            {
-                //TODO - If evaluates as null, try to invoke the default StopStimulus option
-                OnRemovedAsTrainingTarget?.Invoke();
-            }
-            catch(UnassignedReferenceException e)
-            {
-                Debug.Log(e.Message);
-            }
-
-        }
-
-        public virtual void DefaultScaleEffectOn()
+        public void DefaultScaleEffectOn()
         {
             float scaleValue = 1.4f;
             Vector3 objectScale = transform.localScale;
@@ -96,7 +94,7 @@ namespace BCIEssentials.StimulusObjects
                 objectScale.z * scaleValue);
         }
 
-        public virtual void DefaultScaleEffectOff()
+        public void DefaultScaleEffectOff()
         {
             float scaleValue = 1.4f;
             Vector3 objectScale = transform.localScale;
@@ -104,13 +102,13 @@ namespace BCIEssentials.StimulusObjects
                     objectScale.z / scaleValue);
         }
 
-        public virtual void DefaultColorEffectOn()
+        public void DefaultColorEffectOn()
         {
             Renderer renderer = GetComponent<Renderer>();
             renderer.material.color = Color.yellow;
         }
 
-        public virtual void DefaultColorEffectOff()
+        public void DefaultColorEffectOff()
         {
             Renderer renderer = GetComponent<Renderer>();
             renderer.material.color = Color.white;
