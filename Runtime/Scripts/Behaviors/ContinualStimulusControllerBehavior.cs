@@ -22,33 +22,33 @@ namespace BCIEssentials.ControllerBehaviors
         [Tooltip("The interval between processing windows [sec]")]
         public float interEpochInterval = 0f;
         
-        private Coroutine _windowMarkerCoroutine;
+        private Coroutine _epochMarkerCoroutine;
 
 
         protected override void SetupUpForStimulusRun()
         {
-            StopStartCoroutine(ref _windowMarkerCoroutine,
-                RunSendWindowMarkers(trainTarget)
+            StopStartCoroutine(ref _epochMarkerCoroutine,
+                RunSendEpochMarkers(trainTarget)
             );
         }
 
         protected override void CleanUpAfterStimulusRun()
         {
-            StopCoroutineReference(ref _windowMarkerCoroutine);
+            StopCoroutineReference(ref _epochMarkerCoroutine);
         }
         
-        private IEnumerator RunSendWindowMarkers(int trainingIndex = 99)
+        private IEnumerator RunSendEpochMarkers(int trainingIndex = 99)
         {
             while (true)
             {
                 // Send the marker
-                if (MarkerWriter != null) SendWindowMarker(trainingIndex);
+                if (MarkerWriter != null) SendEpochMarker(trainingIndex);
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(epochLength + interEpochInterval);
             }
         }
 
-        protected abstract void SendWindowMarker(int trainingIndex = -1);
+        protected abstract void SendEpochMarker(int trainingIndex = -1);
 
 
         protected override IEnumerator RunStimulusRoutine()

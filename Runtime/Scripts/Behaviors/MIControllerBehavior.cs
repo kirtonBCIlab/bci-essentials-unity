@@ -140,7 +140,7 @@ namespace BCIEssentials.ControllerBehaviors
             MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         {
             MarkerWriter.PushMIMarker(SPOCount, epochLength, trainingIndex);
         }

@@ -64,7 +64,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         {
             string markerString;
                 
