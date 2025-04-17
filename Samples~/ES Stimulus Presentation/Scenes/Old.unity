@@ -178,7 +178,7 @@ MonoBehaviour:
   targetFrameRate: 60
   _hotkeysEnabled: 1
   epochLength: 1
-  interWindowInterval: 0
+  interEpochInterval: 0
   numTrainingSelections: 0
   trainingEpochCount: 3
   pauseBeforeTraining: 2

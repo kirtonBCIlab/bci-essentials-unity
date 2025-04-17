@@ -20,7 +20,7 @@ namespace BCIEssentials.ControllerBehaviors
         public float epochLength = 1.0f;
         [EndFoldoutGroup]
         [Tooltip("The interval between processing windows [sec]")]
-        public float interWindowInterval = 0f;
+        public float interEpochInterval = 0f;
         
         private Coroutine _windowMarkerCoroutine;
 
@@ -44,7 +44,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Send the marker
                 if (MarkerWriter != null) SendWindowMarker(trainingIndex);
                 // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(epochLength + interWindowInterval);
+                yield return new WaitForSecondsRealtime(epochLength + interEpochInterval);
             }
         }
 
@@ -65,7 +65,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected override IEnumerator WaitForStimulusToComplete()
         {
             yield return new WaitForSecondsRealtime(
-                (epochLength + interWindowInterval) * trainingEpochCount
+                (epochLength + interEpochInterval) * trainingEpochCount
             );
             StopStimulusRun();
         }
@@ -75,7 +75,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             for (int i = 0; i < trainingEpochCount; i++)
             {
-                yield return new WaitForSecondsRealtime(epochLength + interWindowInterval);
+                yield return new WaitForSecondsRealtime(epochLength + interEpochInterval);
 
                 if (shamFeedback)
                 {

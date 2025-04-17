@@ -52,7 +52,7 @@ MonoBehaviour:
   FactorySetupRequired: 1
   targetFrameRate: 60
   epochLength: 2
-  interWindowInterval: 0
+  interEpochInterval: 0
   numTrainingSelections: 9
   trainingEpochCount: 3
   pauseBeforeTraining: 2
@@ -115,7 +115,7 @@ MonoBehaviour:
   FactorySetupRequired: 1
   targetFrameRate: 165
   epochLength: 1
-  interWindowInterval: 0
+  interEpochInterval: 0
   numTrainingSelections: 12
   trainingEpochCount: 6
   pauseBeforeTraining: 2
@@ -281,8 +281,6 @@ MonoBehaviour:
   _spoFactory: {fileID: 11400000, guid: f10aba30caad32345985da46bd8337b6, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  epochLength: 1
-  interWindowInterval: 0
   numTrainingSelections: 5
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3

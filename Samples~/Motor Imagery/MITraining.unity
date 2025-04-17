@@ -244,7 +244,7 @@ MonoBehaviour:
   FactorySetupRequired: 1
   targetFrameRate: 60
   epochLength: 2
-  interWindowInterval: 0
+  interEpochInterval: 0
   numTrainingSelections: 9
   trainingEpochCount: 3
   pauseBeforeTraining: 2
