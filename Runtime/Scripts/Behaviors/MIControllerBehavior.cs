@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class MIControllerBehavior : WindowedControllerBehavior
+    public class MIControllerBehavior : ContinualStimulusControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
 

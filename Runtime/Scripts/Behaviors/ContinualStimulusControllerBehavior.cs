@@ -1,15 +1,14 @@
 using System.Collections;
 using UnityEngine;
 using BCIEssentials.StimulusObjects;
-using BCIEssentials.Utilities;
 
 namespace BCIEssentials.ControllerBehaviors
 {
     /// <summary>
     /// Base controller behavior class for paradigms that send
-    /// constant window markers over the course of a trial.
+    /// constant epoch markers over the course of a trial.
     /// </summary>
-    public abstract class WindowedControllerBehavior: BCIControllerBehavior
+    public abstract class ContinualStimulusControllerBehavior: BCIControllerBehavior
     {
 
         [AppendToFoldoutGroup("Training Properties")]

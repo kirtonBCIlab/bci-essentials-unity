@@ -4,7 +4,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public abstract class VEPControllerBehaviour : WindowedControllerBehavior
+    public abstract class VEPControllerBehaviour : ContinualStimulusControllerBehavior
     {
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
