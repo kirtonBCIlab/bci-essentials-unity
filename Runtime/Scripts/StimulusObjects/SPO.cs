@@ -16,15 +16,15 @@ namespace BCIEssentials.StimulusObjects
         /// by the <see cref="Controller"/>;
         /// </summary>
         public bool Selectable = true;
-
+        public UnityEvent OnSelected = new();
 
         [Header("Start stimulus presentation")]
         public UnityEvent OnStimulusTriggered = new();
 
         [Header("Stop stimulus presentation")]
         public UnityEvent OnStimulusEndTriggered = new();
-        public UnityEvent OnSelected = new();
 
+        [Header("Indicate training target")]
         public UnityEvent OnSetAsTrainingTarget = new();
         public UnityEvent OnRemovedAsTrainingTarget = new();
 
