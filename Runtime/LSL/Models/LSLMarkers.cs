@@ -80,7 +80,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Motor Imagery event marker in the format:
     /// <br/><br/>
-    /// "mi,{object count},{train target (-1 if n/a)},{window length}"
+    /// "mi,{object count},{train target (-1 if n/a)},{epoch length}"
     /// </summary>
     public class MIEventMarker: EpochEventMarker
     {
@@ -109,7 +109,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// Switch event marker in the format:
     /// <br/><br/>
-    /// "switch,{object count},{train target (-1 if n/a)},{window length}"
+    /// "switch,{object count},{train target (-1 if n/a)},{epoch length}"
     /// </summary>
     public class SwitchEventMarker: EpochEventMarker
     {
@@ -166,7 +166,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// SSVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
     public class SSVEPEventMarker: VisualEvokedPotentialEventMarker
     {
@@ -202,7 +202,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// TVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
     public class TVEPEventMarker: VisualEvokedPotentialEventMarker
     {

@@ -43,7 +43,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 // Send the marker
                 if (MarkerWriter != null) SendEpochMarker(trainingIndex);
-                // Wait the window length + the inter-window interval
+                // Wait the epoch length + the inter-epoch interval
                 yield return new WaitForSecondsRealtime(epochLength + interEpochInterval);
             }
         }

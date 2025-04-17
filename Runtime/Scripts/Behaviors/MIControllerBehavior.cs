@@ -107,10 +107,10 @@ namespace BCIEssentials.ControllerBehaviors
                 // Get the index of the target object
                 Debug.Log($"Running single training on option {trainingIndex}");
 
-                // For each window in the trial
+                // For each epoch in the trial
                 for (int j = 0; j < (trainingEpochCount); j++)
                 {
-                    // Send the marker for the window
+                    // Send the marker for the epoch
                     MarkerWriter.PushMIMarker(1, epochLength, trainingIndex);
 
                     yield return new WaitForSecondsRealtime(epochLength);
