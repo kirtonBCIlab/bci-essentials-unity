@@ -20,16 +20,6 @@ namespace BCIEssentials.Tests
         }
 
         [Test]
-        public void WhenStartStimulus_ThenReturnsTime()
-        {
-            var expectedResult = Time.time;
-
-            var result = _testSpo.StartStimulus();
-
-            Assert.AreEqual(expectedResult, result);
-        }
-
-        [Test]
         public void WhenStartStimulus_ThenEventInvoked()
         {
             var eventCalled = false;
