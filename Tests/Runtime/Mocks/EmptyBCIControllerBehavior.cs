@@ -8,5 +8,10 @@ namespace BCIEssentials.Tests
     {
         public override BCIBehaviorType BehaviorType => MockBehaviorType;
         public BCIBehaviorType MockBehaviorType;
+
+        protected override IEnumerator RunStimulusRoutine()
+        {
+            while (true) yield return null;
+        }
     }
 }

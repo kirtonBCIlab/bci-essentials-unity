@@ -359,11 +359,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Behavior to invoke during a stimulus run.
         /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator RunStimulusRoutine()
-        {
-            yield break;
-        }
+        protected abstract IEnumerator RunStimulusRoutine();
 
         #endregion
 
