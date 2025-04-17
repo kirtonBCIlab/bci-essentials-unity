@@ -76,7 +76,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 markerString = new TVEPEventMarker
                 (
-                    SPOCount, windowLength,
+                    SPOCount, epochLength,
                     new[] {realFreqFlash}, trainingIndex
                 ).MarkerString;
             }

@@ -69,11 +69,11 @@ namespace BCIEssentials.LSLFramework
 
         public WindowedEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget
         ): base(objectCount, trainingTarget)
         {
-            WindowLength = windowLength;
+            WindowLength = epochLength;
         }
     }
 
@@ -90,7 +90,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -99,10 +99,10 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public MIEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
-        : base(objectCount, windowLength, trainingTarget)
+        : base(objectCount, epochLength, trainingTarget)
         {}
     }
 
@@ -119,7 +119,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -128,10 +128,10 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public SwitchEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
-        : base(objectCount, windowLength, trainingTarget)
+        : base(objectCount, epochLength, trainingTarget)
         {}
     }
 
@@ -154,10 +154,10 @@ namespace BCIEssentials.LSLFramework
 
         public VisualEvokedPotentialEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             float[] frequencies,
             int trainingTarget = -1
-        ): base(objectCount, windowLength, trainingTarget)
+        ): base(objectCount, epochLength, trainingTarget)
         {
             Frequencies = frequencies;
         }
@@ -176,7 +176,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -188,13 +188,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public SSVEPEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         : base
         (
-            objectCount, windowLength,
+            objectCount, epochLength,
             frequencies.ToArray(), trainingTarget
         ) {}
     }
@@ -212,7 +212,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -224,13 +224,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public TVEPEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         : base
         (
-            objectCount, windowLength,
+            objectCount, epochLength,
             frequencies.ToArray(), trainingTarget
         ) {}
     }

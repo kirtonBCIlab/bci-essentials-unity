@@ -177,7 +177,7 @@ MonoBehaviour:
   FactorySetupRequired: 1
   targetFrameRate: 60
   _hotkeysEnabled: 1
-  windowLength: 1
+  epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 0
   numTrainWindows: 3

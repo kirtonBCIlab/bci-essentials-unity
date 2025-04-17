@@ -17,7 +17,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         [StartFoldoutGroup("Signal Properties")]
         [Tooltip("The length of the processing window [sec]")]
-        public float windowLength = 1.0f;
+        public float epochLength = 1.0f;
         [EndFoldoutGroup]
         [Tooltip("The interval between processing windows [sec]")]
         public float interWindowInterval = 0f;
@@ -44,7 +44,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Send the marker
                 if (MarkerWriter != null) SendWindowMarker(trainingIndex);
                 // Wait the window length + the inter-window interval
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+                yield return new WaitForSecondsRealtime(epochLength + interWindowInterval);
             }
         }
 
@@ -65,7 +65,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected override IEnumerator WaitForStimulusToComplete()
         {
             yield return new WaitForSecondsRealtime(
-                (windowLength + interWindowInterval) * numTrainWindows
+                (epochLength + interWindowInterval) * numTrainWindows
             );
             StopStimulusRun();
         }
@@ -75,7 +75,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             for (int i = 0; i < numTrainWindows; i++)
             {
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
+                yield return new WaitForSecondsRealtime(epochLength + interWindowInterval);
 
                 if (shamFeedback)
                 {

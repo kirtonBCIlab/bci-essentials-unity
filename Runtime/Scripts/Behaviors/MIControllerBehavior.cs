@@ -111,9 +111,9 @@ namespace BCIEssentials.ControllerBehaviors
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    MarkerWriter.PushMIMarker(1, windowLength, trainingIndex);
+                    MarkerWriter.PushMIMarker(1, epochLength, trainingIndex);
 
-                    yield return new WaitForSecondsRealtime(windowLength);
+                    yield return new WaitForSecondsRealtime(epochLength);
 
                     if (shamFeedback)
                     {
@@ -142,7 +142,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            MarkerWriter.PushMIMarker(SPOCount, windowLength, trainingIndex);
+            MarkerWriter.PushMIMarker(SPOCount, epochLength, trainingIndex);
         }
     }
 }

@@ -51,7 +51,7 @@ MonoBehaviour:
   _spoFactory: {fileID: 11400000, guid: 742b42676bf053442b2d98c4ba8f2b18, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  windowLength: 2
+  epochLength: 2
   interWindowInterval: 0
   numTrainingSelections: 9
   numTrainWindows: 3
@@ -114,7 +114,7 @@ MonoBehaviour:
   _spoFactory: {fileID: 11400000, guid: b49306ce22f5a9d4d848717eb04761c0, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 165
-  windowLength: 1
+  epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 12
   numTrainWindows: 6
@@ -281,7 +281,7 @@ MonoBehaviour:
   _spoFactory: {fileID: 11400000, guid: f10aba30caad32345985da46bd8337b6, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  windowLength: 1
+  epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 5
   numTrainWindows: 0

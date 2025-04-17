@@ -18,7 +18,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override void SendWindowMarker(int trainingIndex = -1)
         => MarkerWriter.PushSSVEPMarker(
-            SPOCount, windowLength,
+            SPOCount, epochLength,
             realFlashingFrequencies, trainingIndex
         );
 

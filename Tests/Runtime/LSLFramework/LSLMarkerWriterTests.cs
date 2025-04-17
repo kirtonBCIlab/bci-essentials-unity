@@ -29,13 +29,13 @@ namespace BCIEssentials.Tests.LSLFramework
         [TestCase(2, 2.5f, -2, "mi,2,-1,2.50")]
         public void PushMIMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget, string expectedSampleValue
         )
         {
             OutStream.PushMIMarker
             (
-                objectCount, windowLength, trainingTarget
+                objectCount, epochLength, trainingTarget
             );
             AssertPulledSample(expectedSampleValue);
         }
@@ -44,13 +44,13 @@ namespace BCIEssentials.Tests.LSLFramework
         [TestCase(2, 1.5f, 1, "switch,2,2,1.50")]
         public void PushSwitchMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget, string expectedSampleValue
         )
         {
             OutStream.PushSwitchMarker
             (
-                objectCount, windowLength, trainingTarget
+                objectCount, epochLength, trainingTarget
             );
             AssertPulledSample(expectedSampleValue);
         }
@@ -59,13 +59,13 @@ namespace BCIEssentials.Tests.LSLFramework
         [TestCase(4, 1.5f, new[] {12.5f,18.7f,24.4f,30.1f}, 2, "ssvep,4,3,1.50,12.5,18.7,24.4,30.1")]
         public void PushSSVEPMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
-            int objectCount, float windowLength, float[] frequencies,
+            int objectCount, float epochLength, float[] frequencies,
             int trainingTarget, string expectedSampleValue
         )
         {
             OutStream.PushSSVEPMarker
             (
-                objectCount, windowLength,
+                objectCount, epochLength,
                 frequencies, trainingTarget
             );
             AssertPulledSample(expectedSampleValue);
@@ -75,13 +75,13 @@ namespace BCIEssentials.Tests.LSLFramework
         [TestCase(6, 1.5f, new[] {15f}, 2, "tvep,6,3,1.50,15")]
         public void PushTVEPMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
-            int objectCount, float windowLength, float[] frequencies,
+            int objectCount, float epochLength, float[] frequencies,
             int trainingTarget, string expectedSampleValue
         )
         {
             OutStream.PushTVEPMarker
             (
-                objectCount, windowLength,
+                objectCount, epochLength,
                 frequencies, trainingTarget
             );
             AssertPulledSample(expectedSampleValue);

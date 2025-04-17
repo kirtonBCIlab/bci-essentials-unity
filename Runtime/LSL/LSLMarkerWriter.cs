@@ -22,7 +22,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -31,13 +31,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public void PushMIMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
         => PushMarker(
             new MIEventMarker
             (
-                objectCount, windowLength, trainingTarget
+                objectCount, epochLength, trainingTarget
             )
         );
 
@@ -48,7 +48,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -57,13 +57,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public void PushSwitchMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
         => PushMarker(
             new SwitchEventMarker
             (
-                objectCount, windowLength, trainingTarget
+                objectCount, epochLength, trainingTarget
             )
         );
 
@@ -74,7 +74,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -86,14 +86,14 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public void PushSSVEPMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         => PushMarker(
             new SSVEPEventMarker
             (
-                objectCount, windowLength,
+                objectCount, epochLength,
                 frequencies, trainingTarget
             )
         );
@@ -104,7 +104,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -116,14 +116,14 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public void PushTVEPMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         => PushMarker(
             new TVEPEventMarker
             (
-                objectCount, windowLength,
+                objectCount, epochLength,
                 frequencies, trainingTarget
             )
         );
