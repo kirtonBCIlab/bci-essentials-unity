@@ -54,7 +54,7 @@ MonoBehaviour:
   epochLength: 2
   interWindowInterval: 0
   numTrainingSelections: 9
-  numTrainWindows: 3
+  trainingEpochCount: 3
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1
@@ -117,7 +117,7 @@ MonoBehaviour:
   epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 12
-  numTrainWindows: 6
+  trainingEpochCount: 6
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1
@@ -284,7 +284,6 @@ MonoBehaviour:
   epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 5
-  numTrainWindows: 0
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1

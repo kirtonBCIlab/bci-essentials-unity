@@ -13,7 +13,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         [AppendToFoldoutGroup("Training Properties")]
         [Tooltip("The number of windows used in each training iteration")]
-        public int numTrainWindows = 3;
+        public int trainingEpochCount = 3;
 
         [StartFoldoutGroup("Signal Properties")]
         [Tooltip("The length of the processing window [sec]")]
@@ -65,7 +65,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected override IEnumerator WaitForStimulusToComplete()
         {
             yield return new WaitForSecondsRealtime(
-                (epochLength + interWindowInterval) * numTrainWindows
+                (epochLength + interWindowInterval) * trainingEpochCount
             );
             StopStimulusRun();
         }
@@ -73,7 +73,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected IEnumerator DisplayFeedbackWhileWaitingForStimulusToComplete
         (SPO feedbackTarget)
         {
-            for (int i = 0; i < numTrainWindows; i++)
+            for (int i = 0; i < trainingEpochCount; i++)
             {
                 yield return new WaitForSecondsRealtime(epochLength + interWindowInterval);
 

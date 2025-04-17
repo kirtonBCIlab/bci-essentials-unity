@@ -161,7 +161,6 @@ MonoBehaviour:
   targetFrameRate: 60
   interWindowInterval: 0
   numTrainingSelections: 5
-  numTrainWindows: 3
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1

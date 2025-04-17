@@ -162,7 +162,7 @@ MonoBehaviour:
   epochLength: 1
   interWindowInterval: 0
   numTrainingSelections: 12
-  numTrainWindows: 6
+  trainingEpochCount: 6
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1

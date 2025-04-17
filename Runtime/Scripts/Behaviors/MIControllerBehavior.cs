@@ -108,7 +108,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.Log($"Running single training on option {trainingIndex}");
 
                 // For each window in the trial
-                for (int j = 0; j < (numTrainWindows); j++)
+                for (int j = 0; j < (trainingEpochCount); j++)
                 {
                     // Send the marker for the window
                     MarkerWriter.PushMIMarker(1, epochLength, trainingIndex);
