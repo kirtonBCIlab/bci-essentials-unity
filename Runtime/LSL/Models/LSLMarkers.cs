@@ -136,7 +136,7 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class VisualEvokedPotentialEventMarker: EpochEventMarker
+    public abstract class FrequenciesEventMarker: EpochEventMarker
     {
         /// <summary>
         /// Flashing frequencies used by stimulus objects
@@ -152,7 +152,7 @@ namespace BCIEssentials.LSLFramework
             _ => $",{string.Join(",", Frequencies)}"
         };
 
-        public VisualEvokedPotentialEventMarker
+        public FrequenciesEventMarker
         (
             int objectCount, int trainingTarget,
             float epochLength,  float[] frequencies
@@ -167,7 +167,7 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
-    public class SSVEPEventMarker: VisualEvokedPotentialEventMarker
+    public class SSVEPEventMarker: FrequenciesEventMarker
     {
         public override string MarkerString
         => $"ssvep,{base.MarkerString}";
@@ -202,7 +202,7 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
-    public class TVEPEventMarker: VisualEvokedPotentialEventMarker
+    public class TVEPEventMarker: FrequenciesEventMarker
     {
         public override string MarkerString
         => $"tvep,{base.MarkerString}";
