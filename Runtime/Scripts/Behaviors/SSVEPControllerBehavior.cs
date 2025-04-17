@@ -3,7 +3,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : VEPControllerBehaviour
+    public class SSVEPControllerBehavior : FrequencyStimulusControllerBehaviour
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         

@@ -5,7 +5,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class TVEPControllerBehavior : VEPControllerBehaviour
+    public class TVEPControllerBehavior : FrequencyStimulusControllerBehaviour
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
