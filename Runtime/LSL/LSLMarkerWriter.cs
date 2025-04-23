@@ -42,8 +42,10 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a classification marker for the Motor Imagery paradigm
-        /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
         /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
+        /// </remarks>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
@@ -84,8 +86,10 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a classification marker for the Switch paradigm
-        /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
         /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
+        /// </remarks>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
@@ -130,10 +134,12 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a classification marker for the SSVEP paradigm
-        /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
+        /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
         /// <br/>or at the end of the trial
         /// <br/>depending on python configuration
-        /// </summary>
+        /// </remarks>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
@@ -181,10 +187,12 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a classification marker for the TVEP paradigm
-        /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
+        /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
         /// <br/>or at the end of the trial
         /// <br/>depending on python configuration
-        /// </summary>
+        /// </remarks>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
@@ -226,8 +234,10 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a single flash classification marker for the P300 paradigm
-        /// <br/><b>Will trigger a prediction at the end of the trial</b>
         /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction at the end of the trial
+        /// </remarks>
         /// <param name="objectCount">Number of objects in the trial</param>
         /// <param name="activeObject">
         /// Index of object being flashed <i>(0-indexed)</i>
@@ -262,8 +272,10 @@ namespace BCIEssentials.LSLFramework
 
         /// <summary>
         /// Create and send a multi-flash classification marker for the P300 paradigm
-        /// <br/><b>Will trigger a prediction at the end of the trial</b>
         /// </summary>
+        /// <remarks>
+        /// Will trigger a prediction at the end of the trial
+        /// </remarks>
         /// <param name="objectCount">Number of objects in the trial</param>
         /// <param name="activeObjects">
         /// Collection of object indices being flashed together <i>(0-indexed)</i>
