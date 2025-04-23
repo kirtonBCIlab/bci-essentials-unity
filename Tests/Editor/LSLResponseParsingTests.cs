@@ -16,9 +16,9 @@ namespace BCIEssentials.Tests.Editor
         => ParseResponseAndAssertType<LSLPing>(sampleString);
 
         [Test]
-        [TestCase("0", 0)]
-        [TestCase("[2]", 2)]
-        [TestCase(" 1 ", 1)]
+        [TestCase("1", 0)]
+        [TestCase("[3]", 2)]
+        [TestCase(" 2 ", 1)]
         public void BuildResponse_WhenPrediction_ThenReturnsPredictionResponse
         (
             string sampleString, int expectedValue

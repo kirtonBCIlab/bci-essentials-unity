@@ -17,20 +17,6 @@ namespace BCIEssentials.StimulusObjects
         /// </summary>
         public bool Selectable = true;
 
-        /// <summary>
-        /// Assigned in editor or by the PopulateObjectIDList method, this 
-        /// is a unique identifier for this SPO. It defaults to -100.
-        /// </summary>
-        [Tooltip("Will be set by controller behaviour if the list of objects is dynamically populated")]
-        public int ObjectID = -100;
-
-        /// <summary>
-        /// Assigned by the SPO Controller, this represents the
-        /// index of this SPO in the controllers pool of selectables. 
-        /// </summary>
-        [HideInInspector]
-        public int SelectablePoolIndex;
-
 
         [Header("Start stimulus presentation")]
         [FormerlySerializedAs("StartStimulusEvent")]

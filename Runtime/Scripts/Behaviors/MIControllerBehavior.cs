@@ -21,12 +21,21 @@ namespace BCIEssentials.ControllerBehaviors
         protected int selectionCounter = 0;
         protected int updateCounter = 0;
 
-        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
-        {
-            base.PopulateObjectList(populationMethod);
 
+        public override void MakeSelection(int classIndex, bool stopStimulusRun = false)
+        {
+            base.MakeSelection(classIndex, stopStimulusRun);
+            Debug.LogWarning(
+                "You should override this method in an inherited class " +
+                "as object selection is neither deterministic by index " +
+                "between trials nor relevant to the paradigm."
+            );
+        }
+
+        protected override void UpdateObjectListConfiguration()
+        {
             // Warn about the number of objects to be selected from, if greater than 2
-            if (_selectableSPOs.Count > 2)
+            if (SPOCount > 2)
             {
                 Debug.LogWarning("Warning: Selecting between more than 2 objects!");
             }
@@ -59,8 +68,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
 
                 trainTarget = trainArray[i];
-                int targetID = _selectableSPOs[trainTarget].ObjectID; 
-                Debug.Log($"Running training selection {i} on object with ID {targetID}");
+                Debug.Log($"Running training selection {i} on object with ID {trainTarget}");
 
                 SPO targetObject = _selectableSPOs[trainTarget];
                 yield return RunTrainingRound(
@@ -85,7 +93,8 @@ namespace BCIEssentials.ControllerBehaviors
                 yield break;
             }
 
-            SPO targetObject = _selectableSPOs[0];
+            int trainingIndex = 0;
+            SPO targetObject = _selectableSPOs[trainingIndex];
 
             Debug.Log("Starting single training");
             // For a single, specified SPO, run a single training trial
@@ -96,14 +105,13 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.Log($"Running single training on option {targetObject.name}");
 
                 // Get the index of the target object
-                int targetID = targetObject.ObjectID;
-                Debug.Log($"Running single training on option {targetID}");
+                Debug.Log($"Running single training on option {trainingIndex}");
 
                 // For each window in the trial
                 for (int j = 0; j < (numTrainWindows); j++)
                 {
                     // Send the marker for the window
-                    MarkerWriter.PushMIMarker(1, windowLength, targetID);
+                    MarkerWriter.PushMIMarker(1, windowLength, trainingIndex);
 
                     yield return new WaitForSecondsRealtime(windowLength);
 
@@ -126,54 +134,6 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        /// <summary>
-        /// Select an object from <see cref="SelectableSPOs"/> based on the SPO ObjectID,
-        /// not the index in the list.
-        /// </summary>
-        /// <param name="objectIndex"></param>
-        /// <param name="stopStimulusRun"></param>
-        public override void SelectSPO(int objectID, bool stopStimulusRun = false)
-        {
-            //If the current training type is not single, then run the base method
-            if (CurrentTrainingType != BCITrainingType.Single)
-            {
-                base.SelectSPO(objectID, stopStimulusRun);
-                return;
-            }
-            
-            // If the current training type is single, then make sure the SPO selection is
-            // based on the object ID
-            var objectCount = _selectableSPOs.Count;
-            if (objectCount == 0)
-            {
-                Debug.LogWarning("No Objects to select");
-                return;
-            }
-
-            if(_selectableSPOs.TrueForAll(spo => spo.ObjectID != objectID))
-            {
-                Debug.LogWarning($"ObjectID {objectID} not found in the list of SPOs");
-                return;       
-            }
-
-            // Select the SPO(s) with the matching ObjectID. Doesn't currently break so has to check all
-            foreach (var spo in _selectableSPOs)
-            {
-                if (spo.ObjectID == objectID)
-                {
-                    spo.Select();
-                    LastSelectedSPO = spo;
-                    Debug.Log($"SPO '{spo.gameObject.name}' selected.");
-                }
-            }
-            //I'm unsure if this is needed, but I'm mimicking how the base method handles this
-            if (stopStimulusRun)
-            {
-                StopStimulusRun();
-            }
-
-        }
-
         public override void UpdateClassifier()
         {
             Debug.Log("Updating the classifier");
@@ -182,10 +142,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override void SendWindowMarker(int trainingIndex = -1)
         {
-            if (trainingIndex >= 0 && trainingIndex < SPOCount)
-            {
-                trainingIndex = _selectableSPOs[trainingIndex].ObjectID;
-            }
             MarkerWriter.PushMIMarker(SPOCount, windowLength, trainingIndex);
         }
     }

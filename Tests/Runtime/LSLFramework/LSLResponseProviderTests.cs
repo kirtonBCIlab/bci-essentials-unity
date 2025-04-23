@@ -74,7 +74,7 @@ namespace BCIEssentials.Tests.LSLFramework
 
             yield return new WaitForSecondsRealtime(0.05f);
             Assert.NotNull(prediction);
-            Assert.AreEqual(1, prediction.Value);
+            Assert.AreEqual(0, prediction.Value);
         }
 
         [UnityTest]

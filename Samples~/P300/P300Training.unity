@@ -220,7 +220,7 @@ MonoBehaviour:
     BoundKey: 59
   UpdateClassifierBinding:
     BoundKey: 8
-  ObjectSelectionBindings:
+  SelectionBindings:
     Bindings:
     - BoundKey: 48
       Index: 0
