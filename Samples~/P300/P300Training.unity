@@ -159,10 +159,7 @@ MonoBehaviour:
   _spoFactory: {fileID: 11400000, guid: 413cd93389a09cd4a9d317e2a32a7161, type: 2}
   FactorySetupRequired: 1
   targetFrameRate: 60
-  windowLength: 1
-  interWindowInterval: 0
   numTrainingSelections: 5
-  numTrainWindows: 3
   pauseBeforeTraining: 2
   trainTargetPresentationTime: 3
   trainBreak: 1

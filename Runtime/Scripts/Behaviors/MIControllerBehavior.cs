@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class MIControllerBehavior : WindowedControllerBehavior
+    public class MIControllerBehavior : ContinualStimulusControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.MI;
 
@@ -107,13 +107,13 @@ namespace BCIEssentials.ControllerBehaviors
                 // Get the index of the target object
                 Debug.Log($"Running single training on option {trainingIndex}");
 
-                // For each window in the trial
-                for (int j = 0; j < (numTrainWindows); j++)
+                // For each epoch in the trial
+                for (int j = 0; j < (trainingEpochCount); j++)
                 {
-                    // Send the marker for the window
-                    MarkerWriter.PushMIMarker(1, windowLength, trainingIndex);
+                    // Send the marker for the epoch
+                    MarkerWriter.PushMIMarker(1, epochLength, trainingIndex);
 
-                    yield return new WaitForSecondsRealtime(windowLength);
+                    yield return new WaitForSecondsRealtime(epochLength);
 
                     if (shamFeedback)
                     {
@@ -140,9 +140,9 @@ namespace BCIEssentials.ControllerBehaviors
             MarkerWriter.PushTrainingCompleteMarker();
         }
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         {
-            MarkerWriter.PushMIMarker(SPOCount, windowLength, trainingIndex);
+            MarkerWriter.PushMIMarker(SPOCount, epochLength, trainingIndex);
         }
     }
 }

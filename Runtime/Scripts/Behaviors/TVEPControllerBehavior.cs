@@ -5,7 +5,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class TVEPControllerBehavior : VEPControllerBehaviour
+    public class TVEPControllerBehavior : FrequencyStimulusControllerBehaviour
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
@@ -18,9 +18,9 @@ namespace BCIEssentials.ControllerBehaviors
         private float realFlashingFrequency;
 
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         => MarkerWriter.PushTVEPMarker(
-            SPOCount, windowLength,
+            SPOCount, epochLength,
             new[] {realFlashingFrequency}, trainingIndex
         );
 

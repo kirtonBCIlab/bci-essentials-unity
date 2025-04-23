@@ -9,7 +9,7 @@ using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class StimulusPresentationControllerBehavior : WindowedControllerBehavior
+    public class StimulusPresentationControllerBehavior : ContinualStimulusControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.TVEP;
 
@@ -64,7 +64,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         {
             string markerString;
                 
@@ -76,7 +76,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 markerString = new TVEPEventMarker
                 (
-                    SPOCount, windowLength,
+                    SPOCount, epochLength,
                     new[] {realFreqFlash}, trainingIndex
                 ).MarkerString;
             }

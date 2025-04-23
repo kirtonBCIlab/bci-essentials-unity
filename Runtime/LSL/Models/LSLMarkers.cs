@@ -56,33 +56,33 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class WindowedEventMarker: EventMarker
+    public abstract class EpochEventMarker: EventMarker
     {
         /// <summary>
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </summary>
-        public float WindowLength;
+        public float EpochLength;
 
         public override string MarkerString
-        => $"{base.MarkerString},{WindowLength.ToString("f2")}";
+        => $"{base.MarkerString},{EpochLength.ToString("f2")}";
 
-        public WindowedEventMarker
+        public EpochEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget
         ): base(objectCount, trainingTarget)
         {
-            WindowLength = windowLength;
+            EpochLength = epochLength;
         }
     }
 
     /// <summary>
     /// Motor Imagery event marker in the format:
     /// <br/><br/>
-    /// "mi,{object count},{train target (-1 if n/a)},{window length}"
+    /// "mi,{object count},{train target (-1 if n/a)},{epoch length}"
     /// </summary>
-    public class MIEventMarker: WindowedEventMarker
+    public class MIEventMarker: EpochEventMarker
     {
         public override string MarkerString
         => $"mi,{base.MarkerString}";
@@ -90,7 +90,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -99,19 +99,19 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public MIEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
-        : base(objectCount, windowLength, trainingTarget)
+        : base(objectCount, epochLength, trainingTarget)
         {}
     }
 
     /// <summary>
     /// Switch event marker in the format:
     /// <br/><br/>
-    /// "switch,{object count},{train target (-1 if n/a)},{window length}"
+    /// "switch,{object count},{train target (-1 if n/a)},{epoch length}"
     /// </summary>
-    public class SwitchEventMarker: WindowedEventMarker
+    public class SwitchEventMarker: EpochEventMarker
     {
         public override string MarkerString
         => $"switch,{base.MarkerString}";
@@ -119,7 +119,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -128,15 +128,15 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public SwitchEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             int trainingTarget = -1
         )
-        : base(objectCount, windowLength, trainingTarget)
+        : base(objectCount, epochLength, trainingTarget)
         {}
     }
 
 
-    public abstract class VisualEvokedPotentialEventMarker: WindowedEventMarker
+    public abstract class VisualEvokedPotentialEventMarker: EpochEventMarker
     {
         /// <summary>
         /// Flashing frequencies used by stimulus objects
@@ -154,10 +154,10 @@ namespace BCIEssentials.LSLFramework
 
         public VisualEvokedPotentialEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             float[] frequencies,
             int trainingTarget = -1
-        ): base(objectCount, windowLength, trainingTarget)
+        ): base(objectCount, epochLength, trainingTarget)
         {
             Frequencies = frequencies;
         }
@@ -166,7 +166,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// SSVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
     public class SSVEPEventMarker: VisualEvokedPotentialEventMarker
     {
@@ -176,7 +176,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -188,13 +188,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public SSVEPEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         : base
         (
-            objectCount, windowLength,
+            objectCount, epochLength,
             frequencies.ToArray(), trainingTarget
         ) {}
     }
@@ -202,7 +202,7 @@ namespace BCIEssentials.LSLFramework
     /// <summary>
     /// TVEP event marker in the format:
     /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{window length},{...frequencies}"
+    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
     public class TVEPEventMarker: VisualEvokedPotentialEventMarker
     {
@@ -212,7 +212,7 @@ namespace BCIEssentials.LSLFramework
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
         /// </param>
-        /// <param name="windowLength">
+        /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
         /// <b>Must remain constant between trials</b>
         /// </param>
@@ -224,13 +224,13 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public TVEPEventMarker
         (
-            int objectCount, float windowLength,
+            int objectCount, float epochLength,
             IEnumerable<float> frequencies,
             int trainingTarget = -1
         )
         : base
         (
-            objectCount, windowLength,
+            objectCount, epochLength,
             frequencies.ToArray(), trainingTarget
         ) {}
     }

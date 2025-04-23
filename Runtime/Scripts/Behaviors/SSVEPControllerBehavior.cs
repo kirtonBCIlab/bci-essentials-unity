@@ -3,7 +3,7 @@ using BCIEssentials.Controllers;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : VEPControllerBehaviour
+    public class SSVEPControllerBehavior : FrequencyStimulusControllerBehaviour
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
         
@@ -16,9 +16,9 @@ namespace BCIEssentials.ControllerBehaviors
         private float[] realFlashingFrequencies;
 
 
-        protected override void SendWindowMarker(int trainingIndex = -1)
+        protected override void SendEpochMarker(int trainingIndex = -1)
         => MarkerWriter.PushSSVEPMarker(
-            SPOCount, windowLength,
+            SPOCount, epochLength,
             realFlashingFrequencies, trainingIndex
         );
 

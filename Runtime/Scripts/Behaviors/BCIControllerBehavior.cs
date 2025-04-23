@@ -98,7 +98,7 @@ namespace BCIEssentials.ControllerBehaviors
         [ShowIf("shamFeedback")]
         [Tooltip("Time allotted for the display of sham feedback [sec]")]
         public float shamFeedbackBuffer = 0.5f;
-        [Tooltip("Rest time between training windows [sec]")]
+        [Tooltip("Rest time between training rounds [sec]")]
         public float trainBreak = 1f;
         [Tooltip("Index of the object targetted for training,\n"
             + "defaulted to no target (-1)"
@@ -359,11 +359,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Behavior to invoke during a stimulus run.
         /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator RunStimulusRoutine()
-        {
-            yield break;
-        }
+        protected abstract IEnumerator RunStimulusRoutine();
 
         #endregion
 

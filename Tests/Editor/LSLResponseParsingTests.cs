@@ -78,14 +78,14 @@ namespace BCIEssentials.Tests.Editor
         public void BuildResponse_WhenMIMarkerReceipt_ThenParsesMIMarkerReceipt
         (
             string markerString, int expectedObjectCount,
-            int expectedTrainTarget, float expectedWindowLength
+            int expectedTrainTarget, float expectedEpochLength
         )
         {
             string sampleString = BuildMarkerReceiptString(markerString);
             var markerReceipt = ParseResponseAndAssertType<MIEventMarkerReceipt>(sampleString);
             Assert.AreEqual(expectedObjectCount, markerReceipt.ObjectCount);
             Assert.AreEqual(expectedTrainTarget, markerReceipt.TrainingTarget);
-            Assert.AreEqual(expectedWindowLength, markerReceipt.WindowLength);
+            Assert.AreEqual(expectedEpochLength, markerReceipt.EpochLength);
         }
 
 
