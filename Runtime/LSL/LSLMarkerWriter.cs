@@ -131,6 +131,8 @@ namespace BCIEssentials.LSLFramework
         /// <summary>
         /// Create and send a classification marker for the SSVEP paradigm
         /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
+        /// <br/>or at the end of the trial
+        /// <br/>depending on python configuration
         /// </summary>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
@@ -180,6 +182,8 @@ namespace BCIEssentials.LSLFramework
         /// <summary>
         /// Create and send a classification marker for the TVEP paradigm
         /// <br/><b>Will trigger a prediction in <see cref="epochLength"/> seconds</b>
+        /// <br/>or at the end of the trial
+        /// <br/>depending on python configuration
         /// </summary>
         /// <param name="objectCount">
         /// Number of objects (classes) in the trial
