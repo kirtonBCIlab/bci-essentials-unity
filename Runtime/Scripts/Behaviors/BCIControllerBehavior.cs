@@ -339,7 +339,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         private IEnumerator RunStimulus()
         {
-            SetupUpForStimulusRun();
+            SetUpForStimulusRun();
             yield return RunStimulusRoutine();
             StimulusRunning = false;
             SendTrialEndsMarker();
@@ -349,7 +349,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Called before the start of a stimulus run
         /// </summary>
-        protected virtual void SetupUpForStimulusRun() {}
+        protected virtual void SetUpForStimulusRun() {}
         
         /// <summary>
         /// Called after a stimulus run has ended

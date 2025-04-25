@@ -25,7 +25,7 @@ namespace BCIEssentials.ControllerBehaviors
         private Coroutine _epochMarkerCoroutine;
 
 
-        protected override void SetupUpForStimulusRun()
+        protected override void SetUpForStimulusRun()
         {
             StopStartCoroutine(ref _epochMarkerCoroutine,
                 RunSendEpochMarkers(trainTarget)
