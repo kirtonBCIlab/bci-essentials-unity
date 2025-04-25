@@ -10,8 +10,12 @@ namespace BCIEssentials.LSLFramework
             => PushCommandMarker<TrialEndsMarker>();
         public void PushTrainingCompleteMarker()
             => PushCommandMarker<TrainingCompleteMarker>();
+        public void PushTrainClassificationMarker()
+            => PushCommandMarker<TrainClassifierMarker>();
         public void PushUpdateClassifierMarker()
             => PushCommandMarker<UpdateClassifierMarker>();
+        public void PushDoneWithRestingStateCollectionMarker()
+            => PushCommandMarker<DoneWithRestingStateCollectionMarker>();
         public void PushCommandMarker<T>()
             where T: ICommandMarker, new()
             => PushMarker(new T());

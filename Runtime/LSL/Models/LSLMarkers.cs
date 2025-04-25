@@ -23,9 +23,17 @@ namespace BCIEssentials.LSLFramework
     {
         public string MarkerString => "Training Complete";
     }
+    public struct TrainClassifierMarker: ICommandMarker
+    {
+        public string MarkerString => "Train Classifier";
+    }
     public struct UpdateClassifierMarker: ICommandMarker
     {
         public string MarkerString => "Update Classifier";
+    }
+    public struct DoneWithRestingStateCollectionMarker: ICommandMarker
+    {
+        public string MarkerString => "Done with all RS collection";
     }
 
 
