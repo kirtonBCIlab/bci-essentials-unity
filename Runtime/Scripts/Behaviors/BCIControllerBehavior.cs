@@ -339,7 +339,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         private IEnumerator RunStimulus()
         {
-            SetupUpForStimulusRun();
+            SetUpForStimulusRun();
             yield return RunStimulusRoutine();
             StimulusRunning = false;
             SendTrialEndsMarker();
@@ -349,7 +349,7 @@ namespace BCIEssentials.ControllerBehaviors
         /// <summary>
         /// Called before the start of a stimulus run
         /// </summary>
-        protected virtual void SetupUpForStimulusRun() {}
+        protected virtual void SetUpForStimulusRun() {}
         
         /// <summary>
         /// Called after a stimulus run has ended
@@ -594,7 +594,7 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         protected IEnumerator RunTrainingRound(SPO targetObject)
-        => RunTrainingRound(WaitForStimulusToComplete(), targetObject);
+        => RunTrainingRound(RunWaitForTrainingRoundToComplete(), targetObject);
         protected IEnumerator RunTrainingRound
         (
             IEnumerator stimulusDelayRoutine,
@@ -681,7 +681,12 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
-        protected virtual IEnumerator WaitForStimulusToComplete()
+        protected virtual IEnumerator RunWaitForTrainingRoundToComplete()
+        {
+            yield return RunWaitForStimulusToComplete();
+        }
+
+        protected IEnumerator RunWaitForStimulusToComplete()
         {
             while (StimulusRunning)
             {

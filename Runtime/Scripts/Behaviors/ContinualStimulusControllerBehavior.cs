@@ -25,7 +25,7 @@ namespace BCIEssentials.ControllerBehaviors
         private Coroutine _epochMarkerCoroutine;
 
 
-        protected override void SetupUpForStimulusRun()
+        protected override void SetUpForStimulusRun()
         {
             StopStartCoroutine(ref _epochMarkerCoroutine,
                 RunSendEpochMarkers(trainTarget)
@@ -69,7 +69,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual void UpdateStimulus() {}
 
-        protected override IEnumerator WaitForStimulusToComplete()
+        protected override IEnumerator RunWaitForTrainingRoundToComplete()
         {
             yield return new WaitForSecondsRealtime(
                 (epochLength + interEpochInterval) * trainingEpochCount
