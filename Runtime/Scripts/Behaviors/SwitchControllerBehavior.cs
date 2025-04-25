@@ -9,7 +9,10 @@ namespace BCIEssentials.ControllerBehaviors
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.Switch;
 
-        protected override void SendEpochMarker(int trainingIndex = -1)
-        => MarkerWriter.PushSwitchMarker(SPOCount, epochLength, trainingIndex);
+        protected override void SendTrainingMarker(int trainingIndex)
+        => MarkerWriter.PushSwitchTrainingMarker(SPOCount, trainingIndex, epochLength);
+
+        protected override void SendClassificationMarker()
+        => MarkerWriter.PushSwitchClassificationMarker(SPOCount, epochLength);
     }
 }

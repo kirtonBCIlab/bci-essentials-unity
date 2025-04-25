@@ -16,10 +16,14 @@ namespace BCIEssentials.ControllerBehaviors
         private float[] realFlashingFrequencies;
 
 
-        protected override void SendEpochMarker(int trainingIndex = -1)
-        => MarkerWriter.PushSSVEPMarker(
-            SPOCount, epochLength,
-            realFlashingFrequencies, trainingIndex
+        protected override void SendTrainingMarker(int trainingIndex)
+        => MarkerWriter.PushSSVEPTrainingMarker(
+            SPOCount, trainingIndex, epochLength, realFlashingFrequencies
+        );
+
+        protected override void SendClassificationMarker()
+        => MarkerWriter.PushSSVEPClassificationMarker(
+            SPOCount, epochLength, realFlashingFrequencies
         );
 
 

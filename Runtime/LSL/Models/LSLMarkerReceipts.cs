@@ -139,7 +139,7 @@ namespace BCIEssentials.LSLFramework
     public class SwitchEventMarkerReceipt: EpochEventMarkerReceipt {}
 
 
-    public abstract class VisualEvokedPotentialEventMarkerReceipt: EpochEventMarkerReceipt
+    public abstract class FrequenciesEventMarkerReceipt: EpochEventMarkerReceipt
     {
         public float[] Frequencies {get; protected set;}
 
@@ -160,14 +160,14 @@ namespace BCIEssentials.LSLFramework
     /// <br/><br/>
     /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
-    public class SSVEPEventMarkerReceipt: VisualEvokedPotentialEventMarkerReceipt {}
+    public class SSVEPEventMarkerReceipt: FrequenciesEventMarkerReceipt {}
     
     /// <summary>
     /// Receipt for TVEP event marker in the format:
     /// <br/><br/>
     /// "tvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
     /// </summary>
-    public class TVEPEventMarkerReceipt: VisualEvokedPotentialEventMarkerReceipt {}
+    public class TVEPEventMarkerReceipt: FrequenciesEventMarkerReceipt {}
 
 
     /// <summary>

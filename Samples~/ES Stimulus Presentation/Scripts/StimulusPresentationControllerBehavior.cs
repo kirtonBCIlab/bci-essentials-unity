@@ -64,7 +64,13 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override void SendEpochMarker(int trainingIndex = -1)
+        protected override void SendClassificationMarker()
+        {
+            MarkerWriter.PushSSVEPClassificationMarker
+            (SPOCount, epochLength, new[] {realFreqFlash});
+        }
+
+        protected override void SendTrainingMarker(int trainingIndex = -1)
         {
             string markerString;
                 
@@ -76,8 +82,8 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 markerString = new TVEPEventMarker
                 (
-                    SPOCount, epochLength,
-                    new[] {realFreqFlash}, trainingIndex
+                    SPOCount, trainingIndex,
+                    epochLength, new[] {realFreqFlash}
                 ).MarkerString;
             }
 
