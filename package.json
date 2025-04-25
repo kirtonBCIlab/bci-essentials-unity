@@ -1,6 +1,6 @@
 {
   "name": "com.bci4kids.bciessentials",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "displayName": "BCI Essentials",
   "description": "A Unity base environment for streamlined development of BCI applications",
   "unity": "2021.3",
