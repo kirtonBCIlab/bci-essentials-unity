@@ -69,7 +69,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected virtual void UpdateStimulus() {}
 
-        protected override IEnumerator WaitForStimulusToComplete()
+        protected override IEnumerator RunWaitForTrainingRoundToComplete()
         {
             yield return new WaitForSecondsRealtime(
                 (epochLength + interEpochInterval) * trainingEpochCount

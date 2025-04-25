@@ -594,7 +594,7 @@ namespace BCIEssentials.ControllerBehaviors
 
 
         protected IEnumerator RunTrainingRound(SPO targetObject)
-        => RunTrainingRound(WaitForStimulusToComplete(), targetObject);
+        => RunTrainingRound(RunWaitForTrainingRoundToComplete(), targetObject);
         protected IEnumerator RunTrainingRound
         (
             IEnumerator stimulusDelayRoutine,
@@ -681,7 +681,12 @@ namespace BCIEssentials.ControllerBehaviors
             reference = StartCoroutine(routine);
         }
 
-        protected virtual IEnumerator WaitForStimulusToComplete()
+        protected virtual IEnumerator RunWaitForTrainingRoundToComplete()
+        {
+            yield return RunWaitForStimulusToComplete();
+        }
+
+        protected IEnumerator RunWaitForStimulusToComplete()
         {
             while (StimulusRunning)
             {
