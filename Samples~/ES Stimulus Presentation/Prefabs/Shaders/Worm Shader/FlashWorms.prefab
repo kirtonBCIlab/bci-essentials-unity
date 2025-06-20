@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58dafbcfd2f661d438f57f8ab612995a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartStimulusEvent:
+  OnStimulusTriggered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -7166900191518050464}
@@ -129,7 +129,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  StopStimulusEvent:
+  OnStimulusEndTriggered:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -7166900191518050464}
@@ -144,7 +144,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnSelectedEvent:
+  OnSelected:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -4835161535002556767}
