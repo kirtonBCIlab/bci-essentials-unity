@@ -56,7 +56,6 @@ namespace BCIEssentials.Utilities
                     var spo = InstantiateObject(objectParent);
 
                     //Setup SPO
-                    FabricatedObjects.Add(spo);
                     spo.StopStimulus();
 
                     //Setup GameObject

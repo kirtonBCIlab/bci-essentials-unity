@@ -36,8 +36,11 @@ namespace BCIEssentials.Utilities
         protected abstract void InstantiateConfiguredObjects(Transform objectParent);
         protected SPO InstantiateObject(Transform parent)
         {
-            if (parent == null) return Instantiate(_spoPrefab);
-            return Instantiate(_spoPrefab, parent);
+            SPO newObject = (parent == null)
+                ? Instantiate(_spoPrefab)
+                : Instantiate(_spoPrefab, parent);
+            FabricatedObjects.Add(newObject);
+            return newObject;
         }
 
         public void DestroyObjects() {
