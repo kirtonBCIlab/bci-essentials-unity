@@ -55,9 +55,6 @@ namespace BCIEssentials.Utilities
                     //Instantiating prefabs
                     var spo = InstantiateObject(objectParent);
 
-                    //Setup SPO
-                    spo.StopStimulus();
-
                     //Setup GameObject
                     var spoGameObject = spo.gameObject;
                     spoGameObject.SetActive(true);
