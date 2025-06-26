@@ -31,7 +31,7 @@ namespace BCIEssentials.Tests.Utilities
             
             _gridFactory.CreateObjects();
 
-            Assert.AreEqual(0, _gridFactory.FabricatedObjects.Count);
+            Assert.AreEqual(0, _gridFactory.FabricatedObjectCount);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace BCIEssentials.Tests.Utilities
 
             _gridFactory.CreateObjects();
 
-            Assert.AreEqual(expectedCount, _gridFactory.FabricatedObjects.Count);
+            Assert.AreEqual(expectedCount, _gridFactory.FabricatedObjectCount);
         }
 
         [Test]
@@ -70,9 +70,9 @@ namespace BCIEssentials.Tests.Utilities
 
             _gridFactory.CreateObjects();
 
-            Assert.AreEqual(_gridFactory.FabricatedObjects.Count, 4);
+            Assert.AreEqual(_gridFactory.FabricatedObjectCount, 4);
 
-            for (var index = 0; index < _gridFactory.FabricatedObjects.Count; index++)
+            for (var index = 0; index < _gridFactory.FabricatedObjectCount; index++)
             {
                 var actualPosition = _gridFactory.FabricatedObjects[index].transform.position;
                 Assert.AreEqual(expectedPositions[index], actualPosition);
