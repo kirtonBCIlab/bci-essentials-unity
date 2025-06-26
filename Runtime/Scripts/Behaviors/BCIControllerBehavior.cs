@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using System.IO;
+using System.Linq;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
@@ -385,6 +386,11 @@ namespace BCIEssentials.ControllerBehaviors
                         this.GetSelectableSPOsByTag(
                             SPOTag, ObjectListPopulationScope
                         )
+                    );
+                    break;
+                case SPOPopulationMethod.Factory:
+                    SetObjectListAndUpdateConfiguration(
+                        _spoFactory.FabricatedObjects.Where(spo => spo.Selectable).ToList()
                     );
                     break;
             }

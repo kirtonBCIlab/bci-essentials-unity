@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BCIEssentials.StimulusObjects;
 using UnityEngine;
 
@@ -8,7 +9,9 @@ namespace BCIEssentials.Utilities
     {
         [SerializeField] private SPO _spoPrefab;
 
-        public readonly List<SPO> FabricatedObjects = new();
+        public List<SPO> FabricatedObjects => _fabricatedObjects.ToList();
+        public int FabricatedObjectCount => _fabricatedObjects.Count;
+        private List<SPO> _fabricatedObjects = new();
 
         public void Init(SPO prefab)
         {
@@ -25,7 +28,7 @@ namespace BCIEssentials.Utilities
                 return;
             }
 
-            if (FabricatedObjects.Count > 0)
+            if (FabricatedObjectCount > 0)
             {
                 DestroyObjects();
             }
@@ -36,12 +39,15 @@ namespace BCIEssentials.Utilities
         protected abstract void InstantiateConfiguredObjects(Transform objectParent);
         protected SPO InstantiateObject(Transform parent)
         {
-            if (parent == null) return Instantiate(_spoPrefab);
-            return Instantiate(_spoPrefab, parent);
+            SPO newObject = (parent == null)
+                ? Instantiate(_spoPrefab)
+                : Instantiate(_spoPrefab, parent);
+            _fabricatedObjects.Add(newObject);
+            return newObject;
         }
 
         public void DestroyObjects() {
-            foreach (var spo in FabricatedObjects)
+            foreach (var spo in _fabricatedObjects)
             {
                 if (spo != null)
                 {
@@ -49,7 +55,7 @@ namespace BCIEssentials.Utilities
                 }
             }
 
-            FabricatedObjects.Clear();
+            _fabricatedObjects.Clear();
         }
     }
 }

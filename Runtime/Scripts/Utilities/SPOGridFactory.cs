@@ -55,14 +55,10 @@ namespace BCIEssentials.Utilities
                     //Instantiating prefabs
                     var spo = InstantiateObject(objectParent);
 
-                    //Setup SPO
-                    FabricatedObjects.Add(spo);
-                    spo.StopStimulus();
-
                     //Setup GameObject
                     var spoGameObject = spo.gameObject;
                     spoGameObject.SetActive(true);
-                    spoGameObject.name = $"Object {FabricatedObjects.Count}";
+                    spoGameObject.name = $"Object {FabricatedObjectCount}";
 
                     //Setting position of object
                     var position = (Vector3)_spacing;
@@ -84,7 +80,7 @@ namespace BCIEssentials.Utilities
                 totalPosition += spo.transform.position;
             }
 
-            var centerPosition = totalPosition / FabricatedObjects.Count;
+            var centerPosition = totalPosition / FabricatedObjectCount;
             centerPosition.z = -10f;
 
             var mainCamera = Camera.main;
