@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using System.IO;
 using System.Linq;
 using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.StimulusObjects;
 using BCIEssentials.Utilities;
+
+# if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+# endif
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -238,6 +241,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
+# if UNITY_EDITOR
         protected void CreateAndAssignSPOFactory()
         {
             if (_spoFactory)
@@ -250,8 +254,9 @@ namespace BCIEssentials.ControllerBehaviors
             string scenePath = EditorSceneManager.GetActiveScene().path;
             string folderPath = Path.GetDirectoryName(scenePath);
             string fileName = $"{name} SPO Factory.asset";
-            AssetDatabase.CreateAsset(_spoFactory,  $"{folderPath}\\{fileName}");
+            AssetDatabase.CreateAsset(_spoFactory, $"{folderPath}\\{fileName}");
         }
+# endif
 
 
         /// <summary>

@@ -68,23 +68,25 @@ namespace BCIEssentials
         (
             string conditionPropertyPath,
             params int[] validValues
-        ): this(conditionPropertyPath)
+        ) : this(conditionPropertyPath)
         {
             ValidValues = validValues;
         }
 
+# if UNITY_EDITOR
         public bool ShouldShow(SerializedObject target)
         {
             SerializedProperty conditionProperty
             = target.FindProperty(ConditionPropertyPath);
-            
+
             if (conditionProperty == null)
             {
                 Debug.LogWarning($"Property not found for {nameof(ShowIfAttribute)}");
                 return false;
             }
 
-            return conditionProperty.propertyType switch {
+            return conditionProperty.propertyType switch
+            {
                 SerializedPropertyType.Boolean
                     => conditionProperty.boolValue
                 ,
@@ -95,9 +97,10 @@ namespace BCIEssentials
                 SerializedPropertyType.ObjectReference
                     => conditionProperty.objectReferenceValue != null
                 ,
-                    _ => true
+                _ => true
             };
         }
+# endif
     }
 
 
