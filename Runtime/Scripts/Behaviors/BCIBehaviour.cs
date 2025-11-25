@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.Utilities;
 using UnityEngine;
@@ -10,16 +10,16 @@ namespace BCIEssentials.Behaviours
     /// </summary>
     public abstract class BCIBehaviour : MonoBehaviourUsingExtendedAttributes
     {
-        public bool IsRunningSequence => _sequenceRoutine != null;
-        public bool IsRunningTrial { get; protected set; }
-        public bool IsRunningTraining { get; protected set; }
+        public bool IsRunningTrial => _trialBehaviour.IsRunning;
+        public bool IsRunningTraining => _trainingBehaviour.IsRunning;
 
-        // training behaviour
+        [SerializeField]
+        private CoroutineWrapper _trialBehaviour;
+        [SerializeField]
+        private CoroutineWrapper _trainingBehaviour;
 
         protected LSLMarkerWriter MarkerWriter;
         protected LSLResponseProvider ResponseProvider;
-
-        private Coroutine _sequenceRoutine;
 
 
         protected void Initialize()
@@ -27,47 +27,41 @@ namespace BCIEssentials.Behaviours
             gameObject.FindOrCreateComponent(ref MarkerWriter);
             gameObject.FindOrCreateComponent(ref ResponseProvider);
             ResponseProvider.SubscribePredictions(prediction => MakeSelection(prediction.Value));
+
+            Array.ForEach(
+                GetComponents<IBCIMarkerSource>(),
+                source => source.MarkerWriter = MarkerWriter
+            );
+            Array.ForEach(
+                GetComponents<IBCIResponseListener>(),
+                listener => listener.ResponseProvider = ResponseProvider
+            );
         }
 
 
-        public abstract void StartTraining();
+        public void StartTrial() => _trialBehaviour.Begin();
+        public void InterruptTrial() => _trialBehaviour.Interrupt();
 
-        protected abstract void SetUpSequence();
-        protected abstract void CleanUpSequence();
-        protected abstract IEnumerator RunSequence();
+        public void StartTraining() => _trainingBehaviour.Begin();
+        public void InterruptTraining() => _trainingBehaviour.Interrupt();
+
 
         protected abstract void MakeSelection(int index);
+    }
 
 
-        public void StartSequence()
-        {
-            if (IsRunningSequence)
-            {
-                Debug.LogWarning("Attempted to start sequence, but it is already running.");
-                return;
-            }
+    public interface IBCISelector
+    {
+        public void MakeSelection(int index);
+    }
 
-            SetUpSequence();
-            _sequenceRoutine = StartCoroutine(RunSequence());
-            CleanUpSequence();
-        }
+    public interface IBCIMarkerSource
+    {
+        public LSLMarkerWriter MarkerWriter { set; }
+    }
 
-        public void StopSequence()
-        {
-            if (!IsRunningSequence)
-            {
-                Debug.LogWarning("Can't stop a sequence that isn't running.");
-                return;
-            }
-
-            StopCoroutine(_sequenceRoutine);
-            CleanUpSequence();
-        }
-
-
-        protected IEnumerator AwaitSequenceCompletion()
-        {
-            while (IsRunningSequence) yield return null;
-        }
+    public interface IBCIResponseListener
+    {
+        public LSLResponseProvider ResponseProvider { set; }
     }
 }
