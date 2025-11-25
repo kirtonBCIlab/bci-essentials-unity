@@ -4,11 +4,11 @@ namespace BCIEssentials.Utilities
 {
     public static class GameObjectExtensions
     {
-        public static void FindOrCreateComponent<T>
+        public static void GetOrAddComponent<T>
         (
             this GameObject gameObject,
             ref T componentReference
-        ) where T: Component
+        ) where T : Component
         {
             if (
                 componentReference == null &&

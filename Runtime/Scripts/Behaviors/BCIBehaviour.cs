@@ -24,8 +24,8 @@ namespace BCIEssentials.Behaviours
 
         protected void Initialize()
         {
-            gameObject.FindOrCreateComponent(ref MarkerWriter);
-            gameObject.FindOrCreateComponent(ref ResponseProvider);
+            gameObject.GetOrAddComponent(ref MarkerWriter);
+            gameObject.GetOrAddComponent(ref ResponseProvider);
             ResponseProvider.SubscribePredictions(prediction => MakeSelection(prediction.Value));
 
             Array.ForEach(
