@@ -1,10 +1,14 @@
+using BCIEssentials.Behaviours;
+using BCIEssentials.LSLFramework;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Training
 {
-    public abstract class BCITrainingBehaviour : CoroutineWrapper
+    public abstract class BCITrainingBehaviour : CoroutineWrapper, IBCIMarkerSource
     {
+        public LSLMarkerWriter MarkerWriter { get; set; }
+
         [SerializeField]
         protected IBCITrainingTargetIndicator TargetIndicator;
     }

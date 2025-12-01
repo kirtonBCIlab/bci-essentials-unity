@@ -1,6 +1,5 @@
 using System.Collections;
 using BCIEssentials.Behaviours;
-using BCIEssentials.LSLFramework;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
@@ -8,8 +7,6 @@ namespace BCIEssentials.Training
 {
     public class AutomatedBCITrainingBehaviour : BCITrainingBehaviour, IBCIMarkerSource
     {
-        public LSLMarkerWriter MarkerWriter { get; set; }
-
         public int SelectionCount = 8;
         public float TargetIndicationPeriod = 3.0f;
         public bool PersistTargetIndication = false;
