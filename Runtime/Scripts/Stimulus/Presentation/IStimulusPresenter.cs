@@ -1,6 +1,6 @@
-namespace BCIEssentials.Selection
+namespace BCIEssentials.Stimulus.Presentation
 {
-    public interface ISelectable
+    public interface IStimulusPresenter
     {
         public bool IsSelectable { get; }
 
@@ -8,5 +8,8 @@ namespace BCIEssentials.Selection
 
         public void StartTargetIndication();
         public void EndTargetIndication();
+
+        public void TriggerStimulusDisplay();
+        public void EndStimulusDisplay();
     }
 }

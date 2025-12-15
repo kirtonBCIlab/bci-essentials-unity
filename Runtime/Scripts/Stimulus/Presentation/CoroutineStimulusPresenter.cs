@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Selection.Stimulus
+namespace BCIEssentials.Stimulus.Presentation
 {
     public abstract class CoroutineStimulusPresenter : MonoBehaviour, IStimulusPresenter
     {

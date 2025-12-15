@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace BCIEssentials.Selection.Stimulus
+namespace BCIEssentials.Stimulus.Presentation
 {
     public class UnityEventStimulusPresenter : MonoBehaviour, IStimulusPresenter
     {
