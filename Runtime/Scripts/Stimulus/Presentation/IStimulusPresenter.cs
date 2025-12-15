@@ -1,14 +1,10 @@
+using BCIEssentials.Selection;
+using BCIEssentials.Training;
+
 namespace BCIEssentials.Stimulus.Presentation
 {
-    public interface IStimulusPresenter
+    public interface IStimulusPresenter : ISelectable, ITargetable
     {
-        public bool IsSelectable { get; }
-
-        public void Select();
-
-        public void StartTargetIndication();
-        public void EndTargetIndication();
-
         public void TriggerStimulusDisplay();
         public void EndStimulusDisplay();
     }

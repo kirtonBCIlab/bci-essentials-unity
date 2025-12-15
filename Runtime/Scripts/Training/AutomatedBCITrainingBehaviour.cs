@@ -1,5 +1,6 @@
 using System.Collections;
 using BCIEssentials.Behaviours;
+using BCIEssentials.Selection;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace BCIEssentials.Training
         public float RestTime = 1.0f;
 
         [SerializeField]
-        private IBCISelector _selector;
+        private ISelector _selector;
         [SerializeField]
         private CoroutineWrapper _trialBehaviour;
 

@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Behaviours;
+using BCIEssentials.Selection;
 using BCIEssentials.Stimulus.Presentation;
 using BCIEssentials.Training;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    public abstract class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, IBCISelector, IBCITrainingTargetIndicator, ICollection<IStimulusPresenter>
+    public abstract class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<IStimulusPresenter>
     {
         public int OptionCount => _stimulusPresenters.Count;
         [SerializeField]

@@ -10,14 +10,21 @@ namespace BCIEssentials.Training
         public LSLMarkerWriter MarkerWriter { get; set; }
 
         [SerializeField]
-        protected IBCITrainingTargetIndicator TargetIndicator;
+        protected ITrainingTargetIndicator TargetIndicator;
     }
 
 
-    public interface IBCITrainingTargetIndicator
+    public interface ITrainingTargetIndicator
     {
         public int OptionCount { get; }
         public void BeginTargetIndication(int index);
+        public void EndTargetIndication();
+    }
+
+
+    public interface ITargetable
+    {
+        public void StartTargetIndication();
         public void EndTargetIndication();
     }
 }

@@ -50,11 +50,6 @@ namespace BCIEssentials.Behaviours
     }
 
 
-    public interface IBCISelector
-    {
-        public void MakeSelection(int index);
-    }
-
     public interface IBCIMarkerSource
     {
         public LSLMarkerWriter MarkerWriter { set; }
