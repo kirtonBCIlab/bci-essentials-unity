@@ -8,11 +8,10 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    public abstract class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<IStimulusPresenter>
+    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<IStimulusPresenter>
     {
-        public int OptionCount => _stimulusPresenters.Count;
-        [SerializeField]
-        private List<IStimulusPresenter> _stimulusPresenters;
+        public int OptionCount => StimulusPresenters.Count;
+        public List<IStimulusPresenter> StimulusPresenters;
 
         private int? _targetIndex;
 
@@ -51,7 +50,7 @@ namespace BCIEssentials.Stimulus.Collections
                 throw new IndexOutOfRangeException();
             }
 
-            IStimulusPresenter presenter = _stimulusPresenters[index];
+            IStimulusPresenter presenter = StimulusPresenters[index];
             if (presenter == null)
             {
                 Debug.LogWarning("Stimulus presenter is null and can't be selected");
@@ -62,17 +61,17 @@ namespace BCIEssentials.Stimulus.Collections
 
 
         public virtual bool IsReadOnly => false;
-        public int Count => _stimulusPresenters.Count;
-        public void Clear() => _stimulusPresenters.Clear();
+        public int Count => StimulusPresenters.Count;
+        public void Clear() => StimulusPresenters.Clear();
 
         public void Add(IStimulusPresenter presenter)
-        => _stimulusPresenters.Add(presenter);
+        => StimulusPresenters.Add(presenter);
         public bool Remove(IStimulusPresenter presenter)
-        => _stimulusPresenters.Remove(presenter);
+        => StimulusPresenters.Remove(presenter);
         public bool Contains(IStimulusPresenter presenter)
-        => _stimulusPresenters.Contains(presenter);
+        => StimulusPresenters.Contains(presenter);
         public void CopyTo(IStimulusPresenter[] array, int arrayIndex)
-        => _stimulusPresenters.CopyTo(array, arrayIndex);
+        => StimulusPresenters.CopyTo(array, arrayIndex);
 
         public IEnumerator<IStimulusPresenter> GetEnumerator()
         => new StimulusPresenterEnumerator(this);
