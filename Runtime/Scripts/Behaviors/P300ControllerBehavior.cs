@@ -284,7 +284,7 @@ namespace BCIEssentials.ControllerBehaviors
                     && canvasRenderer.IsVisibleFromCanvas(mainCamera))
                     ||
                     (spo.TryGetComponent(out Renderer renderer)
-                    && renderer.IsVisibleFrom(mainCamera))
+                    && renderer.IsVisibleFromCamera(mainCamera))
                 )
                 visibleSPOs.Add(spo);
             }

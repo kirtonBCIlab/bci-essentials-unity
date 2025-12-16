@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
-using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
@@ -29,26 +26,15 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public List<IStimulusPresenter> GetVisiblePresenters()
-        => _stimulusPresenters.Where(p => p switch
-            {
-                Component c => TestGameObjectVisibility(c.gameObject),
-                _ => true
-            }
-        ).ToList();
-        
-        public static bool TestGameObjectVisibility(GameObject gameObject)
-        => (
-            (
-                gameObject.TryGetComponent(out CanvasRenderer canvasRenderer)
-                && canvasRenderer.IsVisibleFromCanvas(Camera.main)
-            )
-        ||
-            (
-                gameObject.TryGetComponent(out Renderer renderer)
-                && renderer.IsVisibleFrom(Camera.main)
-            )
-        );
-        
+        public List<IStimulusPresenter> VisibleStimulusPresenters
+        => GetVisible();
+        public List<IStimulusPresenter> VisibleAndSelectableStimulusPresenters
+        => GetVisibleAndSelectable();
+
+        public List<IStimulusPresenter> GetVisible()
+        => _stimulusPresenters.WhereVisibleFromMainCamera();
+
+        public List<IStimulusPresenter> GetVisibleAndSelectable()
+        => _stimulusPresenters.WhereSelectable().WhereVisibleFromMainCamera();
     }
 }

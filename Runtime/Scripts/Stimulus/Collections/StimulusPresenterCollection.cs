@@ -12,8 +12,6 @@ namespace BCIEssentials.Stimulus.Collections
     public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<IStimulusPresenter>
     {
         public int OptionCount => _stimulusPresenters.Count;
-        public List<IStimulusPresenter> SelectableStimulusPresenters
-        => _stimulusPresenters.Where(p => p.IsSelectable).ToList();
         [SerializeField] protected List<IStimulusPresenter> _stimulusPresenters;
 
         private int? _targetIndex;
@@ -61,6 +59,12 @@ namespace BCIEssentials.Stimulus.Collections
 
             return presenter;
         }
+
+
+        public List<IStimulusPresenter> SelectableStimulusPresenters
+        => GetSelectable();
+        public List<IStimulusPresenter> GetSelectable()
+        => _stimulusPresenters.Where(p => p.IsSelectable).ToList();
 
 
         public virtual bool IsReadOnly => false;

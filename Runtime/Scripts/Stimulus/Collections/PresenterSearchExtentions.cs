@@ -10,6 +10,32 @@ namespace BCIEssentials.Stimulus.Collections
     using static DynamicStimulusPresenterCollection;
     public static class PresenterSearchExtensions
     {
+
+        public static List<IStimulusPresenter> WhereSelectable
+        (
+            this IEnumerable<IStimulusPresenter> caller
+        )
+        => caller.Where(p => p.IsSelectable).ToList();
+
+        public static List<IStimulusPresenter> WhereVisibleFromMainCamera
+        (
+            this IEnumerable<IStimulusPresenter> caller
+        )
+        => caller.WhereVisibleFromCamera(Camera.main);
+
+        public static List<IStimulusPresenter> WhereVisibleFromCamera
+        (
+            this IEnumerable<IStimulusPresenter> caller,
+            Camera camera
+        )
+        => caller.Where(p => p switch
+            {
+                Component c => c.gameObject.HasRendererVisibleFromCamera(camera),
+                _ => true
+            }
+        ).ToList();
+
+
         public static List<IStimulusPresenter> GetSelectablePresentersByType
         (
             this MonoBehaviour caller,
