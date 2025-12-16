@@ -81,27 +81,7 @@ namespace BCIEssentials.Stimulus.Collections
         => _stimulusPresenters.CopyTo(array, arrayIndex);
 
         public IEnumerator<IStimulusPresenter> GetEnumerator()
-        => new StimulusPresenterEnumerator(this);
+        => new StimulusPresenterCollectionEnumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public class StimulusPresenterEnumerator : IEnumerator<IStimulusPresenter>, IEnumerator
-        {
-            private readonly StimulusPresenterCollection _source;
-            private int _cursorIndex = -1;
-
-            public IStimulusPresenter Current => _source[_cursorIndex];
-            object IEnumerator.Current => Current;
-
-            public StimulusPresenterEnumerator(StimulusPresenterCollection collection)
-            => _source = collection;
-
-            public bool MoveNext()
-            {
-                _cursorIndex++;
-                return _cursorIndex < _source.Count;
-            }
-            public void Reset() => _cursorIndex = -1;
-            public void Dispose() { }
-        }
     }
 }
