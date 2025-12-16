@@ -5,8 +5,7 @@ namespace BCIEssentials.Stimulus.Presentation
 {
     public class UnityEventStimulusPresenter : MonoBehaviour, IStimulusPresenter
     {
-        public bool IsSelectable => _selectable;
-        [SerializeField] private bool _selectable;
+        public bool IsSelectable => enabled;
 
         public UnityEvent OnStimulusDisplayTrigged;
         public UnityEvent OnStimulusDisplayEnded;

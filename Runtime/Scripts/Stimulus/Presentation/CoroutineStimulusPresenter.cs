@@ -5,8 +5,7 @@ namespace BCIEssentials.Stimulus.Presentation
 {
     public abstract class CoroutineStimulusPresenter : MonoBehaviour, IStimulusPresenter
     {
-        public bool IsSelectable => _selectable;
-        [SerializeField] private bool _selectable;
+        public bool IsSelectable => enabled;
 
         private Coroutine _stimulusRoutine;
 
