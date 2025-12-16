@@ -1,8 +1,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using BCIEssentials.Stimulus.Presentation;
 using UnityEngine.SceneManagement;
+using BCIEssentials.Stimulus.Presentation;
+using BCIEssentials.Utilities;
 
 namespace BCIEssentials.Stimulus.Collections
 {
@@ -88,44 +89,5 @@ namespace BCIEssentials.Stimulus.Collections
             }
             return selectablePresenters;
         }
-
-
-        public static GameObject[] GetChildObjectsWithTag
-        (
-            this MonoBehaviour caller, string tag
-        )
-        => caller.transform.GetChildObjectsWithTag(tag);
-
-        public static GameObject[] GetChildObjectsWithTag
-        (
-            this Transform caller, string tag
-        )
-        => caller.GetChildrenWithTag(tag).SelectGameObjects();
-
-        public static List<Transform> GetChildrenWithTag
-        (
-            this Transform caller, string tag
-        )
-        {
-            List<Transform> result = new();
-            foreach (Transform child in caller)
-            {
-                if (child.CompareTag(tag)) result.Add(child);
-                result.AddRange(child.GetChildrenWithTag(tag));
-            }
-            return result;
-        }
-
-        private static GameObject[] SelectGameObjects
-        (
-            this IEnumerable<Transform> caller
-        )
-        => caller.Select(t => t.gameObject).ToArray();
-
-        public static List<GameObject> SelectGameObjects
-        (
-            this IEnumerable<Component> caller
-        )
-        => caller.Select(c => c.gameObject).ToList();
     }
 }
