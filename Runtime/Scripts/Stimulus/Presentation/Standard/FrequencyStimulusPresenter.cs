@@ -13,7 +13,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
         Coroutine _stimulusRoutine;
 
 
-        public void TriggerStimulusDisplay()
+        public void StartStimulusDisplay()
         => _stimulusRoutine = StartCoroutine(RunStimulus());
         public void EndStimulusDisplay()
         {

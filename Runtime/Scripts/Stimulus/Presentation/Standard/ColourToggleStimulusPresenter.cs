@@ -4,7 +4,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
     {
         public bool IsSelectable => enabled;
 
-        public void TriggerStimulusDisplay()
+        public void StartStimulusDisplay()
         => SetRendererColour(OnColour);
         public void EndStimulusDisplay()
         => SetRendererColour(OffColour);

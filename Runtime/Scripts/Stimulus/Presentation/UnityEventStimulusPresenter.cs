@@ -16,7 +16,7 @@ namespace BCIEssentials.Stimulus.Presentation
         public UnityEvent OnTargettingEnded;
 
 
-        public void TriggerStimulusDisplay()
+        public void StartStimulusDisplay()
         => OnStimulusDisplayTrigged?.Invoke();
         public void EndStimulusDisplay()
         => OnStimulusDisplayEnded?.Invoke();
