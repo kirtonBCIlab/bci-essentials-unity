@@ -63,7 +63,7 @@ namespace BCIEssentials.Stimulus.Collections
                 _
                     => GetComponentsInScene<IStimulusPresenter>()
             };
-            return presenters.Where(presenter => presenter.IsSelectable).ToList();
+            return presenters.WhereSelectable();
         }
 
         public static T[] GetComponentsInScene<T>
