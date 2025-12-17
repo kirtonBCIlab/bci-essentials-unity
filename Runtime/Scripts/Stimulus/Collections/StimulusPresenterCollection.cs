@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using BCIEssentials.Selection;
 using BCIEssentials.Stimulus.Presentation;
 using BCIEssentials.Training;
@@ -64,7 +63,17 @@ namespace BCIEssentials.Stimulus.Collections
         public List<IStimulusPresenter> SelectableStimulusPresenters
         => GetSelectable();
         public List<IStimulusPresenter> GetSelectable()
-        => _stimulusPresenters.Where(p => p.IsSelectable).ToList();
+        => _stimulusPresenters.WhereSelectable();
+
+        public List<IStimulusPresenter> VisibleStimulusPresenters
+        => GetVisible();
+        public List<IStimulusPresenter> GetVisible()
+        => _stimulusPresenters.WhereVisibleFromMainCamera();
+
+        public List<IStimulusPresenter> VisibleAndSelectableStimulusPresenters
+        => GetVisibleAndSelectable();
+        public List<IStimulusPresenter> GetVisibleAndSelectable()
+        => GetSelectable().WhereVisibleFromMainCamera();
 
 
         public virtual bool IsReadOnly => false;

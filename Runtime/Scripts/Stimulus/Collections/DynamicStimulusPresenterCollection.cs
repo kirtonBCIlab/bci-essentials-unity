@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using BCIEssentials.Stimulus.Presentation;
-
 namespace BCIEssentials.Stimulus.Collections
 {
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
@@ -24,17 +21,5 @@ namespace BCIEssentials.Stimulus.Collections
                 _ => _stimulusPresenters
             };
         }
-
-
-        public List<IStimulusPresenter> VisibleStimulusPresenters
-        => GetVisible();
-        public List<IStimulusPresenter> VisibleAndSelectableStimulusPresenters
-        => GetVisibleAndSelectable();
-
-        public List<IStimulusPresenter> GetVisible()
-        => _stimulusPresenters.WhereVisibleFromMainCamera();
-
-        public List<IStimulusPresenter> GetVisibleAndSelectable()
-        => _stimulusPresenters.WhereSelectable().WhereVisibleFromMainCamera();
     }
 }
