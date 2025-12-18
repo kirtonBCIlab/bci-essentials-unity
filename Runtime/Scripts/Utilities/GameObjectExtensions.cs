@@ -61,8 +61,21 @@ namespace BCIEssentials.Utilities
 
         public static List<GameObject> SelectGameObjects
         (
-            this IEnumerable<Component> caller
+            this IEnumerable<object> caller
         )
-        => caller.Select(c => c.gameObject).ToList();
+        {
+            static GameObject CollapseAndWarn()
+            {
+                Debug.LogWarning("Failed to select GameObject");
+                return null;
+            }
+            return caller.Select(o => o switch
+                {
+                    Component c => c.gameObject,
+                    GameObject g => g,
+                    _ => CollapseAndWarn()
+                }
+            ).ToList();
+        }
     }
 }

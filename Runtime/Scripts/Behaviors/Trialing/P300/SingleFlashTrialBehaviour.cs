@@ -1,0 +1,56 @@
+using System.Collections;
+using System.Collections.Generic;
+using BCIEssentials.Stimulus.Collections;
+using BCIEssentials.Stimulus.Presentation;
+using BCIEssentials.Utilities;
+using UnityEngine;
+
+namespace BCIEssentials.Behaviours.Trialing.P300
+{
+    public class SingleFlashTrialBehaviour : P300TrialBehaviour
+    {
+        protected override IEnumerator Run()
+        {
+            List<IStimulusPresenter> stimulusPresenters = PresenterCollection.GetSelectable();
+            int totalFlashCount = FlashesPerOption * stimulusPresenters.Count;
+
+            int[] stimulusOrder = ArrayUtilities.GenerateRNRA_FisherYates
+            (totalFlashCount, 0, stimulusPresenters.Count - 1);
+
+            foreach (int stimulusIndex in stimulusOrder)
+            {
+                yield return RunSingleFlash(stimulusIndex, stimulusPresenters);
+            }
+        }
+        
+        protected IEnumerator RunSingleFlash
+        (int stimulusIndex, List<IStimulusPresenter> stimulusPresenters)
+        {
+            IStimulusPresenter target = stimulusPresenters[stimulusIndex];
+            target.StartStimulusDisplay();
+            SendSingleFlashMarker(stimulusIndex, stimulusPresenters.Count);
+            yield return new WaitForSeconds(OnTime);
+
+            target.EndStimulusDisplay();
+            yield return new WaitForSeconds(OffTime);
+        }
+
+        protected void SendSingleFlashMarker
+        (int stimulusIndex, int optionCount)
+        {
+            if (MarkerWriter)
+            {
+                if (HasTrainingTarget)
+                {
+                    MarkerWriter.PushSingleFlashP300TrainingMarker
+                    (optionCount, TrainingTarget.Value, stimulusIndex);
+                }
+                else
+                {
+                    MarkerWriter.PushSingleFlashP300ClassificationMarker
+                    (optionCount, stimulusIndex);
+                }
+            }
+        }
+    }
+}
