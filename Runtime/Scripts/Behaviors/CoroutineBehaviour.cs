@@ -1,9 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Utilities
+namespace BCIEssentials.Behaviours
 {
-    public abstract class CoroutineWrapper : MonoBehaviourUsingExtendedAttributes
+    public abstract class CoroutineBehaviour : MonoBehaviourUsingExtendedAttributes
     {
         public bool IsRunning => _routine != null;
         private Coroutine _routine;

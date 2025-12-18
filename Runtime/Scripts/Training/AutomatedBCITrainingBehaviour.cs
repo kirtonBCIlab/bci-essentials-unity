@@ -23,7 +23,7 @@ namespace BCIEssentials.Training
         [SerializeField]
         private ISelector _selector;
         [SerializeField]
-        private CoroutineWrapper _trialBehaviour;
+        private CoroutineBehaviour _trialBehaviour;
 
 
         protected override IEnumerator Run()

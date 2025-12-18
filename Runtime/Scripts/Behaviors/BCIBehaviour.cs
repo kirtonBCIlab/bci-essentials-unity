@@ -14,9 +14,9 @@ namespace BCIEssentials.Behaviours
         public bool IsRunningTraining => _trainingBehaviour.IsRunning;
 
         [SerializeField]
-        private CoroutineWrapper _trialBehaviour;
+        private CoroutineBehaviour _trialBehaviour;
         [SerializeField]
-        private CoroutineWrapper _trainingBehaviour;
+        private CoroutineBehaviour _trainingBehaviour;
 
         protected LSLMarkerWriter MarkerWriter;
         protected LSLResponseProvider ResponseProvider;
