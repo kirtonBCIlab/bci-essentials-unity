@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using BCIEssentials.Stimulus.Presentation;
+
 namespace BCIEssentials.Stimulus.Collections
 {
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
@@ -20,6 +23,18 @@ namespace BCIEssentials.Stimulus.Collections
                 SearchMethod.Tag => this.GetSelectablePresentersByTag(PresenterTag, PopulationScope),
                 _ => _stimulusPresenters
             };
+        }
+
+
+        public override List<IStimulusPresenter> GetSelectable()
+        {
+            if (enabled) Repopulate();
+            return base.GetSelectable();
+        }
+        public override List<IStimulusPresenter> GetVisible()
+        {
+            if (enabled) Repopulate();
+            return base.GetVisible();
         }
     }
 }

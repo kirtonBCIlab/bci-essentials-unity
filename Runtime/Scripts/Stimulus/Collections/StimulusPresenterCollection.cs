@@ -60,19 +60,11 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public List<IStimulusPresenter> SelectableStimulusPresenters
-        => GetSelectable();
-        public List<IStimulusPresenter> GetSelectable()
+        public virtual List<IStimulusPresenter> GetSelectable()
         => _stimulusPresenters.WhereSelectable();
-
-        public List<IStimulusPresenter> VisibleStimulusPresenters
-        => GetVisible();
-        public List<IStimulusPresenter> GetVisible()
+        public virtual List<IStimulusPresenter> GetVisible()
         => _stimulusPresenters.WhereVisibleFromMainCamera();
-
-        public List<IStimulusPresenter> VisibleAndSelectableStimulusPresenters
-        => GetVisibleAndSelectable();
-        public List<IStimulusPresenter> GetVisibleAndSelectable()
+        public virtual List<IStimulusPresenter> GetVisibleAndSelectable()
         => GetSelectable().WhereVisibleFromMainCamera();
 
 
