@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
-using BCIEssentials.Controllers;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.StimulusObjects;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -39,39 +37,6 @@ namespace BCIEssentials.Tests.Utilities
         protected void LogTestName()
         {
             Debug.Log($"<color=green>Test Started: '{CurrentTestName}'</color>");
-        }
-
-        protected static BCIControllerInstance CreateControllerInstance(BCIControllerExtensions.Properties inspectorProperties = null,
-            bool setActive = false)
-        {
-            var gameObject = new GameObject();
-            gameObject.SetActive(false);
-
-            gameObject.AddComponent<LSLMarkerWriter>();
-            gameObject.AddComponent<LSLResponseProvider>().PollingPeriod = 0.02f;
-
-            var controller = gameObject.AddComponent<BCIControllerInstance>();
-            controller.AssignInspectorProperties(inspectorProperties);
-
-            if (setActive)
-            {
-                gameObject.SetActive(true);
-            }
-
-            return controller;
-        }
-
-        protected static SPO AddSPOToScene(string tag = "BCI", bool includeMe = true)
-        {
-            return AddSPOToScene<SPO>(tag, includeMe);
-        }
-
-        protected static T AddSPOToScene<T>(string tag = "BCI", bool includeMe = true) where T : SPO
-        {
-            var spo = new GameObject { tag = string.IsNullOrEmpty(tag) ? "Untagged" : tag }.AddComponent<T>();
-            spo.Selectable = includeMe;
-
-            return spo;
         }
 
         protected IEnumerator LoadEmptySceneAsync()
@@ -139,7 +104,7 @@ namespace BCIEssentials.Tests.Utilities
 
         protected static void StopAllCoroutineRunners()
         {
-            foreach (var runner in Object.FindObjectsOfType<CoroutineRunner>())
+            foreach (var runner in Object.FindObjectsByType<CoroutineRunner>(FindObjectsSortMode.None))
             {
                 if (runner != null)
                 {
