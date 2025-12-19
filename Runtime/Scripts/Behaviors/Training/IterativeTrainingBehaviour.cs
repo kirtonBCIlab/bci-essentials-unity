@@ -1,16 +1,18 @@
 using System.Collections;
+using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
     public class IterativeTrainingBehaviour : AutomatedTrainingBehaviour
     {
+        [Header("Iterative Properties")]
         public int SelectionsBeforeTraining;
         public int SelectionsBetweenTraining;
 
         private int _selectionCounter;
 
 
-        protected override IEnumerator RunRound(int targetIndex)
+        public override IEnumerator RunRound(int targetIndex)
         {
             int iterativeSelectionCount = _selectionCounter - SelectionsBeforeTraining;
             int iterativeSelectionIndex = iterativeSelectionCount % SelectionsBetweenTraining;

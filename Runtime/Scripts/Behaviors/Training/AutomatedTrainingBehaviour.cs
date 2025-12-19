@@ -1,29 +1,12 @@
 using System.Collections;
-using BCIEssentials.Selection;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
-    public class AutomatedTrainingBehaviour : TrainingBehaviour, IBCIMarkerSource
+    public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour, IBCIMarkerSource
     {
         public int SelectionCount = 8;
-        public float TargetIndicationPeriod = 3.0f;
-        public bool PersistTargetIndication = false;
-
-        public float PreTrialTime = 0.5f;
-        public float PostTrialTime = 0.0f;
-
-        public bool SelectTrainingTarget = false;
-        public float TargetSelectionDisplayPeriod = 0.5f;
-
-        public float RestTime = 1.0f;
-
-        [SerializeField]
-        private ISelector _selector;
-        [SerializeField]
-        private CoroutineBehaviour _trialBehaviour;
-
 
         protected override IEnumerator Run()
         {
@@ -38,34 +21,6 @@ namespace BCIEssentials.Behaviours.Training
             }
 
             MarkerWriter.PushTrainingCompleteMarker();
-        }
-
-
-        protected virtual IEnumerator RunRound(int targetIndex)
-        {
-            TargetIndicator.BeginTargetIndication(targetIndex);
-            yield return new WaitForSeconds(TargetIndicationPeriod);
-
-            if (!PersistTargetIndication)
-            {
-                TargetIndicator.EndTargetIndication();
-            }
-
-            yield return new WaitForSeconds(PreTrialTime);
-            _trialBehaviour.Begin();
-            yield return _trialBehaviour.AwaitCompletion();
-            yield return new WaitForSeconds(PostTrialTime);
-
-            if (SelectTrainingTarget && _selector != null)
-            {
-                _selector.MakeSelection(targetIndex);
-                yield return new WaitForSeconds(TargetSelectionDisplayPeriod);
-            }
-
-            if (PersistTargetIndication)
-            {
-                TargetIndicator.EndTargetIndication();
-            }
         }
     }
 }
