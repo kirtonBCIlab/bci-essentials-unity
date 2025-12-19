@@ -1,8 +1,8 @@
 using System.Collections;
 
-namespace BCIEssentials.Training
+namespace BCIEssentials.Behaviours.Training
 {
-    public class IterativeBCITrainingBehaviour : AutomatedBCITrainingBehaviour
+    public class IterativeTrainingBehaviour : AutomatedTrainingBehaviour
     {
         public int SelectionsBeforeTraining;
         public int SelectionsBetweenTraining;

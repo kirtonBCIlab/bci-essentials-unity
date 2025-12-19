@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using BCIEssentials.Behaviours.Training;
 using BCIEssentials.Selection;
 using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Training;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections

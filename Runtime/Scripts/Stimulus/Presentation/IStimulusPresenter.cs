@@ -1,5 +1,5 @@
 using BCIEssentials.Selection;
-using BCIEssentials.Training;
+using BCIEssentials.Behaviours.Training;
 
 namespace BCIEssentials.Stimulus.Presentation
 {

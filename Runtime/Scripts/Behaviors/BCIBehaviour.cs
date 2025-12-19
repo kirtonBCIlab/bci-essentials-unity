@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace BCIEssentials.Behaviours
 {
+    using Trialing;
+    using Training;
     /// <summary>
     /// Base class for any implementation of a BCI paradigm
     /// </summary>
@@ -14,9 +16,9 @@ namespace BCIEssentials.Behaviours
         public bool IsRunningTraining => _trainingBehaviour.IsRunning;
 
         [SerializeField]
-        private CoroutineBehaviour _trialBehaviour;
+        private TrialBehaviour _trialBehaviour;
         [SerializeField]
-        private CoroutineBehaviour _trainingBehaviour;
+        private TrainingBehaviour _trainingBehaviour;
 
         protected LSLMarkerWriter MarkerWriter;
         protected LSLResponseProvider ResponseProvider;

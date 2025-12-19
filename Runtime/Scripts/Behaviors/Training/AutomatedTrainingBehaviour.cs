@@ -1,12 +1,11 @@
 using System.Collections;
-using BCIEssentials.Behaviours;
 using BCIEssentials.Selection;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
-namespace BCIEssentials.Training
+namespace BCIEssentials.Behaviours.Training
 {
-    public class AutomatedBCITrainingBehaviour : BCITrainingBehaviour, IBCIMarkerSource
+    public class AutomatedTrainingBehaviour : TrainingBehaviour, IBCIMarkerSource
     {
         public int SelectionCount = 8;
         public float TargetIndicationPeriod = 3.0f;

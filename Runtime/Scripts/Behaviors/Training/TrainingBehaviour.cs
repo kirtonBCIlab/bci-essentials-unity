@@ -1,10 +1,9 @@
-using BCIEssentials.Behaviours;
 using BCIEssentials.LSLFramework;
 using UnityEngine;
 
-namespace BCIEssentials.Training
+namespace BCIEssentials.Behaviours.Training
 {
-    public abstract class BCITrainingBehaviour : CoroutineBehaviour, IBCIMarkerSource
+    public abstract class TrainingBehaviour : CoroutineBehaviour, IBCIMarkerSource
     {
         public LSLMarkerWriter MarkerWriter { get; set; }
 
