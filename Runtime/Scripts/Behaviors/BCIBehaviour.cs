@@ -47,6 +47,8 @@ namespace BCIEssentials.Behaviours
         public void StartTraining() => _trainingBehaviour.Begin();
         public void InterruptTraining() => _trainingBehaviour.Interrupt();
 
+        public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
+
 
         protected abstract void MakeSelection(int index);
     }
