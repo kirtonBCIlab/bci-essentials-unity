@@ -23,9 +23,9 @@ namespace BCIEssentials.Behaviours.Trialing.P300
             int totalColumnFlashes = FlashesPerOption * Columns;
             int totalRowFlashes = FlashesPerOption * Rows;
 
-            int[] columnStimulusOrder = ArrayUtilities.GenerateRNRA_FisherYates
+            int[] columnStimulusOrder = RNRAUtilities.GenerateRNRA_FisherYates
             (totalColumnFlashes, 0, Columns - 1);
-            int[] rowStimulusOrder = ArrayUtilities.GenerateRNRA_FisherYates
+            int[] rowStimulusOrder = RNRAUtilities.GenerateRNRA_FisherYates
             (totalRowFlashes, 0, Rows - 1);
 
             List<IStimulusPresenter> selectablePresenters = PresenterCollection.GetSelectable();

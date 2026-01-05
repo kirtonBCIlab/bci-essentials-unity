@@ -119,7 +119,7 @@ namespace BCIEssentials.Utilities
         public static int[,] SubsetToRandomMatrix(int[] subset)
         {
             // Debug.Log("Original Subset" + string.Join(",",subset));
-            int[] permutationArray = ArrayUtilities.GenerateRNRA_FisherYates(subset.Length,0,subset.Length-1);
+            int[] permutationArray = RNRAUtilities.GenerateRNRA_FisherYates(subset.Length,0,subset.Length-1);
             int[] subsetPermutated = new int[subset.Length];
             //Apply the permutation to the subset
             for (int i = 0; i < subset.Length; i++)

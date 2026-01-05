@@ -10,7 +10,7 @@ namespace BCIEssentials.Behaviours.Training
 
         protected override IEnumerator Run()
         {
-            int[] trainArray = ArrayUtilities.GenerateRNRA_FisherYates(
+            int[] trainArray = RNRAUtilities.GenerateRNRA_FisherYates(
                 SelectionCount, 0, TargetIndicator.OptionCount
             );
 

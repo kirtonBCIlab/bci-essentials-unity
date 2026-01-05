@@ -14,7 +14,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
             List<IStimulusPresenter> stimulusPresenters = PresenterCollection.GetSelectable();
             int totalFlashCount = FlashesPerOption * stimulusPresenters.Count;
 
-            int[] stimulusOrder = ArrayUtilities.GenerateRNRA_FisherYates
+            int[] stimulusOrder = RNRAUtilities.GenerateRNRA_FisherYates
             (totalFlashCount, 0, stimulusPresenters.Count - 1);
 
             foreach (int stimulusIndex in stimulusOrder)
