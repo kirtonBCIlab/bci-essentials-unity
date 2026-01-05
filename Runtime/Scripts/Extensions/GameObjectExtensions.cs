@@ -2,7 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Utilities
+namespace BCIEssentials.Extensions
 {
     public static class GameObjectExtensions
     {

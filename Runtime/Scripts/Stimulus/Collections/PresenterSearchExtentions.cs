@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using BCIEssentials.Extensions;
 using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
 
 namespace BCIEssentials.Stimulus.Collections
 {

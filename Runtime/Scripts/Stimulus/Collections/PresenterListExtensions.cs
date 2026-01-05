@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using BCIEssentials.Extensions;
 using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections

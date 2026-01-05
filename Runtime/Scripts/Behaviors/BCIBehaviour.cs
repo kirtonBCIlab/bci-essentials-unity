@@ -1,6 +1,6 @@
 using System;
+using BCIEssentials.Extensions;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using BCIEssentials.Extensions;
 using UnityEngine;
 
 namespace BCIEssentials.Utilities

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using BCIEssentials.Extensions;
 using BCIEssentials.Stimulus.Presentation;
 using BCIEssentials.Utilities;
 

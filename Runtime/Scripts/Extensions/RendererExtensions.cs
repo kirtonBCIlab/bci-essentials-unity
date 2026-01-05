@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BCIEssentials.Utilities
+namespace BCIEssentials.Extensions
 {
     public static class RendererExtensions
     {
