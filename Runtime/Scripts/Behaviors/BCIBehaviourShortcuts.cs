@@ -10,8 +10,8 @@ namespace BCIEssentials.Behaviours
     [RequireComponent(typeof(BCIBehaviour))]
     public class BCIBehaviourShortcuts: MonoBehaviourUsingExtendedAttributes
     {
-        public KeyBind StartTrialBinding;
-        public KeyBind StartTrainingBinding;
+        public KeyBind ToggleTrialRunBinding;
+        public KeyBind ToggleTrainingRunBinding;
         public KeyBind UpdateClassifierBinding;
 
         [SerializeField, Space]
@@ -20,8 +20,8 @@ namespace BCIEssentials.Behaviours
 
         private void Reset()
         {
-            StartTrialBinding = KeyCode.S;
-            StartTrainingBinding = KeyCode.T;
+            ToggleTrialRunBinding = KeyCode.S;
+            ToggleTrainingRunBinding = KeyCode.T;
             UpdateClassifierBinding = KeyCode.Backspace;
 
             if (_target == null) _target = GetComponent<BCIBehaviour>();
@@ -30,8 +30,8 @@ namespace BCIEssentials.Behaviours
         protected virtual void Update()
         => ProcessShortcuts(
             new (KeyBind, Action)[] {
-                (StartTrialBinding, _target.StartTrial),
-                (StartTrainingBinding, _target.StartTraining),
+                (ToggleTrialRunBinding, ToggleTrialRun),
+                (ToggleTrainingRunBinding, ToggleTrainingRun),
                 (UpdateClassifierBinding, _target.UpdateClassifier)
             }
         );
@@ -42,6 +42,19 @@ namespace BCIEssentials.Behaviours
         {
             foreach ((KeyBind keyBind, Action method) in shortcuts)
                 if (keyBind.WasPressedThisFrame) method();
+        }
+
+
+        private void ToggleTrialRun()
+        {
+            if (!_target.IsRunningTrial) _target.StartTrial();
+            else _target.InterruptTrial();
+        }
+
+        private void ToggleTrainingRun()
+        {
+            if (!_target.IsRunningTraining) _target.StartTraining();
+            else _target.InterruptTraining();
         }
     }
 }

@@ -8,13 +8,13 @@ namespace BCIEssentials.Selection
     /// <summary>
     /// Implements editable keyboard shortcuts to test BCI selection
     /// </summary>
-    [RequireComponent(typeof(ISelector))]
+    [RequireComponent(typeof(TrialBehaviour))]
     public class SelectorShortcuts : MonoBehaviourUsingExtendedAttributes
     {
         public IndexedKeyBindSet Bindings;
 
+        [SerializeField] private ISelector _target;
         [SerializeField] private TrialBehaviour _trialBehaviour;
-        private ISelector _target;
 
 
         private void Reset()
@@ -32,7 +32,10 @@ namespace BCIEssentials.Selection
             {
                 _trialBehaviour = GetComponent<TrialBehaviour>();
             }
-            _target ??= GetComponent<ISelector>();
+            if (_target == null && TryGetComponent(out ISelector selector))
+            {
+                _target = selector;
+            }
         }
 
         protected virtual void Update()
