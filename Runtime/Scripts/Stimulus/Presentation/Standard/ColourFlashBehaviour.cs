@@ -5,6 +5,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
 {
     public abstract class ColourFlashBehaviour: MonoBehaviourUsingExtendedAttributes
     {
+        public bool IsFlashing { get; private set; }
         [SerializeField]
         private Renderer _renderer;
 
@@ -37,7 +38,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
                 Debug.LogWarning($"No material assigned to renderer component on {gameObject.name}.");
             }
 
-            SetRendererColour(OffColour);
+            SetColour(OffColour);
         }
 
 
@@ -71,16 +72,19 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
         => StartCoroutine(RunFlashes(period, count));
         protected virtual IEnumerator RunFlashes(float period, int count)
         {
+            IsFlashing = true;
             for (int i = 0; i < count; i++)
             {
-                SetRendererColour(OnColour);
+                SetColour(OnColour);
                 yield return new WaitForSecondsRealtime(period);
-                SetRendererColour(OffColour);
+                SetColour(OffColour);
                 yield return new WaitForSecondsRealtime(period);
             }
+            IsFlashing = false;
         }
-        
-        public virtual void SetRendererColour(Color colour)
+
+        public virtual void SetColour(Color colour) => SetRendererColour(colour);
+        protected void SetRendererColour(Color colour)
         {
             if (_renderer && _renderer.material)
             {
