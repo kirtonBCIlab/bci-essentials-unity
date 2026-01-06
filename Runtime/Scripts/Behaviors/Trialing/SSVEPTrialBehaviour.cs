@@ -7,8 +7,9 @@ namespace BCIEssentials.Behaviours.Trialing
 {
     public class SSVEPTrialBehaviour : ContinualTrialBehaviour
     {
-        public List<FrequencyStimulusPresenter> Presenters;
+        [Space]
         public int TargetFrameRate = 30;
+        public List<FrequencyStimulusPresenter> Presenters;
         private float[] _calculatedFrequencies;
 
 

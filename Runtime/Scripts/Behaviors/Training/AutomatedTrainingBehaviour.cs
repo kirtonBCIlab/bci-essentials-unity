@@ -6,6 +6,7 @@ namespace BCIEssentials.Behaviours.Training
 {
     public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour, IBCIMarkerSource
     {
+        [Space]
         public int SelectionCount = 8;
 
         protected override IEnumerator Run()
