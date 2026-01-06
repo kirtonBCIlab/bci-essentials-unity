@@ -32,9 +32,9 @@ namespace BCIEssentials.Selection
             {
                 _trialBehaviour = GetComponent<TrialBehaviour>();
             }
-            if (_target == null && TryGetComponent(out ISelector selector))
+            if (_target == null)
             {
-                _target = selector;
+                _target = GetComponentInChildren<ISelector>();
             }
         }
 
@@ -43,17 +43,38 @@ namespace BCIEssentials.Selection
 
         private void MakeSelectionAtEndOfRun(int selectionIndex)
         {
+            if (!VerifyTargetReference()) return;
+
             if (_trialBehaviour)
             {
                 StartCoroutine(RunTrialDelayedSelection(selectionIndex));
             }
-            else Debug.Log("Missing reference to Trial Behaviour");
+            else Debug.LogWarning("Missing reference to Trial Behaviour");
         }
 
         private IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
             yield return _trialBehaviour.AwaitCompletion();
             _target.MakeSelection(selectionIndex);
+        }
+
+
+        private bool VerifyTargetReference()
+        {
+            if (_target == null)
+            {
+                ISelector result = GetComponentInChildren<ISelector>();
+                if (result != null)
+                {
+                    _target = result;
+                }
+                else
+                {
+                    Debug.LogWarning("Missing Selector component");
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

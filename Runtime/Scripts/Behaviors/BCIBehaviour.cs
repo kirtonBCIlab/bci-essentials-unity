@@ -28,7 +28,8 @@ namespace BCIEssentials.Behaviours
 
         /// <summary>
         /// Create or fetch reference to required LSL components,
-        /// connecting any marker sources or selectors found on the same object
+        /// connecting any marker sources or selectors
+        /// found on the host object or it's children
         /// </summary>
         protected void Initialize()
         {
@@ -36,11 +37,11 @@ namespace BCIEssentials.Behaviours
             gameObject.GetOrAddComponent(ref ResponseProvider);
 
             Array.ForEach(
-                GetComponents<IBCIMarkerSource>(),
+                GetComponentsInChildren<IBCIMarkerSource>(),
                 source => source.MarkerWriter = MarkerWriter
             );
             Array.ForEach(
-                GetComponents<ISelector>(),
+                GetComponentsInChildren<ISelector>(),
                 selector => ResponseProvider.SubscribePredictions(
                     prediction => selector.MakeSelection(prediction.Value)
                 )
