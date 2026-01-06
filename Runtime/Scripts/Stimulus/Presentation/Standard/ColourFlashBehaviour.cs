@@ -80,7 +80,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
             }
         }
         
-        public void SetRendererColour(Color colour)
+        public virtual void SetRendererColour(Color colour)
         {
             if (_renderer && _renderer.material)
             {

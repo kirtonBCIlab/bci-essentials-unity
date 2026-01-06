@@ -6,15 +6,20 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
     public abstract class FrequencyStimulusPresenter : ColourFlashBehaviour, IStimulusPresenter
     {
         public bool IsSelectable => enabled;
-
-        public Color OnColor = Color.white;
-        public Color OffColor = Color.clear;
-
+        public bool IsFlashing => _stimulusRoutine != null;
         Coroutine _stimulusRoutine;
 
 
+        public virtual void Select()
+        => StartSelectionIndication();
+
+
         public void StartStimulusDisplay()
-        => _stimulusRoutine = StartCoroutine(RunStimulus());
+        {
+            SetUpStimulusDisplay();
+            _stimulusRoutine = StartCoroutine(RunStimulus());
+        }
+
         public void EndStimulusDisplay()
         {
             if (_stimulusRoutine != null)
@@ -22,22 +27,23 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
                 StopCoroutine(_stimulusRoutine);
             }
             else Debug.LogWarning("Can't end a stimulus routine that isn't running");
+
+            CleanUpStimulusDisplay();
         }
 
         protected IEnumerator RunStimulus()
         {
             while (true)
             {
-                SetRendererColour(OnColor);
+                SetRendererColour(OnColour);
                 yield return RunDutyCycleDelay(true);
-                SetRendererColour(OffColor);
+                SetRendererColour(OffColour);
                 yield return RunDutyCycleDelay(false);
             }
         }
 
         protected abstract IEnumerator RunDutyCycleDelay(bool on);
-
-        public virtual void Select()
-        => StartSelectionIndication();
+        protected virtual void SetUpStimulusDisplay() { }
+        protected virtual void CleanUpStimulusDisplay() { }
     }
 }

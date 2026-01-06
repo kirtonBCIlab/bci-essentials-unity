@@ -5,6 +5,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
 {
     public class FrameCycleFrequencyStimulusPresenter : FrequencyStimulusPresenter
     {
+        [Space]
         public int FramesOn = 1;
         public int FramesOff = 1;
 

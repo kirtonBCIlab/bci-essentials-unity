@@ -5,15 +5,19 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
 {
     public class TimeCycleFrequencyStimulusPresenter : FrequencyStimulusPresenter
     {
-        public float Frequency
-        {
-            get => _frequency;
-            set => _dutyCycleDelay = 0.5f / (_frequency = value);
-        }
-        private float _frequency = 8;
+        [Space]
+        public float Frequency = 8;
+
         private float _dutyCycleDelay = 0.5f / 8;
         private float _frameDebt;
 
+
+        public void SetFrequency(float value)
+        => UpdateDutyCycleDelay(Frequency = value);
+
+
+        protected override void SetUpStimulusDisplay()
+        => UpdateDutyCycleDelay(Frequency);
 
         protected override IEnumerator RunDutyCycleDelay(bool _)
         {
@@ -33,5 +37,8 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
 
         private float GetCurrentTimestamp()
         => System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000f;
+
+        private void UpdateDutyCycleDelay(float frequency)
+        => _dutyCycleDelay = 0.5f / frequency;
     }
 }
