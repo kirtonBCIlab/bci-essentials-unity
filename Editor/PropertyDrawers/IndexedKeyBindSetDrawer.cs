@@ -16,9 +16,9 @@ namespace BCIEssentials.Editor
         static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
 
         static readonly GUIContent AddButtonContent
-        = new (EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
+        = new (EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
         static readonly GUIContent RemoveButtonContent
-        = new (EditorGUIUtility.IconContent("d_winbtn_win_close@2x"));
+        = new (EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
 
         static readonly GUIStyle FoldoutHeaderStyle
         = new (EditorStyles.foldoutHeader)
