@@ -7,10 +7,12 @@ namespace BCIEssentials.Behaviours
 {
     using Trialing;
     using Training;
+    using BCIEssentials.Selection;
+
     /// <summary>
-    /// Base class for any implementation of a BCI paradigm
+    /// Behaviour skeleton for implementation of a BCI paradigm
     /// </summary>
-    public abstract class BCIBehaviour : MonoBehaviourUsingExtendedAttributes
+    public class BCIBehaviour : MonoBehaviourUsingExtendedAttributes
     {
         public bool IsRunningTrial => _trialBehaviour.IsRunning;
         public bool IsRunningTraining => _trainingBehaviour.IsRunning;
@@ -24,19 +26,24 @@ namespace BCIEssentials.Behaviours
         protected LSLResponseProvider ResponseProvider;
 
 
+        /// <summary>
+        /// Create or fetch reference to required LSL components,
+        /// connecting any marker sources or selectors found on the same object
+        /// </summary>
         protected void Initialize()
         {
             gameObject.GetOrAddComponent(ref MarkerWriter);
             gameObject.GetOrAddComponent(ref ResponseProvider);
-            ResponseProvider.SubscribePredictions(prediction => MakeSelection(prediction.Value));
 
             Array.ForEach(
                 GetComponents<IBCIMarkerSource>(),
                 source => source.MarkerWriter = MarkerWriter
             );
             Array.ForEach(
-                GetComponents<IBCIResponseListener>(),
-                listener => listener.ResponseProvider = ResponseProvider
+                GetComponents<ISelector>(),
+                selector => ResponseProvider.SubscribePredictions(
+                    prediction => selector.MakeSelection(prediction.Value)
+                )
             );
         }
 
@@ -48,19 +55,11 @@ namespace BCIEssentials.Behaviours
         public void InterruptTraining() => _trainingBehaviour.Interrupt();
 
         public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
-
-
-        protected abstract void MakeSelection(int index);
     }
 
 
     public interface IBCIMarkerSource
     {
         public LSLMarkerWriter MarkerWriter { set; }
-    }
-
-    public interface IBCIResponseListener
-    {
-        public LSLResponseProvider ResponseProvider { set; }
     }
 }
