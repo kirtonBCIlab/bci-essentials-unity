@@ -19,7 +19,7 @@ namespace BCIEssentials.Behaviours
 
             SetUp();
             _routine = StartCoroutine(Run());
-            CleanUp();
+            StartCoroutine(RunCleanupAfterCompletion());
         }
 
         public void Interrupt()
@@ -31,7 +31,6 @@ namespace BCIEssentials.Behaviours
             }
 
             StopCoroutine(_routine);
-            CleanUp();
         }
 
         protected virtual void SetUp() { }
@@ -43,6 +42,12 @@ namespace BCIEssentials.Behaviours
         public IEnumerator AwaitCompletion()
         {
             while (IsRunning) yield return null;
+        }
+
+        private IEnumerator RunCleanupAfterCompletion()
+        {
+            yield return AwaitCompletion();
+            CleanUp();
         }
     }
 }
