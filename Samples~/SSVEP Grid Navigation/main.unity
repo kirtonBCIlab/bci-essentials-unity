@@ -546,6 +546,7 @@ GameObject:
   m_Component:
   - component: {fileID: 471476622}
   - component: {fileID: 471476623}
+  - component: {fileID: 471476624}
   m_Layer: 0
   m_Name: Stimulus Presenters
   m_TagString: Untagged
@@ -589,6 +590,30 @@ MonoBehaviour:
   - {fileID: 1281457874}
   - {fileID: 57354924}
   - {fileID: 214308366}
+--- !u!114 &471476624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 471476621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a282f9ac1c238ce469305817bc2f7e1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Bindings:
+    Bindings:
+    - BoundKey: 260
+      Index: 0
+    - BoundKey: 262
+      Index: 1
+    - BoundKey: 259
+      Index: 2
+    - BoundKey: 257
+      Index: 3
+  _target: {fileID: 471476623}
+  _trialBehaviour: {fileID: 584918807}
 --- !u!1 &584918805
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,7 +627,6 @@ GameObject:
   - component: {fileID: 584918807}
   - component: {fileID: 584918806}
   - component: {fileID: 584918810}
-  - component: {fileID: 584918811}
   m_Layer: 0
   m_Name: BCI
   m_TagString: Untagged
@@ -622,6 +646,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf249683faf91e4fb308c079bb5a6f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _targetIndicationBehaviour: {fileID: 471476623}
   _trialBehaviour: {fileID: 584918807}
   TargetIndex: 0
   TargetIndicationPeriod: 3
@@ -688,29 +713,6 @@ MonoBehaviour:
   UpdateClassifierBinding:
     BoundKey: 8
   _target: {fileID: 584918812}
---- !u!114 &584918811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584918805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a282f9ac1c238ce469305817bc2f7e1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Bindings:
-    Bindings:
-    - BoundKey: 260
-      Index: 0
-    - BoundKey: 262
-      Index: 1
-    - BoundKey: 259
-      Index: 2
-    - BoundKey: 257
-      Index: 3
-  _trialBehaviour: {fileID: 584918807}
 --- !u!114 &584918812
 MonoBehaviour:
   m_ObjectHideFlags: 0
