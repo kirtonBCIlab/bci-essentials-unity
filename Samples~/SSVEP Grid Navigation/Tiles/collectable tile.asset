@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: collectable tile
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: 3286163911610860551, guid: 8911aeafef05659458e7fb392d76474d, type: 3}
-  m_DefaultGameObject: {fileID: 0}
-  m_DefaultColliderType: 1
+  m_DefaultGameObject: {fileID: 3294786538365527529, guid: e9693958e97065e49b197ab4c3caf381, type: 3}
+  m_DefaultColliderType: 0
   m_TilingRules: []
