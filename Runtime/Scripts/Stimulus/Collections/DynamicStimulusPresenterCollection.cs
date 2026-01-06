@@ -26,12 +26,12 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public override List<IStimulusPresenter> GetSelectable()
+        public override List<StimulusPresentationBehaviour> GetSelectable()
         {
             if (enabled) Repopulate();
             return base.GetSelectable();
         }
-        public override List<IStimulusPresenter> GetVisible()
+        public override List<StimulusPresentationBehaviour> GetVisible()
         {
             if (enabled) Repopulate();
             return base.GetVisible();

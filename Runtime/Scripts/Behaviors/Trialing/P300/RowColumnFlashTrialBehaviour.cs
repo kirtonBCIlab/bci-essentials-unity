@@ -28,7 +28,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
             int[] rowStimulusOrder = RNRAUtilities.GenerateRNRA_FisherYates
             (totalRowFlashes, 0, Rows - 1);
 
-            List<IStimulusPresenter> selectablePresenters = PresenterCollection.GetSelectable();
+            List<StimulusPresentationBehaviour> selectablePresenters = PresenterCollection.GetSelectable();
 
             for (int i = 0; i < totalColumnFlashes; i++)
             {

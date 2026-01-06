@@ -1,14 +1,24 @@
+using UnityEngine;
+
 namespace BCIEssentials.Stimulus.Presentation.Standard
 {
-    public class ColourToggleStimulusPresenter : ColourFlashBehaviour, IStimulusPresenter
+    public class ColourToggleStimulusPresenter : StimulusPresentationBehaviour
     {
-        public bool IsSelectable => enabled;
+        [SerializeField] protected ColourFlashBehaviour _colourFlashBehaviour;
 
-        public void StartStimulusDisplay()
-        => SetRendererColour(OnColour);
-        public void EndStimulusDisplay()
-        => SetRendererColour(OffColour);
+        public override void StartStimulusDisplay() => ToggleRendererColour(true);
+        public override void EndStimulusDisplay() => ToggleRendererColour(false);
 
-        public void Select() => StartSelectionIndication();
+        public override void Select() => _colourFlashBehaviour.StartSelectionIndication();
+
+        public override void StartTargetIndication() => _colourFlashBehaviour.StartTargetIndication();
+        public override void EndTargetIndication() => _colourFlashBehaviour.EndTargetIndication();
+
+
+        public void ToggleRendererColour(bool value)
+        => _colourFlashBehaviour.SetColour(
+            value ? _colourFlashBehaviour.OnColour
+            : _colourFlashBehaviour.OffColour
+        );
     }
 }

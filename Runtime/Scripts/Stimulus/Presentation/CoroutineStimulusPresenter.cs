@@ -3,18 +3,17 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Presentation
 {
-    public abstract class CoroutineStimulusPresenter : MonoBehaviour, IStimulusPresenter
+    public abstract class CoroutineStimulusPresenter : StimulusPresentationBehaviour
     {
-        public bool IsSelectable => enabled;
 
         private Coroutine _stimulusRoutine;
 
 
-        public void StartStimulusDisplay()
+        public override void StartStimulusDisplay()
         {
             _stimulusRoutine = StartCoroutine(RunStimulusDisplay());
         }
-        public void EndStimulusDisplay()
+        public override void EndStimulusDisplay()
         {
             StopCoroutine(_stimulusRoutine);
             StartCoroutine(RunStimulusCleanup());
@@ -24,14 +23,14 @@ namespace BCIEssentials.Stimulus.Presentation
         protected abstract IEnumerator RunStimulusCleanup();
 
 
-        public void Select()
+        public override void Select()
         => StartCoroutine(RunSelection());
         protected abstract IEnumerator RunSelection();
 
-        public void StartTargetIndication()
+        public override void StartTargetIndication()
         => StartCoroutine(RunTargetIndication());
         protected abstract IEnumerator RunTargetIndication();
-        public void EndTargetIndication()
+        public override void EndTargetIndication()
         => StartCoroutine(RunTargetIndicationCleanup());
         protected abstract IEnumerator RunTargetIndicationCleanup();
     }

@@ -3,24 +3,19 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Presentation.Standard
 {
-    public abstract class FrequencyStimulusPresenter : ColourFlashBehaviour, IStimulusPresenter
+    public abstract class FrequencyStimulusPresenter : ColourToggleStimulusPresenter
     {
-        public bool IsSelectable => enabled;
         public bool IsFlashing => _stimulusRoutine != null;
         Coroutine _stimulusRoutine;
 
 
-        public virtual void Select()
-        => StartSelectionIndication();
-
-
-        public void StartStimulusDisplay()
+        public override void StartStimulusDisplay()
         {
             SetUpStimulusDisplay();
             _stimulusRoutine = StartCoroutine(RunStimulus());
         }
 
-        public void EndStimulusDisplay()
+        public override void EndStimulusDisplay()
         {
             if (_stimulusRoutine != null)
             {
@@ -35,9 +30,9 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
         {
             while (true)
             {
-                SetRendererColour(OnColour);
+                ToggleRendererColour(true);
                 yield return RunDutyCycleDelay(true);
-                SetRendererColour(OffColour);
+                ToggleRendererColour(false);
                 yield return RunDutyCycleDelay(false);
             }
         }

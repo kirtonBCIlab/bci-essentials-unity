@@ -10,10 +10,10 @@ namespace BCIEssentials.Behaviours.Trialing.P300
     public abstract class MultiFlashTrialBehaviour : P300TrialBehaviour
     {
         protected IEnumerator RunMultiFlash
-        (int[] stimulusIndices, List<IStimulusPresenter> stimulusPresenters)
+        (int[] stimulusIndices, List<StimulusPresentationBehaviour> stimulusPresenters)
         {
             int presenterCount = stimulusPresenters.Count;
-            List<IStimulusPresenter> activatedPresenters
+            List<StimulusPresentationBehaviour> activatedPresenters
             = stimulusIndices.Select(i => stimulusPresenters[i]).ToList();
 
             activatedPresenters.StartStimulusDisplay();

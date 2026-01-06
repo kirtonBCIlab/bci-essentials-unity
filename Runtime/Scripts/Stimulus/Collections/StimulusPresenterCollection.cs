@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<IStimulusPresenter>
+    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<StimulusPresentationBehaviour>
     {
         public int OptionCount => _stimulusPresenters.Count;
-        [SerializeField] protected List<IStimulusPresenter> _stimulusPresenters;
+        [SerializeField] protected List<StimulusPresentationBehaviour> _stimulusPresenters;
 
         private int? _targetIndex;
 
@@ -36,8 +36,8 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public IStimulusPresenter this[int index] => GetPresenter(index);
-        protected virtual IStimulusPresenter GetPresenter(int index)
+        public StimulusPresentationBehaviour this[int index] => GetPresenter(index);
+        protected virtual StimulusPresentationBehaviour GetPresenter(int index)
         {
             if (OptionCount == 0)
             {
@@ -50,7 +50,7 @@ namespace BCIEssentials.Stimulus.Collections
                 throw new IndexOutOfRangeException();
             }
 
-            IStimulusPresenter presenter = _stimulusPresenters[index];
+            StimulusPresentationBehaviour presenter = _stimulusPresenters[index];
             if (presenter == null)
             {
                 Debug.LogWarning("Stimulus presenter is null and can't be selected");
@@ -60,11 +60,11 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public virtual List<IStimulusPresenter> GetSelectable()
+        public virtual List<StimulusPresentationBehaviour> GetSelectable()
         => _stimulusPresenters.WhereSelectable();
-        public virtual List<IStimulusPresenter> GetVisible()
+        public virtual List<StimulusPresentationBehaviour> GetVisible()
         => _stimulusPresenters.WhereVisibleFromMainCamera();
-        public virtual List<IStimulusPresenter> GetVisibleAndSelectable()
+        public virtual List<StimulusPresentationBehaviour> GetVisibleAndSelectable()
         => GetSelectable().WhereVisibleFromMainCamera();
 
 
@@ -72,16 +72,16 @@ namespace BCIEssentials.Stimulus.Collections
         public int Count => _stimulusPresenters.Count;
         public void Clear() => _stimulusPresenters.Clear();
 
-        public void Add(IStimulusPresenter presenter)
+        public void Add(StimulusPresentationBehaviour presenter)
         => _stimulusPresenters.Add(presenter);
-        public bool Remove(IStimulusPresenter presenter)
+        public bool Remove(StimulusPresentationBehaviour presenter)
         => _stimulusPresenters.Remove(presenter);
-        public bool Contains(IStimulusPresenter presenter)
+        public bool Contains(StimulusPresentationBehaviour presenter)
         => _stimulusPresenters.Contains(presenter);
-        public void CopyTo(IStimulusPresenter[] array, int arrayIndex)
+        public void CopyTo(StimulusPresentationBehaviour[] array, int arrayIndex)
         => _stimulusPresenters.CopyTo(array, arrayIndex);
 
-        public IEnumerator<IStimulusPresenter> GetEnumerator()
+        public IEnumerator<StimulusPresentationBehaviour> GetEnumerator()
         => new StimulusPresenterCollectionEnumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

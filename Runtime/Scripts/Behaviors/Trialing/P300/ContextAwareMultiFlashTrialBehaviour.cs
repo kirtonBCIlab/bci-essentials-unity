@@ -14,7 +14,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
         {
             for (int i = 0; i < FlashesPerOption; i++)
             {
-                List<IStimulusPresenter> visiblePresenters = PresenterCollection.GetVisibleAndSelectable();
+                List<StimulusPresentationBehaviour> visiblePresenters = PresenterCollection.GetVisibleAndSelectable();
 
                 IEnumerator RunMultiFlashOnVisiblePresenters(int[] stimulusIndices)
                 => RunMultiFlash(stimulusIndices, visiblePresenters);

@@ -8,16 +8,16 @@ namespace BCIEssentials.Stimulus.Collections
 {
     public static class PresenterListExtensions
     {
-        public static List<IStimulusPresenter> WhereSelectable
-        (this IEnumerable<IStimulusPresenter> caller)
+        public static List<StimulusPresentationBehaviour> WhereSelectable
+        (this IEnumerable<StimulusPresentationBehaviour> caller)
         => caller.Where(p => p.IsSelectable).ToList();
 
-        public static List<IStimulusPresenter> WhereVisibleFromMainCamera
-        (this IEnumerable<IStimulusPresenter> caller)
+        public static List<StimulusPresentationBehaviour> WhereVisibleFromMainCamera
+        (this IEnumerable<StimulusPresentationBehaviour> caller)
         => caller.WhereVisibleFromCamera(Camera.main);
 
-        public static List<IStimulusPresenter> WhereVisibleFromCamera
-        (this IEnumerable<IStimulusPresenter> caller, Camera camera)
+        public static List<StimulusPresentationBehaviour> WhereVisibleFromCamera
+        (this IEnumerable<StimulusPresentationBehaviour> caller, Camera camera)
         => caller.Where(p => p switch
             {
                 Component c => c.gameObject.HasRendererVisibleFromCamera(camera),
@@ -27,10 +27,10 @@ namespace BCIEssentials.Stimulus.Collections
 
 
         public static void StartStimulusDisplay
-        (this IEnumerable<IStimulusPresenter> caller)
+        (this IEnumerable<StimulusPresentationBehaviour> caller)
         => caller.ToList().ForEach(p => p.StartStimulusDisplay());
         public static void EndStimulusDisplay
-        (this IEnumerable<IStimulusPresenter> caller)
+        (this IEnumerable<StimulusPresentationBehaviour> caller)
         => caller.ToList().ForEach(p => p.EndStimulusDisplay());
     }
 }

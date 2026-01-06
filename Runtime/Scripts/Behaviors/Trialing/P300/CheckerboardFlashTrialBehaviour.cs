@@ -10,7 +10,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
     {
         protected override IEnumerator Run()
         {
-            List<IStimulusPresenter> selectablePresenters = PresenterCollection.GetSelectable();
+            List<StimulusPresentationBehaviour> selectablePresenters = PresenterCollection.GetSelectable();
 
             IEnumerator RunMultiFlashOnSelectablePresenters(int[] stimulusIndices)
             => RunMultiFlash(stimulusIndices, selectablePresenters);

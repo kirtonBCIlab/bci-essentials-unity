@@ -1,12 +1,9 @@
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace BCIEssentials.Stimulus.Presentation
 {
-    public class UnityEventStimulusPresenter : MonoBehaviour, IStimulusPresenter
+    public class UnityEventStimulusPresenter : StimulusPresentationBehaviour
     {
-        public bool IsSelectable => enabled;
-
         public UnityEvent OnStimulusDisplayTrigged;
         public UnityEvent OnStimulusDisplayEnded;
 
@@ -16,17 +13,17 @@ namespace BCIEssentials.Stimulus.Presentation
         public UnityEvent OnTargettingEnded;
 
 
-        public void StartStimulusDisplay()
+        public override void StartStimulusDisplay()
         => OnStimulusDisplayTrigged?.Invoke();
-        public void EndStimulusDisplay()
+        public override void EndStimulusDisplay()
         => OnStimulusDisplayEnded?.Invoke();
 
-        public void Select()
+        public override void Select()
         => OnSelected?.Invoke();
 
-        public void StartTargetIndication()
+        public override void StartTargetIndication()
         => OnTargeted?.Invoke();
-        public void EndTargetIndication()
+        public override void EndTargetIndication()
         => OnTargettingEnded?.Invoke();
     }
 }

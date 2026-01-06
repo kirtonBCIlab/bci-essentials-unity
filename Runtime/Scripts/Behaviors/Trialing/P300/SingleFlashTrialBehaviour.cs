@@ -11,7 +11,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
     {
         protected override IEnumerator Run()
         {
-            List<IStimulusPresenter> stimulusPresenters = PresenterCollection.GetSelectable();
+            List<StimulusPresentationBehaviour> stimulusPresenters = PresenterCollection.GetSelectable();
             int totalFlashCount = FlashesPerOption * stimulusPresenters.Count;
 
             int[] stimulusOrder = RNRAUtilities.GenerateRNRA_FisherYates
@@ -24,9 +24,9 @@ namespace BCIEssentials.Behaviours.Trialing.P300
         }
         
         protected IEnumerator RunSingleFlash
-        (int stimulusIndex, List<IStimulusPresenter> stimulusPresenters)
+        (int stimulusIndex, List<StimulusPresentationBehaviour> stimulusPresenters)
         {
-            IStimulusPresenter target = stimulusPresenters[stimulusIndex];
+            StimulusPresentationBehaviour target = stimulusPresenters[stimulusIndex];
             target.StartStimulusDisplay();
             SendSingleFlashMarker(stimulusIndex, stimulusPresenters.Count);
             yield return new WaitForSeconds(OnTime);

@@ -9,28 +9,28 @@ namespace BCIEssentials.Stimulus.Collections
     using static DynamicStimulusPresenterCollection;
     public static class PresenterSearchExtensions
     {
-        public static List<IStimulusPresenter> GetSelectablePresentersByType
+        public static List<StimulusPresentationBehaviour> GetSelectablePresentersByType
         (
             this MonoBehaviour caller,
             Scope scope = Scope.Scene,
             bool includeInactive = false
         )
         {
-            IStimulusPresenter[] presenters = scope switch
+            StimulusPresentationBehaviour[] presenters = scope switch
             {
                 Scope.Children
-                    => caller.GetComponentsInChildren<IStimulusPresenter>(includeInactive)
+                    => caller.GetComponentsInChildren<StimulusPresentationBehaviour>(includeInactive)
                 ,
                 Scope.ChildrenOfParent
                     => caller.transform.parent switch
                     {
-                        null => GetComponentsInScene<IStimulusPresenter>()
+                        null => GetComponentsInScene<StimulusPresentationBehaviour>()
                         ,
-                        Transform parent => parent.GetComponentsInChildren<IStimulusPresenter>(includeInactive)
+                        Transform parent => parent.GetComponentsInChildren<StimulusPresentationBehaviour>(includeInactive)
                     }
                 ,
                 _
-                    => GetComponentsInScene<IStimulusPresenter>()
+                    => GetComponentsInScene<StimulusPresentationBehaviour>()
             };
             return presenters.WhereSelectable();
         }
@@ -51,7 +51,7 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public static List<IStimulusPresenter> GetSelectablePresentersByTag
+        public static List<StimulusPresentationBehaviour> GetSelectablePresentersByTag
         (
             this MonoBehaviour caller, string tag,
             Scope scope = Scope.Scene
@@ -74,10 +74,10 @@ namespace BCIEssentials.Stimulus.Collections
                     => GameObject.FindGameObjectsWithTag(tag)
             };
 
-            List<IStimulusPresenter> selectablePresenters = new();
+            List<StimulusPresentationBehaviour> selectablePresenters = new();
             foreach (GameObject o in taggedObjects)
             {
-                if (o.TryGetComponent(out IStimulusPresenter presenter) && presenter.IsSelectable)
+                if (o.TryGetComponent(out StimulusPresentationBehaviour presenter) && presenter.IsSelectable)
                 {
                     selectablePresenters.Add(presenter);
                 }
