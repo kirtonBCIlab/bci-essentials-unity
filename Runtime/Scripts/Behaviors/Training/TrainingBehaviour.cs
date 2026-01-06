@@ -1,4 +1,5 @@
 using BCIEssentials.LSLFramework;
+using BCIEssentials.Selection;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
@@ -8,15 +9,16 @@ namespace BCIEssentials.Behaviours.Training
         public LSLMarkerWriter MarkerWriter { get; set; }
 
         [SerializeField]
-        protected ITrainingTargetIndicator TargetIndicator;
+        protected TargetIndicationBehaviour _targetIndicationBehaviour;
     }
 
 
-    public interface ITrainingTargetIndicator
+    public abstract class TargetIndicationBehaviour : SelectionBehaviour
     {
-        public int OptionCount { get; }
-        public void BeginTargetIndication(int index);
-        public void EndTargetIndication();
+        public abstract int OptionCount { get; }
+
+        public abstract void BeginTargetIndication(int index);
+        public abstract void EndTargetIndication();
     }
 
 

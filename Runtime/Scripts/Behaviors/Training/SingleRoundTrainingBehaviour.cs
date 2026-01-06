@@ -7,9 +7,6 @@ namespace BCIEssentials.Behaviours.Training
 {
     public class SingleRoundTrainingBehaviour : TrainingBehaviour, IBCIMarkerSource
     {
-
-        [SerializeField]
-        private ISelector _selector;
         [SerializeField]
         private TrialBehaviour _trialBehaviour;
 
@@ -33,12 +30,12 @@ namespace BCIEssentials.Behaviours.Training
 
         public virtual IEnumerator RunRound(int targetIndex)
         {
-            TargetIndicator.BeginTargetIndication(targetIndex);
+            _targetIndicationBehaviour.BeginTargetIndication(targetIndex);
             yield return new WaitForSeconds(TargetIndicationPeriod);
 
             if (!PersistTargetIndication)
             {
-                TargetIndicator.EndTargetIndication();
+                _targetIndicationBehaviour.EndTargetIndication();
             }
 
             yield return new WaitForSeconds(PreTrialTime);
@@ -46,15 +43,15 @@ namespace BCIEssentials.Behaviours.Training
             yield return _trialBehaviour.AwaitCompletion();
             yield return new WaitForSeconds(PostTrialTime);
 
-            if (SelectTrainingTarget && _selector != null)
+            if (SelectTrainingTarget && _targetIndicationBehaviour != null)
             {
-                _selector.MakeSelection(targetIndex);
+                _targetIndicationBehaviour.MakeSelection(targetIndex);
                 yield return new WaitForSeconds(TargetSelectionDisplayPeriod);
             }
 
             if (PersistTargetIndication)
             {
-                TargetIndicator.EndTargetIndication();
+                _targetIndicationBehaviour.EndTargetIndication();
             }
         }
     }

@@ -2,29 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using BCIEssentials.Behaviours.Training;
-using BCIEssentials.Selection;
 using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ISelector, ITrainingTargetIndicator, ICollection<StimulusPresentationBehaviour>
+    public class StimulusPresenterCollection : TargetIndicationBehaviour, ICollection<StimulusPresentationBehaviour>
     {
-        public int OptionCount => _stimulusPresenters.Count;
+        public override int OptionCount => _stimulusPresenters.Count;
         [SerializeField] protected List<StimulusPresentationBehaviour> _stimulusPresenters;
 
         private int? _targetIndex;
 
 
-        public void MakeSelection(int index)
+        public override void MakeSelection(int index)
         => GetPresenter(index).Select();
 
-        public void BeginTargetIndication(int index)
+        public override void BeginTargetIndication(int index)
         {
             GetPresenter(index)?.StartTargetIndication();
             _targetIndex = index;
         }
-        public void EndTargetIndication()
+        public override void EndTargetIndication()
         {
             if (!_targetIndex.HasValue)
             {
