@@ -1,20 +1,18 @@
-using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Tilemap))]
 public class CollectionManager : MonoBehaviour
 {
+    private Tilemap Tiles
+    => _tiles ? _tiles
+    : _tiles = GetComponent<Tilemap>();
     private Tilemap _tiles;
-
-    private void Reset()
-    {
-        _tiles ??= GetComponent<Tilemap>();
-    }
 
 
     private void Start()
     {
+        InitializeTiles();
         MovementHandler.MovementAchieved += TryCollection;
     }
 
@@ -26,13 +24,13 @@ public class CollectionManager : MonoBehaviour
 
     private void InitializeTiles()
     {
-        BoundsInt bounds = _tiles.cellBounds;
+        BoundsInt bounds = Tiles.cellBounds;
 
         foreach (Vector3Int gridPosition in bounds.allPositionsWithin)
         {
-            if (!_tiles.HasTile(gridPosition)) continue;
+            if (!Tiles.HasTile(gridPosition)) continue;
 
-            GameObject collectableObject = _tiles.GetInstantiatedObject(gridPosition);
+            GameObject collectableObject = Tiles.GetInstantiatedObject(gridPosition);
             if (collectableObject.TryGetComponent(out Collectable collectable))
             {
                 collectable.UpdateSortOrder(gridPosition);
@@ -43,14 +41,14 @@ public class CollectionManager : MonoBehaviour
 
     private void TryCollection(Vector3Int gridPosition)
     {
-        if (_tiles.HasTile(gridPosition))
+        if (Tiles.HasTile(gridPosition))
         {
-            GameObject collectableObject = _tiles.GetInstantiatedObject(gridPosition);
+            GameObject collectableObject = Tiles.GetInstantiatedObject(gridPosition);
             if (collectableObject.TryGetComponent(out Collectable collectable))
             {
                 collectable.Collect();
             }
-            _tiles.SetTile(gridPosition, null);
+            Tiles.SetTile(gridPosition, null);
         }
     }
 }

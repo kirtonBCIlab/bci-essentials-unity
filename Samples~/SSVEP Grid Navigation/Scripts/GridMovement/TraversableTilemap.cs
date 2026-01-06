@@ -3,17 +3,15 @@ using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Tilemap))]
 public class TraversableTilemap : MonoBehaviour
-{private Tilemap _tiles;
-
-    private void Reset()
-    {
-        _tiles ??= GetComponent<Tilemap>();
-    }
-
+{
+    private Tilemap Tiles
+    => _tiles ? _tiles
+    : _tiles = GetComponent<Tilemap>();
+    private Tilemap _tiles;
 
     public bool CanMoveTo(Vector3Int gridPosition)
-    => _tiles.HasTile(gridPosition);
+    => Tiles.HasTile(gridPosition);
 
     public Vector3 GetCellCentre(Vector3Int cellPosition)
-    => _tiles.GetCellCenterWorld(cellPosition);
+    => Tiles.GetCellCenterWorld(cellPosition);
 }
