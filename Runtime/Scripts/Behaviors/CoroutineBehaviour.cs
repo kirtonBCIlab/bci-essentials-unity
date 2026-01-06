@@ -5,7 +5,7 @@ namespace BCIEssentials.Behaviours
 {
     public abstract class CoroutineBehaviour : MonoBehaviourUsingExtendedAttributes
     {
-        public bool IsRunning => _routine != null;
+        public bool IsRunning { get; private set; }
         private Coroutine _routine;
 
 
@@ -17,9 +17,7 @@ namespace BCIEssentials.Behaviours
                 return;
             }
 
-            SetUp();
-            _routine = StartCoroutine(Run());
-            StartCoroutine(RunCleanupAfterCompletion());
+            StartCoroutine(RunWrapper());
         }
 
         public void Interrupt()
@@ -31,11 +29,11 @@ namespace BCIEssentials.Behaviours
             }
 
             StopCoroutine(_routine);
+            IsRunning = false;
         }
 
         protected virtual void SetUp() { }
         protected virtual void CleanUp() { }
-
         protected abstract IEnumerator Run();
 
 
@@ -44,9 +42,16 @@ namespace BCIEssentials.Behaviours
             while (IsRunning) yield return null;
         }
 
-        private IEnumerator RunCleanupAfterCompletion()
+
+        private IEnumerator RunWrapper()
         {
+            SetUp();
+            _routine = StartCoroutine(Run());
+
+            IsRunning = true;
             yield return AwaitCompletion();
+            IsRunning = false;
+
             CleanUp();
         }
     }
