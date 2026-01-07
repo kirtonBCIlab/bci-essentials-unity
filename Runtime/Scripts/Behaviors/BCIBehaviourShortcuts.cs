@@ -31,7 +31,7 @@ namespace BCIEssentials.Behaviours
 
         protected virtual void Update()
         {
-            ToggleTrainingRunBinding.CallIfPressedThisFrame(ToggleTrialRun);
+            ToggleTrialRunBinding.CallIfPressedThisFrame(ToggleTrialRun);
             ToggleTrainingRunBinding.CallIfPressedThisFrame(ToggleTrainingRun);
             UpdateClassifierBinding.CallIfPressedThisFrame(_target.UpdateClassifier);
         }
