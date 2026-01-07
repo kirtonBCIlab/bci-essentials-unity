@@ -21,6 +21,7 @@ namespace BCIEssentials.Behaviours.Trialing
                     else SendClassificationMarker();
                 }
                 yield return new WaitForSeconds(EpochLength + InterEpochInterval);
+                epochCount++;
             }
         }
 
