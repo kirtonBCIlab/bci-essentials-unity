@@ -25,8 +25,7 @@ namespace BCIEssentials.Behaviours.Training
         public float RestTime = 1.0f;
 
 
-        protected override IEnumerator Run()
-        => RunRound(TargetIndex);
+        protected override IEnumerator Run() => RunRound(TargetIndex);
 
         public virtual IEnumerator RunRound(int targetIndex)
         {
@@ -39,7 +38,7 @@ namespace BCIEssentials.Behaviours.Training
             }
 
             yield return new WaitForSeconds(PreTrialTime);
-            _trialBehaviour.Begin();
+            _trialBehaviour.StartTrainingTrial(targetIndex);
             yield return _trialBehaviour.AwaitCompletion();
             yield return new WaitForSeconds(PostTrialTime);
 
@@ -53,6 +52,12 @@ namespace BCIEssentials.Behaviours.Training
             {
                 _targetIndicationBehaviour.EndTargetIndication();
             }
+        }
+
+
+        protected override void CleanUp()
+        {
+            if (_trialBehaviour.IsRunning) _trialBehaviour.Interrupt();
         }
     }
 }

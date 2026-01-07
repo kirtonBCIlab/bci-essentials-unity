@@ -37,9 +37,15 @@ namespace BCIEssentials.Behaviours.Trialing
 
 
         protected override void SetUp()
-        => Presenters.StartStimulusDisplay();
+        {
+            base.SetUp();
+            Presenters.StartStimulusDisplay();
+        }
         protected override void CleanUp()
-        => Presenters.EndStimulusDisplay();
+        {
+            base.CleanUp();
+            Presenters.EndStimulusDisplay();
+        }
 
 
         protected override void SendTrainingMarker(int trainingIndex)

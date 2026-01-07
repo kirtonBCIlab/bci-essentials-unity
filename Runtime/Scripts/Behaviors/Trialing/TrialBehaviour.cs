@@ -6,18 +6,22 @@ namespace BCIEssentials.Behaviours.Trialing
     {
         public LSLMarkerWriter MarkerWriter { get; set; }
         public bool HasTrainingTarget => TrainingTarget.HasValue;
-        public int? TrainingTarget = null;
+        protected int? TrainingTarget = null;
 
         public void StartTestingTrial()
         {
             TrainingTarget = null;
             Begin();
         }
-        
+
         public void StartTrainingTrial(int target)
         {
             TrainingTarget = target;
             Begin();
         }
+
+        protected override void CleanUp() => ClearTrainingTarget();
+
+        public void ClearTrainingTarget() => TrainingTarget = null;
     }
 }
