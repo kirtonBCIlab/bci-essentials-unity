@@ -1,4 +1,3 @@
-using System;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
@@ -24,24 +23,17 @@ namespace BCIEssentials.Behaviours
             ToggleTrainingRunBinding = KeyCode.T;
             UpdateClassifierBinding = KeyCode.Backspace;
 
-            if (_target == null) _target = GetComponent<BCIBehaviour>();
+            if (_target == null)
+            {
+                _target = GetComponent<BCIBehaviour>();
+            }
         }
 
         protected virtual void Update()
-        => ProcessShortcuts(
-            new (KeyBind, Action)[] {
-                (ToggleTrialRunBinding, ToggleTrialRun),
-                (ToggleTrainingRunBinding, ToggleTrainingRun),
-                (UpdateClassifierBinding, _target.UpdateClassifier)
-            }
-        );
-
-        private void ProcessShortcuts(
-            (KeyBind, Action)[] shortcuts
-        )
         {
-            foreach ((KeyBind keyBind, Action method) in shortcuts)
-                if (keyBind.WasPressedThisFrame) method();
+            ToggleTrainingRunBinding.CallIfPressedThisFrame(ToggleTrialRun);
+            ToggleTrainingRunBinding.CallIfPressedThisFrame(ToggleTrainingRun);
+            UpdateClassifierBinding.CallIfPressedThisFrame(_target.UpdateClassifier);
         }
 
 

@@ -13,6 +13,11 @@ namespace BCIEssentials.Utilities
 
         public bool WasPressedThisFrame
         => Input.GetKeyDown(BoundKey);
+
+        public void CallIfPressedThisFrame(Action method)
+        {
+            if (WasPressedThisFrame) method();
+        }
     }
 
     [Serializable]
@@ -21,6 +26,11 @@ namespace BCIEssentials.Utilities
         public int Index;
         public IndexedKeyBind(int index, KeyCode keyCode)
         : base(keyCode) => Index = index;
+
+        public void CallIfPressedThisFrame(Action<int> indexedMethod)
+        {
+            if (WasPressedThisFrame) indexedMethod(Index);
+        }
     }
 
     [Serializable]
@@ -50,8 +60,7 @@ namespace BCIEssentials.Utilities
         {
             foreach (IndexedKeyBind binding in Bindings)
             {
-                if (binding.WasPressedThisFrame)
-                    onPressed(binding.Index);
+                binding.CallIfPressedThisFrame(onPressed);
             }
         }
     }

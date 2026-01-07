@@ -55,24 +55,5 @@ namespace BCIEssentials.Selection
             yield return _trialBehaviour.AwaitCompletion();
             _target.MakeSelection(selectionIndex);
         }
-
-
-        private bool VerifyTargetReference()
-        {
-            if (_target == null)
-            {
-                SelectionBehaviour result = GetComponentInChildren<SelectionBehaviour>();
-                if (result != null)
-                {
-                    _target = result;
-                }
-                else
-                {
-                    Debug.LogWarning("Missing Selector component");
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 }
