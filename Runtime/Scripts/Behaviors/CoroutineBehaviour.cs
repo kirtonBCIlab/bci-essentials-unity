@@ -46,13 +46,16 @@ namespace BCIEssentials.Behaviours
         private IEnumerator RunWrapper()
         {
             SetUp();
-            _routine = StartCoroutine(Run());
-
-            IsRunning = true;
+            _routine = StartCoroutine(RunWithTrackedStatus());
             yield return AwaitCompletion();
-            IsRunning = false;
-
             CleanUp();
+        }
+
+        private IEnumerator RunWithTrackedStatus()
+        {
+            IsRunning = true;
+            yield return Run();
+            IsRunning = false;
         }
     }
 }
