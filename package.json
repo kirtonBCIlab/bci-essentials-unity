@@ -2,7 +2,7 @@
   "name": "com.bci4kids.bciessentials",
   "version": "2.0.0",
   "displayName": "BCI Essentials",
-  "description": "A Unity base environment for streamlined development of BCI applications",
+  "description": "A set of front end components for streamlined development of BCI applications in Unity",
   "unity": "2021.3",
   "unityRelease": "15f1",
   "documentationUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity",
@@ -19,34 +19,14 @@
   },
   "samples": [
     {
-      "displayName": "Controller Hotswapping Example",
-      "description": "Demonstrates how to set up a BCI controller with multiple behavior types which can be switched at runtime.",
-      "path": "Samples~/Controller Hotswapping Example"
+      "displayName": "P300 Grid",
+      "description": "Simple example setup for a P300 paradigm with multiple selectable trial behaviours and a utility script to generate flashing cubes in a grid.",
+      "path": "Samples~/P300 Grid"
     },
     {
-      "displayName": "Environment Aware P300 Example",
-      "description": "Demonstrates a use case where the P300ControllerBehavior flashing updates targets based on other relative BCI objects.",
-      "path": "Samples~/Environment Aware P300"
-    },
-    {
-      "displayName": "Motor Imagery Example",
-      "description": "An example setup for the MI Controller Behaviour.",
-      "path": "Samples~/Motor Imagery"
-    },
-    {
-      "displayName": "P300 Example",
-      "description": "An example setup for the P300 Controller Behaviour.",
-      "path": "Samples~/P300"
-    },
-    {
-      "displayName": "SSVEP Example",
-      "description": "An example setup for the SSVEP Controller Behaviour.",
-      "path": "Samples~/SSVEP"
-    },
-    {
-      "displayName": "ES Stimulus Presentation",
-      "description": "Stimulus presentation for Emily Schrag's thesis project",
-      "path": "Samples~/ES Stimulus Presentation"
+      "displayName": "SSVEP Tile Navigation",
+      "description": "A more complex game demonstrating one possible configuration of an SSVEP paradigm. Depends on 2D tilemap and vector graphics packages.",
+      "path": "Samples~/SSVEP Tile Navigation"
     }
   ]
 }
