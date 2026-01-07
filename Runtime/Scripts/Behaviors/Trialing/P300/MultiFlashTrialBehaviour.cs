@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BCIEssentials.Extensions;
 using BCIEssentials.Stimulus.Collections;
 using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace BCIEssentials.Behaviours.Trialing.P300
         (int[] stimulusIndices, List<StimulusPresentationBehaviour> stimulusPresenters)
         {
             int presenterCount = stimulusPresenters.Count;
+            stimulusIndices = stimulusIndices.WherePositiveAndLessThan(presenterCount);
+
             List<StimulusPresentationBehaviour> activatedPresenters
             = stimulusIndices.Select(i => stimulusPresenters[i]).ToList();
 
@@ -23,7 +26,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
             activatedPresenters.EndStimulusDisplay();
             yield return new WaitForSeconds(OffTime);
         }
-        
+
         protected void SendMultiFlashMarker
         (IEnumerable<int> stimulusIndices, int optionCount)
         {

@@ -24,6 +24,16 @@ namespace BCIEssentials.Extensions
             return sb.ToString();
         }
 
+        public static string Stringify(this int[] array)
+        => $"[{string.Join(", ", array)}]";
+
+
+        public static int[] WherePositiveAndLessThan
+        (
+            this int[] array, int limit
+        )
+        => array.Where(x => x >= 0 && x < limit).ToArray();
+
 
         public static void Fill<T>
         (
