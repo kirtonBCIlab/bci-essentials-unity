@@ -1,9 +1,9 @@
-Shader "Unlit/Colour Override"
+Shader "Unlit/Colour Mask"
 {
     Properties
     {
-        [MaterialToggle] _OverrideEnabled ("Enable Colour Override", Float) = 1
-        _OverrideColour ("Override Colour", Color) = (1,1,1,1)
+        [MaterialToggle] _MaskEnabled ("Enable Colour Mask", Float) = 1
+        _MaskColour ("Mask Colour", Color) = (1,1,1,1)
 
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
@@ -67,17 +67,17 @@ Shader "Unlit/Colour Override"
                 return OUT;
             }
 
-            fixed _OverrideEnabled;
-            fixed4 _OverrideColour;
+            fixed _MaskEnabled;
+            fixed4 _MaskColour;
 
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed a = step(0.5, i.color.a);
 
-                fixed4 override = _OverrideEnabled * _OverrideColour * a;
-                fixed4 overridden = (1 - _OverrideEnabled) * i.color;
+                fixed4 mask = _MaskEnabled * _MaskColour * a;
+                fixed4 unmaskedColour = (1 - _MaskEnabled) * i.color;
 
-                return override + overridden;
+                return mask + unmaskedColour;
             }
             ENDCG
         }

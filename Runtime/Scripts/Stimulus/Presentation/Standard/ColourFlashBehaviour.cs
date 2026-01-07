@@ -7,7 +7,7 @@ namespace BCIEssentials.Stimulus.Presentation.Standard
     {
         public bool IsFlashing { get; private set; }
         [SerializeField]
-        private Renderer _renderer;
+        protected Renderer _renderer;
 
         public Color OnColour = Color.red;
         public Color OffColour = Color.white;
