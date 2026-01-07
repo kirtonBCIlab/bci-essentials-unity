@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Presentation.Standard
 {
-    public abstract class ColourFlashBehaviour: MonoBehaviourUsingExtendedAttributes
+    public class ColourFlashBehaviour: MonoBehaviourUsingExtendedAttributes
     {
         public bool IsFlashing { get; private set; }
         [SerializeField]
