@@ -36,7 +36,7 @@ namespace BCIEssentials.Behaviours.Trialing.P300
                 int[] column = gridMatrix.GetColumn(columnIndex);
                 yield return RunMultiFlash(column, selectablePresenters);
 
-                if (i <= totalRowFlashes)
+                if (i < totalRowFlashes)
                 {
                     int rowIndex = rowStimulusOrder[i];
                     int[] row = gridMatrix.GetRow(rowIndex);
