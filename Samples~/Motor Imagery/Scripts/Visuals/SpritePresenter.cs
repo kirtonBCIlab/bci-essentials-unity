@@ -1,25 +1,24 @@
 using System.Collections;
 using BCIEssentials;
+using BCIEssentials.Extensions;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class SpritePresenter : MonoBehaviourUsingExtendedAttributes
 {
     private Coroutine _delayedSpriteChainRoutine;
+    private SpriteRenderer Renderer
+    => this.CoalesceComponentReference(ref _renderer);
     private SpriteRenderer _renderer;
-    void Reset()
-    {
-        _renderer = GetComponent<SpriteRenderer>();
-    }
 
 
-    public void Hide() => _renderer.enabled = false;
-    public void Show() => _renderer.enabled = true;
+    public void Hide() => Renderer.enabled = false;
+    public void Show() => Renderer.enabled = true;
 
 
     public void SetSprite(Sprite sprite)
     {
-        _renderer.sprite = sprite;
+        Renderer.sprite = sprite;
     }
 
     public void StartSpriteChain(Sprite immediateSprite, params (Sprite, float)[] chain)
