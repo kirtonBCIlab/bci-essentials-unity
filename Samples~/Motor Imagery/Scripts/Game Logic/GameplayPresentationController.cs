@@ -8,6 +8,7 @@ public class GameplayPresentationController : MonoBehaviour
     public KeyBind InputKey = KeyCode.Space;
     public CharacterPresenter Character;
     public MonsterPresenter Monster;
+    public ChargeLevelPresenter ChargeBar;
 
     public float RestPeriod = 8;
     public float ChargePeriod = 2;
@@ -32,6 +33,7 @@ public class GameplayPresentationController : MonoBehaviour
             DrainFrameTimeFromChargeLevel();
         }
         _chargeLevel = Mathf.Clamp01(_chargeLevel);
+        ChargeBar.DisplayChargeLevel(_chargeLevel);
     }
 
     private void Throw()
