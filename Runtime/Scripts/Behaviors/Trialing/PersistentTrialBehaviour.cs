@@ -12,17 +12,31 @@ namespace BCIEssentials.Behaviours.Trialing
 
         protected override IEnumerator Run()
         {
-            int epochCount = 0;
-            while (epochCount < TrainingEpochCount || !HasTrainingTarget)
+            WaitForSeconds segmentDuration = new(EpochLength + InterEpochInterval);
+
+            if (HasTrainingTarget)
             {
-                if (MarkerWriter != null)
+                for (int i = 0; i < TrainingEpochCount; i++)
                 {
-                    if (HasTrainingTarget) SendTrainingMarker(TrainingTarget.Value);
-                    else SendClassificationMarker();
+                    yield return RunTrialSegment(segmentDuration);
                 }
-                yield return new WaitForSeconds(EpochLength + InterEpochInterval);
-                epochCount++;
             }
+            else while (true) yield return RunTrialSegment(segmentDuration);
+        }
+
+
+        protected IEnumerator RunTrialSegment(float duration)
+        {
+            yield return RunTrialSegment(new WaitForSeconds(duration));
+        }
+        protected IEnumerator RunTrialSegment(WaitForSeconds duration)
+        {
+            if (MarkerWriter != null)
+            {
+                if (HasTrainingTarget) SendTrainingMarker(TrainingTarget.Value);
+                else SendClassificationMarker();
+            }
+            yield return duration;
         }
 
         protected abstract void SendTrainingMarker(int trainingIndex);
