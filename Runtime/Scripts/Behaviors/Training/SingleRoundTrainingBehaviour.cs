@@ -1,12 +1,13 @@
 using System.Collections;
 using BCIEssentials.Behaviours.Trialing;
-using BCIEssentials.Selection;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
     public class SingleRoundTrainingBehaviour : TrainingBehaviour, IBCIMarkerSource
     {
+        [SerializeField]
+        protected TargetIndicationBehaviour _targetIndicationBehaviour;
         [SerializeField]
         private TrialBehaviour _trialBehaviour;
 
