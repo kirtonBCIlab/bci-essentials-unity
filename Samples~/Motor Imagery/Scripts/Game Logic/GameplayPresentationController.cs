@@ -8,6 +8,7 @@ public class GameplayPresentationController : MonoBehaviour
     public KeyBind InputKey = KeyCode.Space;
     public CharacterPresenter Character;
     public MonsterPresenter Monster;
+    public ProjectilePresenter Projectile;
     public ChargeLevelPresenter ChargeBar;
 
     public float RestPeriod = 8;
@@ -58,6 +59,7 @@ public class GameplayPresentationController : MonoBehaviour
             StartCoroutine(RunRestPeriod());
         }
         else Character.DisplayThrow();
+        Projectile.DisplayProjectile();
     }
 
     private IEnumerator RunRestPeriod()

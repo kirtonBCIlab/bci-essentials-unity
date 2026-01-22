@@ -4,6 +4,7 @@ public class TrainingPresentationController : MonoBehaviour
 {
     public CharacterPresenter Character;
     public MonsterPresenter Monster;
+    public ProjectilePresenter Projectile;
 
     private void Start()
     {
@@ -11,6 +12,8 @@ public class TrainingPresentationController : MonoBehaviour
         BlockTrainTrainingBehaviour.ActivePeriodStarted += Character.DisplayCharge;
         BlockTrainTrainingBehaviour.RestPeriodStarted += Character.DisplayThrow;
         BlockTrainTrainingBehaviour.OffBlockStarted += Character.DisplaySitAfterThrow;
+        BlockTrainTrainingBehaviour.RestPeriodStarted += Projectile.DisplayProjectile;
+        BlockTrainTrainingBehaviour.OffBlockStarted += Projectile.DisplayProjectile;
         BlockTrainTrainingBehaviour.CleanupInvoked += Character.DisplayIdle;
 
         BlockTrainTrainingBehaviour.OnBlockStarted += Monster.DisplayNewMonster;
