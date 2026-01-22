@@ -4,17 +4,17 @@ using UnityEngine;
 namespace BCIEssentials.Behaviours
 {
     /// <summary>
-    /// Implements editable keyboard shortcuts for BCI Behaviour methods.
+    /// Implements editable keyboard shortcuts for BCI Controller methods.
     /// </summary>
-    [RequireComponent(typeof(BCIBehaviour))]
-    public class BCIBehaviourShortcuts: MonoBehaviourUsingExtendedAttributes
+    [RequireComponent(typeof(BCIController))]
+    public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
     {
         public KeyBind ToggleTrialRunBinding;
         public KeyBind ToggleTrainingRunBinding;
         public KeyBind UpdateClassifierBinding;
 
         [SerializeField, Space]
-        private BCIBehaviour _target;
+        private BCIController _target;
 
 
         private void Reset()
@@ -25,7 +25,7 @@ namespace BCIEssentials.Behaviours
 
             if (_target == null)
             {
-                _target = GetComponent<BCIBehaviour>();
+                _target = GetComponent<BCIController>();
             }
         }
 
