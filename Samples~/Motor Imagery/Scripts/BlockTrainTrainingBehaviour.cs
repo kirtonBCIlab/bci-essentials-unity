@@ -9,6 +9,7 @@ public class BlockTrainTrainingBehaviour: TrainingBehaviour
 {
     public static event Action ActivePeriodStarted;
     public static event Action RestPeriodStarted;
+    public static event Action OnBlockStarted;
     public static event Action OffBlockStarted;
     public static event Action CleanupInvoked;
 
@@ -34,6 +35,7 @@ public class BlockTrainTrainingBehaviour: TrainingBehaviour
             OffBlockStarted?.Invoke();
             yield return RunTrainingEpochs(0, epochLength, offBlockEpochCount);
 
+            OnBlockStarted?.Invoke();
             for (int c = 0; c < ActivePeriodsPerOnBlock; c++)
             {
                 ActivePeriodStarted?.Invoke();

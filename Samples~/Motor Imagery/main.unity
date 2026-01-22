@@ -567,8 +567,8 @@ MonoBehaviour:
   ReloadSprite: {fileID: 21300000, guid: c85f79c31f9762d47a438ec44208acea, type: 3}
   SitSprite: {fileID: 21300000, guid: 01e124bfc86386945ae6944be8a12d3c, type: 3}
   SnoozeSprite: {fileID: 21300000, guid: 5eb443d7b57332b4ba84ca9be50d9f83, type: 3}
-  ReloadPeriod: 0.1
-  ThrowPeriod: 0.05
+  ReloadPeriod: 0.25
+  ThrowPeriod: 0.1
 --- !u!212 &472505019
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -756,6 +756,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 700037838}
+  - component: {fileID: 700037840}
+  - component: {fileID: 700037839}
   m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
@@ -781,6 +783,41 @@ Transform:
   - {fileID: 1262696479}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &700037839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700037837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3387ecf0d51a2cc4d93b5c94df6de600, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InputProvider: {fileID: 74454234}
+  InputKey:
+    BoundKey: 32
+  Character: {fileID: 472505018}
+  Monster: {fileID: 1262696480}
+  RestPeriod: 8
+  ChargePeriod: 2
+  CaptureThreshold: 3
+  DrainRate: 0.5
+--- !u!114 &700037840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700037837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fda611362d090d746b980bb57c271e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Character: {fileID: 472505018}
+  Monster: {fileID: 1262696480}
 --- !u!1 &826757412
 GameObject:
   m_ObjectHideFlags: 0

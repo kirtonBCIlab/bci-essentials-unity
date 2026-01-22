@@ -11,8 +11,9 @@ namespace BCIEssentials.Utilities
         public static implicit operator KeyCode(KeyBind b) => b.BoundKey;
         public static implicit operator KeyBind(KeyCode k) => new(k);
 
-        public bool WasPressedThisFrame
-        => Input.GetKeyDown(BoundKey);
+        public bool IsPressed => Input.GetKey(BoundKey);
+        public bool WasPressedThisFrame => Input.GetKeyDown(BoundKey);
+        public bool WasReleasedThisFrame => Input.GetKeyUp(BoundKey);
 
         public void CallIfPressedThisFrame(Action method)
         {

@@ -7,7 +7,7 @@ using UnityEngine;
 public class ClassificationProvider : CoroutineBehaviour, IBCIMarkerSource, ISelector
 {
     public LSLMarkerWriter MarkerWriter { get; set; }
-    public static bool InputValue { get; private set; }
+    public bool InputValue { get; private set; }
     public float EpochLength = 0.5f;
 
 
