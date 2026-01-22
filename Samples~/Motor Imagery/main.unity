@@ -221,6 +221,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 74454232}
+  - component: {fileID: 74454235}
   - component: {fileID: 74454233}
   - component: {fileID: 74454234}
   m_Layer: 0
@@ -275,6 +276,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EpochLength: 0.5
+--- !u!114 &74454235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74454230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb42a83f7fca4e74fa001c28816ee88a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &141462537
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,6 +636,7 @@ GameObject:
   - component: {fileID: 495655112}
   - component: {fileID: 495655111}
   - component: {fileID: 495655110}
+  - component: {fileID: 495655114}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -716,6 +730,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &495655114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 495655109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cbb8b93c6728ad4b889c846d84442f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonPairs:
+  - StartButton: {fileID: 826757414}
+    StopButton: {fileID: 2131897168}
+  - StartButton: {fileID: 1094559008}
+    StopButton: {fileID: 1622915609}
 --- !u!1 &700037837
 GameObject:
   m_ObjectHideFlags: 0
@@ -833,13 +864,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2131897167}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 74454233}
+        m_TargetAssemblyTypeName: BlockTrainTrainingBehaviour, Assembly-CSharp
+        m_MethodName: Begin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1046,7 +1077,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1094559009}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 74454234}
+        m_TargetAssemblyTypeName: ClassificationProvider, Assembly-CSharp
+        m_MethodName: Begin
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1094559009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1306,7 +1349,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0.2, y: 1}
-  m_AnchoredPosition: {x: 20, y: -20}
+  m_AnchoredPosition: {x: 20, y: -50}
   m_SizeDelta: {x: -20, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1622915609
@@ -1352,7 +1395,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1622915610}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 74454234}
+        m_TargetAssemblyTypeName: ClassificationProvider, Assembly-CSharp
+        m_MethodName: Interrupt
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1622915610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1540,7 +1595,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2131897169}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 74454233}
+        m_TargetAssemblyTypeName: BlockTrainTrainingBehaviour, Assembly-CSharp
+        m_MethodName: Interrupt
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2131897169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1596,7 +1663,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0.2, y: 1}
-  m_AnchoredPosition: {x: 20, y: -20}
+  m_AnchoredPosition: {x: 20, y: -50}
   m_SizeDelta: {x: -20, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!1660057539 &9223372036854775807

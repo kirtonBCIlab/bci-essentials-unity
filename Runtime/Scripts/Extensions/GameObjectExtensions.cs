@@ -6,6 +6,16 @@ namespace BCIEssentials.Extensions
 {
     public static class GameObjectExtensions
     {
+        public static void Activate(this GameObject caller)
+        => caller.SetActive(true);
+        public static void ActivateGameObject(this Component caller)
+        => caller.gameObject.Activate();
+        public static void Deactivate(this GameObject caller)
+        => caller.SetActive(false);
+        public static void DeactivateGameObject(this Component caller)
+        => caller.gameObject.Deactivate();
+
+
         public static void GetOrAddComponent<T>
         (
             this GameObject gameObject, ref T componentReference
@@ -26,7 +36,7 @@ namespace BCIEssentials.Extensions
 
         public static T CoalesceComponentReference<T>
         (
-            this MonoBehaviour caller, ref T componentReference
+            this Component caller, ref T componentReference
         ) where T : Component
         {
             if (componentReference == null)

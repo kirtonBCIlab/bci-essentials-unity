@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BCIEssentials.Extensions
@@ -107,5 +108,27 @@ namespace BCIEssentials.Extensions
                 yield return columnMethod(column);
             }
         }
+
+
+        public static bool IsNullOrEmpty<T>(this T[] array)
+        => array == null || array.Length == 0;
+
+        public static T[] Coalesce<T>(this T[] array, T[] defaultArray)
+        => array.IsNullOrEmpty() ? defaultArray : array;
+
+        public static T[] Excluding<T>(this T[] array, T exclude)
+        {
+            if (exclude == null) return array;
+            List<T> arrayCopy = array.ToList();
+            if (!arrayCopy.Contains(exclude)) return array;
+            arrayCopy.Remove(exclude);
+            return arrayCopy.ToArray();
+        }
+
+        public static T PickRandom<T>(this T[] array)
+        => array[UnityEngine.Random.Range(0, array.Length)];
+
+        public static T PickRandomExcluding<T>(this T[] array, T exclude)
+        => array.Excluding(exclude).PickRandom();
     }
 }
