@@ -1,3 +1,4 @@
+using BCIEssentials.Extensions;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
@@ -22,12 +23,11 @@ namespace BCIEssentials.Behaviours
             ToggleTrialRunBinding = KeyCode.S;
             ToggleTrainingRunBinding = KeyCode.T;
             UpdateClassifierBinding = KeyCode.Backspace;
-
-            if (_target == null)
-            {
-                _target = GetComponent<BCIController>();
-            }
+            this.CoalesceComponentReference(ref _target);
         }
+
+        private void Start() => this.CoalesceComponentReference(ref _target);
+
 
         protected virtual void Update()
         {

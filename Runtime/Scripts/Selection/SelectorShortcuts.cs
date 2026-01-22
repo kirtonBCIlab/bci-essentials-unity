@@ -1,5 +1,6 @@
 using System.Collections;
 using BCIEssentials.Behaviours.Trialing;
+using BCIEssentials.Extensions;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
@@ -28,15 +29,16 @@ namespace BCIEssentials.Selection
                 (8, KeyCode.Alpha8), (9, KeyCode.Alpha9)
             );
 
-            if (_trialBehaviour == null)
-            {
-                _trialBehaviour = GetComponentInChildren<TrialBehaviour>();
-            }
-            if (_target == null)
-            {
-                _target = GetComponent<SelectionBehaviour>();
-            }
+            this.CoalesceComponentReference(ref _trialBehaviour);
+            this.CoalesceComponentReference(ref _target);
         }
+
+        private void Start()
+        {
+            this.CoalesceComponentReference(ref _trialBehaviour);
+            this.CoalesceComponentReference(ref _target);
+        }
+
 
         protected virtual void Update()
         => Bindings.Process(MakeSelectionAtEndOfRun);

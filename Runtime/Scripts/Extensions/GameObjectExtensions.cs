@@ -8,8 +8,7 @@ namespace BCIEssentials.Extensions
     {
         public static void GetOrAddComponent<T>
         (
-            this GameObject gameObject,
-            ref T componentReference
+            this GameObject gameObject, ref T componentReference
         ) where T : Component
         {
             if (
@@ -23,6 +22,21 @@ namespace BCIEssentials.Extensions
                 );
                 componentReference = gameObject.AddComponent<T>();
             }
+        }
+
+        public static T CoalesceComponentReference<T>
+        (
+            this MonoBehaviour caller, ref T componentReference
+        ) where T : Component
+        {
+            if (componentReference == null)
+            {
+                if (!caller.TryGetComponent(out componentReference))
+                {
+                    componentReference = caller.GetComponentInChildren<T>();
+                }
+            }
+            return componentReference;
         }
 
 
