@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using BCIEssentials.Behaviours;
 using BCIEssentials.LSLFramework;
@@ -6,6 +7,9 @@ using UnityEngine;
 
 public class ClassificationProvider : CoroutineBehaviour, IBCIMarkerSource, ISelector
 {
+    public event Action ClassificationStarted;
+    public event Action ClassificationEnded;
+
     public LSLMarkerWriter MarkerWriter { get; set; }
     public bool InputValue { get; private set; }
     public float EpochLength = 0.5f;
@@ -26,4 +30,8 @@ public class ClassificationProvider : CoroutineBehaviour, IBCIMarkerSource, ISel
             yield return epochDelay;
         }
     }
+
+
+    protected override void SetUp() => ClassificationStarted?.Invoke();
+    protected override void CleanUp() => ClassificationEnded?.Invoke();
 }

@@ -20,6 +20,18 @@ public class GameplayPresentationController : MonoBehaviour
     private bool _isResting = false;
 
 
+    private void Start()
+    {
+        InputProvider.ClassificationStarted += Monster.DisplayNewMonster;
+        InputProvider.ClassificationStarted += ChargeBar.Show;
+        InputProvider.ClassificationStarted += () => _chargeLevel = 0;
+
+        InputProvider.ClassificationEnded += Character.DisplayIdle;
+        InputProvider.ClassificationEnded += Monster.Hide;
+        InputProvider.ClassificationEnded += ChargeBar.Hide;
+    }
+
+
     private void Update()
     {
         if (_isResting || !InputProvider.IsRunning) return;

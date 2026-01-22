@@ -4,10 +4,15 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class ChargeLevelPresenter : MonoBehaviour
 {
+    public GameObject VisibilityParent;
+
     private RectTransform Rect
     => this.CoalesceComponentReference(ref _rect);
     private RectTransform _rect;
 
+
+    public void Show() => VisibilityParent.Activate();
+    public void Hide() => VisibilityParent.Deactivate();
 
     public void DisplayChargeLevel(float t)
     {
