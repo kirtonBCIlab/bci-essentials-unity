@@ -13,8 +13,8 @@ public class CharacterPresenter : SpritePresenter
     public Sprite SnoozeSprite;
 
     [StartFoldoutGroup("Timing")]
-    public float ReloadPeriod = 0.1f;
-    public float ThrowPeriod = 0.05f;
+    public float ReloadPeriod = 0.25f;
+    public float ThrowPeriod = 0.1f;
 
     private bool _loaded;
 
@@ -38,5 +38,12 @@ public class CharacterPresenter : SpritePresenter
     public void DisplayThrow()
     {
         StartSpriteChain(ThrowSprite, (IdleSprite, ThrowPeriod));
+        _loaded = false;
+    }
+
+    public void DisplaySitAfterThrow()
+    {
+        StartSpriteChain(ThrowSprite, (SitSprite, ThrowPeriod));
+        _loaded = false;
     }
 }

@@ -7,8 +7,9 @@ public class MonsterPresenter : SpritePresenter
     public Sprite[] MonsterSprites;
     private Sprite _lastShownMonster;
 
-    public void ShowNewMonster()
+    public void DisplayNewMonster()
     {
+        Show();
         Sprite newMonster = MonsterSprites.PickRandomExcluding(_lastShownMonster);
         SetSprite(newMonster);
         _lastShownMonster = newMonster;
