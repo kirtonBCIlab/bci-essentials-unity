@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trialing
 {
-    public class SSVEPTrialBehaviour : ContinualTrialBehaviour
+    public class SSVEPTrialBehaviour : PersistentTrialBehaviour
     {
         [Space]
         public int TargetFrameRate = 30;

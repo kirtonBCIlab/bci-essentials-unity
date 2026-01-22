@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trialing
 {
-    public abstract class ContinualTrialBehaviour : TrialBehaviour
+    public abstract class PersistentTrialBehaviour : TrialBehaviour
     {
         public int TrainingEpochCount = 3;
         public float EpochLength = 1.0f;
