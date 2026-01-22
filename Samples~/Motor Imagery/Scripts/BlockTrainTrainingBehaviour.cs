@@ -36,13 +36,19 @@ public class BlockTrainTrainingBehaviour: TrainingBehaviour
             yield return RunTrainingEpochs(0, epochLength, offBlockEpochCount);
 
             OnBlockStarted?.Invoke();
-            for (int c = 0; c < ActivePeriodsPerOnBlock; c++)
+            int activePeriodsCompleted = 0;
+
+            while (activePeriodsCompleted < ActivePeriodsPerOnBlock)
             {
                 ActivePeriodStarted?.Invoke();
                 yield return RunTrainingEpochs(1, epochLength, activePeriodEpochCount);
 
-                RestPeriodStarted?.Invoke();
-                yield return new WaitForSeconds(RestPeriodDuration);
+                activePeriodsCompleted++;
+                if (activePeriodsCompleted < ActivePeriodsPerOnBlock)
+                {
+                    RestPeriodStarted?.Invoke();
+                    yield return new WaitForSeconds(RestPeriodDuration);
+                }
             }
         }
     }

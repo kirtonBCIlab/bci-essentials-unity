@@ -10,7 +10,7 @@ public class TrainingPresentationController : MonoBehaviour
         Monster.Hide();
         BlockTrainTrainingBehaviour.ActivePeriodStarted += Character.DisplayCharge;
         BlockTrainTrainingBehaviour.RestPeriodStarted += Character.DisplayThrow;
-        BlockTrainTrainingBehaviour.OffBlockStarted += Character.DisplaySit;
+        BlockTrainTrainingBehaviour.OffBlockStarted += Character.DisplaySitAfterThrow;
         BlockTrainTrainingBehaviour.CleanupInvoked += Character.DisplayIdle;
 
         BlockTrainTrainingBehaviour.OnBlockStarted += Monster.DisplayNewMonster;
