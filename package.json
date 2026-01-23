@@ -27,6 +27,11 @@
       "displayName": "SSVEP Tile Navigation",
       "description": "A more complex game demonstrating one possible configuration of an SSVEP paradigm. Depends on 2D tilemap and vector graphics packages.",
       "path": "Samples~/SSVEP Tile Navigation"
+    },
+    {
+      "displayName": "Motor Imagery",
+      "description": "Basic one button game implementing training for and live input from a BCI using Motor Imagery.",
+      "path": "Samples~/Motor Imagery"
     }
   ]
 }
