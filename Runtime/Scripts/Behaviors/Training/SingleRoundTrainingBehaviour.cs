@@ -11,6 +11,11 @@ namespace BCIEssentials.Behaviours.Training
         [SerializeField]
         private TrialBehaviour _trialBehaviour;
 
+        [StartFoldoutGroup("Marker Properties")]
+        [SerializeField]
+        [Tooltip("Whether to send 'Trial Started' and 'Trial Ends' markers. Disable if the training trial behaviour already sends these markers.")]
+        private bool _sendTrialMarkers = true;
+
         [StartFoldoutGroup("Training Properties")]
         public int TargetIndex;
 
@@ -26,10 +31,16 @@ namespace BCIEssentials.Behaviours.Training
         public float RestTime = 1.0f;
 
 
+
         protected override IEnumerator Run() => RunRound(TargetIndex);
 
         public virtual IEnumerator RunRound(int targetIndex)
         {
+            if (_sendTrialMarkers && MarkerWriter != null) 
+            {
+                MarkerWriter.PushTrialStartedMarker();
+            }
+            
             _targetIndicationBehaviour.BeginTargetIndication(targetIndex);
             yield return new WaitForSeconds(TargetIndicationPeriod);
 
@@ -52,6 +63,11 @@ namespace BCIEssentials.Behaviours.Training
             if (PersistTargetIndication)
             {
                 _targetIndicationBehaviour.EndTargetIndication();
+            }
+
+            if (_sendTrialMarkers && MarkerWriter != null) 
+            {
+                MarkerWriter.PushTrialEndsMarker();
             }
         }
 
