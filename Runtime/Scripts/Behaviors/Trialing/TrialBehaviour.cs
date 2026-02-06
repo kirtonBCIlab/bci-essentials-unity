@@ -20,7 +20,15 @@ namespace BCIEssentials.Behaviours.Trialing
             Begin();
         }
 
-        protected override void CleanUp() => ClearTrainingTarget();
+        protected override void SetUp()
+        {
+            MarkerWriter.PushTrialStartedMarker();
+        }
+        protected override void CleanUp()
+        {
+            MarkerWriter.PushTrialEndsMarker();
+            ClearTrainingTarget();
+        }
 
         public void ClearTrainingTarget() => TrainingTarget = null;
     }
