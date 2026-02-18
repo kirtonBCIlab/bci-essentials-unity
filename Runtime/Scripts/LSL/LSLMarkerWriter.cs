@@ -66,50 +66,6 @@ namespace BCIEssentials.LSLFramework
 
 
         /// <summary>
-        /// Create and send a training marker for the Switch paradigm
-        /// </summary>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
-        /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
-        /// </param>
-        /// <param name="epochLength">
-        /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
-        /// </param>
-        public void PushSwitchTrainingMarker
-        (
-            int objectCount,
-            int trainingTarget,
-            float epochLength
-        )
-        => PushMarker(new SwitchEventMarker
-            (objectCount, trainingTarget, epochLength)
-        );
-
-        /// <summary>
-        /// Create and send a classification marker for the Switch paradigm
-        /// </summary>
-        /// <remarks>
-        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
-        /// </remarks>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
-        /// </param>
-        /// <param name="epochLength">
-        /// Arbitrary length of the processing Epoch <br/>
-        /// </param>
-        public void PushSwitchClassificationMarker
-        (
-            int objectCount, float epochLength
-        )
-        => PushMarker(new SwitchEventMarker
-            (objectCount, -1, epochLength)
-        );
-
-
-        /// <summary>
         /// Create and send a training marker for the SSVEP paradigm
         /// </summary>
         /// <param name="objectCount">
@@ -159,59 +115,6 @@ namespace BCIEssentials.LSLFramework
             IEnumerable<float> frequencies
         )
         => PushMarker(new SSVEPEventMarker
-            (objectCount, -1, epochLength, frequencies)
-        );
-
-        /// <summary>
-        /// Create and send a training marker for the TVEP paradigm
-        /// </summary>
-        /// <param name="objectCount">
-        /// Number of objects (frequencies) in the trial
-        /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
-        /// </param>
-        /// <param name="epochLength">
-        /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
-        /// </param>
-        /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus objects
-        /// </param>
-        public void PushTVEPTrainingMarker
-        (
-            int objectCount,
-            int trainingTarget,
-            float epochLength,
-            IEnumerable<float> frequencies
-        )
-        => PushMarker(new TVEPEventMarker
-            (objectCount, trainingTarget, epochLength, frequencies)
-        );
-
-        /// <summary>
-        /// Create and send a classification marker for the TVEP paradigm
-        /// </summary>
-        /// <remarks>
-        /// Will trigger a prediction in <paramref name="epochLength"/> seconds
-        /// <br/>or at the end of the trial
-        /// <br/>depending on python configuration
-        /// </remarks>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
-        /// </param>
-        /// <param name="epochLength">
-        /// Arbitrary length of the processing Epoch <br/>
-        /// </param>
-        /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus objects
-        /// </param>
-        public void PushTVEPClassificationMarker
-        (
-            int objectCount, float epochLength,
-            IEnumerable<float> frequencies
-        )
-        => PushMarker(new TVEPEventMarker
             (objectCount, -1, epochLength, frequencies)
         );
 

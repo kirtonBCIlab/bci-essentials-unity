@@ -41,21 +41,6 @@ namespace BCIEssentials.Tests.LSLFramework
         }
 
         [Test]
-        [TestCase(2, 1, 1.5f, "switch,2,2,1.50")]
-        public void PushSwitchMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
-        (
-            int objectCount, int trainingTarget,
-            float epochLength, string expectedSampleValue
-        )
-        {
-            OutStream.PushSwitchTrainingMarker
-            (
-                objectCount, trainingTarget, epochLength
-            );
-            AssertPulledSample(expectedSampleValue);
-        }
-
-        [Test]
         [TestCase(4, 2, 1.5f, new[] {12.5f,18.7f,24.4f,30.1f}, "ssvep,4,3,1.50,12.5,18.7,24.4,30.1")]
         public void PushSSVEPMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
@@ -64,22 +49,6 @@ namespace BCIEssentials.Tests.LSLFramework
         )
         {
             OutStream.PushSSVEPTrainingMarker
-            (
-                objectCount, trainingTarget,
-                epochLength, frequencies
-            );
-            AssertPulledSample(expectedSampleValue);
-        }
-
-        [Test]
-        [TestCase(6, 2, 1.5f, new[] {15f}, "tvep,6,3,1.50,15")]
-        public void PushTVEPMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
-        (
-            int objectCount, int trainingTarget, float epochLength,
-            float[] frequencies, string expectedSampleValue
-        )
-        {
-            OutStream.PushTVEPTrainingMarker
             (
                 objectCount, trainingTarget,
                 epochLength, frequencies

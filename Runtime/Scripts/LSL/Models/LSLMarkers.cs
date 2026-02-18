@@ -114,35 +114,6 @@ namespace BCIEssentials.LSLFramework
         {}
     }
 
-    /// <summary>
-    /// Switch event marker in the format:
-    /// <br/><br/>
-    /// "switch,{object count},{train target (-1 if n/a)},{epoch length}"
-    /// </summary>
-    public class SwitchEventMarker: EpochEventMarker
-    {
-        public override string MarkerString
-        => $"switch,{base.MarkerString}";
-
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
-        /// </param>
-        /// <param name="trainingTarget">
-        /// Index of class targetted for training <i>(0-indexed)</i>
-        /// </param>
-        /// <param name="epochLength">
-        /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
-        /// </param>
-        public SwitchEventMarker
-        (
-            int objectCount, int trainingTarget,
-            float epochLength
-        )
-        : base(objectCount, trainingTarget, epochLength)
-        {}
-    }
-
 
     public abstract class FrequenciesEventMarker: EpochEventMarker
     {
@@ -202,41 +173,6 @@ namespace BCIEssentials.LSLFramework
         (
             objectCount, trainingTarget,
             epochLength, frequencies.ToArray()
-        ) {}
-    }
-
-    /// <summary>
-    /// TVEP event marker in the format:
-    /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
-    /// </summary>
-    public class TVEPEventMarker: FrequenciesEventMarker
-    {
-        public override string MarkerString
-        => $"tvep,{base.MarkerString}";
-
-        /// <param name="objectCount">
-        /// Number of objects (frequencies) in the trial
-        /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
-        /// </param>
-        /// <param name="epochLength">
-        /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
-        /// </param>
-        /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus objects
-        /// </param>
-        public TVEPEventMarker
-        (
-            int objectCount, int trainingTarget,
-            float epochLength, IEnumerable<float> frequencies
-        )
-        : base
-        (
-            objectCount, trainingTarget,
-            epochLength, frequencies.ToArray() 
         ) {}
     }
 
