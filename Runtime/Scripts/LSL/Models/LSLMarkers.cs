@@ -9,29 +9,29 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public interface ICommandMarker: ILSLMarker {}
+    public interface IStatusMarker: ILSLMarker {}
 
-    public struct TrialStartedMarker: ICommandMarker
+    public struct TrialStartedMarker: IStatusMarker
     {
         public string MarkerString => "Trial Started";
     }
-    public struct TrialEndsMarker: ICommandMarker 
+    public struct TrialEndsMarker: IStatusMarker 
     {
         public string MarkerString => "Trial Ends";
     }
-    public struct TrainingCompleteMarker: ICommandMarker
+    public struct TrainingCompleteMarker: IStatusMarker
     {
         public string MarkerString => "Training Complete";
     }
-    public struct TrainClassifierMarker: ICommandMarker
+    public struct TrainClassifierMarker: IStatusMarker
     {
         public string MarkerString => "Train Classifier";
     }
-    public struct UpdateClassifierMarker: ICommandMarker
+    public struct UpdateClassifierMarker: IStatusMarker
     {
         public string MarkerString => "Update Classifier";
     }
-    public struct DoneWithRestingStateCollectionMarker: ICommandMarker
+    public struct DoneWithRestingStateCollectionMarker: IStatusMarker
     {
         public string MarkerString => "Done with all RS collection";
     }

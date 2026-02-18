@@ -12,12 +12,12 @@ namespace BCIEssentials.Tests.LSLFramework
         [TestCase(typeof(TrialEndsMarker), "Trial Ends")]
         [TestCase(typeof(TrainingCompleteMarker), "Training Complete")]
         [TestCase(typeof(UpdateClassifierMarker), "Update Classifier")]
-        public void PushMarker_WhenTypedCommandMarkerPushed_ThenMarkerStringPulled
+        public void PushMarker_WhenTypedStatusMarkerPushed_ThenMarkerStringPulled
         (
             Type markerType, string expectedSampleValue
         )
         {
-            var marker = (ICommandMarker)Activator.CreateInstance(markerType);
+            var marker = (IStatusMarker)Activator.CreateInstance(markerType);
             OutStream.PushMarker(marker);
             AssertPulledSample(expectedSampleValue);
         }

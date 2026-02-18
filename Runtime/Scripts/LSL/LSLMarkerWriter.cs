@@ -5,19 +5,19 @@ namespace BCIEssentials.LSLFramework
     public class LSLMarkerWriter: LSLStreamWriter
     {
         public void PushTrialStartedMarker()
-            => PushCommandMarker<TrialStartedMarker>();
+            => PushStatusMarker<TrialStartedMarker>();
         public void PushTrialEndsMarker()
-            => PushCommandMarker<TrialEndsMarker>();
+            => PushStatusMarker<TrialEndsMarker>();
         public void PushTrainingCompleteMarker()
-            => PushCommandMarker<TrainingCompleteMarker>();
+            => PushStatusMarker<TrainingCompleteMarker>();
         public void PushTrainClassificationMarker()
-            => PushCommandMarker<TrainClassifierMarker>();
+            => PushStatusMarker<TrainClassifierMarker>();
         public void PushUpdateClassifierMarker()
-            => PushCommandMarker<UpdateClassifierMarker>();
+            => PushStatusMarker<UpdateClassifierMarker>();
         public void PushDoneWithRestingStateCollectionMarker()
-            => PushCommandMarker<DoneWithRestingStateCollectionMarker>();
-        public void PushCommandMarker<T>()
-            where T: ICommandMarker, new()
+            => PushStatusMarker<DoneWithRestingStateCollectionMarker>();
+        public void PushStatusMarker<T>()
+            where T: IStatusMarker, new()
             => PushMarker(new T());
 
 
