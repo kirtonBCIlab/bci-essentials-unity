@@ -107,7 +107,7 @@ namespace BCIEssentials.LSLFramework
             ,
             string trimmedSample when
                 TryMatchRegex(trimmedSample, MarkerReceiptRegex, out string markerBody)
-                => MarkerReceipt.Parse(markerBody)
+                => LSLMarkerReceipt.Parse(markerBody)
             ,
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
         };
@@ -142,18 +142,27 @@ namespace BCIEssentials.LSLFramework
         protected virtual void ParseBody(string body) {}
     }
 
-    public class LSLPing: SingleChannelLSLResponse {}
+    public class LSLPing : SingleChannelLSLResponse { }
+
+    public class LSLMarkerReceipt : SingleChannelLSLResponse
+    {
+        public string MarkerBody { get; protected set; }
+
+        public new static LSLResponse Parse(string body)
+        => new LSLMarkerReceipt {MarkerBody = body};
+    }
+
 
     /// <summary>
     /// Prediction/Selection response from bci-essentials python back end.
     /// <br/><i>(0-indexed)</i>
     /// </summary>
-    public class LSLPredictionResponse: SingleChannelLSLResponse
+    public class LSLPredictionResponse : SingleChannelLSLResponse
     {
         /// <summary>
         /// Index of object or class to select <i>(0-indexed)</i>
         /// </summary>
-        public int Value {get; protected set;}
+        public int Value { get; protected set; }
 
         protected override void ParseBody(string body)
         {
