@@ -1,6 +1,5 @@
 using LSL;
 using UnityEngine;
-using static System.Diagnostics.Process;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -31,14 +30,12 @@ namespace BCIEssentials.LSLFramework
                 Debug.LogWarning($"Stream already initialized");
                 return false;
             }
-            
-            string deviceID = SystemInfo.deviceUniqueIdentifier;
-            int processID = GetCurrentProcess().Id;
+
             var streamInfo = new StreamInfo
             (
                 StreamName, StreamType,
                 channel_format: channel_format_t.cf_string,
-                source_id: $"{deviceID}-Unity-{processID}"
+                source_id: BuildSourceID()
             );
             _outlet = new StreamOutlet(streamInfo);
             
@@ -56,7 +53,7 @@ namespace BCIEssentials.LSLFramework
         {
             if (HasLiveOutlet || OpenStream())
             {
-                _outlet.push_sample(new[] {s});
+                _outlet.push_sample(new[] { s });
                 if (PrintLogs)
                 {
                     Debug.Log($"Sent Marker: {s}");
@@ -66,6 +63,17 @@ namespace BCIEssentials.LSLFramework
             {
                 Debug.LogError("No outlet to write to");
             }
+        }
+        
+        /// <summary>
+        /// Provides a source id string for the underlying outlet
+        /// <br/> A combination of device id and application name by default
+        /// </summary>
+        protected virtual string BuildSourceID()
+        {
+            string deviceID = SystemInfo.deviceUniqueIdentifier;
+            string applicationName = Application.productName;
+            return $"{deviceID}-{applicationName}";
         }
     }
 }
