@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
-    public class SingleRoundTrainingBehaviour : TrainingBehaviour, IBCIMarkerSource
+    public class SingleRoundTrainingBehaviour : TrainingBehaviour
     {
         [SerializeField]
         protected TargetIndicationBehaviour _targetIndicationBehaviour;
