@@ -5,7 +5,7 @@ namespace BCIEssentials.Behaviours
     using Trialing;
     using Training;
 
-    public class BCIController : MarkerComponentProvider
+    public class BCIController : CommunicationComponentProvider
     {
         public bool IsRunningTrial => _trialBehaviour.IsRunning;
         public bool IsRunningTraining => _trainingBehaviour.IsRunning;

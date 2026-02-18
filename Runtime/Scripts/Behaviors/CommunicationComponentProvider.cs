@@ -6,7 +6,7 @@ namespace BCIEssentials.Behaviours
     using LSLFramework;
     using Selection;
 
-    public class MarkerComponentProvider : MonoBehaviourUsingExtendedAttributes
+    public class CommunicationComponentProvider : MonoBehaviourUsingExtendedAttributes
     {
         protected LSLMarkerWriter MarkerWriter;
         protected LSLResponseProvider ResponseProvider;
