@@ -11,7 +11,7 @@ namespace BCIEssentials.Behaviours.Training
 
     public abstract class TargetIndicationBehaviour : SelectionBehaviour
     {
-        public abstract int OptionCount { get; }
+        public abstract int TargetCount { get; }
 
         public abstract void BeginTargetIndication(int index);
         public abstract void EndTargetIndication();

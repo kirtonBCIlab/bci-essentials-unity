@@ -20,7 +20,7 @@ public class StimulusPresenterGridFactory : StimulusPresenterCollection
             return;
         }
 
-        if (OptionCount > 0) DestroyPresenters();
+        if (Count > 0) DestroyPresenters();
 
         BuildGridObjects(objectParent);
     }
@@ -34,7 +34,7 @@ public class StimulusPresenterGridFactory : StimulusPresenterCollection
                 var presenter = InstantiatePresenter(objectParent);
                 GameObject presenterObject = presenter.gameObject;
 
-                presenterObject.name = $"Stimulus Presenter {OptionCount}";
+                presenterObject.name = $"Stimulus Presenter {Count}";
                 presenterObject.transform.position = new()
                 {
                     x = GetPositionAxis(_spacing.x, columnIndex, _columnCount),

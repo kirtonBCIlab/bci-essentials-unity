@@ -9,7 +9,7 @@ namespace BCIEssentials.Stimulus.Collections
 {
     public class StimulusPresenterCollection : TargetIndicationBehaviour, ICollection<StimulusPresentationBehaviour>
     {
-        public override int OptionCount => _stimulusPresenters.Count;
+        public override int TargetCount => Count;
         [SerializeField] protected List<StimulusPresentationBehaviour> _stimulusPresenters;
 
         private int? _targetIndex;
@@ -38,13 +38,13 @@ namespace BCIEssentials.Stimulus.Collections
         public StimulusPresentationBehaviour this[int index] => GetPresenter(index);
         protected virtual StimulusPresentationBehaviour GetPresenter(int index)
         {
-            if (OptionCount == 0)
+            if (Count == 0)
             {
                 Debug.Log("Can't index an empty collection");
                 return null;
             }
 
-            if (index < 0 || index >= OptionCount)
+            if (index < 0 || index >= Count)
             {
                 throw new IndexOutOfRangeException();
             }
