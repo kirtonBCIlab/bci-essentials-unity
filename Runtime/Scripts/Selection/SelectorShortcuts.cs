@@ -41,16 +41,13 @@ namespace BCIEssentials.Selection
 
 
         protected virtual void Update()
-        => Bindings.Process(MakeSelectionAtEndOfRun);
+        => Bindings.Process(
+            _trialBehaviour ? MakeSelectionAtEndOfRun
+            : _target.MakeSelection
+        );
 
         private void MakeSelectionAtEndOfRun(int selectionIndex)
-        {
-            if (_trialBehaviour)
-            {
-                StartCoroutine(RunTrialDelayedSelection(selectionIndex));
-            }
-            else Debug.LogWarning("Missing reference to Trial Behaviour");
-        }
+        => StartCoroutine(RunTrialDelayedSelection(selectionIndex));
 
         private IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
