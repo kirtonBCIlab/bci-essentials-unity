@@ -18,10 +18,8 @@ namespace BCIEssentials.Behaviours.Training
         public bool PersistTargetIndication = false;
 
         public float PreTrialTime = 0.5f;
-        public float PostTrialTime = 0.0f;
-
         [EndFoldoutGroup]
-        public float RestTime = 1.0f;
+        public float PostTrialTime = 0.0f;
 
 
         protected override IEnumerator Run() => RunRound(TargetIndex);

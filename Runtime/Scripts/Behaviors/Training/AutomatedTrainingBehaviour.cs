@@ -8,6 +8,7 @@ namespace BCIEssentials.Behaviours.Training
     {
         [Space]
         public int SelectionCount = 8;
+        public float RestTime = 1.0f;
 
         protected override IEnumerator Run()
         {
