@@ -71,7 +71,7 @@ namespace BCIEssentials.LSLFramework
             while (lastCaptureTime > 0 && pullCounter++ < maxSamples)
             {
                 lastCaptureTime = PullResponse(out Response response);
-                if (lastCaptureTime > 0)
+                if (lastCaptureTime > 0 && response is not EmptyResponse)
                     pulledResponses.Add(response);
             }
             return pulledResponses.ToArray();
@@ -81,7 +81,7 @@ namespace BCIEssentials.LSLFramework
         {
             double captureTime = _inlet.pull_sample(_sampleBuffer, 0);
             parsedResponse = BuildResponse(_sampleBuffer, captureTime);
-            if (PrintLogs)
+            if (PrintLogs && parsedResponse is not EmptyResponse)
             {
                 Debug.Log($"Pulled {parsedResponse}");
             }
