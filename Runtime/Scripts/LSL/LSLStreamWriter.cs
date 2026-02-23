@@ -6,7 +6,7 @@ namespace BCIEssentials.LSLFramework
     public class LSLStreamWriter: MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";
-        public string StreamType = "LSL_Marker_Strings";
+        public string StreamType = "BCI_Essentials_Markers";
         public bool PrintLogs = false;
 
         public bool HasConsumers => _outlet?.have_consumers() ?? false;
