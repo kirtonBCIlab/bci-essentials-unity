@@ -4,7 +4,7 @@ namespace BCIEssentials.Behaviours.Trialing
 {
     public abstract class TrialBehaviour : CoroutineBehaviour, IBCIMarkerSource
     {
-        public LSLMarkerWriter MarkerWriter { get; set; }
+        public MarkerWriter MarkerWriter { get; set; }
         public bool HasTrainingTarget => TrainingTarget.HasValue;
         protected int? TrainingTarget = null;
 

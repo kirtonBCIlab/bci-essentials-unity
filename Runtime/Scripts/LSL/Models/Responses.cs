@@ -5,30 +5,30 @@ using System;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLResponse
+    public class Response
     {
         public double CaptureTime {get; protected set;}
         public string[] RawSampleValues {get; protected set;}
 
-        public LSLResponse() {}
+        public Response() {}
 
         /// <summary>
         /// Build typed response object from LSL sample.
         /// </summary>
-        public static LSLResponse BuildResponse
+        public static Response BuildResponse
         (
             string[] sampleValues, double captureTime
         )
         {
-            LSLResponse responseObject = sampleValues switch
+            Response responseObject = sampleValues switch
             {
                 _ when sampleValues.All(string.IsNullOrEmpty)
-                    => new EmptyLSLResponse()
+                    => new EmptyResponse()
                 ,
                 { Length: 1 } _
-                    => SingleChannelLSLResponse.Parse(sampleValues[0])
+                    => SingleChannelResponse.Parse(sampleValues[0])
                 ,
-                _ => CreateUnparsedMessage<LSLResponse>(string.Join(" | ", sampleValues))
+                _ => CreateUnparsedMessage<Response>(string.Join(" | ", sampleValues))
             };
 
             responseObject.CaptureTime = captureTime;
@@ -37,11 +37,11 @@ namespace BCIEssentials.LSLFramework
             return responseObject;
         }
 
-        protected static LSLResponse CreateUnparsedMessage<T>
+        protected static Response CreateUnparsedMessage<T>
         (
             string warningBody
         )
-        where T: LSLResponse, new()
+        where T: Response, new()
         {
             Debug.LogWarning($"Failed to parse {typeof(T).Name} into meaningful type: {warningBody}");
             return new T();
@@ -82,10 +82,10 @@ namespace BCIEssentials.LSLFramework
         }
     }
 
-    public class EmptyLSLResponse: LSLResponse {}
+    public class EmptyResponse: Response {}
 
 
-    public class SingleChannelLSLResponse: LSLResponse
+    public class SingleChannelResponse: Response
     {
         private static readonly Regex PredictionRegex
             = new(@"(\d+)\s*:\s*\[([\d\. ]+)\]");
@@ -96,7 +96,7 @@ namespace BCIEssentials.LSLFramework
         /// Build typed response object from singular
         /// channel value of an LSL sample.
         /// </summary>
-        public static LSLResponse BuildResponse
+        public static Response BuildResponse
         (
             string sampleValue, double captureTime
         )
@@ -105,35 +105,35 @@ namespace BCIEssentials.LSLFramework
         /// <summary>
         /// Parse sample into a skeleton response object
         /// </summary>
-        public static LSLResponse Parse
+        public static Response Parse
         (
             string sampleValue
         )
         => sampleValue.Trim() switch
         {
             "ping"
-                => new LSLPing()
+                => new Ping()
             ,
             string trimmedSample when
                 TryMatchRegex(trimmedSample, PredictionRegex, out string[][] predictionSegments)
-                => LSLPrediction.Parse(predictionSegments)
+                => Prediction.Parse(predictionSegments)
             ,
             string trimmedSample when
                 TryMatchRegex(trimmedSample, MarkerReceiptRegex, out string markerBody)
-                => LSLMarkerReceipt.Parse(markerBody)
+                => MarkerReceipt.Parse(markerBody)
             ,
-            _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
+            _ => CreateUnparsedMessage<SingleChannelResponse>(sampleValue)
         };
     }
 
-    public class LSLPing : SingleChannelLSLResponse { }
+    public class Ping : SingleChannelResponse { }
 
-    public class LSLMarkerReceipt : SingleChannelLSLResponse
+    public class MarkerReceipt : SingleChannelResponse
     {
         public string MarkerBody { get; protected set; }
 
-        public new static LSLResponse Parse(string body)
-        => new LSLMarkerReceipt {MarkerBody = body};
+        public new static Response Parse(string body)
+        => new MarkerReceipt {MarkerBody = body};
     }
 
 
@@ -141,7 +141,7 @@ namespace BCIEssentials.LSLFramework
     /// Prediction/Selection response from bci-essentials python back end.
     /// <br/><i>(0-indexed)</i>
     /// </summary>
-    public class LSLPrediction : SingleChannelLSLResponse
+    public class Prediction : SingleChannelResponse
     {
         /// <summary>
         /// Index of object or class to select <i>(0-indexed)</i>
@@ -153,18 +153,18 @@ namespace BCIEssentials.LSLFramework
         public float[] Probabilities { get; protected set; }
 
 
-        public static LSLPrediction Parse(string[][] predictionSegments)
+        public static Prediction Parse(string[][] predictionSegments)
         => predictionSegments switch
         {
             { Length: 1 } => ParseValues(predictionSegments[0]),
-            _ => LSLCompositePrediction.Parse(predictionSegments)
+            _ => CompositePrediction.Parse(predictionSegments)
         };
 
-        public static LSLPrediction ParseValues(string[] valueStrings)
+        public static Prediction ParseValues(string[] valueStrings)
         {
             try
             {
-                return new LSLPrediction()
+                return new Prediction()
                 {
                     Index = int.Parse(valueStrings[0]),
                     Probabilities = valueStrings[1].Split(" ")
@@ -175,7 +175,7 @@ namespace BCIEssentials.LSLFramework
             {
                 throw new FormatException
                 (
-                    $"Body segments of {typeof(LSLPrediction).Name}"
+                    $"Body segments of {typeof(Prediction).Name}"
                     + $"were in unexpected format: {valueStrings}"
                     , ex
                 );
@@ -187,16 +187,16 @@ namespace BCIEssentials.LSLFramework
     /// Prediction/Selection response containing multiple results,
     /// <br>it is recommended to use the most recent result
     /// </summary>
-    public class LSLCompositePrediction : LSLPrediction
+    public class CompositePrediction : Prediction
     {
-        public LSLPrediction[] Parts { get; protected set; }
+        public Prediction[] Parts { get; protected set; }
 
-        public new static LSLCompositePrediction Parse(string[][] predictionSegments)
+        public new static CompositePrediction Parse(string[][] predictionSegments)
         {
-            LSLPrediction[] parts = predictionSegments.Select(
+            Prediction[] parts = predictionSegments.Select(
                 valueStrings => ParseValues(valueStrings)
             ).ToArray();
-            LSLPrediction latest = parts[^1];
+            Prediction latest = parts[^1];
 
             return new()
             {

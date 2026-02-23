@@ -8,8 +8,8 @@ namespace BCIEssentials.Behaviours
 
     public class CommunicationComponentProvider : MonoBehaviourUsingExtendedAttributes
     {
-        protected LSLMarkerWriter MarkerWriter;
-        protected LSLResponseProvider ResponseProvider;
+        protected MarkerWriter MarkerWriter;
+        protected ResponseProvider ResponseProvider;
 
 
         /// <summary>
@@ -42,6 +42,6 @@ namespace BCIEssentials.Behaviours
 
     public interface IBCIMarkerSource
     {
-        public LSLMarkerWriter MarkerWriter { set; }
+        public MarkerWriter MarkerWriter { set; }
     }
 }

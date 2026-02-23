@@ -5,7 +5,7 @@ namespace BCIEssentials.Behaviours.Training
 {
     public abstract class TrainingBehaviour : CoroutineBehaviour, IBCIMarkerSource
     {
-        public LSLMarkerWriter MarkerWriter { get; set; }
+        public MarkerWriter MarkerWriter { get; set; }
     }
 
 

@@ -3,13 +3,13 @@ using System.Linq;
 
 namespace BCIEssentials.LSLFramework
 {
-    public interface ILSLMarker
+    public interface IMarker
     {
         public string MarkerString {get;}
     }
 
 
-    public interface IStatusMarker: ILSLMarker {}
+    public interface IStatusMarker: IMarker {}
 
     public struct TrialStartedMarker: IStatusMarker
     {
@@ -37,7 +37,7 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class EventMarker: ILSLMarker
+    public abstract class EventMarker: IMarker
     {
         /// <summary>
         /// Number of objects or classes in the trial

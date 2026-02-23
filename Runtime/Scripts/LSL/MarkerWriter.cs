@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLMarkerWriter: LSLStreamWriter
+    public class MarkerWriter: LSLStreamWriter
     {
         public void PushTrialStartedMarker()
             => PushStatusMarker<TrialStartedMarker>();
@@ -196,7 +196,7 @@ namespace BCIEssentials.LSLFramework
         );
 
 
-        public void PushMarker(ILSLMarker marker)
+        public void PushMarker(IMarker marker)
             => PushString(marker.MarkerString);
     }
 }

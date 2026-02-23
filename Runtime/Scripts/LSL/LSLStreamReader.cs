@@ -5,11 +5,11 @@ using UnityEngine;
 namespace BCIEssentials.LSLFramework
 {
     using static LSLStreamResolver;
-    using static LSLResponse;
+    using static Response;
 
     public class LSLStreamReader: MonoBehaviour
     {
-        public string StreamType = "BCI";
+        public string StreamType = "BCI_Essentials_Predictions";
         [SerializeField] bool _openOnStart = false;
         public bool PrintLogs = false;
 
@@ -56,28 +56,28 @@ namespace BCIEssentials.LSLFramework
         }
 
         
-        public virtual LSLResponse[] PullAllResponses(int maxSamples = 50)
+        public virtual Response[] PullAllResponses(int maxSamples = 50)
         {
             if (!HasLiveInlet)
             {
                 Debug.LogWarning("The target stream is unavailable");
-                return new LSLResponse[0];
+                return new Response[0];
             }
 
-            List<LSLResponse> pulledResponses = new();
+            List<Response> pulledResponses = new();
             double lastCaptureTime = double.MaxValue;
             int pullCounter = 0;
 
             while (lastCaptureTime > 0 && pullCounter++ < maxSamples)
             {
-                lastCaptureTime = PullResponse(out LSLResponse response);
+                lastCaptureTime = PullResponse(out Response response);
                 if (lastCaptureTime > 0)
                     pulledResponses.Add(response);
             }
             return pulledResponses.ToArray();
         }
 
-        private double PullResponse(out LSLResponse parsedResponse)
+        private double PullResponse(out Response parsedResponse)
         {
             double captureTime = _inlet.pull_sample(_sampleBuffer, 0);
             parsedResponse = BuildResponse(_sampleBuffer, captureTime);

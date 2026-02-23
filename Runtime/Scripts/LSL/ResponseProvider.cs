@@ -10,7 +10,7 @@ namespace BCIEssentials.LSLFramework
     A convenience class that pulls responses from an LSL
     outlet, providing them through typed callback subscriptions.
     </summary> **/
-    public class LSLResponseProvider: LSLStreamReader
+    public class ResponseProvider: LSLStreamReader
     {
         [Min(0)]
         public float PollingPeriod = 0.1f;
@@ -28,9 +28,9 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        public void SubscribePredictions(Action<LSLPredictionResponse> callback)
+        public void SubscribePredictions(Action<Prediction> callback)
         => Subscribe(callback);
-        public void SubscribeAll(Action<LSLResponse> callback)
+        public void SubscribeAll(Action<Response> callback)
         => Subscribe(callback);
         /** <summary>
         Add a method to the callback list,
@@ -47,7 +47,7 @@ namespace BCIEssentials.LSLFramework
         </code></example>
         </summary> **/
         public void Subscribe<T>(Action<T> callback)
-        where T: LSLResponse
+        where T: Response
         {
             _subscribers.Add(new ResponseSubscriber<T>(callback));
             if (!IsPolling)
@@ -55,9 +55,9 @@ namespace BCIEssentials.LSLFramework
         }
 
         
-        public bool UnsubscribePredictions(Action<LSLPredictionResponse> callback)
+        public bool UnsubscribePredictions(Action<Prediction> callback)
         => Unsubscribe(callback);
-        public bool UnsubscribeAll(Action<LSLResponse> callback)
+        public bool UnsubscribeAll(Action<Response> callback)
         => Unsubscribe(callback);
         /** <summary>
         Remove a method from the callback list,
@@ -67,7 +67,7 @@ namespace BCIEssentials.LSLFramework
         invalidated target is automatically unsubscribed
         </summary> **/
         public bool Unsubscribe<T>(Action<T> callback)
-        where T: LSLResponse
+        where T: Response
         {
             int subscribersRemoved = _subscribers.RemoveAll
             (
@@ -114,14 +114,14 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        public override LSLResponse[] PullAllResponses(int maxSamples = 50)
+        public override Response[] PullAllResponses(int maxSamples = 50)
         {
-            LSLResponse[] pulledResponses = base.PullAllResponses(maxSamples);
+            Response[] pulledResponses = base.PullAllResponses(maxSamples);
             Array.ForEach(pulledResponses, NotifySubscribers);
             return pulledResponses;
         }
 
-        protected void NotifySubscribers(LSLResponse response)
+        protected void NotifySubscribers(Response response)
         => _subscribers.ToList().ForEach
         (
             subscriber => subscriber.Notify(response)
@@ -144,7 +144,7 @@ namespace BCIEssentials.LSLFramework
         }
 
         protected struct ResponseSubscriber<TResponse>: IResponseSubscriber
-        where TResponse: LSLResponse
+        where TResponse: Response
         {
             public Action<TResponse> responseCallback;
             private bool _callbackIsStatic;
