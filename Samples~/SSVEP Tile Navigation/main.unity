@@ -560,6 +560,7 @@ GameObject:
   - component: {fileID: 471476623}
   - component: {fileID: 471476625}
   - component: {fileID: 471476624}
+  - component: {fileID: 471476626}
   m_Layer: 0
   m_Name: Stimulus Presenters
   m_TagString: Untagged
@@ -640,6 +641,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Selection.StimulusPresenterCollectionSelector
   _target: {fileID: 471476623}
+--- !u!114 &471476626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 471476621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 311dfe5af981ee54c87b53d6f58e40ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Training.StimulusPresenterCollectionTargetIndicator
+  _target: {fileID: 471476623}
 --- !u!1 &584918805
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,15 +686,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf249683faf91e4fb308c079bb5a6f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetIndicationBehaviour: {fileID: 471476623}
+  _targetIndicationBehaviour: {fileID: 471476626}
   _trialBehaviour: {fileID: 584918807}
   TargetIndex: 0
   TargetIndicationPeriod: 3
   PersistTargetIndication: 0
   PreTrialTime: 0.5
   PostTrialTime: 0
-  RestTime: 1
   SelectionCount: 8
+  RestTime: 1
 --- !u!114 &584918807
 MonoBehaviour:
   m_ObjectHideFlags: 0
