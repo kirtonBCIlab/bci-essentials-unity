@@ -14,7 +14,7 @@ namespace BCIEssentials.Behaviours.Trials.P300
 
         protected override IEnumerator Run()
         {
-            List<StimulusPresentationBehaviour> visiblePresenters = PresenterCollection.GetVisible();
+            List<StimulusPresentationBehaviour> visiblePresenters = PresenterCollection.GetVisibleAndSelectable();
             List<GameObject> presenterGameObjects = visiblePresenters.SelectGameObjects();
 
             for (int i = 0; i < FlashesPerOption; i++)

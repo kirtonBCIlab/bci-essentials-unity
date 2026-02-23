@@ -7,10 +7,15 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    public class StimulusPresenterCollection : TargetIndicationBehaviour, ICollection<StimulusPresentationBehaviour>
+    using Presenter = StimulusPresentationBehaviour;
+    using PresenterList = List<StimulusPresentationBehaviour>;
+    public class StimulusPresenterCollection : TargetIndicationBehaviour, ICollection<Presenter>
     {
         public override int TargetCount => Count;
-        [SerializeField] protected List<StimulusPresentationBehaviour> _stimulusPresenters;
+        public PresenterList LatestSubset => _latestSubset ?? _stimulusPresenters;
+        private PresenterList _latestSubset;
+        
+        [SerializeField] protected PresenterList _stimulusPresenters;
 
         private int? _targetIndex;
 
@@ -32,8 +37,8 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public StimulusPresentationBehaviour this[int index] => GetPresenter(index);
-        protected virtual StimulusPresentationBehaviour GetPresenter(int index)
+        public Presenter this[int index] => GetPresenter(index);
+        protected virtual Presenter GetPresenter(int index)
         {
             if (Count == 0)
             {
@@ -46,7 +51,7 @@ namespace BCIEssentials.Stimulus.Collections
                 throw new IndexOutOfRangeException();
             }
 
-            StimulusPresentationBehaviour presenter = _stimulusPresenters[index];
+            Presenter presenter = _stimulusPresenters[index];
             if (presenter == null)
             {
                 Debug.LogWarning("Stimulus presenter is null and can't be selected");
@@ -56,28 +61,28 @@ namespace BCIEssentials.Stimulus.Collections
         }
 
 
-        public virtual List<StimulusPresentationBehaviour> GetSelectable()
-        => _stimulusPresenters.WhereSelectable();
-        public virtual List<StimulusPresentationBehaviour> GetVisible()
-        => _stimulusPresenters.WhereVisibleFromMainCamera();
-        public virtual List<StimulusPresentationBehaviour> GetVisibleAndSelectable()
-        => GetSelectable().WhereVisibleFromMainCamera();
+        public virtual PresenterList GetSelectable()
+        => _latestSubset = _stimulusPresenters.WhereSelectable();
+        public virtual PresenterList GetVisible()
+        => _latestSubset = _stimulusPresenters.WhereVisibleFromMainCamera();
+        public virtual PresenterList GetVisibleAndSelectable()
+        => _latestSubset = GetSelectable().WhereVisibleFromMainCamera();
 
 
         public virtual bool IsReadOnly => false;
         public int Count => _stimulusPresenters.Count;
         public void Clear() => _stimulusPresenters.Clear();
 
-        public void Add(StimulusPresentationBehaviour presenter)
+        public void Add(Presenter presenter)
         => _stimulusPresenters.Add(presenter);
-        public bool Remove(StimulusPresentationBehaviour presenter)
+        public bool Remove(Presenter presenter)
         => _stimulusPresenters.Remove(presenter);
-        public bool Contains(StimulusPresentationBehaviour presenter)
+        public bool Contains(Presenter presenter)
         => _stimulusPresenters.Contains(presenter);
-        public void CopyTo(StimulusPresentationBehaviour[] array, int arrayIndex)
+        public void CopyTo(Presenter[] array, int arrayIndex)
         => _stimulusPresenters.CopyTo(array, arrayIndex);
 
-        public IEnumerator<StimulusPresentationBehaviour> GetEnumerator()
+        public IEnumerator<Presenter> GetEnumerator()
         => new StimulusPresenterCollectionEnumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

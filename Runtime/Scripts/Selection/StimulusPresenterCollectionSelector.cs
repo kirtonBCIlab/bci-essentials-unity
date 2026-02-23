@@ -14,6 +14,6 @@ namespace BCIEssentials.Selection
         private void Start() => this.CoalesceComponentReference(ref _target);
 
         public override void OnPrediction(Prediction prediction)
-        => _target[prediction.Index].Select();
+        => _target.LatestSubset[prediction.Index].Select();
     }
 }
