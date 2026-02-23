@@ -1,6 +1,6 @@
 using BCIEssentials.LSLFramework;
 
-namespace BCIEssentials.Behaviours.Trialing
+namespace BCIEssentials.Behaviours.Trials
 {
     public abstract class TrialBehaviour : CoroutineBehaviour, IBCIMarkerSource
     {

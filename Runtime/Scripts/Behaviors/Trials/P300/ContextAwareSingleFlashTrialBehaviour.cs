@@ -5,7 +5,7 @@ using BCIEssentials.Stimulus.Presentation;
 using BCIEssentials.Utilities;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trialing.P300
+namespace BCIEssentials.Behaviours.Trials.P300
 {
     using static ContextAwareUtilities;
     public class ContextAwareSingleFlashTrialBehaviour : SingleFlashTrialBehaviour

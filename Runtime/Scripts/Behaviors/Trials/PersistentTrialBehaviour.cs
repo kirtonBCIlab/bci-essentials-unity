@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trialing
+namespace BCIEssentials.Behaviours.Trials
 {
     public abstract class PersistentTrialBehaviour : TrialBehaviour
     {

@@ -1,5 +1,5 @@
 using System.Collections;
-using BCIEssentials.Behaviours.Trialing;
+using BCIEssentials.Behaviours.Trials;
 using BCIEssentials.Extensions;
 using BCIEssentials.Utilities;
 using UnityEngine;

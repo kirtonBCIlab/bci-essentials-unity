@@ -3,7 +3,7 @@ using BCIEssentials.Stimulus.Collections;
 using BCIEssentials.Stimulus.Presentation.Standard;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trialing
+namespace BCIEssentials.Behaviours.Trials
 {
     public class SSVEPTrialBehaviour : PersistentTrialBehaviour
     {

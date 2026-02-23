@@ -1,6 +1,6 @@
 using BCIEssentials.Stimulus.Collections;
 
-namespace BCIEssentials.Behaviours.Trialing.P300
+namespace BCIEssentials.Behaviours.Trials.P300
 {
     public abstract class P300TrialBehaviour : TrialBehaviour
     {

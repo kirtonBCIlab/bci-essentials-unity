@@ -6,7 +6,7 @@ using BCIEssentials.Stimulus.Collections;
 using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trialing.P300
+namespace BCIEssentials.Behaviours.Trials.P300
 {
     public abstract class MultiFlashTrialBehaviour : P300TrialBehaviour
     {

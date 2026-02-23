@@ -4,7 +4,7 @@ using BCIEssentials.Extensions;
 using BCIEssentials.Stimulus.Presentation;
 using BCIEssentials.Utilities;
 
-namespace BCIEssentials.Behaviours.Trialing.P300
+namespace BCIEssentials.Behaviours.Trials.P300
 {
     public class CheckerboardFlashTrialBehaviour : GridFlashTrialBehaviour
     {

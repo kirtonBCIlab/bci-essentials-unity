@@ -1,4 +1,4 @@
-namespace BCIEssentials.Behaviours.Trialing.P300
+namespace BCIEssentials.Behaviours.Trials.P300
 {
     public abstract class GridFlashTrialBehaviour : MultiFlashTrialBehaviour
     {

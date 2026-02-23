@@ -1,5 +1,5 @@
 using System.Collections;
-using BCIEssentials.Behaviours.Trialing;
+using BCIEssentials.Behaviours.Trials;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
