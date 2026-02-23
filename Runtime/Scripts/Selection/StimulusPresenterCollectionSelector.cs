@@ -11,6 +11,7 @@ namespace BCIEssentials.Selection
         [SerializeField]
         private StimulusPresenterCollection _target;
 
+        private void Reset() => this.CoalesceComponentReference(ref _target);
         private void Start() => this.CoalesceComponentReference(ref _target);
 
         public override void OnPrediction(Prediction prediction)

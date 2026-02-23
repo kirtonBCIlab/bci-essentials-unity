@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Behaviours.Training;
 using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
@@ -9,32 +8,12 @@ namespace BCIEssentials.Stimulus.Collections
 {
     using Presenter = StimulusPresentationBehaviour;
     using PresenterList = List<StimulusPresentationBehaviour>;
-    public class StimulusPresenterCollection : TargetIndicationBehaviour, ICollection<Presenter>
+    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ICollection<Presenter>
     {
-        public override int TargetCount => Count;
-        public PresenterList LatestSubset => _latestSubset ?? _stimulusPresenters;
+        public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
         private PresenterList _latestSubset;
         
         [SerializeField] protected PresenterList _stimulusPresenters;
-
-        private int? _targetIndex;
-
-
-        public override void BeginTargetIndication(int index)
-        {
-            GetPresenter(index)?.StartTargetIndication();
-            _targetIndex = index;
-        }
-        public override void EndTargetIndication()
-        {
-            if (!_targetIndex.HasValue)
-            {
-                Debug.LogWarning("No item has been targetted for training.");
-                return;
-            }
-            GetPresenter(_targetIndex.Value)?.EndTargetIndication();
-            _targetIndex = null;
-        }
 
 
         public Presenter this[int index] => GetPresenter(index);
