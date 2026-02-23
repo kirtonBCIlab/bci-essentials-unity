@@ -65,6 +65,21 @@ namespace BCIEssentials.LSLFramework
             capturedGroup = match.Success? match.Groups[1].Value: "";
             return match.Success;
         }
+
+        public static bool TryMatchRegex
+        (
+            string input, Regex pattern,
+            out string[][] capturedGroups
+        )
+        {
+            MatchCollection matches = pattern.Matches(input);
+            capturedGroups = matches.Select(
+                match => match.Groups.Select(
+                    group => group.Value
+                ).ToArray()[1..]
+            ).ToArray();
+            return matches.Count > 0;
+        }
     }
 
     public class EmptyLSLResponse: LSLResponse {}
@@ -72,10 +87,8 @@ namespace BCIEssentials.LSLFramework
 
     public class SingleChannelLSLResponse: LSLResponse
     {
-        private static readonly char[] TrimmedCharacters
-            = new[] {'[', ']'};
         private static readonly Regex PredictionRegex
-            = new(@"^(\d+)$");
+            = new(@"(\d+)\s*:\s*\[([\d\. ]+)\]");
         private static readonly Regex MarkerReceiptRegex
             = new(@"^marker received\s*:\s*(.+)$");
 
@@ -96,14 +109,14 @@ namespace BCIEssentials.LSLFramework
         (
             string sampleValue
         )
-        => sampleValue.Trim(TrimmedCharacters).Trim() switch
+        => sampleValue.Trim() switch
         {
             "ping"
                 => new LSLPing()
             ,
             string trimmedSample when
-                TryMatchRegex(trimmedSample, PredictionRegex, out string predictionBody)
-                => BuildPartialResponseFromBody<LSLPredictionResponse>(predictionBody)
+                TryMatchRegex(trimmedSample, PredictionRegex, out string[][] predictionSegments)
+                => LSLPrediction.Parse(predictionSegments)
             ,
             string trimmedSample when
                 TryMatchRegex(trimmedSample, MarkerReceiptRegex, out string markerBody)
@@ -111,35 +124,6 @@ namespace BCIEssentials.LSLFramework
             ,
             _ => CreateUnparsedMessage<SingleChannelLSLResponse>(sampleValue)
         };
-
-
-        protected static SingleChannelLSLResponse BuildPartialResponseFromBody<T>
-        (
-            string capturedBody = ""
-        )
-        where T : SingleChannelLSLResponse, new()
-        {
-            T responseObject = new T();
-            
-            if (capturedBody is not "")
-            {
-                try
-                {
-                    responseObject.ParseBody(capturedBody);
-                }
-                catch (Exception ex)
-                {
-                    throw new FormatException
-                    (
-                        $"Body of {typeof(T).Name} was in unexpected format: {capturedBody}"
-                    , ex);
-                }
-            }
-
-            return responseObject;
-        }
-
-        protected virtual void ParseBody(string body) {}
     }
 
     public class LSLPing : SingleChannelLSLResponse { }
@@ -157,17 +141,69 @@ namespace BCIEssentials.LSLFramework
     /// Prediction/Selection response from bci-essentials python back end.
     /// <br/><i>(0-indexed)</i>
     /// </summary>
-    public class LSLPredictionResponse : SingleChannelLSLResponse
+    public class LSLPrediction : SingleChannelLSLResponse
     {
         /// <summary>
         /// Index of object or class to select <i>(0-indexed)</i>
         /// </summary>
-        public int Value { get; protected set; }
+        public int Index { get; protected set; }
+        /// <summary>
+        /// Confidence ratio for each possible class or stimulus item
+        /// </summary>
+        public float[] Probabilities { get; protected set; }
 
-        protected override void ParseBody(string body)
+
+        public static LSLPrediction Parse(string[][] predictionSegments)
+        => predictionSegments switch
         {
-            Value = int.Parse(body);
-            if (Value > 0) Value--;
+            { Length: 1 } => ParseValues(predictionSegments[0]),
+            _ => LSLCompositePrediction.Parse(predictionSegments)
+        };
+
+        public static LSLPrediction ParseValues(string[] valueStrings)
+        {
+            try
+            {
+                return new LSLPrediction()
+                {
+                    Index = int.Parse(valueStrings[0]),
+                    Probabilities = valueStrings[1].Split(" ")
+                        .Select(s => float.Parse(s)).ToArray()
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new FormatException
+                (
+                    $"Body segments of {typeof(LSLPrediction).Name}"
+                    + $"were in unexpected format: {valueStrings}"
+                    , ex
+                );
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prediction/Selection response containing multiple results,
+    /// <br>it is recommended to use the most recent result
+    /// </summary>
+    public class LSLCompositePrediction : LSLPrediction
+    {
+        public LSLPrediction[] Parts { get; protected set; }
+
+        public new static LSLCompositePrediction Parse(string[][] predictionSegments)
+        {
+            LSLPrediction[] parts = predictionSegments.Select(
+                valueStrings => ParseValues(valueStrings)
+            ).ToArray();
+            LSLPrediction latest = parts[^1];
+
+            return new()
+            {
+                Index = latest.Index,
+                Probabilities = latest.Probabilities,
+                Parts = parts
+            };
         }
     }
 }
