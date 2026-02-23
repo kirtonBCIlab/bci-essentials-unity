@@ -1,5 +1,4 @@
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Selection;
 
 namespace BCIEssentials.Behaviours.Training
 {
@@ -9,7 +8,7 @@ namespace BCIEssentials.Behaviours.Training
     }
 
 
-    public abstract class TargetIndicationBehaviour : SelectionBehaviour
+    public abstract class TargetIndicationBehaviour : MonoBehaviourUsingExtendedAttributes
     {
         public abstract int TargetCount { get; }
 

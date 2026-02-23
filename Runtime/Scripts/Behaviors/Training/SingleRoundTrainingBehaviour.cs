@@ -20,8 +20,6 @@ namespace BCIEssentials.Behaviours.Training
         public float PreTrialTime = 0.5f;
         public float PostTrialTime = 0.0f;
 
-        public bool SelectTrainingTarget = false;
-        public float TargetSelectionDisplayPeriod = 0.5f;
         [EndFoldoutGroup]
         public float RestTime = 1.0f;
 
@@ -42,12 +40,6 @@ namespace BCIEssentials.Behaviours.Training
             _trialBehaviour.StartTrainingTrial(targetIndex);
             yield return _trialBehaviour.AwaitCompletion();
             yield return new WaitForSeconds(PostTrialTime);
-
-            if (SelectTrainingTarget && _targetIndicationBehaviour != null)
-            {
-                _targetIndicationBehaviour.MakeSelection(targetIndex);
-                yield return new WaitForSeconds(TargetSelectionDisplayPeriod);
-            }
 
             if (PersistTargetIndication)
             {

@@ -15,9 +15,6 @@ namespace BCIEssentials.Stimulus.Collections
         private int? _targetIndex;
 
 
-        public override void MakeSelection(int index)
-        => GetPresenter(index).Select();
-
         public override void BeginTargetIndication(int index)
         {
             GetPresenter(index)?.StartTargetIndication();

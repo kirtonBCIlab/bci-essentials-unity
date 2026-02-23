@@ -27,9 +27,9 @@ namespace BCIEssentials.Behaviours
                 source => source.MarkerWriter = MarkerWriter
             );
             Array.ForEach(
-                GetComponentsInChildren<ISelector>(),
+                GetComponentsInChildren<IPredictionSink>(),
                 selector => ResponseProvider.SubscribePredictions(
-                    prediction => selector.MakeSelection(prediction.Value)
+                    selector.OnPrediction
                 )
             );
         }

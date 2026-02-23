@@ -43,7 +43,7 @@ namespace BCIEssentials.Selection
         protected virtual void Update()
         => Bindings.Process(
             _trialBehaviour ? MakeSelectionAtEndOfRun
-            : _target.MakeSelection
+            : MakeSelection
         );
 
         private void MakeSelectionAtEndOfRun(int selectionIndex)
@@ -52,7 +52,15 @@ namespace BCIEssentials.Selection
         private IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
             yield return _trialBehaviour.AwaitCompletion();
-            _target.MakeSelection(selectionIndex);
+            MakeSelection(selectionIndex);
         }
+
+        private void MakeSelection(int selectionIndex)
+        => _target.OnPrediction(new DummyPrediction(selectionIndex));
+    }
+
+    public class DummyPrediction : LSLFramework.Prediction
+    {
+        public DummyPrediction(int index) { Index = index; }
     }
 }

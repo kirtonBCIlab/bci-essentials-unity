@@ -1,12 +1,14 @@
+using BCIEssentials.LSLFramework;
+
 namespace BCIEssentials.Selection
 {
-    public abstract class SelectionBehaviour : MonoBehaviourUsingExtendedAttributes, ISelector
+    public abstract class SelectionBehaviour : MonoBehaviourUsingExtendedAttributes, IPredictionSink
     {
-        public abstract void MakeSelection(int index);
+        public abstract void OnPrediction(Prediction prediction);
     }
 
-    public interface ISelector
+    public interface IPredictionSink
     {
-        public void MakeSelection(int index);
+        public void OnPrediction(Prediction prediction);
     }
 }
