@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace BCIEssentials.Tests.LSLFramework
 {
-    public class LSLMarkerWriterTests: LSLStreamWriterTestRunner<LSLMarkerWriter>
+    public class LSLMarkerWriterTests: LSLStreamWriterTestRunner<MarkerWriter>
     {
         [Test]
         [TestCase(typeof(TrialStartedMarker), "Trial Started")]
