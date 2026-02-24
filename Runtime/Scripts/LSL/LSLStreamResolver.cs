@@ -11,10 +11,10 @@ namespace BCIEssentials.LSLFramework
     <br/><br/>
     Provides both synchronous and asynchronous methods
     <code>
-    StartCoroutine(LSLStreamResolver.RunResolveByType("BCI", UseStreamInfo));
+    StartCoroutine(LSLStreamResolver.RunResolveByType("BCI_Essentials_Predictions", UseStreamInfo));
     </code> or
     <code>
-    if (LSLStreamResolver.TryResolveByType("BCI", out StreamInfo resolvedStream))
+    if (LSLStreamResolver.TryResolveByType("BCI_Essentials_Predictions", out StreamInfo resolvedStream))
     {
         UseStreamInfo(resolvedStreamInfo);
     }
