@@ -36,14 +36,20 @@ public class GameplayPresentationController : MonoBehaviour
     private void Update()
     {
         if (_isResting || !InputProvider.IsRunning) return;
-        if (InputProvider.InputValue || InputKey.IsPressed)
+
+        float inputMultiplier = 2 * InputProvider.InputValue - 1;
+        if (InputKey.IsPressed)
         {
             AddFrameTimeToChargeLevel();
+        }
+        else if (inputMultiplier > 0)
+        {
+            AddFrameTimeToChargeLevel(inputMultiplier);
         }
         else if (_chargeLevel >= 1) Throw();
         else
         {
-            DrainFrameTimeFromChargeLevel();
+            DrainFrameTimeFromChargeLevel(-inputMultiplier);
         }
         _chargeLevel = Mathf.Clamp01(_chargeLevel);
         ChargeBar.DisplayChargeLevel(_chargeLevel);
@@ -73,15 +79,15 @@ public class GameplayPresentationController : MonoBehaviour
     }
 
 
-    private void AddFrameTimeToChargeLevel()
+    private void AddFrameTimeToChargeLevel(float multiplier = 1)
     {
         if (_chargeLevel == 0) Character.DisplayCharge();
-        _chargeLevel += Time.deltaTime / ChargePeriod;
+        _chargeLevel += multiplier * Time.deltaTime / ChargePeriod;
     }
-    private void DrainFrameTimeFromChargeLevel()
+    private void DrainFrameTimeFromChargeLevel( float multiplier = 1)
     {
         float oldChargeLevel = _chargeLevel;
-        _chargeLevel -= DrainRate * Time.deltaTime / ChargePeriod;
+        _chargeLevel -= DrainRate * multiplier * Time.deltaTime / ChargePeriod;
         if (_chargeLevel <= 0 && oldChargeLevel > 0) Character.DisplayIdle();
     }
 }

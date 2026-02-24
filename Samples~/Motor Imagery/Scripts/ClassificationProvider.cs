@@ -11,18 +11,19 @@ public class ClassificationProvider : CoroutineBehaviour, IBCIMarkerSource, IPre
     public event Action ClassificationEnded;
 
     public MarkerWriter MarkerWriter { get; set; }
-    public bool InputValue { get; private set; }
-    public float EpochLength = 0.5f;
+    public float InputValue { get; private set; }
+    public float EpochLength = 1.0f;
 
 
     public void OnPrediction(Prediction prediction)
     {
-        InputValue = prediction.Index > 0;
+        InputValue = prediction.Probabilities[1];
     }
 
 
     protected override IEnumerator Run()
     {
+        InputValue = 0;
         WaitForSeconds epochDelay = new(EpochLength);
         while (true)
         {
