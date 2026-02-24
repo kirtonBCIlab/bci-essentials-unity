@@ -51,15 +51,9 @@ namespace BCIEssentials.Behaviours.Trials
 
         protected override void SendTrainingMarker(int trainingIndex)
         => MarkerWriter.PushSSVEPTrainingMarker
-        (
-            Presenters.Count, trainingIndex, EpochLength,
-            _calculatedFrequencies
-        );
+        (trainingIndex, EpochLength, _calculatedFrequencies);
         protected override void SendClassificationMarker()
         => MarkerWriter.PushSSVEPClassificationMarker
-        (
-            Presenters.Count, EpochLength,
-            _calculatedFrequencies
-        );
+        (EpochLength, _calculatedFrequencies);
     }
 }

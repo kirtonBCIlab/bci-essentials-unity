@@ -41,17 +41,16 @@ namespace BCIEssentials.Tests.LSLFramework
         }
 
         [Test]
-        [TestCase(4, 2, 1.5f, new[] {12.5f,18.7f,24.4f,30.1f}, "ssvep,4,3,1.50,12.5,18.7,24.4,30.1")]
+        [TestCase(2, 1.5f, new[] {12.5f,18.7f,24.4f,30.1f}, "ssvep,4,3,1.50,12.5,18.7,24.4,30.1")]
         public void PushSSVEPMarker_WhenMarkerPushed_ThenPulledWithCorrectFormat
         (
-            int objectCount, int trainingTarget, float epochLength,
+            int trainingTarget, float epochLength,
             float[] frequencies, string expectedSampleValue
         )
         {
             OutStream.PushSSVEPTrainingMarker
             (
-                objectCount, trainingTarget,
-                epochLength, frequencies
+                trainingTarget, epochLength, frequencies
             );
             AssertPulledSample(expectedSampleValue);
         }

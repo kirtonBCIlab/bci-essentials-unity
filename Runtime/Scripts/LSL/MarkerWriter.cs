@@ -69,9 +69,6 @@ namespace BCIEssentials.LSLFramework
         /// <summary>
         /// Create and send a training marker for the SSVEP paradigm
         /// </summary>
-        /// <param name="frequencyCount">
-        /// Number of classes (frequencies) in the trial
-        /// </param>
         /// <param name="trainingTargetIndex">
         /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
         /// </param>
@@ -80,17 +77,16 @@ namespace BCIEssentials.LSLFramework
         /// <b>Must remain constant</b>
         /// </param>
         /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus presenters
+        /// Collection of flashing frequencies used by stimulus presenters <br/>
         /// </param>
         public void PushSSVEPTrainingMarker
         (
-            int frequencyCount,
             int trainingTargetIndex,
             float epochLength,
             IEnumerable<float> frequencies
         )
         => PushMarker(new SSVEPEventMarker
-            (frequencyCount, trainingTargetIndex, epochLength, frequencies)
+            (trainingTargetIndex, epochLength, frequencies)
         );
 
         /// <summary>
@@ -101,9 +97,6 @@ namespace BCIEssentials.LSLFramework
         /// <br/>or at the end of the trial
         /// <br/>depending on python configuration
         /// </remarks>
-        /// <param name="frequencyCount">
-        /// Number of classes (frequencies) in the trial
-        /// </param>
         /// <param name="epochLength">
         /// Arbitrary length of the processing Epoch <br/>
         /// Ideally at least 1-2 seconds
@@ -113,11 +106,11 @@ namespace BCIEssentials.LSLFramework
         /// </param>
         public void PushSSVEPClassificationMarker
         (
-            int frequencyCount, float epochLength,
+            float epochLength,
             IEnumerable<float> frequencies
         )
         => PushMarker(new SSVEPEventMarker
-            (frequencyCount, -1, epochLength, frequencies)
+            (-1, epochLength, frequencies)
         );
 
 
