@@ -29,19 +29,19 @@ namespace BCIEssentials.Behaviours.Trials.P300
         }
 
         protected void SendMultiFlashMarker
-        (IEnumerable<int> stimulusIndices, int optionCount)
+        (IEnumerable<int> stimulusIndices, int presenterCount)
         {
             if (MarkerWriter)
             {
                 if (HasTrainingTarget)
                 {
                     MarkerWriter.PushMultiFlashP300TrainingMarker
-                    (optionCount, TrainingTarget.Value, stimulusIndices);
+                    (presenterCount, TrainingTarget.Value, stimulusIndices);
                 }
                 else
                 {
                     MarkerWriter.PushMultiFlashP300ClassificationMarker
-                    (optionCount, stimulusIndices);
+                    (presenterCount, stimulusIndices);
                 }
             }
         }

@@ -24,24 +24,24 @@ namespace BCIEssentials.LSLFramework
         /// <summary>
         /// Create and send a training marker for the Motor Imagery paradigm
         /// </summary>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
+        /// <param name="stateCount">
+        /// Number of target states
         /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
+        /// <b>Must remain constant</b>
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// <param name="trainingTargetIndex">
+        /// Index of state targetted for training <i>(0-indexed)</i>
         /// </param>
         public void PushMITrainingMarker
         (
-            int objectCount,
-            int trainingTarget,
+            int stateCount,
+            int trainingTargetIndex,
             float epochLength
         )
         => PushMarker(new MIEventMarker
-            (objectCount, trainingTarget, epochLength)
+            (stateCount, trainingTargetIndex, epochLength)
         );
 
         /// <summary>
@@ -50,46 +50,47 @@ namespace BCIEssentials.LSLFramework
         /// <remarks>
         /// Will trigger a prediction in <paramref name="epochLength"/> seconds
         /// </remarks>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
+        /// <param name="stateCount">
+        /// Number target states
         /// </param>
         /// <param name="epochLength">
         /// Arbitrary length of the processing Epoch <br/>
+        /// Ideally at least 1-2 seconds
         /// </param>
         public void PushMIClassificationMarker
         (
-            int objectCount, float epochLength
+            int stateCount, float epochLength
         )
         => PushMarker(new MIEventMarker
-            (objectCount, -1, epochLength)
+            (stateCount, -1, epochLength)
         );
 
 
         /// <summary>
         /// Create and send a training marker for the SSVEP paradigm
         /// </summary>
-        /// <param name="objectCount">
-        /// Number of objects (frequencies) in the trial
+        /// <param name="frequencyCount">
+        /// Number of classes (frequencies) in the trial
         /// </param>
-        /// <param name="trainingTarget">
+        /// <param name="trainingTargetIndex">
         /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
         /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
+        /// <b>Must remain constant</b>
         /// </param>
         /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus objects
+        /// Collection of flashing frequencies used by stimulus presenters
         /// </param>
         public void PushSSVEPTrainingMarker
         (
-            int objectCount,
-            int trainingTarget,
+            int frequencyCount,
+            int trainingTargetIndex,
             float epochLength,
             IEnumerable<float> frequencies
         )
         => PushMarker(new SSVEPEventMarker
-            (objectCount, trainingTarget, epochLength, frequencies)
+            (frequencyCount, trainingTargetIndex, epochLength, frequencies)
         );
 
         /// <summary>
@@ -100,43 +101,44 @@ namespace BCIEssentials.LSLFramework
         /// <br/>or at the end of the trial
         /// <br/>depending on python configuration
         /// </remarks>
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
+        /// <param name="frequencyCount">
+        /// Number of classes (frequencies) in the trial
         /// </param>
         /// <param name="epochLength">
         /// Arbitrary length of the processing Epoch <br/>
+        /// Ideally at least 1-2 seconds
         /// </param>
         /// <param name="frequencies">
-        /// Collection of flashing frequencies used by stimulus objects
+        /// Collection of flashing frequencies used by stimulus presenters
         /// </param>
         public void PushSSVEPClassificationMarker
         (
-            int objectCount, float epochLength,
+            int frequencyCount, float epochLength,
             IEnumerable<float> frequencies
         )
         => PushMarker(new SSVEPEventMarker
-            (objectCount, -1, epochLength, frequencies)
+            (frequencyCount, -1, epochLength, frequencies)
         );
 
 
         /// <summary>
         /// Create and send a single flash training marker for the P300 paradigm
         /// </summary>
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="trainingTarget">
-        /// Index of object being targetted for training <i>(0-indexed)</i>
+        /// <param name="presenterCount">Number of presenters in the trial</param>
+        /// <param name="trainingTargetIndex">
+        /// Index of stimulus presenter targetted for training <i>(0-indexed)</i>
         /// </param>
         /// <param name="activeObject">
-        /// Index of object being flashed <i>(0-indexed)</i>
+        /// Index of stimulus presenter triggered <i>(0-indexed)</i>
         /// </param>
         public void PushSingleFlashP300TrainingMarker
         (
-            int objectCount,
-            int trainingTarget,
+            int presenterCount,
+            int trainingTargetIndex,
             int activeObject
         )
         => PushMarker(new SingleFlashP300EventMarker
-            (objectCount, trainingTarget, activeObject)
+            (presenterCount, trainingTargetIndex, activeObject)
         );
 
         /// <summary>
@@ -145,36 +147,36 @@ namespace BCIEssentials.LSLFramework
         /// <remarks>
         /// Will trigger a prediction at the end of the trial
         /// </remarks>
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="activeObject">
-        /// Index of object being flashed <i>(0-indexed)</i>
+        /// <param name="presenterCount">Number of presenters in the trial</param>
+        /// <param name="stimulusIndex">
+        /// Index of stimulus presenter triggered <i>(0-indexed)</i>
         /// </param>
         public void PushSingleFlashP300ClassificationMarker
         (
-            int objectCount, int activeObject
+            int presenterCount, int stimulusIndex
         )
         => PushMarker(new SingleFlashP300EventMarker
-            (objectCount, -1, activeObject)
+            (presenterCount, -1, stimulusIndex)
         );
 
         /// <summary>
         /// Create and send a multi-flash training marker for the P300 paradigm
         /// </summary>
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="trainingTarget">
-        /// Index of object targetted for training <i>(0-indexed)</i>
+        /// <param name="presenterCount">Number of presenters in the trial</param>
+        /// <param name="trainingTargetIndex">
+        /// Index of stimulus presenter targetted for training <i>(0-indexed)</i>
         /// </param>
-        /// <param name="activeObjects">
-        /// Collection of object indices being flashed together <i>(0-indexed)</i>
+        /// <param name="stimulusIndices">
+        /// Collection of stimulus presenter indices triggered <i>(0-indexed)</i>
         /// </param>
         public void PushMultiFlashP300TrainingMarker
         (
-            int objectCount,
-            int trainingTarget,
-            IEnumerable<int> activeObjects
+            int presenterCount,
+            int trainingTargetIndex,
+            IEnumerable<int> stimulusIndices
         )
         => PushMarker(new MultiFlashP300EventMarker
-            (objectCount, trainingTarget, activeObjects)
+            (presenterCount, trainingTargetIndex, stimulusIndices)
         );
 
         /// <summary>
@@ -183,16 +185,16 @@ namespace BCIEssentials.LSLFramework
         /// <remarks>
         /// Will trigger a prediction at the end of the trial
         /// </remarks>
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="activeObjects">
-        /// Collection of object indices being flashed together <i>(0-indexed)</i>
+        /// <param name="presenterCount">Number of presenters in the trial</param>
+        /// <param name="stimulusIndices">
+        /// Collection of stimulus presenter indices triggered <i>(0-indexed)</i>
         /// </param>
         public void PushMultiFlashP300ClassificationMarker
         (
-            int objectCount, IEnumerable<int> activeObjects
+            int presenterCount, IEnumerable<int> stimulusIndices
         )
         => PushMarker(new MultiFlashP300EventMarker
-            (objectCount, -1, activeObjects)
+            (presenterCount, -1, stimulusIndices)
         );
 
 

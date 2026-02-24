@@ -40,26 +40,26 @@ namespace BCIEssentials.LSLFramework
     public abstract class EventMarker: IMarker
     {
         /// <summary>
-        /// Number of objects or classes in the trial
+        /// Number of classes or stimulus presenters in the trial
         /// </summary>
-        public int ObjectCount;
+        public int CaseCount;
         /// <summary>
         /// Index of object, frequency, or class targetted for selection <i>(0-indexed)</i>
         /// </summary>
-        public int TrainingTarget;
+        public int TrainingTargetIndex;
 
         public virtual string MarkerString
-        => $"{ObjectCount},{(TrainingTarget < 0? -1: TrainingTarget + 1)}";
+        => $"{CaseCount},{(TrainingTargetIndex < 0? -1: TrainingTargetIndex + 1)}";
 
         public EventMarker
         (
-            int objectCount, int trainingTarget
+            int caseCount, int trainingTargetIndex
         )
         {
-            ObjectCount = objectCount;
-            TrainingTarget = trainingTarget;
-            if (TrainingTarget > objectCount || trainingTarget < 0)
-                TrainingTarget = -1;
+            CaseCount = caseCount;
+            TrainingTargetIndex = trainingTargetIndex;
+            if (TrainingTargetIndex > caseCount || trainingTargetIndex < 0)
+                TrainingTargetIndex = -1;
         }
     }
 
@@ -68,7 +68,7 @@ namespace BCIEssentials.LSLFramework
     {
         /// <summary>
         /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
+        /// <b>Must remain constant for training</b>
         /// </summary>
         public float EpochLength;
 
@@ -77,9 +77,9 @@ namespace BCIEssentials.LSLFramework
 
         public EpochEventMarker
         (
-            int objectCount, int trainingTarget,
+            int caseCount, int trainingTargetIndex,
             float epochLength
-        ): base(objectCount, trainingTarget)
+        ): base(caseCount, trainingTargetIndex)
         {
             EpochLength = epochLength;
         }
@@ -95,22 +95,22 @@ namespace BCIEssentials.LSLFramework
         public override string MarkerString
         => $"mi,{base.MarkerString}";
 
-        /// <param name="objectCount">
-        /// Number of objects (classes) in the trial
+        /// <param name="caseCount">
+        /// Number of target states
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of class targetted for training <i>(0-indexed)</i>
+        /// <param name="trainingTargetIndex">
+        /// Index of state targetted for training <i>(0-indexed)</i>
         /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
+        /// <b>Must remain constant for training</b>
         /// </param>
         public MIEventMarker
         (
-            int objectCount, int trainingTarget,
+            int caseCount, int trainingTargetIndex,
             float epochLength
         )
-        : base(objectCount, trainingTarget, epochLength)
+        : base(caseCount, trainingTargetIndex, epochLength)
         {}
     }
 
@@ -136,24 +136,24 @@ namespace BCIEssentials.LSLFramework
             _ => $",{string.Join(",", Frequencies)}"
         };
 
-        /// <param name="objectCount">
-        /// Number of objects (frequencies) in the trial
+        /// <param name="caseCount">
+        /// Number of classes (frequencies) in the trial
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object (frequency) targetted for training <i>(0-indexed)</i>
+        /// <param name="trainingTargetIndex">
+        /// Index of class (frequency) targetted for training <i>(0-indexed)</i>
         /// </param>
         /// <param name="epochLength">
         /// Length of the processing Epoch <br/>
-        /// <b>Must remain constant between trials</b>
+        /// <b>Must remain constant for training</b>
         /// </param>
         /// <param name="frequencies">
         /// Collection of flashing frequencies used by stimulus objects
         /// </param>
         public SSVEPEventMarker
         (
-            int objectCount, int trainingTarget,
+            int caseCount, int trainingTargetIndex,
             float epochLength,  IEnumerable<float> frequencies
-        ): base(objectCount, trainingTarget, epochLength)
+        ): base(caseCount, trainingTargetIndex, epochLength)
         {
             Frequencies = frequencies.ToArray();
         }
@@ -171,8 +171,8 @@ namespace BCIEssentials.LSLFramework
     {
         public P300EventMarker
         (
-            int objectCount, int trainingTarget
-        ): base(objectCount, trainingTarget)
+            int caseCount, int trainingTargetIndex
+        ): base(caseCount, trainingTargetIndex)
         {}
     }
 
@@ -183,25 +183,28 @@ namespace BCIEssentials.LSLFramework
     /// </summary>
     public class SingleFlashP300EventMarker: P300EventMarker
     {
-        public int ActiveObject;
+        /// <summary>
+        /// Index of stimulus presenter triggered
+        /// </summary>
+        public int StimulusIndex;
 
         public override string MarkerString
-        => $"p300,s,{base.MarkerString},{ActiveObject + 1}";
+        => $"p300,s,{base.MarkerString},{StimulusIndex + 1}";
 
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="activeObject">
-        /// Index of object being flashed <i>(0-indexed)</i>
+        /// <param name="caseCount">Number of objects in the trial</param>
+        /// <param name="stimulusIndex">
+        /// Index of stimulus presenter triggered <i>(0-indexed)</i>
         /// </param>
-        /// <param name="trainingTarget">
-        /// Index of object being targetted for training <i>(0-indexed)</i>
+        /// <param name="trainingTargetIndex">
+        /// Index of stimulus presenter targetted for training <i>(0-indexed)</i>
         /// </param>
         public SingleFlashP300EventMarker
         (
-            int objectCount, int trainingTarget,
-            int activeObject
-        ): base(objectCount, trainingTarget)
+            int caseCount, int trainingTargetIndex,
+            int stimulusIndex
+        ): base(caseCount, trainingTargetIndex)
         {
-            ActiveObject = activeObject;
+            StimulusIndex = stimulusIndex;
         }
     }
 
@@ -212,32 +215,35 @@ namespace BCIEssentials.LSLFramework
     /// </summary>
     public class MultiFlashP300EventMarker: P300EventMarker
     {
-        public int[] ActiveObjects;
+        /// <summary>
+        /// Collection of stimulus presenter indices triggered
+        /// </summary>
+        public int[] StimulusIndices;
 
         public override string MarkerString
-        => $"p300,m,{base.MarkerString}{ActiveObjectString}";
+        => $"p300,m,{base.MarkerString}{StimulusIndicesString}";
 
-        protected string ActiveObjectString
-        => ActiveObjects switch {
+        protected string StimulusIndicesString
+        => StimulusIndices switch {
             null or {Length: 0} => "",
-            _ => $",{string.Join(',', ActiveObjects.Select(x => ++x))}"
+            _ => $",{string.Join(',', StimulusIndices.Select(x => ++x))}"
         };
 
-        /// <param name="objectCount">Number of objects in the trial</param>
-        /// <param name="trainingTarget">
-        /// Index of object targetted for training <i>(0-indexed)</i>
+        /// <param name="caseCount">Number of objects in the trial</param>
+        /// <param name="trainingTargetIndex">
+        /// Index of stimulus presenter targetted for training <i>(0-indexed)</i>
         /// </param>
-        /// <param name="activeObjects">
-        /// Collection of object indices being flashed together <i>(0-indexed)</i>
+        /// <param name="stimulusIndices">
+        /// Collection of stimulus presenter indices triggered <i>(0-indexed)</i>
         /// </param>
         public MultiFlashP300EventMarker
         (
-            int objectCount, int trainingTarget,
-            IEnumerable<int> activeObjects
+            int caseCount, int trainingTargetIndex,
+            IEnumerable<int> stimulusIndices
         )
-        : base(objectCount, trainingTarget)
+        : base(caseCount, trainingTargetIndex)
         {
-            ActiveObjects = activeObjects.ToArray();
+            StimulusIndices = stimulusIndices.ToArray();
         }
     }
 }

@@ -36,19 +36,19 @@ namespace BCIEssentials.Behaviours.Trials.P300
         }
 
         protected void SendSingleFlashMarker
-        (int stimulusIndex, int optionCount)
+        (int stimulusIndex, int presenterCount)
         {
             if (MarkerWriter)
             {
                 if (HasTrainingTarget)
                 {
                     MarkerWriter.PushSingleFlashP300TrainingMarker
-                    (optionCount, TrainingTarget.Value, stimulusIndex);
+                    (presenterCount, TrainingTarget.Value, stimulusIndex);
                 }
                 else
                 {
                     MarkerWriter.PushSingleFlashP300ClassificationMarker
-                    (optionCount, stimulusIndex);
+                    (presenterCount, stimulusIndex);
                 }
             }
         }
