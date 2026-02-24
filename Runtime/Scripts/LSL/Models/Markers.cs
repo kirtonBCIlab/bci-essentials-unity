@@ -115,7 +115,12 @@ namespace BCIEssentials.LSLFramework
     }
 
 
-    public abstract class FrequenciesEventMarker: EpochEventMarker
+    /// <summary>
+    /// SSVEP event marker in the format:
+    /// <br/><br/>
+    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
+    /// </summary>
+    public class SSVEPEventMarker: EpochEventMarker
     {
         /// <summary>
         /// Flashing frequencies used by stimulus objects
@@ -123,33 +128,13 @@ namespace BCIEssentials.LSLFramework
         public float[] Frequencies;
 
         public override string MarkerString
-        => $"{base.MarkerString}{FrequenciesString}";
+        => $"ssvep,{base.MarkerString}{FrequenciesString}";
 
         protected string FrequenciesString
         => Frequencies switch {
             null or {Length: 0} => "",
             _ => $",{string.Join(",", Frequencies)}"
         };
-
-        public FrequenciesEventMarker
-        (
-            int objectCount, int trainingTarget,
-            float epochLength,  float[] frequencies
-        ): base(objectCount, trainingTarget, epochLength)
-        {
-            Frequencies = frequencies;
-        }
-    }
-
-    /// <summary>
-    /// SSVEP event marker in the format:
-    /// <br/><br/>
-    /// "ssvep,{object count},{train target (-1 if n/a)},{epoch length},{...frequencies}"
-    /// </summary>
-    public class SSVEPEventMarker: FrequenciesEventMarker
-    {
-        public override string MarkerString
-        => $"ssvep,{base.MarkerString}";
 
         /// <param name="objectCount">
         /// Number of objects (frequencies) in the trial
@@ -167,13 +152,11 @@ namespace BCIEssentials.LSLFramework
         public SSVEPEventMarker
         (
             int objectCount, int trainingTarget,
-            float epochLength, IEnumerable<float> frequencies
-        )
-        : base
-        (
-            objectCount, trainingTarget,
-            epochLength, frequencies.ToArray()
-        ) {}
+            float epochLength,  IEnumerable<float> frequencies
+        ): base(objectCount, trainingTarget, epochLength)
+        {
+            Frequencies = frequencies.ToArray();
+        }
     }
 
 
