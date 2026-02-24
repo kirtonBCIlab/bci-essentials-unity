@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    using Presenter = StimulusPresentationBehaviour;
-    using PresenterList = List<StimulusPresentationBehaviour>;
+    using Presenter = Presentation.StimulusPresentationBehaviour;
+    using PresenterList = List<Presentation.StimulusPresentationBehaviour>;
+
     public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ICollection<Presenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();

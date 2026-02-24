@@ -1,9 +1,10 @@
 using System.Collections;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
+    using Utilities;
+
     public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour
     {
         [Space]

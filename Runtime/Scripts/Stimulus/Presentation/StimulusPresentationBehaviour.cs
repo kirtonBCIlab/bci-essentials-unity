@@ -1,8 +1,8 @@
-using BCIEssentials.Selection;
-using BCIEssentials.Behaviours.Training;
-
 namespace BCIEssentials.Stimulus.Presentation
 {
+    using Selection;
+    using Behaviours.Training;
+
     public abstract class StimulusPresentationBehaviour : MonoBehaviourUsingExtendedAttributes, ISelectable, ITargetable
     {
         public virtual bool IsSelectable => enabled;

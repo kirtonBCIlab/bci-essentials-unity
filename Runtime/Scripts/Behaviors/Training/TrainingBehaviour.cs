@@ -1,7 +1,7 @@
-using BCIEssentials.LSLFramework;
-
 namespace BCIEssentials.Behaviours.Training
 {
+    using LSLFramework;
+
     public abstract class TrainingBehaviour : CoroutineBehaviour, IMarkerSource
     {
         public MarkerWriter MarkerWriter { get; set; }

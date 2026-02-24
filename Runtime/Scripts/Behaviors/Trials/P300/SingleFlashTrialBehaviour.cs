@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Stimulus.Collections;
-using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trials.P300
 {
+    using Stimulus.Presentation;
+    using Utilities;
+
     public class SingleFlashTrialBehaviour : P300TrialBehaviour
     {
         protected override IEnumerator Run()

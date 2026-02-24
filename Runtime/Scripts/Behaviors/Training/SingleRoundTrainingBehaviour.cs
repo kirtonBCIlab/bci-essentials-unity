@@ -1,9 +1,10 @@
 using System.Collections;
-using BCIEssentials.Behaviours.Trials;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
+    using Trials;
+
     public class SingleRoundTrainingBehaviour : TrainingBehaviour
     {
         [SerializeField]

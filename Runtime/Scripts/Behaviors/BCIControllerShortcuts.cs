@@ -1,9 +1,10 @@
-using BCIEssentials.Extensions;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours
 {
+    using Extensions;
+    using Utilities;
+
     /// <summary>
     /// Implements editable keyboard shortcuts for BCI Controller methods.
     /// </summary>

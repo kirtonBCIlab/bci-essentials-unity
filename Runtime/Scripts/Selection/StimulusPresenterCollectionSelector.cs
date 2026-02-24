@@ -1,10 +1,11 @@
-using BCIEssentials.Extensions;
-using BCIEssentials.LSLFramework;
-using BCIEssentials.Stimulus.Collections;
 using UnityEngine;
 
 namespace BCIEssentials.Selection
 {
+    using Extensions;
+    using LSLFramework;
+    using Stimulus.Collections;
+
     [RequireComponent(typeof(StimulusPresenterCollection))]
     public class StimulusPresenterCollectionSelector : SelectionBehaviour
     {

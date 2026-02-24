@@ -1,10 +1,11 @@
 using System.Collections.Generic;
-using BCIEssentials.Stimulus.Collections;
-using BCIEssentials.Stimulus.Presentation.Standard;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trials
 {
+    using Stimulus.Collections;
+    using Stimulus.Presentation.Standard;
+
     public class SSVEPTrialBehaviour : PersistentTrialBehaviour
     {
         [Space]

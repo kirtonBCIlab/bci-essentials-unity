@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Presentation;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    using static DynamicStimulusPresenterCollection;
+    using Extensions;
+    using Stimulus.Presentation;
+    using Scope = DynamicStimulusPresenterCollection.Scope;
+
     public static class PresenterSearchExtensions
     {
         public static List<StimulusPresentationBehaviour> GetSelectablePresentersByType

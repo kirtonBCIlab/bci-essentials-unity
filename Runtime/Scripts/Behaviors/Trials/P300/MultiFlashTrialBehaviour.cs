@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Collections;
-using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trials.P300
 {
+    using Extensions;
+    using Stimulus.Collections;
+    using Stimulus.Presentation;
+
     public abstract class MultiFlashTrialBehaviour : P300TrialBehaviour
     {
         protected IEnumerator RunMultiFlash

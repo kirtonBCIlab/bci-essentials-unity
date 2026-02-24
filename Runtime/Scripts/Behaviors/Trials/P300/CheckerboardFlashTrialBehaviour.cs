@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
 
 namespace BCIEssentials.Behaviours.Trials.P300
 {
+    using Extensions;
+    using Stimulus.Presentation;
+    using Utilities;
+
     public class CheckerboardFlashTrialBehaviour : GridFlashTrialBehaviour
     {
         protected override IEnumerator Run()

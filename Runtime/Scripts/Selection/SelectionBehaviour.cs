@@ -1,7 +1,7 @@
-using BCIEssentials.LSLFramework;
-
 namespace BCIEssentials.Selection
 {
+    using LSLFramework;
+
     public abstract class SelectionBehaviour : MonoBehaviourUsingExtendedAttributes, IPredictionSink
     {
         public abstract void OnPrediction(Prediction prediction);

@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Presentation;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Trials.P300
 {
-    using static ContextAwareUtilities;
+    using Extensions;
+    using Stimulus.Presentation;
+    using static Utilities.ContextAwareUtilities;
+
     public class ContextAwareMultiFlashTrialBehaviour : MultiFlashTrialBehaviour
     {
         protected override IEnumerator Run()

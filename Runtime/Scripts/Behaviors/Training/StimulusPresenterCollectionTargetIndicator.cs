@@ -1,10 +1,10 @@
-using BCIEssentials.Behaviours.Training;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Training
+namespace BCIEssentials.Behaviours.Training
 {
+    using Extensions;
+    using Stimulus.Collections;
+
     [RequireComponent(typeof(StimulusPresenterCollection))]
     public class StimulusPresenterCollectionTargetIndicator : TargetIndicationBehaviour
     {

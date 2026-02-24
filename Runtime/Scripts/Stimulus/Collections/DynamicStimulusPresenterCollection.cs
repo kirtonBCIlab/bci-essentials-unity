@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using BCIEssentials.Stimulus.Presentation;
 
 namespace BCIEssentials.Stimulus.Collections
 {
+    using Presentation;
+
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
     {
         public enum SearchMethod { Type, Tag }

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using BCIEssentials.Extensions;
-using BCIEssentials.Stimulus.Presentation;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
+    using Extensions;
+    using Stimulus.Presentation;
+
     public static class PresenterListExtensions
     {
         public static List<StimulusPresentationBehaviour> WhereSelectable

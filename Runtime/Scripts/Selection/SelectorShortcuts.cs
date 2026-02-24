@@ -1,11 +1,12 @@
 using System.Collections;
-using BCIEssentials.Behaviours.Trials;
-using BCIEssentials.Extensions;
-using BCIEssentials.Utilities;
 using UnityEngine;
 
 namespace BCIEssentials.Selection
 {
+    using Behaviours.Trials;
+    using Extensions;
+    using Utilities;
+
     /// <summary>
     /// Implements editable keyboard shortcuts to test BCI selection
     /// </summary>

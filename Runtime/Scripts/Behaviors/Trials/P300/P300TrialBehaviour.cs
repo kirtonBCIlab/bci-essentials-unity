@@ -1,7 +1,7 @@
-using BCIEssentials.Stimulus.Collections;
-
 namespace BCIEssentials.Behaviours.Trials.P300
 {
+    using Stimulus.Collections;
+
     public abstract class P300TrialBehaviour : TrialBehaviour
     {
         public StimulusPresenterCollection PresenterCollection;
