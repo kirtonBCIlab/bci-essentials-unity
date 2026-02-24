@@ -23,7 +23,7 @@ namespace BCIEssentials.Behaviours
             gameObject.GetOrAddComponent(ref ResponseProvider);
 
             Array.ForEach(
-                GetComponentsInChildren<IBCIMarkerSource>(),
+                GetComponentsInChildren<IMarkerSource>(),
                 source => source.MarkerWriter = MarkerWriter
             );
             Array.ForEach(
@@ -40,7 +40,7 @@ namespace BCIEssentials.Behaviours
     }
 
 
-    public interface IBCIMarkerSource
+    public interface IMarkerSource
     {
         public MarkerWriter MarkerWriter { set; }
     }

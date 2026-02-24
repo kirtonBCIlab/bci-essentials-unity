@@ -2,7 +2,7 @@ using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.Behaviours.Trials
 {
-    public abstract class TrialBehaviour : CoroutineBehaviour, IBCIMarkerSource
+    public abstract class TrialBehaviour : CoroutineBehaviour, IMarkerSource
     {
         public MarkerWriter MarkerWriter { get; set; }
         public bool HasTrainingTarget => TrainingTarget.HasValue;

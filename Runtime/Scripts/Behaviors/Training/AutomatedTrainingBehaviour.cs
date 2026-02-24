@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Behaviours.Training
 {
-    public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour, IBCIMarkerSource
+    public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour
     {
         [Space]
         public int SelectionCount = 8;

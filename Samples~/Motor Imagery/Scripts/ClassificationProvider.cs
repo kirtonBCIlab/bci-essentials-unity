@@ -5,7 +5,7 @@ using BCIEssentials.LSLFramework;
 using BCIEssentials.Selection;
 using UnityEngine;
 
-public class ClassificationProvider : CoroutineBehaviour, IBCIMarkerSource, IPredictionSink
+public class ClassificationProvider : CoroutineBehaviour, IMarkerSource, IPredictionSink
 {
     public event Action ClassificationStarted;
     public event Action ClassificationEnded;

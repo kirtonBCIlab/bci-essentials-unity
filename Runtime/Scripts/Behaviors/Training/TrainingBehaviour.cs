@@ -2,7 +2,7 @@ using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.Behaviours.Training
 {
-    public abstract class TrainingBehaviour : CoroutineBehaviour, IBCIMarkerSource
+    public abstract class TrainingBehaviour : CoroutineBehaviour, IMarkerSource
     {
         public MarkerWriter MarkerWriter { get; set; }
     }
