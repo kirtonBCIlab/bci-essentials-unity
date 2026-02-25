@@ -7,11 +7,15 @@ namespace BCIEssentials.LSLFramework
     using static LSLStreamResolver;
     using static Response;
 
-    public class LSLStreamReader: MonoBehaviour
+    public class LSLStreamReader : MonoBehaviour
     {
+        [System.Flags]
+        public enum ResponseTypes { None, Predictions, Pings }
+
         public string StreamType = "BCI_Essentials_Predictions";
         [SerializeField] bool _openOnStart = false;
-        public bool PrintLogs = false;
+        public ResponseTypes LoggingMask = ResponseTypes.None;
+        protected bool LogPings => (LoggingMask & ResponseTypes.Pings) != 0;
 
         protected bool IsResolvingStream = false;
 
@@ -81,7 +85,11 @@ namespace BCIEssentials.LSLFramework
         {
             double captureTime = _inlet.pull_sample(_sampleBuffer, 0);
             parsedResponse = BuildResponse(_sampleBuffer, captureTime);
-            if (PrintLogs && parsedResponse is not EmptyResponse)
+            if (
+                LoggingMask != ResponseTypes.None
+                && parsedResponse is not EmptyResponse
+                && (parsedResponse is not Ping || LogPings)
+            )
             {
                 Debug.Log($"Pulled {parsedResponse}");
             }
