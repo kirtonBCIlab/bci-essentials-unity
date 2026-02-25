@@ -53,7 +53,11 @@ public class BlockTrainTrainingBehaviour: TrainingBehaviour
         }
     }
 
-    protected override void CleanUp() => CleanupInvoked?.Invoke();
+    protected override void CleanUp()
+    {
+        MarkerWriter.PushTrainingCompleteMarker();
+        CleanupInvoked?.Invoke();
+    }
 
 
     private IEnumerator RunTrainingEpochs
