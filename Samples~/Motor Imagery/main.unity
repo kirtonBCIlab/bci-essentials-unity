@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ede2e3258b0e4e4f8692426fa27897c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OffBlockDuration: 8
+  OffBlockDuration: 6
   ActivePeriodDuration: 2
   RestPeriodDuration: 2
   ActivePeriodsPerOnBlock: 3
