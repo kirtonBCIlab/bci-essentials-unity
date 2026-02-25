@@ -69,7 +69,7 @@ namespace BCIEssentials.Tests.LSLFramework
             InStream.SubscribePredictions(p => prediction = p);
 
             PushStringThroughOutlet("ping");
-            PushStringThroughOutlet("1:[0.39 0.61]");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
             yield return new WaitForSecondsRealtime(0.05f);
@@ -89,7 +89,7 @@ namespace BCIEssentials.Tests.LSLFramework
             InStream.Subscribe<BCIEssentials.LSLFramework.Ping>(_ => pingCount++);
 
             PushStringThroughOutlet("ping");
-            PushStringThroughOutlet("1:[0.39 0.61]");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
             yield return new WaitForSecondsRealtime(0.05f);

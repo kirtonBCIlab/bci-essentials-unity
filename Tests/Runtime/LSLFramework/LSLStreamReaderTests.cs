@@ -84,7 +84,7 @@ namespace BCIEssentials.Tests.LSLFramework
         [Test]
         public void PullResponses_WhenPredictionSamplePushed_ThenParsedPredictionPulled()
         {
-            PushStringThroughOutlet("1:[0.39 0.61]");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             var responses = InStream.PullAllResponses();
             Assert.AreEqual(1, responses.Length);
             Assert.IsInstanceOf<Prediction>(responses[0]);

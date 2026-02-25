@@ -16,7 +16,7 @@ namespace BCIEssentials.Tests.Editor
         => ParseResponseAndAssertType<Ping>(sampleString);
 
         [Test]
-        [TestCase("1:[0.52 0.47 0.01]", 1, new float[] { 0.52f, 0.47f, 0.01f })]
+        [TestCase("1:[0.52 0.47 0.01]", 0, new float[] { 0.52f, 0.47f, 0.01f })]
         public void BuildResponse_WhenPrediction_ThenReturnsPrediction
         (
             string sampleString, int expectedIndex, float[] expectedProbabilities
@@ -34,7 +34,7 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         [
             TestCase(
-                "1:[0.2853 0.7147],0:[0.8230 0.1770],1:[0.4573 0.5427],0:[0.9358 0.0642]",
+                "2:[0.2853 0.7147],1:[0.8230 0.1770],2:[0.4573 0.5427],1:[0.9358 0.0642]",
                 "constituent prediction"
             )
         ]
@@ -92,7 +92,6 @@ namespace BCIEssentials.Tests.Editor
         object GetTestData(string key)
         => key switch
         {
-            "single prediction" => _predictionTestValues,
             "constituent prediction" => _constituentPredictionTestValues,
             _ => null
         };
@@ -108,8 +107,6 @@ namespace BCIEssentials.Tests.Editor
                 Assert.That(Probabilities, Is.EquivalentTo(actual.Probabilities));
             }
         }
-        static readonly PredictionValues _predictionTestValues
-        = new() { Index = 1, Probabilities = new float[] { 0.52f, 0.47f, 0.01f } };
         static readonly PredictionValues[] _constituentPredictionTestValues
         = new PredictionValues[]
         {
