@@ -13,7 +13,7 @@ namespace BCIEssentials.Tests.Editor
         {
             void ThrowTest()
             {
-                ArrayUtilities.GenerateRNRA(55, int.MaxValue, int.MinValue);
+                RNRAUtilities.GenerateRNRA(55, int.MaxValue, int.MinValue);
             }
 
             Assert.Throws<ArgumentException>(ThrowTest);
@@ -22,7 +22,7 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
-            var result = ArrayUtilities.GenerateRNRA(3, 2, 2);
+            var result = RNRAUtilities.GenerateRNRA(3, 2, 2);
             int[] expected = Enumerable.Repeat(2, 3).ToArray();
 
             CollectionAssert.AreEqual(expected, result);
@@ -34,7 +34,7 @@ namespace BCIEssentials.Tests.Editor
         [TestCase(-5)]
         public void GenerateRNRA_WhenInvalidArrayLength_ThenReturnsEmptyArray(int arrayLength)
         {
-            var result = ArrayUtilities.GenerateRNRA(arrayLength, 5, 55);
+            var result = RNRAUtilities.GenerateRNRA(arrayLength, 5, 55);
 
             Assert.AreEqual(0, result.Length);
         }
@@ -47,7 +47,7 @@ namespace BCIEssentials.Tests.Editor
         public void GenerateRNRA_ThenReturnsArrayWithValuesWithinBoundsAndOfLength(int arrayLength, int minValue,
             int maxValue)
         {
-            var result = ArrayUtilities.GenerateRNRA(arrayLength, minValue, maxValue);
+            var result = RNRAUtilities.GenerateRNRA(arrayLength, minValue, maxValue);
 
             //Within Range
             Array.Sort(result);
@@ -70,7 +70,7 @@ namespace BCIEssentials.Tests.Editor
             int[] expected = new int[] { 0, 1, 2, 3, 4, 5 };
             //NOTE - At the moment, we need to have N+1 be the max value in our Array Utilities at the moment,
             //       as the upper bound is not currently inclusive
-            var result = ArrayUtilities.GenerateRNRA(expected.Length, 0, 6);
+            var result = RNRAUtilities.GenerateRNRA(expected.Length, 0, 6);
 
             //It is unclear why this is changing length on each trun, as the entries shouldn't change any time.
             //I have updated this to be hardcoded instead to see if the problem continues.
@@ -84,7 +84,7 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_WhenValueRangeGreaterThanLength_ThenReturnsArrayWithAllUniqueEntries()
         {
-            var result = ArrayUtilities.GenerateRNRA(5, 0, 10);
+            var result = RNRAUtilities.GenerateRNRA(5, 0, 10);
             CollectionAssert.AllItemsAreUnique(result);
         }
 
@@ -96,7 +96,7 @@ namespace BCIEssentials.Tests.Editor
             
             //I HAVE FOUND THE PROBLEM FINALLY! We have a "max_value-1" call that happens so that the upper boundary is not inclusive,
             //e.g. this goes from 0-3 in the current tests, instead of 0-4. When we change this we may need to change that part too.
-            var result = ArrayUtilities.GenerateRNRA(12, 0, 4);
+            var result = RNRAUtilities.GenerateRNRA(12, 0, 4);
 
             int[] expected = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 };
 
@@ -108,7 +108,7 @@ namespace BCIEssentials.Tests.Editor
         {
             int[] expected = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
 
-            var result = ArrayUtilities.GenerateRNRA(expected.Length, 0, 4);
+            var result = RNRAUtilities.GenerateRNRA(expected.Length, 0, 4);
 
             Assert.AreNotEqual(4, result[^1]);
             // int minRangeValue = 0;
@@ -133,7 +133,7 @@ namespace BCIEssentials.Tests.Editor
 
             void ThrowTest()
             {
-                ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+                RNRAUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
             }
 
             Assert.Throws<ArgumentException>(ThrowTest);
@@ -144,7 +144,7 @@ namespace BCIEssentials.Tests.Editor
         [TestCase(-5)]
         public void GenerateRNRA_FisherYates_WhenArrayLengthIsInvalid_ThenReturnEmptyArray(int arrayLength)
         {
-            var result = ArrayUtilities.GenerateRNRA(arrayLength, 5, 55);
+            var result = RNRAUtilities.GenerateRNRA(arrayLength, 5, 55);
 
             Assert.AreEqual(0, result.Length);
         }
@@ -152,7 +152,7 @@ namespace BCIEssentials.Tests.Editor
         [Test]
         public void GenerateRNRA_FisherYates_WhenMaxEqualToMin_ThenReturnsSingleElementArray()
         {
-            var result = ArrayUtilities.GenerateRNRA_FisherYates(3, 2, 2);
+            var result = RNRAUtilities.GenerateRNRA_FisherYates(3, 2, 2);
             int[] expected = Enumerable.Repeat(2, 3).ToArray();
 
             CollectionAssert.AreEqual(expected, result);
@@ -167,7 +167,7 @@ namespace BCIEssentials.Tests.Editor
             int minRangeValue = 0;
             int maxRangeValue = 5;
 
-            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+            int[] result = RNRAUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
 
             // Assert
             Assert.AreEqual(arrayLength, result.Length);
@@ -181,7 +181,7 @@ namespace BCIEssentials.Tests.Editor
             int minRangeValue = 0;
             int maxRangeValue = 9;
 
-            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+            int[] result = RNRAUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
 
             // Assert
             Assert.AreEqual(arrayLength, result.Length);
@@ -196,7 +196,7 @@ namespace BCIEssentials.Tests.Editor
             int minRangeValue = 0;
             int maxRangeValue = 5;
 
-            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+            int[] result = RNRAUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
 
             // Assert
             Assert.AreEqual(arrayLength, result.Length);
@@ -211,7 +211,7 @@ namespace BCIEssentials.Tests.Editor
             int minRangeValue = 0;
             int maxRangeValue = 4;
 
-            int[] result = ArrayUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
+            int[] result = RNRAUtilities.GenerateRNRA_FisherYates(arrayLength, minRangeValue, maxRangeValue);
 
             //Make some copies of each of the series that repeat a total of 3 times in this example
             var partOne = result.Take(5);
@@ -225,7 +225,7 @@ namespace BCIEssentials.Tests.Editor
         {
             var entries = new[] { 0, 1, 2, 3, 4, 5 };
 
-            var result = ArrayUtilities.GenerateRNRA_FisherYates(entries.Length, entries[0], entries[^1]);
+            var result = RNRAUtilities.GenerateRNRA_FisherYates(entries.Length, entries[0], entries[^1]);
 
             Array.Sort(result);
             Assert.AreEqual(entries.Length,result.Length);
@@ -245,7 +245,7 @@ namespace BCIEssentials.Tests.Editor
 
             void ThrowTest()
             {
-                ArrayUtilities.ShuffleYates(arrayLength, minRangeValue, maxRangeValue,random);
+                RNRAUtilities.ShuffleYates(arrayLength, minRangeValue, maxRangeValue,random);
             }
 
             Assert.Throws<ArgumentException>(ThrowTest);
@@ -257,7 +257,7 @@ namespace BCIEssentials.Tests.Editor
         public void ShuffleYates_WhenLengthIsInvalid_ReturnEmpty(int arrayLength)
         {
             Random random = new Random(42);
-            var result = ArrayUtilities.ShuffleYates(arrayLength,0,5,random);
+            var result = RNRAUtilities.ShuffleYates(arrayLength,0,5,random);
 
             Assert.AreEqual(0,result.Length);
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16mm"
+   height="12mm"
+   viewBox="0 0 16 12"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="gem.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#000000"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="false"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#000000"
+     inkscape:document-units="mm"
+     inkscape:antialias-rendering="false"
+     borderlayer="true"
+     showborder="true"
+     labelstyle="default"
+     showgrid="true"
+     inkscape:zoom="9.2081684"
+     inkscape:cx="49.901346"
+     inkscape:cy="1.6832881"
+     inkscape:window-width="3840"
+     inkscape:window-height="2054"
+     inkscape:window-x="3829"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="0"
+       originy="0"
+       spacingx="0.99999997"
+       spacingy="0.99999997"
+       empcolor="#00ff00"
+       empopacity="0.6"
+       color="#00ff00"
+       opacity="0.30196078"
+       empspacing="4"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:#afe9e9;fill-opacity:1;stroke:#5fd3d3;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:normal"
+       id="path8"
+       cx="0"
+       cy="-3.9892604"
+       rx="4"
+       ry="3.9892604" />
+    <path
+       id="path10"
+       style="fill:none;stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round"
+       d="m -0.99999995,-5.7320506 c 0.53847678,-0.3108897 1.19091748,-0.3536529 1.76536675,-0.1157082 0.5744493,0.2379447 1.0055563,0.7295281 1.1664847,1.3301209"
+       sodipodi:nodetypes="csc" />
+  </g>
+</svg>

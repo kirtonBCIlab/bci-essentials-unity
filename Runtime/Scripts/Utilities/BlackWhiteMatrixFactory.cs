@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace BCIEssentials.Utilities
 {
+    using Extensions;
+
     public class BlackWhiteMatrixFactory
     {
         public int MatrixWidth { get; private set; }

@@ -84,12 +84,12 @@ namespace BCIEssentials.Tests.LSLFramework
         [Test]
         public void PullResponses_WhenPredictionSamplePushed_ThenParsedPredictionPulled()
         {
-            PushStringThroughOutlet("1");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             var responses = InStream.PullAllResponses();
             Assert.AreEqual(1, responses.Length);
-            Assert.IsInstanceOf<LSLPredictionResponse>(responses[0]);
-            var prediction = responses[0] as LSLPredictionResponse;
-            Assert.AreEqual(0, prediction.Value);
+            Assert.IsInstanceOf<Prediction>(responses[0]);
+            var prediction = responses[0] as Prediction;
+            Assert.AreEqual(1, prediction.Index);
         }
 
         

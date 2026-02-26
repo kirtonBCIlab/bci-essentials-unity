@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    using Controllers;
+    using Utilities;
 
     [CustomPropertyDrawer(typeof(IndexedKeyBindSet))]
     public class IndexedKeyBindSetDrawer: PropertyDrawer
@@ -16,9 +16,9 @@ namespace BCIEssentials.Editor
         static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
 
         static readonly GUIContent AddButtonContent
-        = new (EditorGUIUtility.IconContent("d_CreateAddNew@2x"));
+        = new (EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
         static readonly GUIContent RemoveButtonContent
-        = new (EditorGUIUtility.IconContent("d_winbtn_win_close@2x"));
+        = new (EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
 
         static readonly GUIStyle FoldoutHeaderStyle
         = new (EditorStyles.foldoutHeader)
@@ -86,7 +86,10 @@ namespace BCIEssentials.Editor
         private void DrawHeader(Rect position, GUIContent label)
         {
             _foldout = EditorPrefs.GetBool(_prefsKey);
-            label.text = label.text.TrimSuffix("Bindings");
+            if (label.text != "Bindings")
+            {
+                label.text = label.text.TrimSuffix("Bindings");
+            }
 
             var foldoutRect = position.Narrowed(
                 ButtonWidth + ItemCountLabelWidth + ItemSpacing.x

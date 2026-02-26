@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    using Controllers;
+    using Utilities;
 
     [CustomPropertyDrawer(typeof(KeyBind))]
     public class KeyBindDrawer: PropertyDrawer

@@ -1,0 +1,29 @@
+using System.Collections;
+using UnityEngine;
+
+namespace BCIEssentials.Behaviours.Training
+{
+    using Utilities;
+
+    public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour
+    {
+        [Space]
+        public int SelectionCount = 8;
+        public float RestTime = 1.0f;
+
+        protected override IEnumerator Run()
+        {
+            int[] trainArray = RNRAUtilities.GenerateRNRA_FisherYates(
+                SelectionCount, 0, _targetIndicationBehaviour.TargetCount - 1
+            );
+
+            foreach (int targetIndex in trainArray)
+            {
+                yield return RunRound(targetIndex);
+                yield return new WaitForSeconds(RestTime);
+            }
+
+            MarkerWriter.PushTrainingCompleteMarker();
+        }
+    }
+}

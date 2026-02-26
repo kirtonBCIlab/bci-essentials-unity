@@ -9,13 +9,13 @@ namespace BCIEssentials.Tests.LSLFramework
 {
     public class LSLResponseProviderTests: LSLOutletTestRunner
     {
-        LSLResponseProvider InStream;
+        ResponseProvider InStream;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            InStream = AddComponent<LSLResponseProvider>();
+            InStream = AddComponent<ResponseProvider>();
             InStream.StreamType = OutletType;
             InStream.PollingPeriod = 0.02f;
         }
@@ -45,7 +45,7 @@ namespace BCIEssentials.Tests.LSLFramework
         [Test]
         public void Unsubscribe_WhenPolling_ThenNotPolling()
         {
-            static void dummySubscriber(LSLResponse r) { }
+            static void dummySubscriber(Response r) { }
             InStream.SubscribeAll(dummySubscriber);
             Assert.IsTrue(InStream.IsPolling);
             InStream.UnsubscribeAll(dummySubscriber);
@@ -55,7 +55,7 @@ namespace BCIEssentials.Tests.LSLFramework
         [UnityTest]
         public IEnumerator Subscribe_WhenSubscribedAndPushMarker_ThenResponseProvided()
         {
-            LSLResponse response = null;
+            Response response = null;
             InStream.SubscribeAll(r => response = r);
             PushStringThroughOutlet("ping");
             yield return new WaitForSecondsRealtime(0.05f);
@@ -65,16 +65,16 @@ namespace BCIEssentials.Tests.LSLFramework
         [UnityTest]
         public IEnumerator Subscribe_WhenSubscribePredictions_ThenOnlyPredictionsReceived()
         {
-            LSLPredictionResponse prediction = null;
+            Prediction prediction = null;
             InStream.SubscribePredictions(p => prediction = p);
 
             PushStringThroughOutlet("ping");
-            PushStringThroughOutlet("1");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
             yield return new WaitForSecondsRealtime(0.05f);
             Assert.NotNull(prediction);
-            Assert.AreEqual(0, prediction.Value);
+            Assert.AreEqual(1, prediction.Index);
         }
 
         [UnityTest]
@@ -86,10 +86,10 @@ namespace BCIEssentials.Tests.LSLFramework
 
             InStream.SubscribeAll(_ => responseCount++);
             InStream.SubscribePredictions(_ => predictionCount++);
-            InStream.Subscribe<LSLPing>(_ => pingCount++);
+            InStream.Subscribe<BCIEssentials.LSLFramework.Ping>(_ => pingCount++);
 
             PushStringThroughOutlet("ping");
-            PushStringThroughOutlet("1");
+            PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
             yield return new WaitForSecondsRealtime(0.05f);
@@ -125,8 +125,8 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             InStream.PollingPeriod = 10;
 
-            LSLPing ping = null;
-            InStream.Subscribe<LSLPing>(p => ping = p);
+            BCIEssentials.LSLFramework.Ping ping = null;
+            InStream.Subscribe<BCIEssentials.LSLFramework.Ping>(p => ping = p);
 
             PushStringThroughOutlet("ping");
             InStream.PullAllResponses();
@@ -139,7 +139,7 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             public int responseCount = 0;
 
-            public void ReceiveLSLResponse(LSLResponse r)
+            public void ReceiveLSLResponse(Response r)
             {
                 responseCount++;
             }

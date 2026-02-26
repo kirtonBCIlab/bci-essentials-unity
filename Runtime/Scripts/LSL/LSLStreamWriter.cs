@@ -1,0 +1,79 @@
+using LSL;
+using UnityEngine;
+
+namespace BCIEssentials.LSLFramework
+{
+    public class LSLStreamWriter: MonoBehaviour
+    {
+        public string StreamName = "UnityMarkerStream";
+        public string StreamType = "BCI_Essentials_Markers";
+        public bool PrintLogs = false;
+
+        public bool HasConsumers => _outlet?.have_consumers() ?? false;
+        protected bool HasLiveOutlet => _outlet is not null;
+        private StreamOutlet _outlet;
+
+
+        void Start()
+        {
+            if (!HasLiveOutlet)
+                OpenStream();
+        }
+
+        void OnDestroy() => CloseStream();
+
+
+        public bool OpenStream()
+        {
+            if (HasLiveOutlet)
+            {
+                Debug.LogWarning($"Stream already initialized");
+                return false;
+            }
+
+            var streamInfo = new StreamInfo
+            (
+                StreamName, StreamType,
+                channel_format: channel_format_t.cf_string,
+                source_id: BuildSourceID()
+            );
+            _outlet = new StreamOutlet(streamInfo);
+            
+            return true;
+        }
+
+        public void CloseStream()
+        {
+            _outlet?.Close();
+            _outlet = null;
+        }
+
+
+        public void PushString(string s)
+        {
+            if (HasLiveOutlet || OpenStream())
+            {
+                _outlet.push_sample(new[] { s });
+                if (PrintLogs)
+                {
+                    Debug.Log($"Sent Marker: {s}");
+                }
+            }
+            else
+            {
+                Debug.LogError("No outlet to write to");
+            }
+        }
+        
+        /// <summary>
+        /// Provides a source id string for the underlying outlet
+        /// <br/> A combination of device id and application name by default
+        /// </summary>
+        protected virtual string BuildSourceID()
+        {
+            string deviceID = SystemInfo.deviceUniqueIdentifier;
+            string applicationName = Application.productName;
+            return $"{deviceID}-{applicationName}";
+        }
+    }
+}

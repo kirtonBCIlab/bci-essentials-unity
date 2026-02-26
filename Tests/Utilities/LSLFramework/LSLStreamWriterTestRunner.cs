@@ -7,8 +7,7 @@ using static BCIEssentials.LSLFramework.LSLStreamResolver;
 
 namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
-    public class LSLStreamWriterTestRunner<T>:
-        PersistentScenePlayModeTestRunner where T: LSLStreamWriter
+    public class LSLStreamWriterTestRunner<T>: PlayModeTestRunner where T: LSLStreamWriter
     {
         protected T OutStream;
         private StreamInlet _inlet;
