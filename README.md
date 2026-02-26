@@ -2,7 +2,7 @@
 A Unity package for development of BCI applications. This environment needs a BCI Essentials back end *([BCI-essentials-Python](https://github.com/kirtonBCIlab/bci-essentials-python))* to work properly.
 
 ## Getting Started
-- **[Wiki](https://docs.bci.games/bessy-unity/getting-started)** – More information, including detailed installation instructions.
+**More information in [the documentation](https://docs.bci.games/bessy-unity/getting-started)**.
 
 ### Install into Unity Project
 Follow these instructions to install BCI Essentials Unity as a package to an existing project.  For instructions on how to add packages hosted on Github using Unity's Package Manager [click here](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
