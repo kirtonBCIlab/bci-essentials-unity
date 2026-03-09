@@ -10,7 +10,7 @@ namespace BCIEssentials.LSLFramework
     A convenience class that pulls responses from an LSL
     outlet, providing them through typed callback subscriptions.
     </summary> **/
-    public class ResponseProvider: LSLStreamReader
+    public partial class ResponseProvider: LSLStreamReader
     {
         [Min(0)]
         public float PollingPeriod = 0.1f;
@@ -132,49 +132,5 @@ namespace BCIEssentials.LSLFramework
         (
             subscriber => !subscriber.HasValidCallbackTarget()
         );
-
-
-        protected interface IResponseSubscriber
-        {
-            public void Notify<T>(T Response);
-
-            public bool MatchesCallback<T>(Action<T> callback);
-
-            public bool HasValidCallbackTarget();
-        }
-
-        protected struct ResponseSubscriber<TResponse>: IResponseSubscriber
-        where TResponse: Response
-        {
-            public Action<TResponse> responseCallback;
-            private bool _callbackIsStatic;
-
-            public ResponseSubscriber(Action<TResponse> callback)
-            {
-                responseCallback = callback;
-                _callbackIsStatic = callback.Target is null;
-            }
-
-            public void Notify<T>(T response)
-            {
-                if (response is TResponse typedResponse)
-                {
-                    try { responseCallback(typedResponse); }
-                    catch (Exception e) { Debug.LogException(e); }
-                }
-            }
-
-            public bool MatchesCallback<T>(Action<T> callback)
-            => responseCallback.Method == callback.Method
-            && responseCallback.Target == callback.Target;
-
-            public bool HasValidCallbackTarget()
-            => responseCallback.Target switch
-            {
-                UnityEngine.Object o => o != null,
-                null => _callbackIsStatic,
-                _ => true
-            };
-        }
     }
 }
