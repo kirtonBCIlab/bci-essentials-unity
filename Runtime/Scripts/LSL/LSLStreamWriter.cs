@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using LSL;
 using UnityEngine;
 
@@ -10,7 +12,7 @@ namespace BCIEssentials.LSLFramework
         public bool PrintLogs = false;
 
         public bool HasConsumers => _outlet?.have_consumers() ?? false;
-        protected bool HasLiveOutlet => _outlet is not null;
+        public bool HasLiveOutlet => _outlet is not null;
         private StreamOutlet _outlet;
 
 
@@ -29,6 +31,40 @@ namespace BCIEssentials.LSLFramework
             {
                 Debug.LogWarning($"Stream already initialized");
                 return false;
+            }
+
+            LSLStreamWriter[] streamWritersInScene
+            = FindObjectsByType<LSLStreamWriter>(FindObjectsSortMode.None);
+
+            bool wouldDuplicateStream = streamWritersInScene.Any(
+                writer => writer != this &&
+                    writer.HasLiveOutlet &&
+                (
+                    writer.StreamType == StreamType &&
+                    writer.StreamName == StreamName
+                )
+            );
+            if (wouldDuplicateStream)
+            {
+                Debug.LogError(
+                    "Another Stream Writer with the same name and type is "
+                    + "already live, will not open this one to avoid duplication"
+                );
+                return false;
+            }
+
+            bool wouldDuplicateType = streamWritersInScene.Any(
+                writer => writer != this &&
+                    writer.HasLiveOutlet &&
+                    writer.StreamType == StreamType
+            );
+            if (wouldDuplicateType)
+            {
+                Debug.LogWarning(
+                    "Another Stream Writer with the same type is already live, "
+                    + "beware that a standard back end will only see "
+                    + "the first of these and ignore any others"
+                );
             }
 
             var streamInfo = new StreamInfo
