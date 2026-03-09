@@ -84,8 +84,8 @@ namespace BCIEssentials.LSLFramework
         private void StartPolling()
         {
             StopPolling();
-            if (!HasLiveInlet && !IsResolvingStream)
-                OpenStream();
+            if (!IsConnected && !IsResolvingStream)
+                FindAndOpenStream();
 
             _pollingCoroutine = StartCoroutine(RunPollForSamples());
         }
@@ -102,17 +102,26 @@ namespace BCIEssentials.LSLFramework
 
         protected IEnumerator RunPollForSamples()
         {
-            while(true)
+            while (!IsConnected) yield return null;
+            while (true)
             {
-                if (HasLiveInlet)
+                if (IsConnected)
                 {
                     PruneSubscriberList();
                     PullAllResponses();
                 }
+                else yield return RunReconnect();
                 yield return new WaitForSeconds(PollingPeriod);
             }
         }
 
+        protected IEnumerator RunReconnect()
+        {
+            Debug.LogWarning("Response Provider Disconnected, attempting to reconnect...");
+            FindAndOpenStream();
+            while (!IsConnected) yield return new WaitForSeconds(PollingPeriod);
+            Debug.Log("Response Provider Reconnected");
+        }
 
         public override Response[] PullAllResponses(int maxSamples = 50)
         {

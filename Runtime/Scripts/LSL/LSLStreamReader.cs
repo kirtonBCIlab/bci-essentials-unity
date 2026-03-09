@@ -19,21 +19,22 @@ namespace BCIEssentials.LSLFramework
 
         protected bool IsResolvingStream = false;
 
+        public bool TargetStreamExists => TryResolveByType(StreamType, out _);
+        public bool IsConnected => (_inlet is not null) && TargetStreamExists;
         public int SamplesAvailable => _inlet?.samples_available() ?? 0;
-        public bool HasLiveInlet => _inlet is not null;
         private StreamInlet _inlet;
         private string[] _sampleBuffer;
 
 
         void Start()
         {
-            if (_openOnStart) OpenStream();
+            if (_openOnStart) FindAndOpenStream();
         }
 
         void OnDestroy() => CloseStream();
 
         
-        public void OpenStream(float resolutionPeriod = 0.1f)
+        public void FindAndOpenStream(float resolutionPeriod = 0.1f)
         {
             IsResolvingStream = true;
             StartCoroutine(
@@ -62,9 +63,9 @@ namespace BCIEssentials.LSLFramework
         
         public virtual Response[] PullAllResponses(int maxSamples = 50)
         {
-            if (!HasLiveInlet)
+            if (!IsConnected)
             {
-                Debug.LogWarning("The target stream is unavailable");
+                Debug.LogWarning("Inlet isn't connected to stream");
                 return new Response[0];
             }
 
