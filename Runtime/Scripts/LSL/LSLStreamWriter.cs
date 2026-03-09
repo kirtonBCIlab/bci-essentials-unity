@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LSL;
@@ -33,39 +34,8 @@ namespace BCIEssentials.LSLFramework
                 return false;
             }
 
-            LSLStreamWriter[] streamWritersInScene
-            = FindObjectsByType<LSLStreamWriter>(FindObjectsSortMode.None);
-
-            bool wouldDuplicateStream = streamWritersInScene.Any(
-                writer => writer != this &&
-                    writer.HasLiveOutlet &&
-                (
-                    writer.StreamType == StreamType &&
-                    writer.StreamName == StreamName
-                )
-            );
-            if (wouldDuplicateStream)
-            {
-                Debug.LogError(
-                    "Another Stream Writer with the same name and type is "
-                    + "already live, will not open this one to avoid duplication"
-                );
-                return false;
-            }
-
-            bool wouldDuplicateType = streamWritersInScene.Any(
-                writer => writer != this &&
-                    writer.HasLiveOutlet &&
-                    writer.StreamType == StreamType
-            );
-            if (wouldDuplicateType)
-            {
-                Debug.LogWarning(
-                    "Another Stream Writer with the same type is already live, "
-                    + "beware that a standard back end will only see "
-                    + "the first of these and ignore any others"
-                );
-            }
+            ThrowExceptionIfDuplicateWriterIsLive();
+            WarnIfTypeIsReused();
 
             var streamInfo = new StreamInfo
             (
@@ -100,7 +70,42 @@ namespace BCIEssentials.LSLFramework
                 Debug.LogError("No outlet to write to");
             }
         }
-        
+
+
+        private bool WriterSharesNameAndType(LSLStreamWriter other)
+        => other.StreamName == StreamName && WriterSharesType(other);
+        private bool WriterSharesType(LSLStreamWriter other)
+        => other.StreamType == StreamType;
+
+        private void ThrowExceptionIfDuplicateWriterIsLive()
+        {
+            if (AnyOtherLiveStreamWriters(WriterSharesNameAndType))
+            throw new Exception(
+                "Another Stream Writer with the same name and type is "
+                + "already live, opening this one would duplicate streams"
+            );
+        }
+
+        private void WarnIfTypeIsReused()
+        {
+            if (AnyOtherLiveStreamWriters(WriterSharesType))
+            Debug.LogWarning(
+                "Another Stream Writer with the same type is already live, "
+                + "beware that a standard back end will only see "
+                + "the first of these and ignore any others"
+            );
+        }
+
+        private bool AnyOtherLiveStreamWriters(Func<LSLStreamWriter, bool> predicate)
+        {
+            LSLStreamWriter[] streamWritersInScene
+            = FindObjectsByType<LSLStreamWriter>(FindObjectsSortMode.None);
+            return streamWritersInScene.Any(
+                writer => writer != this && writer.HasLiveOutlet && predicate(writer)
+            );
+        }
+
+
         /// <summary>
         /// Provides a source id string for the underlying outlet
         /// <br/> A combination of device id and application name by default
