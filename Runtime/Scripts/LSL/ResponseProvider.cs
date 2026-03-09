@@ -158,7 +158,10 @@ namespace BCIEssentials.LSLFramework
             public void Notify<T>(T response)
             {
                 if (response is TResponse typedResponse)
-                    responseCallback(typedResponse);
+                {
+                    try { responseCallback(typedResponse); }
+                    catch (Exception e) { Debug.LogException(e); }
+                }
             }
 
             public bool MatchesCallback<T>(Action<T> callback)
