@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    using Utilities;
     using static LSLStreamResolver;
     using static Response;
 
@@ -54,6 +55,8 @@ namespace BCIEssentials.LSLFramework
 
         private void InitializeInlet(StreamInfo resolvedStreamInfo)
         {
+            WarnIfTypeInUse();
+
             _sampleBuffer = new string[resolvedStreamInfo.channel_count()];
             _inlet = new(resolvedStreamInfo);
             IsResolvingStream = false;
@@ -95,6 +98,19 @@ namespace BCIEssentials.LSLFramework
                 Debug.Log($"Pulled {parsedResponse}");
             }
             return captureTime;
+        }
+
+
+        private bool ConnectedReaderSharesType(LSLStreamReader other)
+        => other.IsConnected && other.StreamType == StreamType;
+
+        private void WarnIfTypeInUse()
+        {
+            if (this.AnyOther(ConnectedReaderSharesType))
+            Debug.LogWarning(
+                "Another Stream Reader is already connected to a "
+                + $"stream of the type {StreamType}."
+            );
         }
     }
 }
