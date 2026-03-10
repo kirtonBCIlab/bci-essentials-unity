@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace BCIEssentials.LSLFramework.Utilities
+namespace BCIEssentials.LSLFramework
 {
     public static class ComponentsExtensions
     {

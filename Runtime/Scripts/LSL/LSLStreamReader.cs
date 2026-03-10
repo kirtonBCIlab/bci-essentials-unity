@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using Utilities;
     using static LSLStreamResolver;
     using static Response;
 

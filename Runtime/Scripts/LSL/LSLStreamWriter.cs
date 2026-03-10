@@ -1,11 +1,8 @@
-using System;
 using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using Utilities;
-
     public class LSLStreamWriter : MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";
