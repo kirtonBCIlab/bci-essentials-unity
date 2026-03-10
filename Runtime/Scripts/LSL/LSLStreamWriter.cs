@@ -80,10 +80,7 @@ namespace BCIEssentials.LSLFramework
         private void ThrowExceptionIfDuplicateWriterIsLive()
         {
             if (this.AnyOther(LiveWriterSharesNameAndType))
-            throw new Exception(
-                "Another Stream Writer with the same name and type is "
-                + "already live, opening this one would duplicate streams"
-            );
+                throw new DuplicateOutletException();
         }
 
         private void WarnIfTypeInUse()

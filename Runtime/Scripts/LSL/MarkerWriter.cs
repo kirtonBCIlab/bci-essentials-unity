@@ -208,18 +208,11 @@ namespace BCIEssentials.LSLFramework
             }
             else if (_lastEpochLength.Value != marker.EpochLength)
             {
-                string exceptionMessage = $"Epoch length doesn't match "
-                + $"the previous value ({_lastEpochLength}), this will "
-                + "prevent the back end from making proper predictions";
+                float previousEpochLength = _lastEpochLength.Value;
                 _lastEpochLength = marker.EpochLength;
-                throw new EpochLengthException(exceptionMessage);
+                throw new EpochLengthException(previousEpochLength);
             }
             PushMarker(marker);
-        }
-
-        public class EpochLengthException : System.Exception
-        {
-            public EpochLengthException(string message) : base(message) { }
         }
     }
 }
