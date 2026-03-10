@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    using static Utilities.ComponentSearchMethods;
+
     public class LSLStreamWriter : MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";

@@ -6,6 +6,7 @@ namespace BCIEssentials.LSLFramework
 {
     using static LSLStreamResolver;
     using static Response;
+    using static Utilities.ComponentSearchMethods;
 
     public class LSLStreamReader : MonoBehaviour
     {
@@ -62,7 +63,7 @@ namespace BCIEssentials.LSLFramework
             _inlet.open_stream(0.1);
         }
 
-        
+
         public virtual Response[] PullAllResponses(int maxSamples = 50)
         {
             if (!IsConnected)
