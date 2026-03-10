@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLStreamWriter: MonoBehaviour
+    using Utilities;
+
+    public class LSLStreamWriter : MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";
         public string StreamType = "BCI_Essentials_Markers";
@@ -35,7 +35,7 @@ namespace BCIEssentials.LSLFramework
             }
 
             ThrowExceptionIfDuplicateWriterIsLive();
-            WarnIfTypeIsReused();
+            WarnIfTypeInUse();
 
             var streamInfo = new StreamInfo
             (
@@ -72,36 +72,27 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        private bool WriterSharesNameAndType(LSLStreamWriter other)
-        => other.StreamName == StreamName && WriterSharesType(other);
-        private bool WriterSharesType(LSLStreamWriter other)
-        => other.StreamType == StreamType;
+        private bool LiveWriterSharesNameAndType(LSLStreamWriter other)
+        => other.StreamName == StreamName && LiveWriterSharesType(other);
+        private bool LiveWriterSharesType(LSLStreamWriter other)
+        => other.HasLiveOutlet && other.StreamType == StreamType;
 
         private void ThrowExceptionIfDuplicateWriterIsLive()
         {
-            if (AnyOtherLiveStreamWriters(WriterSharesNameAndType))
+            if (this.AnyOther(LiveWriterSharesNameAndType))
             throw new Exception(
                 "Another Stream Writer with the same name and type is "
                 + "already live, opening this one would duplicate streams"
             );
         }
 
-        private void WarnIfTypeIsReused()
+        private void WarnIfTypeInUse()
         {
-            if (AnyOtherLiveStreamWriters(WriterSharesType))
+            if (this.AnyOther(LiveWriterSharesType))
             Debug.LogWarning(
                 "Another Stream Writer with the same type is already live, "
                 + "beware that a standard back end will only see "
                 + "the first of these and ignore any others"
-            );
-        }
-
-        private bool AnyOtherLiveStreamWriters(Func<LSLStreamWriter, bool> predicate)
-        {
-            LSLStreamWriter[] streamWritersInScene
-            = FindObjectsByType<LSLStreamWriter>(FindObjectsSortMode.None);
-            return streamWritersInScene.Any(
-                writer => writer != this && writer.HasLiveOutlet && predicate(writer)
             );
         }
 
