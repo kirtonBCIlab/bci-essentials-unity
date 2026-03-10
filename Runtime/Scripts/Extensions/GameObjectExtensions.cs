@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BCIEssentials.Extensions
@@ -15,24 +15,6 @@ namespace BCIEssentials.Extensions
         public static void DeactivateGameObject(this Component caller)
         => caller.gameObject.Deactivate();
 
-
-        public static void GetOrAddComponent<T>
-        (
-            this GameObject gameObject, ref T componentReference
-        ) where T : Component
-        {
-            if (
-                componentReference == null &&
-                !gameObject.TryGetComponent(out componentReference)
-            )
-            {
-                Debug.Log(
-                    $"No {typeof(T).Name}"
-                    + " component found, creating one..."
-                );
-                componentReference = gameObject.AddComponent<T>();
-            }
-        }
 
         public static T CoalesceComponentReference<T>
         (

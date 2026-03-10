@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    using Extensions;
     using static LSLStreamResolver;
     using static Response;
-    using static Utilities.ComponentSearchMethods;
 
     public class LSLStreamReader : MonoBehaviour
     {
@@ -34,7 +34,7 @@ namespace BCIEssentials.LSLFramework
 
         void OnDestroy() => CloseStream();
 
-        
+
         public void FindAndOpenStream(float resolutionPeriod = 0.1f)
         {
             IsResolvingStream = true;

@@ -19,8 +19,8 @@ namespace BCIEssentials.Behaviours
         /// </summary>
         protected void ProvideMarkerComponentsToChildren()
         {
-            gameObject.GetOrAddComponent(ref MarkerWriter);
-            gameObject.GetOrAddComponent(ref ResponseProvider);
+            gameObject.GetOrAddComponent(ref MarkerWriter, true);
+            gameObject.GetOrAddComponent(ref ResponseProvider, true);
 
             Array.ForEach(
                 GetComponentsInChildren<IMarkerSource>(),

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using static Utilities.ComponentSearchMethods;
+    using Extensions;
 
     public class LSLStreamWriter : MonoBehaviour
     {
@@ -43,7 +43,7 @@ namespace BCIEssentials.LSLFramework
                 source_id: BuildSourceID()
             );
             _outlet = new StreamOutlet(streamInfo);
-            
+
             return true;
         }
 
