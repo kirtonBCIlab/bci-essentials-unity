@@ -208,9 +208,7 @@ namespace BCIEssentials.LSLFramework
             }
             else if (_lastEpochLength.Value != marker.EpochLength)
             {
-                float previousEpochLength = _lastEpochLength.Value;
-                _lastEpochLength = marker.EpochLength;
-                throw new EpochLengthException(previousEpochLength);
+                throw new EpochLengthException(_lastEpochLength.Value);
             }
             PushMarker(marker);
         }
