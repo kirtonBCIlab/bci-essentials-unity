@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace BCIEssentials.Behaviours
@@ -45,6 +46,7 @@ namespace BCIEssentials.Behaviours
         /// </summary>
         public void ProvideCommunication()
         {
+            WarnIfProvisionScopeOverlaps();
             gameObject.GetOrAddComponent(ref MarkerWriter, true);
             gameObject.GetOrAddComponent(ref ResponseProvider, true);
 
@@ -81,6 +83,24 @@ namespace BCIEssentials.Behaviours
         {
             ResponseProvider.SubscribePredictions(sink.OnPrediction);
             _servicedComponentIds.Append(sink.GetInstanceID());
+        }
+
+
+        private void WarnIfProvisionScopeOverlaps()
+        {
+            CommunicationProvider[] providersInScope = ProvisionScope switch
+            {
+                Scope.Scene => GetComponentsInScene<CommunicationProvider>(),
+                Scope.Children => GetComponentsInChildren<CommunicationProvider>(),
+                _ => GetComponents<CommunicationProvider>()
+            };
+            if (providersInScope.Length > 1)
+            {
+                Debug.LogWarning(
+                    $"Another Communication Provider exists within the {ProvisionScope}"
+                    + $" (selected scope), which may lead to unexpected behaviour"
+                );
+            }
         }
     }
 
