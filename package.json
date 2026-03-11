@@ -5,7 +5,7 @@
   "description": "A set of front end components for streamlined development of BCI applications in Unity",
   "unity": "2021.3",
   "unityRelease": "15f1",
-  "documentationUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity",
+  "documentationUrl": "https://docs.bci.games",
   "changelogUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity/releases",
   "license": "MIT",
   "author": {
