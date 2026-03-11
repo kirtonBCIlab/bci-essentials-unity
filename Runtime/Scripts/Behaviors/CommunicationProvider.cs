@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 namespace BCIEssentials.Behaviours
 {
+    using System.Linq;
     using Extensions;
     using LSLFramework;
     using Selection;
@@ -9,60 +12,86 @@ namespace BCIEssentials.Behaviours
 
     public class CommunicationProvider : MonoBehaviourUsingExtendedAttributes
     {
+        [Flags]
+        public enum ProvisionOccasion { Manual, Awake, SceneLoad = 3 }
         public enum Scope { Scene, Children, SameObject }
-        public Scope provisionScope;
+
+        public ProvisionOccasion ProvisionTriggers = ProvisionOccasion.Awake;
+        public Scope ProvisionScope = Scope.Scene;
 
         protected MarkerWriter MarkerWriter;
         protected ResponseProvider ResponseProvider;
+
+        private readonly HashSet<int> _servicedComponentIds = new();
+
+
+        private void Awake()
+        {
+            if (ProvisionTriggers.HasFlag(ProvisionOccasion.SceneLoad))
+            {
+                SceneManager.activeSceneChanged += (_, _) => ProvideCommunication();
+            }
+            else if (ProvisionTriggers.HasFlag(ProvisionOccasion.Awake))
+            {
+                ProvideCommunication();
+            }
+        }
 
 
         /// <summary>
         /// Create or fetch reference to required LSL components,
         /// connecting any marker sources or selectors
-        /// found on the host object or it's children
+        /// found in the configured scope
         /// </summary>
-        protected void ProvideCommunication()
+        public void ProvideCommunication()
         {
             gameObject.GetOrAddComponent(ref MarkerWriter, true);
             gameObject.GetOrAddComponent(ref ResponseProvider, true);
 
-            (
-                IMarkerSource[] sources,
-                IPredictionSink[] sinks
-            ) = provisionScope switch
+            IMarkerSource[] unservicedSources = GetUnservicedComponents<IMarkerSource>();
+            IPredictionSink[] unservicedSinks = GetUnservicedComponents<IPredictionSink>();
+
+            Array.ForEach(unservicedSources, ProvideMarkerWriter);
+            Array.ForEach(unservicedSinks, ProvideResponseSubscription);
+        }
+        
+        T[] GetUnservicedComponents<T>() where T : IHasInstanceID
+        {
+            T[] found = ProvisionScope switch
             {
-                Scope.Scene => (
-                    GetComponentsInScene<IMarkerSource>(),
-                    GetComponentsInScene<IPredictionSink>()
-                ),
-                Scope.Children => (
-                    GetComponentsInChildren<IMarkerSource>(),
-                    GetComponentsInChildren<IPredictionSink>()
-                ),
-                _ => (
-                    GetComponents<IMarkerSource>(),
-                    GetComponents<IPredictionSink>()
-                )
+                Scope.Scene => GetComponentsInScene<T>(),
+                Scope.Children => GetComponentsInChildren<T>(),
+                _ => GetComponents<T>(),
             };
 
-            Array.ForEach(sources, ProvideMarkerWriter);
-            Array.ForEach(sinks, ProvideResponseSubscription);
+            return found.Where(
+                c => !_servicedComponentIds.Contains(c.GetInstanceID())
+            ).ToArray();
         }
-
-        private void Awake() => ProvideCommunication();
 
         public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
 
 
         private void ProvideMarkerWriter(IMarkerSource source)
-        => source.MarkerWriter = MarkerWriter;
+        {
+            source.MarkerWriter = MarkerWriter;
+            _servicedComponentIds.Append(source.GetInstanceID());
+        }
         private void ProvideResponseSubscription(IPredictionSink sink)
-        => ResponseProvider.SubscribePredictions(sink.OnPrediction);
+        {
+            ResponseProvider.SubscribePredictions(sink.OnPrediction);
+            _servicedComponentIds.Append(sink.GetInstanceID());
+        }
     }
 
 
-    public interface IMarkerSource
+    public interface IMarkerSource : IHasInstanceID
     {
         public MarkerWriter MarkerWriter { set; }
+    }
+
+    public interface IHasInstanceID
+    {
+        public int GetInstanceID();
     }
 }
