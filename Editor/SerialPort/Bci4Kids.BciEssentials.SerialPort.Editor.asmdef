@@ -1,0 +1,11 @@
+{
+    "name": "Bci4Kids.BciEssentials.SerialPort.Editor",
+    "rootNamespace": "BCIEssentials.SerialPort.Editor",
+    "references": [
+        "Bci4Kids.BciEssentials.SerialPort",
+        "Bci4Kids.BciEssentials.LSLFramework"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

@@ -3,7 +3,8 @@
     "rootNamespace": "BciEssentials.Editor.Tests",
     "references": [
         "Bci4Kids.BciEssentials",
-        "Bci4Kids.BciEssentials.LSLFramework"
+        "Bci4Kids.BciEssentials.LSLFramework",
+        "Bci4Kids.BciEssentials.SerialPort"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"

@@ -191,7 +191,11 @@ namespace BCIEssentials.LSLFramework
         );
 
 
-        public void PushMarker(IMarker marker)
+        /// <summary>
+        /// Push a marker to the LSL stream.
+        /// Override to add additional output channels (e.g. serial triggers).
+        /// </summary>
+        public virtual void PushMarker(IMarker marker)
             => PushString(marker.MarkerString);
     }
 }

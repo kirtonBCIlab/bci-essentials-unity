@@ -1,0 +1,7 @@
+{
+    "name": "Bci4Kids.BciEssentials.SerialPort",
+    "rootNamespace": "BCIEssentials.SerialPort",
+    "references": [
+        "Bci4Kids.BciEssentials.LSLFramework"
+    ]
+}
