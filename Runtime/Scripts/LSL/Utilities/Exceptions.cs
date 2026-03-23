@@ -16,9 +16,8 @@ namespace BCIEssentials.LSLFramework
     {
         public EpochLengthException(float previousEpochLength)
         : base(
-            "Epoch length doesn't match the previous value: "
-            + $"{previousEpochLength}, this will prevent "
-            + "the back end from making proper predictions"
+            "Length of marked epoch doesn't match "
+            + $"preceding values: {previousEpochLength}"
         )
         { }
     }
