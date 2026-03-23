@@ -3,14 +3,16 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class LSLStreamWriter: MonoBehaviour
+    using Extensions;
+
+    public class LSLStreamWriter : MonoBehaviour
     {
         public string StreamName = "UnityMarkerStream";
         public string StreamType = "BCI_Essentials_Markers";
         public bool PrintLogs = false;
 
         public bool HasConsumers => _outlet?.have_consumers() ?? false;
-        protected bool HasLiveOutlet => _outlet is not null;
+        public bool HasLiveOutlet => _outlet is not null;
         private StreamOutlet _outlet;
 
 
@@ -31,6 +33,9 @@ namespace BCIEssentials.LSLFramework
                 return false;
             }
 
+            ThrowExceptionIfDuplicateWriterIsLive();
+            WarnIfTypeInUse();
+
             var streamInfo = new StreamInfo
             (
                 StreamName, StreamType,
@@ -38,7 +43,7 @@ namespace BCIEssentials.LSLFramework
                 source_id: BuildSourceID()
             );
             _outlet = new StreamOutlet(streamInfo);
-            
+
             return true;
         }
 
@@ -64,7 +69,30 @@ namespace BCIEssentials.LSLFramework
                 Debug.LogError("No outlet to write to");
             }
         }
-        
+
+
+        private bool LiveWriterSharesNameAndType(LSLStreamWriter other)
+        => other.StreamName == StreamName && LiveWriterSharesType(other);
+        private bool LiveWriterSharesType(LSLStreamWriter other)
+        => other.HasLiveOutlet && other.StreamType == StreamType;
+
+        private void ThrowExceptionIfDuplicateWriterIsLive()
+        {
+            if (this.AnyOther(LiveWriterSharesNameAndType))
+                throw new DuplicateOutletException();
+        }
+
+        private void WarnIfTypeInUse()
+        {
+            if (this.AnyOther(LiveWriterSharesType))
+            Debug.LogWarning(
+                "Another Stream Writer with the same type is already live, "
+                + "beware that a standard back end will only see "
+                + "the first of these and ignore any others"
+            );
+        }
+
+
         /// <summary>
         /// Provides a source id string for the underlying outlet
         /// <br/> A combination of device id and application name by default

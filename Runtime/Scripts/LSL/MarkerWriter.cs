@@ -4,6 +4,8 @@ namespace BCIEssentials.LSLFramework
 {
     public class MarkerWriter: LSLStreamWriter
     {
+        private float? _lastEpochLength;
+
         public void PushTrialStartedMarker()
             => PushStatusMarker<TrialStartedMarker>();
         public void PushTrialEndsMarker()
@@ -40,7 +42,7 @@ namespace BCIEssentials.LSLFramework
             int trainingTargetIndex,
             float epochLength
         )
-        => PushMarker(new MIEventMarker
+        => PushEpochMarker(new MIEventMarker
             (stateCount, trainingTargetIndex, epochLength)
         );
 
@@ -61,7 +63,7 @@ namespace BCIEssentials.LSLFramework
         (
             int stateCount, float epochLength
         )
-        => PushMarker(new MIEventMarker
+        => PushEpochMarker(new MIEventMarker
             (stateCount, -1, epochLength)
         );
 
@@ -85,7 +87,7 @@ namespace BCIEssentials.LSLFramework
             float epochLength,
             IEnumerable<float> frequencies
         )
-        => PushMarker(new SSVEPEventMarker
+        => PushEpochMarker(new SSVEPEventMarker
             (trainingTargetIndex, epochLength, frequencies)
         );
 
@@ -104,12 +106,15 @@ namespace BCIEssentials.LSLFramework
         /// <param name="frequencies">
         /// Collection of flashing frequencies used by stimulus presenters
         /// </param>
+        /// <exception cref="EpochLengthException">
+        /// Thrown when a different Epoch Length is used
+        /// </exception>
         public void PushSSVEPClassificationMarker
         (
             float epochLength,
             IEnumerable<float> frequencies
         )
-        => PushMarker(new SSVEPEventMarker
+        => PushEpochMarker(new SSVEPEventMarker
             (-1, epochLength, frequencies)
         );
 
@@ -193,5 +198,19 @@ namespace BCIEssentials.LSLFramework
 
         public void PushMarker(IMarker marker)
             => PushString(marker.MarkerString);
+
+
+        public void PushEpochMarker(EpochEventMarker marker)
+        {
+            if (!_lastEpochLength.HasValue)
+            {
+                _lastEpochLength = marker.EpochLength;
+            }
+            else if (_lastEpochLength.Value != marker.EpochLength)
+            {
+                throw new EpochLengthException(_lastEpochLength.Value);
+            }
+            PushMarker(marker);
+        }
     }
 }

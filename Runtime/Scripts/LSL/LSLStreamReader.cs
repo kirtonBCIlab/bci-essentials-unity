@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    using Extensions;
     using static LSLStreamResolver;
     using static Response;
 
@@ -19,21 +20,22 @@ namespace BCIEssentials.LSLFramework
 
         protected bool IsResolvingStream = false;
 
+        public bool TargetStreamExists => TryResolveByType(StreamType, out _);
+        public bool IsConnected => (_inlet is not null) && TargetStreamExists;
         public int SamplesAvailable => _inlet?.samples_available() ?? 0;
-        public bool HasLiveInlet => _inlet is not null;
         private StreamInlet _inlet;
         private string[] _sampleBuffer;
 
 
         void Start()
         {
-            if (_openOnStart) OpenStream();
+            if (_openOnStart) FindAndOpenStream();
         }
 
         void OnDestroy() => CloseStream();
 
-        
-        public void OpenStream(float resolutionPeriod = 0.1f)
+
+        public void FindAndOpenStream(float resolutionPeriod = 0.1f)
         {
             IsResolvingStream = true;
             StartCoroutine(
@@ -53,18 +55,20 @@ namespace BCIEssentials.LSLFramework
 
         private void InitializeInlet(StreamInfo resolvedStreamInfo)
         {
+            WarnIfTypeInUse();
+
             _sampleBuffer = new string[resolvedStreamInfo.channel_count()];
             _inlet = new(resolvedStreamInfo);
             IsResolvingStream = false;
             _inlet.open_stream(0.1);
         }
 
-        
+
         public virtual Response[] PullAllResponses(int maxSamples = 50)
         {
-            if (!HasLiveInlet)
+            if (!IsConnected)
             {
-                Debug.LogWarning("The target stream is unavailable");
+                Debug.LogWarning("Inlet isn't connected to stream");
                 return new Response[0];
             }
 
@@ -94,6 +98,19 @@ namespace BCIEssentials.LSLFramework
                 Debug.Log($"Pulled {parsedResponse}");
             }
             return captureTime;
+        }
+
+
+        private bool ConnectedReaderSharesType(LSLStreamReader other)
+        => other.IsConnected && other.StreamType == StreamType;
+
+        private void WarnIfTypeInUse()
+        {
+            if (this.AnyOther(ConnectedReaderSharesType))
+            Debug.LogWarning(
+                "Another Stream Reader is already connected to a "
+                + $"stream of the type {StreamType}."
+            );
         }
     }
 }

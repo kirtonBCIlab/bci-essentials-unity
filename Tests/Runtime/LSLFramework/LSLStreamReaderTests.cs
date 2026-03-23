@@ -100,13 +100,13 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             var inStream = AddComponent<LSLStreamReader>();
             inStream.StreamType = streamType;
-            inStream.OpenStream(0.02f);
+            inStream.FindAndOpenStream(0.02f);
             return inStream;
         }
 
         private void AssertConnected(LSLStreamReader inStream)
-        => Assert.IsTrue(inStream.HasLiveInlet);
+        => Assert.IsTrue(inStream.IsConnected);
         private void AssertNotConnected(LSLStreamReader inStream)
-        => Assert.IsFalse(inStream.HasLiveInlet);
+        => Assert.IsFalse(inStream.IsConnected);
     }
 }

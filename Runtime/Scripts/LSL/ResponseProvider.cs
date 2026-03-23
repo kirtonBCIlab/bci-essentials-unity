@@ -10,7 +10,7 @@ namespace BCIEssentials.LSLFramework
     A convenience class that pulls responses from an LSL
     outlet, providing them through typed callback subscriptions.
     </summary> **/
-    public class ResponseProvider: LSLStreamReader
+    public partial class ResponseProvider: LSLStreamReader
     {
         [Min(0)]
         public float PollingPeriod = 0.1f;
@@ -84,8 +84,8 @@ namespace BCIEssentials.LSLFramework
         private void StartPolling()
         {
             StopPolling();
-            if (!HasLiveInlet && !IsResolvingStream)
-                OpenStream();
+            if (!IsConnected && !IsResolvingStream)
+                FindAndOpenStream();
 
             _pollingCoroutine = StartCoroutine(RunPollForSamples());
         }
@@ -102,17 +102,26 @@ namespace BCIEssentials.LSLFramework
 
         protected IEnumerator RunPollForSamples()
         {
-            while(true)
+            while (!IsConnected) yield return null;
+            while (true)
             {
-                if (HasLiveInlet)
+                if (IsConnected)
                 {
                     PruneSubscriberList();
                     PullAllResponses();
                 }
+                else yield return RunReconnect();
                 yield return new WaitForSeconds(PollingPeriod);
             }
         }
 
+        protected IEnumerator RunReconnect()
+        {
+            Debug.LogWarning("Response Provider Disconnected, attempting to reconnect...");
+            FindAndOpenStream();
+            while (!IsConnected) yield return new WaitForSeconds(PollingPeriod);
+            Debug.Log("Response Provider Reconnected");
+        }
 
         public override Response[] PullAllResponses(int maxSamples = 50)
         {
@@ -132,46 +141,5 @@ namespace BCIEssentials.LSLFramework
         (
             subscriber => !subscriber.HasValidCallbackTarget()
         );
-
-
-        protected interface IResponseSubscriber
-        {
-            public void Notify<T>(T Response);
-
-            public bool MatchesCallback<T>(Action<T> callback);
-
-            public bool HasValidCallbackTarget();
-        }
-
-        protected struct ResponseSubscriber<TResponse>: IResponseSubscriber
-        where TResponse: Response
-        {
-            public Action<TResponse> responseCallback;
-            private bool _callbackIsStatic;
-
-            public ResponseSubscriber(Action<TResponse> callback)
-            {
-                responseCallback = callback;
-                _callbackIsStatic = callback.Target is null;
-            }
-
-            public void Notify<T>(T response)
-            {
-                if (response is TResponse typedResponse)
-                    responseCallback(typedResponse);
-            }
-
-            public bool MatchesCallback<T>(Action<T> callback)
-            => responseCallback.Method == callback.Method
-            && responseCallback.Target == callback.Target;
-
-            public bool HasValidCallbackTarget()
-            => responseCallback.Target switch
-            {
-                UnityEngine.Object o => o != null,
-                null => _callbackIsStatic,
-                _ => true
-            };
-        }
     }
 }

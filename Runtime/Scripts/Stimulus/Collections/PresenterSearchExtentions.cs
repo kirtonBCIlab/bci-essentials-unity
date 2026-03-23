@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace BCIEssentials.Stimulus.Collections
 {
     using Extensions;
     using Stimulus.Presentation;
+    using static Utilities.ComponentSearchMethods;
     using Scope = DynamicStimulusPresenterCollection.Scope;
 
     public static class PresenterSearchExtensions
@@ -34,21 +34,6 @@ namespace BCIEssentials.Stimulus.Collections
                     => GetComponentsInScene<StimulusPresentationBehaviour>()
             };
             return presenters.WhereSelectable();
-        }
-
-        public static T[] GetComponentsInScene<T>
-        (
-            bool includeInactive = false
-        )
-        {
-            Scene scene = SceneManager.GetActiveScene();
-            List<T> results = new();
-
-            foreach (GameObject rootObject in scene.GetRootGameObjects())
-            {
-                results.AddRange(rootObject.GetComponentsInChildren<T>(includeInactive));
-            }
-            return results.ToArray();
         }
 
 
