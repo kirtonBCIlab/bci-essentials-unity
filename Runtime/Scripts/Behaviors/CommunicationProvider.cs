@@ -8,7 +8,6 @@ namespace BCIEssentials.Behaviours
     using System.Linq;
     using Extensions;
     using LSLFramework;
-    using Selection;
     using static Utilities.ComponentSearchMethods;
 
     public class CommunicationProvider : MonoBehaviourUsingExtendedAttributes
@@ -102,16 +101,5 @@ namespace BCIEssentials.Behaviours
                 );
             }
         }
-    }
-
-
-    public interface IMarkerSource : IHasInstanceID
-    {
-        public MarkerWriter MarkerWriter { set; }
-    }
-
-    public interface IHasInstanceID
-    {
-        public int GetInstanceID();
     }
 }
