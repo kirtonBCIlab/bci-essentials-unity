@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using BCIEssentials.Behaviours;
 using BCIEssentials.LSLFramework;
-using BCIEssentials.Selection;
+using BCIEssentials;
 using UnityEngine;
 
 public class ClassificationProvider : CoroutineBehaviour, IMarkerSource, IPredictionSink
