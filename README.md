@@ -12,4 +12,7 @@ Follow these instructions to install BCI Essentials Unity as a package to an exi
 
 *Note - tested with Unity version 6000.3.9f1 and 2021.3.15.f1, some editor versions might not work.*
 
+## Serial Triggers
+Support for serial trigger boxes is implemented in a separate package which can be found [HERE](https://github.com/kirtonBCIlab/bci-essentials-unity-serial-triggers).
+
 [Contributing](CONTRIBUTING.md)
