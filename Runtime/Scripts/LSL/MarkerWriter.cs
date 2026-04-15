@@ -196,7 +196,7 @@ namespace BCIEssentials.LSLFramework
         );
 
 
-        public void PushMarker(IMarker marker)
+        public virtual void PushMarker(IMarker marker)
             => PushString(marker.MarkerString);
 
 
