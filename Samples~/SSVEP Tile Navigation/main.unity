@@ -615,18 +615,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a282f9ac1c238ce469305817bc2f7e1c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Selection.SelectorShortcuts
   Bindings:
     Bindings:
-    - BoundKey: 260
+    - BoundKey: 88
       Index: 0
-    - BoundKey: 262
+    - BoundKey: 90
       Index: 1
-    - BoundKey: 259
+    - BoundKey: 87
       Index: 2
-    - BoundKey: 257
+    - BoundKey: 85
       Index: 3
-  _target: {fileID: 0}
+  _target: {fileID: 471476625}
   _trialBehaviour: {fileID: 584918807}
 --- !u!114 &471476625
 MonoBehaviour:
@@ -743,14 +743,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e57ae8077f4c0c47b086a7f0b17d1fa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Behaviours.BCIControllerShortcuts
   ToggleTrialRunBinding:
-    BoundKey: 115
+    BoundKey: 33
   ToggleTrainingRunBinding:
-    BoundKey: 116
+    BoundKey: 34
   UpdateClassifierBinding:
-    BoundKey: 8
-  _target: {fileID: 0}
+    BoundKey: 65
+  _target: {fileID: 584918811}
 --- !u!114 &584918811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -763,6 +763,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 464254de7f56ddb419569333b1ccf1b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ProvisionTriggers: 1
+  ProvisionScope: 0
   _trialBehaviour: {fileID: 584918807}
   _trainingBehaviour: {fileID: 584918806}
 --- !u!1 &640805667

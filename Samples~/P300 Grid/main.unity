@@ -785,13 +785,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e57ae8077f4c0c47b086a7f0b17d1fa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Behaviours.BCIControllerShortcuts
   ToggleTrialRunBinding:
-    BoundKey: 115
+    BoundKey: 33
   ToggleTrainingRunBinding:
-    BoundKey: 116
+    BoundKey: 34
   UpdateClassifierBinding:
-    BoundKey: 8
+    BoundKey: 65
   _target: {fileID: 728918692}
 --- !u!114 &728918691
 MonoBehaviour:
@@ -826,6 +826,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 464254de7f56ddb419569333b1ccf1b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ProvisionTriggers: 1
+  ProvisionScope: 0
   _trialBehaviour: {fileID: 1090924884}
   _trainingBehaviour: {fileID: 728918691}
 --- !u!1 &1090924883
