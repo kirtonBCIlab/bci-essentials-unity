@@ -2,13 +2,16 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="16mm"
+   width="18mm"
    height="12mm"
-   viewBox="0 0 16 12"
+   viewBox="0 0 18 12"
    version="1.1"
    id="svg1"
    sodipodi:docname="character.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   inkscape:export-filename="character.png"
+   inkscape:export-xdpi="381"
+   inkscape:export-ydpi="381"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +19,7 @@
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#000000"
-     bordercolor="#eeeeee"
+     bordercolor="#ededed"
      borderopacity="1"
      inkscape:showpageshadow="false"
      inkscape:pageopacity="0"
@@ -30,7 +33,7 @@
      showgrid="true"
      inkscape:zoom="16"
      inkscape:cx="14.09375"
-     inkscape:cy="3.15625"
+     inkscape:cy="13.15625"
      inkscape:window-width="3840"
      inkscape:window-height="2054"
      inkscape:window-x="3829"
@@ -60,25 +63,25 @@
      id="layer1">
     <path
        style="fill:#8dd35f;stroke:#5aa02c;stroke-width:1;stroke-linecap:round;stroke-linejoin:round"
-       d="m -3.9999999,0 c 0,0 -4,-7.9999998 3.9999999,-7.9999998 C 8.0000001,-7.9999998 3.9999999,0 3.9999999,0 1.3333329,1.3333334 -1.3333332,1.3333334 -3.9999999,0 Z"
+       d="m 4.9999987,9.9999997 c 0,0 -4.00000002,-8.0000002 3.9999999,-8.0000002 8.0000004,0 4.0000004,8.0000002 4.0000004,8.0000002 -2.666668,1.3333333 -5.3333336,1.3333333 -8.0000003,0 z"
        id="path4"
        sodipodi:nodetypes="cscc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round"
-       d="m -2.9999997,-5 c 0,0 0.9999995,1 2.9999997,1.0000001 2.0000001,1e-7 3.0219992,-0.9879034 3.0000001,-1.0000001"
+       d="m 5.9999989,4.9999998 c 0,0 0.9999995,1 2.9999997,1.0000001 C 10.999999,6 12.021998,5.0120965 11.999999,4.9999998"
        id="path5"
        sodipodi:nodetypes="czc" />
     <circle
        style="fill:#000000;stroke:#5aa02c;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
        id="path7"
-       cx="6.4802351"
-       cy="-3.4999995"
+       cx="15.499999"
+       cy="6"
        r="1.4999999" />
     <circle
        style="fill:#000000;stroke:#5aa02c;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
        id="path8"
-       cx="-6.5"
-       cy="-4.5"
+       cx="2.4999998"
+       cy="6"
        r="1.4999999" />
   </g>
 </svg>

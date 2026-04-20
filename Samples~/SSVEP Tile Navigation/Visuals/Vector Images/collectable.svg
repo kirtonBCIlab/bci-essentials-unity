@@ -2,13 +2,16 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="16mm"
-   height="12mm"
-   viewBox="0 0 16 12"
+   width="9mm"
+   height="9mm"
+   viewBox="0 0 9 9"
    version="1.1"
    id="svg1"
-   sodipodi:docname="gem.svg"
+   sodipodi:docname="collectable.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   inkscape:export-filename="collectable.png"
+   inkscape:export-xdpi="381"
+   inkscape:export-ydpi="381"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +33,7 @@
      showgrid="true"
      inkscape:zoom="9.2081684"
      inkscape:cx="49.901346"
-     inkscape:cy="1.6832881"
+     inkscape:cy="-15.692589"
      inkscape:window-width="3840"
      inkscape:window-height="2054"
      inkscape:window-x="3829"
@@ -61,14 +64,14 @@
     <ellipse
        style="fill:#afe9e9;fill-opacity:1;stroke:#5fd3d3;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:normal"
        id="path8"
-       cx="0"
-       cy="-3.9892604"
+       cx="4.5"
+       cy="4.4892607"
        rx="4"
        ry="3.9892604" />
     <path
        id="path10"
        style="fill:none;stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round"
-       d="m -0.99999995,-5.7320506 c 0.53847678,-0.3108897 1.19091748,-0.3536529 1.76536675,-0.1157082 0.5744493,0.2379447 1.0055563,0.7295281 1.1664847,1.3301209"
+       d="M 3.5000001,2.7464703 C 4.0384768,2.4355806 4.6909175,2.3928174 5.2653668,2.6307621 5.8398161,2.8687068 6.2709231,3.3602902 6.4318515,3.960883"
        sodipodi:nodetypes="csc" />
   </g>
 </svg>

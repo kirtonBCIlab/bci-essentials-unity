@@ -2,13 +2,16 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="16mm"
-   height="12mm"
-   viewBox="0 0 16 12"
+   width="25mm"
+   height="17mm"
+   viewBox="0 0 25 17"
    version="1.1"
    id="svg1"
-   sodipodi:docname="arrow up.svg"
+   sodipodi:docname="arrow bottom.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   inkscape:export-filename="arrow bottom.png"
+   inkscape:export-xdpi="381"
+   inkscape:export-ydpi="381"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -28,9 +31,9 @@
      showborder="true"
      labelstyle="default"
      showgrid="true"
-     inkscape:zoom="4"
-     inkscape:cx="83.625"
-     inkscape:cy="21.125"
+     inkscape:zoom="8"
+     inkscape:cx="24.5625"
+     inkscape:cy="11.8125"
      inkscape:window-width="3840"
      inkscape:window-height="2054"
      inkscape:window-x="3829"
@@ -60,22 +63,17 @@
      id="layer1">
     <path
        style="fill:#1a1a1a;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round"
-       d="M 24.000001,2.11262e-7 V 4 L 16,8.0000002 V 4.0000001"
+       d="m 16.5,8.499994 v 4 l 8.000001,-4 V 4.4999941"
        id="path3"
        sodipodi:nodetypes="cccc" />
     <path
-       style="fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="M 24.000001,8.0000002 V 12 L 16,16 8.0000002,12 4.4504801e-7,16 V 12 L 8.0000002,8.0000002 16,12 Z"
-       id="path2"
-       sodipodi:nodetypes="ccccccccc" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="M 24.000001,8.0000005 V 12 L 16,16 8.0000002,12 4.4504801e-7,16 v -4"
+       style="fill:#1a1a1a;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 0.5,12.499994 v 4 h 24.000001 v -4"
        id="path2-8"
-       sodipodi:nodetypes="cccccc" />
+       sodipodi:nodetypes="cccc" />
     <path
        style="fill:#4d4d4d;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="M 16,4.0000001 24.000001,1.1262003e-8 H 4.4504801e-7 V 12 L 8.0000002,8.0000002 16,12 24.000001,8.0000002 Z"
+       d="m 0.5,0.4999941 8,4 8,-4 8.000001,4 L 16.5,8.499994 l 8.000001,4 H 0.5 Z"
        id="path1"
        sodipodi:nodetypes="cccccccc" />
   </g>

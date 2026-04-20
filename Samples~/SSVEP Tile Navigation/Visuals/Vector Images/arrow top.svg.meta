@@ -8,19 +8,19 @@ ScriptedImporter:
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 12408, guid: 0000000000000000e000000000000000, type: 0}
-  svgType: 0
+  svgType: 3
   texturedSpriteMeshType: 0
-  svgPixelsPerUnit: 16
+  svgPixelsPerUnit: 100
   gradientResolution: 64
-  alignment: 10
+  alignment: 0
   customPivot: {x: 0, y: 0}
   generatePhysicsShape: 0
   viewportOptions: 0
   preserveViewport: 0
   advancedMode: 0
-  tessellationMode: 0
-  predefinedResolutionIndex: 3
-  targetResolution: 480
+  tessellationMode: 1
+  predefinedResolutionIndex: 1
+  targetResolution: 1080
   resolutionMultiplier: 1
   stepDistance: 10
   samplingStepDistance: 100
@@ -39,15 +39,15 @@ ScriptedImporter:
   useSVGPixelsPerUnit: 0
   spriteData:
     TessellationDetail: 0
-    SpriteName: arrow upSprite
-    SpritePivot: {x: 0.01999998, y: 0.9705779}
+    SpriteName: 
+    SpritePivot: {x: 0, y: 0}
     SpriteAlignment: 0
     SpriteBorder: {x: 0, y: 0, z: 0, w: 0}
     SpriteRect:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 25.000002
-      height: 16.994041
-    SpriteID: 1f40d2af3177d1d428f2bfcfbc1080f3
+      width: 0
+      height: 0
+    SpriteID: 
     PhysicsOutlines: []
