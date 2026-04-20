@@ -1,11 +1,12 @@
 using System.Collections;
 using BCIEssentials.Utilities;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameplayPresentationController : MonoBehaviour
 {
     public ClassificationProvider InputProvider;
-    public KeyBind InputKey = KeyCode.Space;
+    public KeyBind InputKey = Key.Space;
     public CharacterPresenter Character;
     public MonsterPresenter Monster;
     public ProjectilePresenter Projectile;
@@ -84,7 +85,7 @@ public class GameplayPresentationController : MonoBehaviour
         if (_chargeLevel == 0) Character.DisplayCharge();
         _chargeLevel += multiplier * Time.deltaTime / ChargePeriod;
     }
-    private void DrainFrameTimeFromChargeLevel( float multiplier = 1)
+    private void DrainFrameTimeFromChargeLevel(float multiplier = 1)
     {
         float oldChargeLevel = _chargeLevel;
         _chargeLevel -= DrainRate * multiplier * Time.deltaTime / ChargePeriod;

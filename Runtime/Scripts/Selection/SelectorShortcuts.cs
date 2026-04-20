@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BCIEssentials.Selection
 {
@@ -23,11 +24,11 @@ namespace BCIEssentials.Selection
         {
             Bindings = new IndexedKeyBindSet
             (
-                (0, KeyCode.Alpha0), (1, KeyCode.Alpha1),
-                (2, KeyCode.Alpha2), (3, KeyCode.Alpha3),
-                (4, KeyCode.Alpha4), (5, KeyCode.Alpha5),
-                (6, KeyCode.Alpha6), (7, KeyCode.Alpha7),
-                (8, KeyCode.Alpha8), (9, KeyCode.Alpha9)
+                (0, Key.Digit0), (1, Key.Digit1),
+                (2, Key.Digit2), (3, Key.Digit3),
+                (4, Key.Digit4), (5, Key.Digit5),
+                (6, Key.Digit6), (7, Key.Digit7),
+                (8, Key.Digit8), (9, Key.Digit9)
             );
 
             this.CoalesceComponentReference(ref _trialBehaviour);

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BCIEssentials.Behaviours
 {
@@ -9,7 +10,7 @@ namespace BCIEssentials.Behaviours
     /// Implements editable keyboard shortcuts for BCI Controller methods.
     /// </summary>
     [RequireComponent(typeof(BCIController))]
-    public class BCIControllerShortcuts: MonoBehaviourUsingExtendedAttributes
+    public class BCIControllerShortcuts : MonoBehaviourUsingExtendedAttributes
     {
         public KeyBind ToggleTrialRunBinding;
         public KeyBind ToggleTrainingRunBinding;
@@ -21,9 +22,9 @@ namespace BCIEssentials.Behaviours
 
         private void Reset()
         {
-            ToggleTrialRunBinding = KeyCode.S;
-            ToggleTrainingRunBinding = KeyCode.T;
-            UpdateClassifierBinding = KeyCode.Backspace;
+            ToggleTrialRunBinding = Key.S;
+            ToggleTrainingRunBinding = Key.T;
+            UpdateClassifierBinding = Key.Backspace;
             this.CoalesceComponentReference(ref _target);
         }
 
