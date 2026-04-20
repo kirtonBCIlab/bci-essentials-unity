@@ -1,12 +1,13 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BCIEssentials.Editor
 {
     using Utilities;
 
     [CustomPropertyDrawer(typeof(IndexedKeyBindSet))]
-    public class IndexedKeyBindSetDrawer: PropertyDrawer
+    public class IndexedKeyBindSetDrawer : PropertyDrawer
     {
         const float ButtonWidth = 20f;
         const float ItemCountLabelWidth = 48f;
@@ -16,12 +17,12 @@ namespace BCIEssentials.Editor
         static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
 
         static readonly GUIContent AddButtonContent
-        = new (EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
+        = new(EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
         static readonly GUIContent RemoveButtonContent
-        = new (EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
+        = new(EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
 
         static readonly GUIStyle FoldoutHeaderStyle
-        = new (EditorStyles.foldoutHeader)
+        = new(EditorStyles.foldoutHeader)
         { clipping = TextClipping.Clip };
 
 
@@ -52,7 +53,7 @@ namespace BCIEssentials.Editor
             position.height = LineHeight;
             DrawHeader(position, label);
 
-            if(!_foldout) return;
+            if (!_foldout) return;
 
             position.y += LineHeight + ColumnHeaderSpacing;
             DrawItems(position);
@@ -143,7 +144,7 @@ namespace BCIEssentials.Editor
 
             GUI.Label(position, label, EditorStyles.miniLabel);
         }
-        
+
         private void DrawColumnHeaders(Rect position)
         {
             position.y += ColumnHeaderSpacing;
@@ -211,7 +212,7 @@ namespace BCIEssentials.Editor
             SerializedProperty keyCodeProperty
             = GetElementKeyCodeProperty(arrayIndex);
 
-            KeyCode keyCode = (KeyCode)keyCodeProperty.enumValueFlag;
+            Key keyCode = (Key)keyCodeProperty.enumValueFlag;
             Rect keyCodeRect = elementRect
                 .HorizontalSlice(NormalizedIndexFieldSize)
                 .Narrowed(ButtonWidth + ItemSpacing.x);
