@@ -6,17 +6,15 @@ using UnityEngine.SceneManagement;
 namespace BCIEssentials.Behaviours
 {
     using System.Linq;
-    using Extensions;
     using LSLFramework;
     using static Utilities.ComponentSearchMethods;
 
     public class CommunicationProvider : MonoBehaviourUsingExtendedAttributes
     {
-        [Flags]
-        public enum ProvisionOccasion { Manual, Awake, SceneLoad = 3 }
+        public enum ProvisionOccasion { Manual, Awake, SceneLoad }
         public enum Scope { Scene, Children, SameObject }
 
-        public ProvisionOccasion ProvisionTriggers = ProvisionOccasion.Awake;
+        public ProvisionOccasion ProvisionTrigger = ProvisionOccasion.Awake;
         public Scope ProvisionScope = Scope.Scene;
 
         [SerializeField] protected MarkerWriter MarkerWriter;
@@ -27,14 +25,21 @@ namespace BCIEssentials.Behaviours
 
         private void Awake()
         {
-            if (ProvisionTriggers.HasFlag(ProvisionOccasion.SceneLoad))
+            MarkerWriter.OpenStream();
+            if (ProvisionTrigger == ProvisionOccasion.SceneLoad)
             {
                 SceneManager.activeSceneChanged += (_, _) => ProvideCommunication();
             }
-            else if (ProvisionTriggers.HasFlag(ProvisionOccasion.Awake))
+            else if (ProvisionTrigger == ProvisionOccasion.Awake)
             {
                 ProvideCommunication();
             }
+        }
+
+        private void OnDestroy()
+        {
+            MarkerWriter.CloseStream();
+            ResponseProvider.CloseStream();
         }
 
 
