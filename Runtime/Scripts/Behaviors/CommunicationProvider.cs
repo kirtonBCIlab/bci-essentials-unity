@@ -19,8 +19,8 @@ namespace BCIEssentials.Behaviours
         public ProvisionOccasion ProvisionTriggers = ProvisionOccasion.Awake;
         public Scope ProvisionScope = Scope.Scene;
 
-        protected MarkerWriter MarkerWriter;
-        protected ResponseProvider ResponseProvider;
+        [SerializeField] protected MarkerWriter MarkerWriter;
+        [SerializeField] protected ResponseProvider ResponseProvider;
 
         private readonly HashSet<int> _servicedComponentIds = new();
 
@@ -46,8 +46,6 @@ namespace BCIEssentials.Behaviours
         public void ProvideCommunication()
         {
             WarnIfProvisionScopeOverlaps();
-            gameObject.GetOrAddComponent(ref MarkerWriter, true);
-            gameObject.GetOrAddComponent(ref ResponseProvider, true);
 
             IMarkerSource[] unservicedSources = GetUnservicedComponents<IMarkerSource>();
             IPredictionSink[] unservicedSinks = GetUnservicedComponents<IPredictionSink>();

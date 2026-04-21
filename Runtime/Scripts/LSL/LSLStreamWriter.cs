@@ -1,28 +1,22 @@
+using System.Collections.Generic;
+using System.Linq;
 using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using Extensions;
-
-    public class LSLStreamWriter : MonoBehaviour
+    [System.Serializable]
+    public class LSLStreamWriter
     {
+        private static readonly List<LSLStreamWriter> _liveWriters = new();
+
         public string StreamName = "UnityMarkerStream";
         public string StreamType = "BCI_Essentials_Markers";
         public bool PrintLogs = false;
 
         public bool HasConsumers => _outlet?.have_consumers() ?? false;
         public bool HasLiveOutlet => _outlet is not null;
-        private StreamOutlet _outlet;
-
-
-        void Start()
-        {
-            if (!HasLiveOutlet)
-                OpenStream();
-        }
-
-        void OnDestroy() => CloseStream();
+        protected StreamOutlet _outlet;
 
 
         public bool OpenStream()
@@ -44,13 +38,17 @@ namespace BCIEssentials.LSLFramework
             );
             _outlet = new StreamOutlet(streamInfo);
 
+            _liveWriters.Add(this);
             return true;
         }
 
+
+        ~LSLStreamWriter() => CloseStream();
         public void CloseStream()
         {
             _outlet?.Close();
             _outlet = null;
+            _liveWriters.Remove(this);
         }
 
 
@@ -78,18 +76,19 @@ namespace BCIEssentials.LSLFramework
 
         private void ThrowExceptionIfDuplicateWriterIsLive()
         {
-            if (this.AnyOther(LiveWriterSharesNameAndType))
+            if (_liveWriters.Any(LiveWriterSharesNameAndType))
                 throw new DuplicateOutletException();
         }
 
         private void WarnIfTypeInUse()
         {
-            if (this.AnyOther(LiveWriterSharesType))
-            Debug.LogWarning(
-                "Another Stream Writer with the same type is already live, "
-                + "beware that a standard back end will only see "
-                + "the first of these and ignore any others"
-            );
+
+            if (_liveWriters.Any(LiveWriterSharesType))
+                Debug.LogWarning(
+                    "Another Stream Writer with the same type is already live, "
+                    + "beware that a standard back end will only see "
+                    + "the first of these and ignore any others"
+                );
         }
 
 
@@ -103,5 +102,7 @@ namespace BCIEssentials.LSLFramework
             string applicationName = Application.productName;
             return $"{deviceID}-{applicationName}";
         }
+
+        public static implicit operator bool(LSLStreamWriter writer) => writer != null;
     }
 }
