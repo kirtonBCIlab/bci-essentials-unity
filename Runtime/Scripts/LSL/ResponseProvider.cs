@@ -19,8 +19,8 @@ namespace BCIEssentials.LSLFramework
         public float PollingPeriod = 0.1f;
 
         private List<IResponseSubscriber> _subscribers = new();
-        
-        public bool IsPolling => _pollingThread?.IsAlive == true;
+
+        public bool IsPolling { get; private set; }
         private Thread _pollingThread;
 
 
@@ -90,6 +90,7 @@ namespace BCIEssentials.LSLFramework
             if (!IsConnected && !IsResolvingStream)
                 FindAndOpenStream();
 
+            IsPolling = true;
             _pollingThread = new(PollForSamples);
             _pollingThread.Start();
         }
@@ -98,7 +99,8 @@ namespace BCIEssentials.LSLFramework
         {
             if (IsPolling)
             {
-                _pollingThread.Interrupt();
+                IsPolling = false;
+                _pollingThread.Join((int)(PollingPeriod * 1000));
                 _pollingThread = null;
             }
         }
@@ -107,7 +109,7 @@ namespace BCIEssentials.LSLFramework
         protected void PollForSamples()
         {
             while (!IsConnected) SleepForSeconds(PollingPeriod);
-            while (true)
+            while (IsPolling)
             {
                 if (IsConnected)
                 {
