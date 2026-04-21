@@ -1,14 +1,14 @@
-using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.TestTools;
+using System.Threading;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.Tests.Utilities.LSLFramework;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace BCIEssentials.Tests.LSLFramework
 {
-    public class LSLStreamReaderTests: LSLOutletTestRunner
+    public class LSLStreamReaderTests : LSLOutletTestRunner
     {
         LSLStreamReader InStream;
 
@@ -90,11 +90,12 @@ namespace BCIEssentials.Tests.LSLFramework
             Assert.AreEqual(1, prediction.Index);
         }
 
-        
+
         private LSLStreamReader BuildAndOpenStreamReader(string streamType)
         {
             LSLStreamReader inStream = new() { StreamType = streamType };
             inStream.FindAndOpenStream(0.02f);
+            Thread.Sleep(50);
             return inStream;
         }
 
