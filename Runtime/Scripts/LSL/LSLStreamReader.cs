@@ -98,7 +98,7 @@ namespace BCIEssentials.LSLFramework
 
 
         private bool ConnectedReaderSharesType(LSLStreamReader other)
-        => other.IsConnected && other.StreamType == StreamType;
+        => other != this && other.IsConnected && other.StreamType == StreamType;
 
         private void WarnIfTypeInUse()
         {

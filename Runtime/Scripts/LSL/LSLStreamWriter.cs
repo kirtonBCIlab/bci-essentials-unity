@@ -72,7 +72,7 @@ namespace BCIEssentials.LSLFramework
         private bool LiveWriterSharesNameAndType(LSLStreamWriter other)
         => other.StreamName == StreamName && LiveWriterSharesType(other);
         private bool LiveWriterSharesType(LSLStreamWriter other)
-        => other.HasLiveOutlet && other.StreamType == StreamType;
+        => other != this && other.HasLiveOutlet && other.StreamType == StreamType;
 
         private void ThrowExceptionIfDuplicateWriterIsLive()
         {
