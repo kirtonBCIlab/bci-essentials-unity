@@ -1,8 +1,8 @@
-using LSL;
-using static LSL.LSL;
-using UnityEngine;
-using System.Collections;
 using System;
+using System.Threading;
+using LSL;
+using UnityEngine;
+using static LSL.LSL;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -11,7 +11,7 @@ namespace BCIEssentials.LSLFramework
     <br/><br/>
     Provides both synchronous and asynchronous methods
     <code>
-    StartCoroutine(LSLStreamResolver.RunResolveByType("BCI_Essentials_Predictions", UseStreamInfo));
+    LSLStreamResolver.StartTypeResolutionThread("BCI_Essentials_Predictions", UseStreamInfo));
     </code> or
     <code>
     if (LSLStreamResolver.TryResolveByType("BCI_Essentials_Predictions", out StreamInfo resolvedStream))
@@ -33,10 +33,10 @@ namespace BCIEssentials.LSLFramework
             string name, out StreamInfo resolvedStreamInfo
         )
         => TryResolveByProperty("name", name, out resolvedStreamInfo);
-        
+
         public static bool TryResolveByProperty
         (
-            string propertyName, string propertyValue, 
+            string propertyName, string propertyValue,
             out StreamInfo resolvedStreamInfo
         ) => TryResolveByPredicate
         (
@@ -55,46 +55,58 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        public static IEnumerator RunResolveByType
+        public static Thread StartTypeResolutionThread
         (
             string type, Action<StreamInfo> callback,
             float period = 0.1f
         )
-        => RunResolveByProperty("type", type, callback, period);
+        => StartPropertyResolutionThread("type", type, callback, period);
 
-        public static IEnumerator RunResolveByName
+        public static Thread RunResolveByName
         (
             string name, Action<StreamInfo> callback,
             float period = 0.1f
         )
-        => RunResolveByProperty("name", name, callback, period);
+        => StartPropertyResolutionThread("name", name, callback, period);
 
-        public static IEnumerator RunResolveByProperty
+        public static Thread StartPropertyResolutionThread
         (
             string propertyName, string propertyValue,
             Action<StreamInfo> callback,
             float period = 0.1f
         )
-        => RunResolveByPredicate
+        => StartPredicateResolutionThread
         (
             BuildPredicate(propertyName, propertyValue),
             callback, period
         );
 
-        public static IEnumerator RunResolveByPredicate
+        public static Thread StartPredicateResolutionThread
         (
             string predicate, Action<StreamInfo> callback,
             float period = 0.1f
         )
         {
-            if (!PredicateIsValid(predicate)) yield break;
+            if (!PredicateIsValid(predicate)) return null;
 
+            Thread resolutionThread = new(() => RunResolutionThread(predicate, period, callback));
+            resolutionThread.Start();
+            return resolutionThread;
+        }
+
+        private static void RunResolutionThread
+        (
+            string predicate, float period,
+            Action<StreamInfo> callback
+        )
+        {
             StreamInfo resolvedStreamInfo;
-            while (!TryResolve(predicate, out resolvedStreamInfo))
-                yield return new WaitForSeconds(period);
-
+            while (!TryResolve(predicate, out resolvedStreamInfo)) SleepForSeconds(period);
             callback(resolvedStreamInfo);
         }
+
+        public static void SleepForSeconds(float seconds)
+        => Thread.Sleep((int)(seconds * 1000));
 
 
         private static bool TryResolve
@@ -102,9 +114,9 @@ namespace BCIEssentials.LSLFramework
             string predicate, out StreamInfo resolvedStreamInfo
         )
         {
-            resolvedStreamInfo = resolve_stream(predicate, 1, 0) switch 
+            resolvedStreamInfo = resolve_stream(predicate, 1, 0) switch
             {
-                StreamInfo[] resolvedStreamInfos and {Length: > 0}
+                StreamInfo[] resolvedStreamInfos and { Length: > 0 }
                     => resolvedStreamInfos[0]
                 ,
                 _ => null
