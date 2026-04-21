@@ -115,9 +115,9 @@ namespace BCIEssentials.LSLFramework
                 {
                     PruneSubscriberList();
                     PullAllResponses();
+                    SleepForSeconds(PollingPeriod);
                 }
                 else Reconnect();
-                SleepForSeconds(PollingPeriod);
             }
         }
 
@@ -125,7 +125,11 @@ namespace BCIEssentials.LSLFramework
         {
             Debug.LogWarning("Response Provider Disconnected, attempting to reconnect...");
             FindAndOpenStream();
-            while (!IsConnected) SleepForSeconds(PollingPeriod);
+            while (!IsConnected)
+            {
+                if (!IsPolling) return;
+                SleepForSeconds(PollingPeriod);
+            }
             Debug.Log("Response Provider Reconnected");
         }
 
