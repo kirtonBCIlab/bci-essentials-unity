@@ -22,7 +22,7 @@ namespace BCIEssentials.Tests.LSLFramework
         [TearDown]
         public override void TearDown()
         {
-            Destroy(InStream);
+            InStream.CloseStream();
             base.TearDown();
         }
 
@@ -38,7 +38,6 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             var inStream = BuildAndOpenStreamReader("Invalid Stream Type");
             AssertNotConnected(inStream);
-            Destroy(inStream);
         }
 
         [UnityTest]
@@ -54,7 +53,6 @@ namespace BCIEssentials.Tests.LSLFramework
 
             AssertConnected(inStream);
             outlet.Dispose();
-            Destroy(inStream);
         }
 
         [Test]
@@ -93,13 +91,9 @@ namespace BCIEssentials.Tests.LSLFramework
         }
 
         
-        private LSLStreamReader BuildAndOpenStreamReader
-        (
-            string streamType
-        )
+        private LSLStreamReader BuildAndOpenStreamReader(string streamType)
         {
-            var inStream = AddComponent<LSLStreamReader>();
-            inStream.StreamType = streamType;
+            LSLStreamReader inStream = new() { StreamType = streamType };
             inStream.FindAndOpenStream(0.02f);
             return inStream;
         }

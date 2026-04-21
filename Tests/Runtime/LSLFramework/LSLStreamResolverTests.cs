@@ -39,13 +39,10 @@ namespace BCIEssentials.Tests.LSLFramework
             StreamInfo resolvedStreamInfo = null;
             string streamType = OutletType + "-Delayed";
 
-            DummyBehaviour resolutionHost = AddComponent<DummyBehaviour>();
-            resolutionHost.StartCoroutine(
-                RunResolveByType(
-                    streamType,
-                    streamInfo => resolvedStreamInfo = streamInfo,
-                    0.02f
-                )
+            StartTypeResolutionThread(
+                streamType,
+                streamInfo => resolvedStreamInfo = streamInfo,
+                0.02f
             );
             yield return waitForResolutionDelay;
 
@@ -55,7 +52,6 @@ namespace BCIEssentials.Tests.LSLFramework
 
             Assert.IsNotNull(resolvedStreamInfo);
             outlet.Dispose();
-            Destroy(resolutionHost);
         }
     }
 }
