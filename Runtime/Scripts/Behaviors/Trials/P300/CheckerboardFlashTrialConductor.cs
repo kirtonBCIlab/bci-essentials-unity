@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Extensions;
     using Stimulus.Presentation;
     using Utilities;
 
-    public class CheckerboardFlashTrialBehaviour : GridFlashTrialBehaviour
+    [System.Serializable]
+    public class CheckerboardFlashTrialConductor : GridFlashTrialConductor
     {
+        public CheckerboardFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+
         protected override IEnumerator Run()
         {
             List<StimulusPresentationBehaviour> selectablePresenters = PresenterCollection.GetSelectable();

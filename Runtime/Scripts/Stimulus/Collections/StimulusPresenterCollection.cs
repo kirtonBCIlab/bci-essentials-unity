@@ -8,7 +8,7 @@ namespace BCIEssentials.Stimulus.Collections
     using Presenter = Presentation.StimulusPresentationBehaviour;
     using PresenterList = List<Presentation.StimulusPresentationBehaviour>;
 
-    public class StimulusPresenterCollection : MonoBehaviourUsingExtendedAttributes, ICollection<Presenter>
+    public class StimulusPresenterCollection: ICollection<Presenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
         private PresenterList _latestSubset;

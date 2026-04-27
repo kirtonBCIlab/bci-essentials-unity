@@ -2,15 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Extensions;
     using Stimulus.Presentation;
     using static Utilities.ContextAwareUtilities;
 
-    public class ContextAwareSingleFlashTrialBehaviour : SingleFlashTrialBehaviour
+    [System.Serializable]
+    public class ContextAwareSingleFlashTrialConductor : SingleFlashTrialConductor
     {
         private int _lastTourEndNode;
+        public ContextAwareSingleFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
         protected override IEnumerator Run()
         {
@@ -19,7 +21,7 @@ namespace BCIEssentials.Behaviours.Trials.P300
 
             for (int i = 0; i < FlashesPerOption; i++)
             {
-                int[] stimulusOrder = CalculateGraphTSP(presenterGameObjects);
+                int[] stimulusOrder = CalculateGraphTSP(presenterGameObjects, ref _lastTourEndNode);
 
                 foreach (int stimulusIndex in stimulusOrder)
                 {

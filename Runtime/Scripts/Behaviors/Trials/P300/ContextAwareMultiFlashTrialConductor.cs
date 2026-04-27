@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Extensions;
     using Stimulus.Presentation;
     using static Utilities.ContextAwareUtilities;
 
-    public class ContextAwareMultiFlashTrialBehaviour : MultiFlashTrialBehaviour
+    [System.Serializable]
+    public class ContextAwareMultiFlashTrialConductor : MultiFlashTrialConductor
     {
+        public ContextAwareMultiFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+
         protected override IEnumerator Run()
         {
             for (int i = 0; i < FlashesPerOption; i++)

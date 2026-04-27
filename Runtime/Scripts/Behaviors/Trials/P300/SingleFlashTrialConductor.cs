@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Stimulus.Presentation;
     using Utilities;
 
-    public class SingleFlashTrialBehaviour : P300TrialBehaviour
+    [System.Serializable]
+    public class SingleFlashTrialConductor : P300TrialConductor
     {
+        public SingleFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+
         protected override IEnumerator Run()
         {
             List<StimulusPresentationBehaviour> stimulusPresenters = PresenterCollection.GetSelectable();
@@ -22,7 +25,7 @@ namespace BCIEssentials.Behaviours.Trials.P300
                 yield return RunSingleFlash(stimulusIndex, stimulusPresenters);
             }
         }
-        
+
         protected IEnumerator RunSingleFlash
         (int stimulusIndex, List<StimulusPresentationBehaviour> stimulusPresenters)
         {

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Extensions;
     using Stimulus.Collections;
     using Stimulus.Presentation;
 
-    public abstract class MultiFlashTrialBehaviour : P300TrialBehaviour
+    public abstract class MultiFlashTrialConductor : P300TrialConductor
     {
+        public MultiFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
         protected IEnumerator RunMultiFlash
         (int[] stimulusIndices, List<StimulusPresentationBehaviour> stimulusPresenters)
         {

@@ -1,12 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours
+namespace BCIEssentials
 {
-    public abstract class CoroutineBehaviour : MonoBehaviourUsingExtendedAttributes
+    public abstract class CoroutineWrapper
     {
         public bool IsRunning { get; private set; }
+        private readonly MonoBehaviour _executionHost;
         private Coroutine _routine;
+
+        public CoroutineWrapper(MonoBehaviour executionHost)
+        => _executionHost = executionHost;
 
 
         public void Begin()
@@ -17,7 +21,7 @@ namespace BCIEssentials.Behaviours
                 return;
             }
 
-            StartCoroutine(RunWrapper());
+            _executionHost.StartCoroutine(RunWrapper());
         }
 
         public void Interrupt()
@@ -28,7 +32,7 @@ namespace BCIEssentials.Behaviours
                 return;
             }
 
-            StopCoroutine(_routine);
+            _executionHost.StopCoroutine(_routine);
             IsRunning = false;
         }
 
@@ -46,7 +50,7 @@ namespace BCIEssentials.Behaviours
         private IEnumerator RunWrapper()
         {
             SetUp();
-            _routine = StartCoroutine(RunWithTrackedStatus());
+            _routine = _executionHost.StartCoroutine(RunWithTrackedStatus());
             yield return AwaitCompletion();
             CleanUp();
         }

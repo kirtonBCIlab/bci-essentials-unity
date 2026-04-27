@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials.P300
+namespace BCIEssentials
 {
     using Extensions;
     using Stimulus.Presentation;
     using Utilities;
 
-    public class RowColumnFlashBehaviour : GridFlashTrialBehaviour
+    [System.Serializable]
+    public class RowColumnFlashTrialConductor : GridFlashTrialConductor
     {
+        public RowColumnFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+
         protected override IEnumerator Run()
         {
             int[,] gridMatrix = EmptyGridMatrix;
