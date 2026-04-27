@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace BCIEssentials.Behaviours
 {
-    using System.Linq;
     using LSLFramework;
     using static Utilities.ComponentSearchMethods;
 
@@ -19,8 +17,6 @@ namespace BCIEssentials.Behaviours
 
         [SerializeField] protected MarkerWriter MarkerWriter;
         [SerializeField] protected ResponseProvider ResponseProvider;
-
-        private readonly HashSet<int> _servicedComponentIds = new();
 
 
         private void Awake()
@@ -52,40 +48,28 @@ namespace BCIEssentials.Behaviours
         {
             WarnIfProvisionScopeOverlaps();
 
-            IMarkerSource[] unservicedSources = GetUnservicedComponents<IMarkerSource>();
-            IPredictionSink[] unservicedSinks = GetUnservicedComponents<IPredictionSink>();
+            IMarkerSource[] unservicedSources = FindComponentsInScope<IMarkerSource>();
+            IPredictionSink[] unservicedSinks = FindComponentsInScope<IPredictionSink>();
 
             Array.ForEach(unservicedSources, ProvideMarkerWriter);
             Array.ForEach(unservicedSinks, ProvideResponseSubscription);
         }
-        
-        T[] GetUnservicedComponents<T>() where T : IHasInstanceID
-        {
-            T[] found = ProvisionScope switch
-            {
-                Scope.Scene => GetComponentsInScene<T>(),
-                Scope.Children => GetComponentsInChildren<T>(),
-                _ => GetComponents<T>(),
-            };
 
-            return found.Where(
-                c => !_servicedComponentIds.Contains(c.GetInstanceID())
-            ).ToArray();
-        }
+        T[] FindComponentsInScope<T>()
+        => ProvisionScope switch
+        {
+            Scope.Scene => GetComponentsInScene<T>(),
+            Scope.Children => GetComponentsInChildren<T>(),
+            _ => GetComponents<T>(),
+        };
 
         public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
 
 
         private void ProvideMarkerWriter(IMarkerSource source)
-        {
-            source.MarkerWriter = MarkerWriter;
-            _servicedComponentIds.Append(source.GetInstanceID());
-        }
+        => source.MarkerWriter = MarkerWriter;
         private void ProvideResponseSubscription(IPredictionSink sink)
-        {
-            ResponseProvider.SubscribePredictions(sink.OnPrediction);
-            _servicedComponentIds.Append(sink.GetInstanceID());
-        }
+        => ResponseProvider.SubscribePredictions(sink.OnPrediction);
 
 
         private void WarnIfProvisionScopeOverlaps()
