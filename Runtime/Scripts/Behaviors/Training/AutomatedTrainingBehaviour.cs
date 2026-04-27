@@ -1,20 +1,24 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Training
+namespace BCIEssentials
 {
     using Utilities;
 
-    public class AutomatedTrainingBehaviour : SingleRoundTrainingBehaviour
+    public class AutomatedTrainingConductor : SingleRoundTrainingConductor
     {
         [Space]
         public int SelectionCount = 8;
         public float RestTime = 1.0f;
 
+        public AutomatedTrainingConductor(
+            MonoBehaviour executionHost, ITargetIndicator targetIndicator
+        ) : base(executionHost, targetIndicator) { }
+
         protected override IEnumerator Run()
         {
             int[] trainArray = RNRAUtilities.GenerateRNRA_FisherYates(
-                SelectionCount, 0, _targetIndicationBehaviour.TargetCount - 1
+                SelectionCount, 0, _targetIndicator.TargetCount - 1
             );
 
             foreach (int targetIndex in trainArray)
