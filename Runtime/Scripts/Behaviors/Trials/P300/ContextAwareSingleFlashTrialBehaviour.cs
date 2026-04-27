@@ -19,8 +19,7 @@ namespace BCIEssentials.Behaviours.Trials.P300
 
             for (int i = 0; i < FlashesPerOption; i++)
             {
-                int[] stimulusOrder = CalculateGraphTSP
-                (presenterGameObjects, ref _lastTourEndNode);
+                int[] stimulusOrder = CalculateGraphTSP(presenterGameObjects);
 
                 foreach (int stimulusIndex in stimulusOrder)
                 {

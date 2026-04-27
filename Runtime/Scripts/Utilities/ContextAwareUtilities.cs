@@ -5,6 +5,10 @@ namespace BCIEssentials.Utilities
 {
     public static class ContextAwareUtilities
     {
+        private static int _lastTourEndNode;
+        public static int[] CalculateGraphTSP(List<GameObject> nodes, bool debugPrint = false)
+        => CalculateGraphTSP(nodes, ref _lastTourEndNode, debugPrint);
+
         public static int[] CalculateGraphTSP
         (
             List<GameObject> nodes,
