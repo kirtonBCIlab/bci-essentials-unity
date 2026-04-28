@@ -16,7 +16,7 @@ namespace BCIEssentials
         protected virtual void Start()
         {
             Application.targetFrameRate = TargetFrameRate;
-            _trialConductor.RecalculateFrequencies(TargetFrameRate);
+            _trialConductor.RecalculateMarkerFrequencies(TargetFrameRate);
         }
 
 

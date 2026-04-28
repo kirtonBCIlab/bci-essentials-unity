@@ -11,15 +11,15 @@ namespace BCIEssentials
     {
         [Space]
         public List<FrequencyStimulusPresenter> Presenters;
-        private float[] _calculatedFrequencies;
+        private float[] _markerFrequencies;
 
         public SSVEPTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
 
-        public virtual void RecalculateFrequencies(int frameRate)
+        public virtual void RecalculateMarkerFrequencies(int frameRate)
         {
             int presenterCount = Presenters.Count;
-            _calculatedFrequencies = new float[presenterCount];
+            _markerFrequencies = new float[presenterCount];
             for (int i = 0; i < presenterCount; i++)
             {
                 float frequency = Presenters[i] switch
@@ -28,7 +28,7 @@ namespace BCIEssentials
                     TimeCycleFrequencyStimulusPresenter spo => spo.Frequency,
                     _ => 0
                 };
-                _calculatedFrequencies[i] = frequency;
+                _markerFrequencies[i] = frequency;
             }
         }
 
@@ -47,9 +47,9 @@ namespace BCIEssentials
 
         protected override void SendTrainingMarker(int trainingIndex)
         => MarkerWriter.PushSSVEPTrainingMarker
-        (trainingIndex, EpochLength, _calculatedFrequencies);
+        (trainingIndex, EpochLength, _markerFrequencies);
         protected override void SendClassificationMarker()
         => MarkerWriter.PushSSVEPClassificationMarker
-        (EpochLength, _calculatedFrequencies);
+        (EpochLength, _markerFrequencies);
     }
 }
