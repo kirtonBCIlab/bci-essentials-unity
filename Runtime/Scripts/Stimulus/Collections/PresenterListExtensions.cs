@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    using BCIEssentials.Selection;
     using Extensions;
     using Stimulus.Presentation;
 

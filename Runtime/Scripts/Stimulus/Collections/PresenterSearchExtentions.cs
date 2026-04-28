@@ -6,7 +6,6 @@ namespace BCIEssentials.Stimulus.Collections
     using Extensions;
     using Stimulus.Presentation;
     using static Utilities.ComponentSearchMethods;
-    using Scope = DynamicStimulusPresenterCollection.Scope;
 
     public static class PresenterSearchExtensions
     {
