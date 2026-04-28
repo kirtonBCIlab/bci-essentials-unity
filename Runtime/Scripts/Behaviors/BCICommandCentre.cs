@@ -81,35 +81,12 @@ namespace BCIEssentials
         private IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
             yield return _trialConductor.AwaitCompletion();
-            OnPrediction(new DummyPrediction(selectionIndex, TargetCount));
+            OnPrediction(new MockPrediction(selectionIndex, TargetCount));
         }
 
 
         public abstract void OnPrediction(Prediction prediction);
         public abstract void BeginTargetIndication(int index);
         public abstract void EndTargetIndication();
-
-
-        public class DummyPrediction : Prediction
-        {
-            public DummyPrediction(int index) { Index = index; }
-            public DummyPrediction(int selectedIndex, int targetCount) : this(selectedIndex)
-            {
-                Probabilities = new float[targetCount];
-                float selectionProbability = Random.Range(1f / targetCount, 1f);
-                float remainingProbability = 1f - selectionProbability;
-
-                for (int i = 0; i < targetCount; i++)
-                {
-                    if (i == selectedIndex) Probabilities[i] = selectionProbability;
-                    else
-                    {
-                        float maximumProbability = Mathf.Min(selectionProbability, remainingProbability);
-                        Probabilities[i] = Random.Range(0, maximumProbability);
-                        remainingProbability -= Probabilities[i];
-                    }
-                }
-            }
-        }
     }
 }
