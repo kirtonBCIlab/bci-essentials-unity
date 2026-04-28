@@ -14,14 +14,15 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
     public static event Action CleanupInvoked;
 
     public MarkerWriter MarkerWriter { get; set; }
-    public float OffBlockDuration = 8.0f;
-    public float OnBlockDuration = 12.0f;
-    public float ActivePeriodDuration = 1.0f;
-    public float RestPeriodDuration = 0.5f;
 
     [Space]
     public float EpochLength = 2.0f;
     public int Iterations = 4;
+    public float BlockDuration = 8.0f;
+
+    [Header("On Block Animation Timing")]
+    public float ActivePeriodDuration = 1.0f;
+    public float RestPeriodDuration = 0.5f;
 
     private Coroutine _onBlockCycleRoutine;
     private WaitForSeconds _epochDelay;
@@ -34,22 +35,20 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
         _activePeriodDelay = new(ActivePeriodDuration);
         _restPeriodDelay = new(RestPeriodDuration);
 
-        float minimumBlockDuration = Mathf.Min(OnBlockDuration, OnBlockDuration);
-        int epochCount = Mathf.FloorToInt(minimumBlockDuration / EpochLength);
+        int epochCount = Mathf.FloorToInt(BlockDuration / EpochLength);
+        float uncapturedBlockTime = BlockDuration - epochCount * EpochLength;
+        WaitForSeconds blockTimeBufferDelay = new(uncapturedBlockTime);
 
         for (int i = 0; i < Iterations; i++)
         {
             OffBlockStarted?.Invoke();
             yield return RunTrainingEpochs(0, epochCount);
-            yield return new WaitForSeconds(OffBlockDuration - minimumBlockDuration);
+            yield return blockTimeBufferDelay;
 
             OnBlockStarted?.Invoke();
             _onBlockCycleRoutine = _executionHost.StartCoroutine(RunOnBlockCycle());
             yield return RunTrainingEpochs(1, epochCount);
-            yield return new WaitForSeconds(OnBlockDuration - minimumBlockDuration);
-
-            _executionHost.StopCoroutine(_onBlockCycleRoutine);
-            _onBlockCycleRoutine = null;
+            yield return blockTimeBufferDelay;
         }
     }
 
@@ -58,6 +57,7 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
         if (_onBlockCycleRoutine != null)
         {
             _executionHost.StopCoroutine(_onBlockCycleRoutine);
+            _onBlockCycleRoutine = null;
         }
         MarkerWriter.PushTrainingCompleteMarker();
         CleanupInvoked?.Invoke();
@@ -76,12 +76,17 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
 
     private IEnumerator RunOnBlockCycle()
     {
-        while (IsRunning)
+        float elapsedTime = 0;
+        while (BlockDuration - elapsedTime > ActivePeriodDuration)
         {
             ActivePeriodStarted?.Invoke();
             yield return _activePeriodDelay;
+            elapsedTime += ActivePeriodDuration;
+
             RestPeriodStarted?.Invoke();
             yield return _restPeriodDelay;
+            elapsedTime += RestPeriodDuration;
         }
+        _onBlockCycleRoutine = null;
     }
 }
