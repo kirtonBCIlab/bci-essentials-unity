@@ -7,8 +7,9 @@ namespace BCIEssentials
 
     public class P300CommandCentre : BCICommandCentre
     {
-        public override int TargetCount => _stimulusPresenters.Count;
-        public enum FlashingPattern {
+        public override int TargetCount => _stimulusPresenters.LatestSubset.Count;
+        public enum FlashingPattern
+        {
             Random, ContextAware,
             RowColumn, Checkerboard, ContextAwareGroups
         }
@@ -25,15 +26,20 @@ namespace BCIEssentials
 
         public void ReplaceTrialConductor(FlashingPattern pattern)
         => ReplaceTrialConductor(pattern switch
-            {
-                FlashingPattern.Random => new RandomFlashTrialConductor(this),
-                FlashingPattern.ContextAware => new ContextAwareTrialConductor(this),
-                FlashingPattern.RowColumn => new RowColumnFlashTrialConductor(this),
-                FlashingPattern.Checkerboard => new CheckerboardFlashTrialConductor(this),
-                FlashingPattern.ContextAwareGroups => new ContextAwareGroupsTrialConductor(this),
-                _ => null
-            }
-        );
+        {
+            FlashingPattern.Random => new RandomFlashTrialConductor(this),
+            FlashingPattern.ContextAware => new ContextAwareTrialConductor(this),
+            FlashingPattern.RowColumn => new RowColumnFlashTrialConductor(this),
+            FlashingPattern.Checkerboard => new CheckerboardFlashTrialConductor(this),
+            FlashingPattern.ContextAwareGroups => new ContextAwareGroupsTrialConductor(this),
+            _ => _trialConductor
+        });
+
+        public void ReplaceTrialConductor(P300TrialConductor newTrialConductor)
+        {
+            newTrialConductor.PresenterCollection = _stimulusPresenters;
+            base.ReplaceTrialConductor(newTrialConductor);
+        }
 
 
         public override void OnPrediction(Prediction prediction)
