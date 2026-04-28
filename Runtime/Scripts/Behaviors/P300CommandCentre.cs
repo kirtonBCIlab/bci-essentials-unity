@@ -24,8 +24,7 @@ namespace BCIEssentials
         }
 
         public void ReplaceTrialConductor(FlashingPattern pattern)
-        {
-            _trialConductor = pattern switch
+        => ReplaceTrialConductor(pattern switch
             {
                 FlashingPattern.Random => new SingleFlashTrialConductor(this),
                 FlashingPattern.ContextAware => new ContextAwareSingleFlashTrialConductor(this),
@@ -33,10 +32,8 @@ namespace BCIEssentials
                 FlashingPattern.Checkerboard => new CheckerboardFlashTrialConductor(this),
                 FlashingPattern.ContextAwareGroups => new ContextAwareMultiFlashTrialConductor(this),
                 _ => null
-            };
-            _trialConductor.MarkerWriter = _markerWriter;
-            _trainingConductor.TrialConductor = _trialConductor;
-        }
+            }
+        );
 
 
         public override void OnPrediction(Prediction prediction)

@@ -48,6 +48,14 @@ namespace BCIEssentials
         }
 
 
+        public void ReplaceTrialConductor(TrialConductor newTrialConductor)
+        {
+            _trialConductor = newTrialConductor;
+            _trialConductor.MarkerWriter = _markerWriter;
+            _trainingConductor.TrialConductor = _trialConductor;
+        }
+
+
         protected virtual void Update() => ProcessKeyBinds();
         protected virtual void ProcessKeyBinds()
         {
