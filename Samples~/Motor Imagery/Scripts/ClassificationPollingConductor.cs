@@ -1,18 +1,20 @@
 using System;
 using System.Collections;
-using BCIEssentials.Behaviours;
 using BCIEssentials.LSLFramework;
 using BCIEssentials;
 using UnityEngine;
 
-public class ClassificationProvider : CoroutineBehaviour, IMarkerSource, IPredictionSink
+[Serializable]
+public class ClassificationPollingConductor : CoroutineWrapper, IMarkerSource, IPredictionSink
 {
     public event Action ClassificationStarted;
     public event Action ClassificationEnded;
 
     public MarkerWriter MarkerWriter { get; set; }
     public float InputValue { get; private set; }
-    public float EpochLength = 1.0f;
+    public float EpochLength = 2.0f;
+
+    public ClassificationPollingConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
 
     public void OnPrediction(Prediction prediction)

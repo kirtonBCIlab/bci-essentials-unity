@@ -9,15 +9,15 @@ public class TrainingPresentationController : MonoBehaviour
     private void Start()
     {
         Monster.Hide();
-        BlockTrainTrainingBehaviour.ActivePeriodStarted += Character.DisplayCharge;
-        BlockTrainTrainingBehaviour.RestPeriodStarted += Character.DisplayThrow;
-        BlockTrainTrainingBehaviour.OffBlockStarted += Character.DisplaySitAfterThrow;
-        BlockTrainTrainingBehaviour.RestPeriodStarted += Projectile.DisplayProjectile;
-        BlockTrainTrainingBehaviour.OffBlockStarted += Projectile.DisplayProjectile;
-        BlockTrainTrainingBehaviour.CleanupInvoked += Character.DisplayIdle;
+        BlockTrainTrainingConductor.ActivePeriodStarted += Character.DisplayCharge;
+        BlockTrainTrainingConductor.RestPeriodStarted += Character.DisplayThrow;
+        BlockTrainTrainingConductor.OffBlockStarted += Character.DisplaySitAfterThrow;
+        BlockTrainTrainingConductor.RestPeriodStarted += Projectile.DisplayProjectile;
+        BlockTrainTrainingConductor.OffBlockStarted += Projectile.DisplayProjectile;
+        BlockTrainTrainingConductor.CleanupInvoked += Character.DisplayIdle;
 
-        BlockTrainTrainingBehaviour.OnBlockStarted += Monster.DisplayNewMonster;
-        BlockTrainTrainingBehaviour.OffBlockStarted += Monster.Hide;
-        BlockTrainTrainingBehaviour.CleanupInvoked += Monster.Hide;
+        BlockTrainTrainingConductor.OnBlockStarted += Monster.DisplayNewMonster;
+        BlockTrainTrainingConductor.OffBlockStarted += Monster.Hide;
+        BlockTrainTrainingConductor.CleanupInvoked += Monster.Hide;
     }
 }

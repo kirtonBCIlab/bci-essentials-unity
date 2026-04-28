@@ -3,9 +3,9 @@ using BCIEssentials.Utilities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using InputProvider = ClassificationPollingConductor;
 public class GameplayPresentationController : MonoBehaviour
 {
-    public ClassificationProvider InputProvider;
     public KeyBind InputKey = Key.Space;
     public CharacterPresenter Character;
     public MonsterPresenter Monster;
@@ -17,6 +17,8 @@ public class GameplayPresentationController : MonoBehaviour
     public int CaptureThreshold = 3;
     [Range(0, 1)] public float DrainRate = 0.5f;
 
+    private InputProvider _inputProvider;
+
     private int _throws;
     private float _chargeLevel;
     private bool _isResting = false;
@@ -24,21 +26,22 @@ public class GameplayPresentationController : MonoBehaviour
 
     private void Start()
     {
-        InputProvider.ClassificationStarted += Monster.DisplayNewMonster;
-        InputProvider.ClassificationStarted += ChargeBar.Show;
-        InputProvider.ClassificationStarted += () => _chargeLevel = 0;
+        _inputProvider = FindAnyObjectByType<ExampleMiCommandCentre>().ClassificationPollingConductor;
+        _inputProvider.ClassificationStarted += Monster.DisplayNewMonster;
+        _inputProvider.ClassificationStarted += ChargeBar.Show;
+        _inputProvider.ClassificationStarted += () => _chargeLevel = 0;
 
-        InputProvider.ClassificationEnded += Character.DisplayIdle;
-        InputProvider.ClassificationEnded += Monster.Hide;
-        InputProvider.ClassificationEnded += ChargeBar.Hide;
+        _inputProvider.ClassificationEnded += Character.DisplayIdle;
+        _inputProvider.ClassificationEnded += Monster.Hide;
+        _inputProvider.ClassificationEnded += ChargeBar.Hide;
     }
 
 
     private void Update()
     {
-        if (_isResting || !InputProvider.IsRunning) return;
+        if (_isResting || !_inputProvider.IsRunning) return;
 
-        float inputMultiplier = 2 * InputProvider.InputValue - 1;
+        float inputMultiplier = 2 * _inputProvider.InputValue - 1;
         if (InputKey.IsPressed)
         {
             AddFrameTimeToChargeLevel();

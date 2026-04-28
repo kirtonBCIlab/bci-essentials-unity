@@ -6,7 +6,7 @@ namespace BCIEssentials
     public abstract class CoroutineWrapper
     {
         public bool IsRunning { get; private set; }
-        private readonly MonoBehaviour _executionHost;
+        protected readonly MonoBehaviour _executionHost;
         private Coroutine _routine;
 
         public CoroutineWrapper(MonoBehaviour executionHost)
