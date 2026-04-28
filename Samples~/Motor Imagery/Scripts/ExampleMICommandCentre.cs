@@ -1,3 +1,4 @@
+using BCIEssentials.LSLFramework;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -5,12 +6,19 @@ public class ExampleMiCommandCentre: MonoBehaviour
 {
     public BlockTrainTrainingConductor TrainingConductor;
     public ClassificationPollingConductor ClassificationPollingConductor;
+
+    [Header("Communication")]
+    [SerializeField] private MarkerWriter _markerWriter;
+    [SerializeField] private ResponseProvider _responseProvider;
     [SerializeField, Space] private UnityEvent _onTrainingCompleted;
 
     private void Reset()
     {
-        TrainingConductor = new(this);
-        ClassificationPollingConductor = new(this);
+        _markerWriter = new();
+        _responseProvider = new();
+        TrainingConductor = new(this) { MarkerWriter = _markerWriter };
+        ClassificationPollingConductor = new(this) { MarkerWriter = _markerWriter };
+        _responseProvider.SubscribePredictions(ClassificationPollingConductor.OnPrediction);
     }
 
     private void Start()

@@ -28,7 +28,8 @@ namespace BCIEssentials
         {
             _markerWriter = new();
             _responseProvider = new();
-            _trainingConductor = new(this, this);
+            _trainingConductor = new(this, this) { MarkerWriter = _markerWriter };
+            _responseProvider.SubscribePredictions(OnPrediction);
             ResetKeyBinds();
         }
 
