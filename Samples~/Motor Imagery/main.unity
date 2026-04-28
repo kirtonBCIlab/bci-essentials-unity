@@ -221,9 +221,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 74454232}
-  - component: {fileID: 74454235}
   - component: {fileID: 74454233}
-  - component: {fileID: 74454234}
   m_Layer: 0
   m_Name: BCI Brain
   m_TagString: Untagged
@@ -257,39 +255,62 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ede2e3258b0e4e4f8692426fa27897c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  OffBlockDuration: 6
-  ActivePeriodDuration: 2
-  RestPeriodDuration: 2
-  ActivePeriodsPerOnBlock: 3
-  Iterations: 4
---- !u!114 &74454234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74454230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2a05e72181820142b64e3b84a64de42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClassificationProvider
-  EpochLength: 1
---- !u!114 &74454235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74454230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb42a83f7fca4e74fa001c28816ee88a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ProvisionTriggers: 1
-  ProvisionScope: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ExampleMiCommandCentre
+  TrainingConductor:
+    EpochLength: 2
+    Iterations: 4
+    BlockDuration: 8
+    ActivePeriodDuration: 1
+    RestPeriodDuration: 0.5
+  ClassificationPollingConductor:
+    EpochLength: 2
+  _markerWriter:
+    StreamName: UnityMarkerStream
+    StreamType: BCI_Essentials_Markers
+    PrintLogs: 1
+  _responseProvider:
+    StreamType: BCI_Essentials_Predictions
+    LoggingMask: -1
+    PollingPeriod: 0.1
+  _onTrainingCompleted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2131897167}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 826757412}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1094559006}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &141462537
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,7 +886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3387ecf0d51a2cc4d93b5c94df6de600, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputProvider: {fileID: 74454234}
   InputKey:
     BoundKey: 32
   Character: {fileID: 472505018}
@@ -975,8 +995,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 74454233}
-        m_TargetAssemblyTypeName: BlockTrainTrainingBehaviour, Assembly-CSharp
-        m_MethodName: Begin
+        m_TargetAssemblyTypeName: ExampleMiCommandCentre, Assembly-CSharp
+        m_MethodName: StartTraining
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1212,9 +1232,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 74454234}
-        m_TargetAssemblyTypeName: ClassificationProvider, Assembly-CSharp
-        m_MethodName: Begin
+      - m_Target: {fileID: 74454233}
+        m_TargetAssemblyTypeName: ExampleMiCommandCentre, Assembly-CSharp
+        m_MethodName: StartClassifying
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1699,9 +1719,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 74454234}
-        m_TargetAssemblyTypeName: ClassificationProvider, Assembly-CSharp
-        m_MethodName: Interrupt
+      - m_Target: {fileID: 74454233}
+        m_TargetAssemblyTypeName: ExampleMiCommandCentre, Assembly-CSharp
+        m_MethodName: StopClassifying
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2131,8 +2151,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 74454233}
-        m_TargetAssemblyTypeName: BlockTrainTrainingBehaviour, Assembly-CSharp
-        m_MethodName: Interrupt
+        m_TargetAssemblyTypeName: ExampleMiCommandCentre, Assembly-CSharp
+        m_MethodName: StopTraining
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
