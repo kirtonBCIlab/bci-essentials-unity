@@ -8,9 +8,9 @@ namespace BCIEssentials
     using Utilities;
 
     [System.Serializable]
-    public class SingleFlashTrialConductor : P300TrialConductor
+    public class RandomFlashTrialConductor : P300TrialConductor
     {
-        public SingleFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+        public RandomFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
         protected override IEnumerator Run()
         {

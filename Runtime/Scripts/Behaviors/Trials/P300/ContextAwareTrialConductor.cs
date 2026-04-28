@@ -9,10 +9,10 @@ namespace BCIEssentials
     using static Utilities.ContextAwareUtilities;
 
     [System.Serializable]
-    public class ContextAwareSingleFlashTrialConductor : SingleFlashTrialConductor
+    public class ContextAwareTrialConductor : RandomFlashTrialConductor
     {
         private int _lastTourEndNode;
-        public ContextAwareSingleFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
+        public ContextAwareTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
         protected override IEnumerator Run()
         {
