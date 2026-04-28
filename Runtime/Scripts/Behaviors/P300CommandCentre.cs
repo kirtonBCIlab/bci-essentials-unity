@@ -14,7 +14,7 @@ namespace BCIEssentials
             RowColumn, Checkerboard, ContextAwareGroups
         }
 
-        [SerializeField] protected StimulusPresenterCollection _stimulusPresenters;
+        [SerializeField, Space] protected DynamicStimulusPresenterCollection _stimulusPresenters;
         protected StimulusPresenterCollectionTargetIndicator _targetIndicator;
 
 
