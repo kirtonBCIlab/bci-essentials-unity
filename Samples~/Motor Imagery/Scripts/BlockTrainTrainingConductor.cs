@@ -32,12 +32,14 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
         for (int i = 0; i < Iterations; i++)
         {
             OffBlockStarted?.Invoke();
+            MarkerWriter.PushTrialStartedMarker();
             yield return RunTrainingEpochs(0, epochCount);
             yield return blockTimeBufferDelay;
 
             OnBlockStarted?.Invoke();
             yield return RunTrainingEpochs(1, epochCount);
             yield return blockTimeBufferDelay;
+            MarkerWriter.PushTrialEndsMarker();
         }
     }
 
