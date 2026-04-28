@@ -47,13 +47,19 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
             _onBlockCycleRoutine = _executionHost.StartCoroutine(RunOnBlockCycle());
             yield return RunTrainingEpochs(1, epochCount);
             yield return new WaitForSeconds(OnBlockDuration - minimumBlockDuration);
+
+            _executionHost.StopCoroutine(_onBlockCycleRoutine);
+            _onBlockCycleRoutine = null;
         }
     }
 
     protected override void CleanUp()
     {
+        if (_onBlockCycleRoutine != null)
+        {
+            _executionHost.StopCoroutine(_onBlockCycleRoutine);
+        }
         MarkerWriter.PushTrainingCompleteMarker();
-        _executionHost.StopCoroutine(_onBlockCycleRoutine);
         CleanupInvoked?.Invoke();
     }
 
