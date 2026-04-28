@@ -7,8 +7,6 @@ using UnityEngine;
 [Serializable]
 public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
 {
-    public static event Action ActivePeriodStarted;
-    public static event Action RestPeriodStarted;
     public static event Action OnBlockStarted;
     public static event Action OffBlockStarted;
     public static event Action CleanupInvoked;
@@ -20,24 +18,16 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
     public int Iterations = 4;
     public float BlockDuration = 8.0f;
 
-    [Header("On Block Animation Timing")]
-    public float ActivePeriodDuration = 1.0f;
-    public float RestPeriodDuration = 0.5f;
-
-    private Coroutine _onBlockCycleRoutine;
     private WaitForSeconds _epochDelay;
-    private WaitForSeconds _activePeriodDelay, _restPeriodDelay;
 
 
     protected override IEnumerator Run()
     {
         _epochDelay = new(EpochLength);
-        _activePeriodDelay = new(ActivePeriodDuration);
-        _restPeriodDelay = new(RestPeriodDuration);
 
         int epochCount = Mathf.FloorToInt(BlockDuration / EpochLength);
-        float uncapturedBlockTime = BlockDuration - epochCount * EpochLength;
-        WaitForSeconds blockTimeBufferDelay = new(uncapturedBlockTime);
+        float unmarkedBlockTime = BlockDuration - epochCount * EpochLength;
+        WaitForSeconds blockTimeBufferDelay = new(unmarkedBlockTime);
 
         for (int i = 0; i < Iterations; i++)
         {
@@ -46,7 +36,6 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
             yield return blockTimeBufferDelay;
 
             OnBlockStarted?.Invoke();
-            _onBlockCycleRoutine = _executionHost.StartCoroutine(RunOnBlockCycle());
             yield return RunTrainingEpochs(1, epochCount);
             yield return blockTimeBufferDelay;
         }
@@ -54,11 +43,6 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
 
     protected override void CleanUp()
     {
-        if (_onBlockCycleRoutine != null)
-        {
-            _executionHost.StopCoroutine(_onBlockCycleRoutine);
-            _onBlockCycleRoutine = null;
-        }
         MarkerWriter.PushTrainingCompleteMarker();
         CleanupInvoked?.Invoke();
     }
@@ -72,21 +56,5 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
             MarkerWriter.PushMITrainingMarker(2, trainingTarget, EpochLength);
             yield return _epochDelay;
         }
-    }
-
-    private IEnumerator RunOnBlockCycle()
-    {
-        float elapsedTime = 0;
-        while (BlockDuration - elapsedTime > ActivePeriodDuration)
-        {
-            ActivePeriodStarted?.Invoke();
-            yield return _activePeriodDelay;
-            elapsedTime += ActivePeriodDuration;
-
-            RestPeriodStarted?.Invoke();
-            yield return _restPeriodDelay;
-            elapsedTime += RestPeriodDuration;
-        }
-        _onBlockCycleRoutine = null;
     }
 }
