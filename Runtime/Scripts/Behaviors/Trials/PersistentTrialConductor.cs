@@ -1,13 +1,15 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials
+namespace BCIEssentials
 {
-    public abstract class PersistentTrialBehaviour : TrialBehaviour
+    public abstract class PersistentTrialConductor : TrialConductor
     {
         public int TrainingEpochCount = 3;
         public float EpochLength = 1.0f;
         public float InterEpochInterval = 0;
+
+        public PersistentTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
 
         protected override IEnumerator Run()

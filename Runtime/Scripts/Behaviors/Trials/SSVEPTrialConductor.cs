@@ -1,26 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Behaviours.Trials
+namespace BCIEssentials
 {
     using Stimulus.Collections;
     using Stimulus.Presentation.Standard;
 
-    public class SSVEPTrialBehaviour : PersistentTrialBehaviour
+    [System.Serializable]
+    public class SSVEPTrialConductor : PersistentTrialConductor
     {
         [Space]
-        public int TargetFrameRate = 30;
         public List<FrequencyStimulusPresenter> Presenters;
         private float[] _calculatedFrequencies;
 
+        public SSVEPTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
-        protected virtual void Start()
-        {
-            Application.targetFrameRate = TargetFrameRate;
-            RecalculateFrequencies(TargetFrameRate);
-        }
-        
-        protected virtual void RecalculateFrequencies(int frameRate)
+
+        public virtual void RecalculateFrequencies(int frameRate)
         {
             int presenterCount = Presenters.Count;
             _calculatedFrequencies = new float[presenterCount];
