@@ -12,19 +12,19 @@ public class ExampleMiCommandCentre: MonoBehaviour
     [SerializeField] private ResponseProvider _responseProvider;
     [SerializeField, Space] private UnityEvent _onTrainingCompleted;
 
-    private void Reset()
-    {
-        _markerWriter = new();
-        _responseProvider = new();
-        TrainingConductor = new() { MarkerWriter = _markerWriter };
-        ClassificationPollingConductor = new() { MarkerWriter = _markerWriter };
-        _responseProvider.SubscribePredictions(ClassificationPollingConductor.OnPrediction);
-    }
 
-    private void Start()
-    => BlockTrainTrainingConductor.CleanupInvoked += _onTrainingCompleted.Invoke;
+    private void Awake()
+    {
+        TrainingConductor.MarkerWriter ??= _markerWriter;
+        ClassificationPollingConductor.MarkerWriter ??= _markerWriter;
+        _responseProvider.SubscribePredictions(ClassificationPollingConductor.OnPrediction);
+
+        BlockTrainTrainingConductor.CleanupInvoked += _onTrainingCompleted.Invoke;
+    }
     private void OnDestroy()
-    => BlockTrainTrainingConductor.CleanupInvoked -= _onTrainingCompleted.Invoke;
+    {
+        BlockTrainTrainingConductor.CleanupInvoked -= _onTrainingCompleted.Invoke;
+    }
 
 
     public void StartTraining() => TrainingConductor.Begin(this);
