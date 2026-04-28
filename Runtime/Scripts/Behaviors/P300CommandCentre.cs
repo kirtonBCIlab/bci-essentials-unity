@@ -7,7 +7,7 @@ namespace BCIEssentials
 
     public class P300CommandCentre : BCICommandCentre
     {
-        public override int TargetCount => _stimulusPresenters.LatestSubset.Count;
+        public override int TargetCount => _presenterCollection.LatestSubset.Count;
         public enum FlashingPattern
         {
             Random, ContextAware,
@@ -15,7 +15,7 @@ namespace BCIEssentials
         }
 
         [ContextMenuItem("Locate Presenters", nameof(RepopulateStimulusPresenters))]
-        [SerializeField] protected DynamicStimulusPresenterCollection _stimulusPresenters;
+        [SerializeField] protected DynamicStimulusPresenterCollection _presenterCollection;
         protected StimulusPresenterCollectionTargetIndicator _targetIndicator;
 
 
@@ -40,18 +40,18 @@ namespace BCIEssentials
         {
             if (newTrialConductor is P300TrialConductor p300TrialConductor)
             {
-                p300TrialConductor.PresenterCollection = _stimulusPresenters;
+                p300TrialConductor.PresenterCollection = _presenterCollection;
             }
             _trialConductor = newTrialConductor;
         }
 
 
         [ContextMenu("Locate Presenters")]
-        public void RepopulateStimulusPresenters() => _stimulusPresenters.Repopulate(this);
+        public void RepopulateStimulusPresenters() => _presenterCollection.Repopulate(this);
 
 
         public override void OnPrediction(Prediction prediction)
-        => _stimulusPresenters.LatestSubset[prediction.Index].Select();
+        => _presenterCollection.LatestSubset[prediction.Index].Select();
 
         public override void BeginTargetIndication(int index)
         => _targetIndicator.BeginTargetIndication(index);
