@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace BCIEssentials.Stimulus.Collections
 {
     using Presentation;
+    using UnityEditor;
     using UnityEngine;
 
     public enum SearchMethod { Type, Tag }
@@ -11,13 +12,13 @@ namespace BCIEssentials.Stimulus.Collections
     [System.Serializable]
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
     {
-        [StartFoldoutGroup("Presenter Discovery")]
+        [Header("Presenter Discovery")]
         public SearchMethod PopulationMethod;
         public Scope PopulationScope;
 
         [ShowIf(nameof(PopulationMethod), (int)SearchMethod.Tag)]
         public string PresenterTag = "BCI";
-        [EndFoldoutGroup] public bool RepopulateWhenQueried;
+        public bool RepopulateWhenQueried;
 
         private readonly MonoBehaviour _defaultSearchAnchor;
 
@@ -25,7 +26,6 @@ namespace BCIEssentials.Stimulus.Collections
         => _defaultSearchAnchor = defaultSearchAnchor;
 
 
-        [ContextMenu("Locate Presenters")]
         public void Repopulate() => Repopulate(_defaultSearchAnchor);
         public void Repopulate(MonoBehaviour searchAnchor)
         {
@@ -37,6 +37,27 @@ namespace BCIEssentials.Stimulus.Collections
             };
         }
 
+#if UNITY_EDITOR
+        public void RepopulateSerialized(SerializedProperty property)
+        {
+            SerializedProperty presenterListProperty
+            = property.FindPropertyRelative(nameof(_stimulusPresenters));
+
+            Repopulate(property.serializedObject.targetObject as MonoBehaviour);
+            int presenterCount = _stimulusPresenters.Count;
+
+            presenterListProperty.arraySize = presenterCount;
+            for (int i = 0; i < presenterCount; i++)
+            {
+                SerializedProperty presenterEntryProperty
+                = presenterListProperty.GetArrayElementAtIndex(i);
+
+                presenterEntryProperty.objectReferenceInstanceIDValue = _stimulusPresenters[i].GetInstanceID();
+            }
+
+            Debug.Log($"Found {presenterCount} Stimulus Presenters Matching Search Criteria");
+        }
+#endif
 
         public override List<StimulusPresentationBehaviour> GetSelectable()
         {

@@ -14,7 +14,8 @@ namespace BCIEssentials
             RowColumn, Checkerboard, ContextAwareGroups
         }
 
-        [SerializeField, Space] protected DynamicStimulusPresenterCollection _stimulusPresenters;
+        [ContextMenuItem("Locate Presenters", nameof(RepopulateStimulusPresenters))]
+        [SerializeField] protected DynamicStimulusPresenterCollection _stimulusPresenters;
         protected StimulusPresenterCollectionTargetIndicator _targetIndicator;
 
 
@@ -43,6 +44,10 @@ namespace BCIEssentials
             }
             _trialConductor = newTrialConductor;
         }
+
+
+        [ContextMenu("Locate Presenters")]
+        public void RepopulateStimulusPresenters() => _stimulusPresenters.Repopulate(this);
 
 
         public override void OnPrediction(Prediction prediction)
