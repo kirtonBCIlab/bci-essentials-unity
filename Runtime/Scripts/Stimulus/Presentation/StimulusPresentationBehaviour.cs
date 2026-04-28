@@ -1,13 +1,16 @@
 namespace BCIEssentials.Stimulus.Presentation
 {
-    using Selection;
-    using Behaviours.Training;
-
-
     public interface IStimulusPresenter
     {
         public void StartStimulusDisplay();
         public void EndStimulusDisplay();
+    }
+
+    public interface ISelectable
+    {
+        public bool IsSelectable { get; }
+
+        public void Select();
     }
 
     public abstract class StimulusPresentationBehaviour : MonoBehaviourUsingExtendedAttributes, IStimulusPresenter, ISelectable, ITargetable
