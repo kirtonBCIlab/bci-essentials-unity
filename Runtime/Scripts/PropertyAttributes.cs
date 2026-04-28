@@ -49,12 +49,11 @@ namespace BCIEssentials
 
     /// <summary>
     /// Triggers conditional inspector rendering on a serialized script field
-    /// if used from a child of <see cref="MonoBehaviourUsingExtendedAttributes"/>
     /// <br/>
     /// Multiple instances can be used to require multiple conditions.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
-    public class ShowIfAttribute : Attribute
+    public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionPropertyPath;
         public int[] ValidValues;
