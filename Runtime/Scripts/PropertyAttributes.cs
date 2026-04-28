@@ -73,10 +73,18 @@ namespace BCIEssentials
         }
 
 # if UNITY_EDITOR
-        public bool ShouldShow(SerializedObject target)
+        public bool ShouldShow(SerializedProperty referenceProperty)
         {
+            string referencePath = referenceProperty.propertyPath;
+
+            string[] referencePathSegments = referencePath.Split('.');
+            string parentPropertyPath = referencePathSegments.Length > 1
+                ? string.Join('.', referencePathSegments[0..^1]) + '.'
+                : "";
+
+            SerializedObject hostObject = referenceProperty.serializedObject;
             SerializedProperty conditionProperty
-            = target.FindProperty(ConditionPropertyPath);
+            = hostObject.FindProperty(parentPropertyPath + ConditionPropertyPath);
 
             if (conditionProperty == null)
             {

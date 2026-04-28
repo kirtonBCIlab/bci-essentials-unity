@@ -21,6 +21,6 @@ namespace BCIEssentials.Editor
 
         private bool ShouldShow(SerializedProperty property)
         => attribute is ShowIfAttribute showIfAttribute &&
-            showIfAttribute.ShouldShow(property.serializedObject);
+            showIfAttribute.ShouldShow(property);
     }
 }
