@@ -11,7 +11,6 @@ namespace BCIEssentials
 
     public abstract class MultiFlashTrialConductor : P300TrialConductor
     {
-        public MultiFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
         protected IEnumerator RunMultiFlash
         (int[] stimulusIndices, List<StimulusPresentationBehaviour> stimulusPresenters)
         {

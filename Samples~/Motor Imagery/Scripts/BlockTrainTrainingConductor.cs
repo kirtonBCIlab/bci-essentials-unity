@@ -28,9 +28,6 @@ public class BlockTrainTrainingConductor : CoroutineWrapper, IMarkerSource
     private WaitForSeconds _activePeriodDelay, _restPeriodDelay;
 
 
-    public BlockTrainTrainingConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
-
     protected override IEnumerator Run()
     {
         _epochDelay = new(EpochLength);

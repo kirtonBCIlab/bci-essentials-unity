@@ -22,9 +22,8 @@ namespace BCIEssentials
 
         protected ITargetIndicator _targetIndicator;
 
-        public SingleRoundTrainingConductor(
-            MonoBehaviour executionHost, ITargetIndicator targetIndicator
-        ) : base(executionHost) => _targetIndicator = targetIndicator;
+        public SingleRoundTrainingConductor(ITargetIndicator targetIndicator)
+        => _targetIndicator = targetIndicator;
 
 
         protected override IEnumerator Run() => RunRound(TargetIndex);
@@ -40,7 +39,7 @@ namespace BCIEssentials
             }
 
             yield return new WaitForSeconds(PreTrialTime);
-            TrialConductor.StartTrainingTrial(targetIndex);
+            TrialConductor.StartTrainingTrial(targetIndex, _executionHost);
             yield return TrialConductor.AwaitCompletion();
             yield return new WaitForSeconds(PostTrialTime);
 

@@ -12,7 +12,6 @@ namespace BCIEssentials
     public class ContextAwareTrialConductor : RandomFlashTrialConductor
     {
         private int _lastTourEndNode;
-        public ContextAwareTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
         protected override IEnumerator Run()
         {

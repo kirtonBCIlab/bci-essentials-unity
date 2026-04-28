@@ -10,8 +10,6 @@ namespace BCIEssentials
     [System.Serializable]
     public class RandomFlashTrialConductor : P300TrialConductor
     {
-        public RandomFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
         protected override IEnumerator Run()
         {
             List<StimulusPresentationBehaviour> stimulusPresenters = PresenterCollection.GetSelectable();

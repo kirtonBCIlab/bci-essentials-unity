@@ -10,19 +10,17 @@ namespace BCIEssentials
         public bool HasTrainingTarget => TrainingTarget.HasValue;
         protected int? TrainingTarget = null;
 
-        public TrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
 
-
-        public void StartTestingTrial()
+        public void StartTestingTrial(MonoBehaviour executionHost)
         {
             TrainingTarget = null;
-            Begin();
+            Begin(executionHost);
         }
 
-        public void StartTrainingTrial(int target)
+        public void StartTrainingTrial(int target, MonoBehaviour executionHost)
         {
             TrainingTarget = target;
-            Begin();
+            Begin(executionHost);
         }
 
         protected override void SetUp()

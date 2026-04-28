@@ -11,8 +11,6 @@ namespace BCIEssentials
     [System.Serializable]
     public class RowColumnFlashTrialConductor : GridFlashTrialConductor
     {
-        public RowColumnFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
         protected override IEnumerator Run()
         {
             int[,] gridMatrix = EmptyGridMatrix;

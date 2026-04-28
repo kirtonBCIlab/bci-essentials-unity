@@ -6,14 +6,12 @@ namespace BCIEssentials
     public abstract class CoroutineWrapper
     {
         public bool IsRunning { get; private set; }
-        protected readonly MonoBehaviour _executionHost;
         private Coroutine _routine;
 
-        public CoroutineWrapper(MonoBehaviour executionHost)
-        => _executionHost = executionHost;
+        protected MonoBehaviour _executionHost;
 
 
-        public void Begin()
+        public void Begin(MonoBehaviour executionHost)
         {
             if (IsRunning)
             {
@@ -21,7 +19,8 @@ namespace BCIEssentials
                 return;
             }
 
-            _executionHost.StartCoroutine(RunWrapper());
+            _executionHost = executionHost;
+            executionHost.StartCoroutine(RunWrapper());
         }
 
         public void Interrupt()

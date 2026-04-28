@@ -28,7 +28,7 @@ namespace BCIEssentials
         {
             _markerWriter = new();
             _responseProvider = new();
-            _trainingConductor = new(this, this) { MarkerWriter = _markerWriter };
+            _trainingConductor = new(this) { MarkerWriter = _markerWriter };
             _responseProvider.SubscribePredictions(OnPrediction);
             ResetKeyBinds();
         }
@@ -71,7 +71,7 @@ namespace BCIEssentials
 
         protected void ToggleConductorRun(CoroutineWrapper target)
         {
-            if (!target.IsRunning) target.Begin();
+            if (!target.IsRunning) target.Begin(this);
             else target.Interrupt();
         }
 

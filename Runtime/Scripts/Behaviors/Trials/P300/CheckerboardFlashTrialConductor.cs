@@ -11,8 +11,6 @@ namespace BCIEssentials
     [System.Serializable]
     public class CheckerboardFlashTrialConductor : GridFlashTrialConductor
     {
-        public CheckerboardFlashTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
         protected override IEnumerator Run()
         {
             List<StimulusPresentationBehaviour> selectablePresenters = PresenterCollection.GetSelectable();

@@ -11,8 +11,6 @@ namespace BCIEssentials
     [System.Serializable]
     public class ContextAwareGroupsTrialConductor : MultiFlashTrialConductor
     {
-        public ContextAwareGroupsTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
         protected override IEnumerator Run()
         {
             for (int i = 0; i < FlashesPerOption; i++)

@@ -9,8 +9,6 @@ namespace BCIEssentials
         public float EpochLength = 1.0f;
         public float InterEpochInterval = 0;
 
-        public PersistentTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
 
         protected override IEnumerator Run()
         {

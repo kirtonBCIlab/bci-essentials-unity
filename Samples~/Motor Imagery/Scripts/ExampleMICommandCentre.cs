@@ -16,8 +16,8 @@ public class ExampleMiCommandCentre: MonoBehaviour
     {
         _markerWriter = new();
         _responseProvider = new();
-        TrainingConductor = new(this) { MarkerWriter = _markerWriter };
-        ClassificationPollingConductor = new(this) { MarkerWriter = _markerWriter };
+        TrainingConductor = new() { MarkerWriter = _markerWriter };
+        ClassificationPollingConductor = new() { MarkerWriter = _markerWriter };
         _responseProvider.SubscribePredictions(ClassificationPollingConductor.OnPrediction);
     }
 
@@ -27,9 +27,9 @@ public class ExampleMiCommandCentre: MonoBehaviour
     => BlockTrainTrainingConductor.CleanupInvoked -= _onTrainingCompleted.Invoke;
 
 
-    public void StartTraining() => TrainingConductor.Begin();
+    public void StartTraining() => TrainingConductor.Begin(this);
     public void StopTraining() => TrainingConductor.Interrupt();
 
-    public void StartClassifying() => ClassificationPollingConductor.Begin();
+    public void StartClassifying() => ClassificationPollingConductor.Begin(this);
     public void StopClassifying() => ClassificationPollingConductor.Interrupt();
 }

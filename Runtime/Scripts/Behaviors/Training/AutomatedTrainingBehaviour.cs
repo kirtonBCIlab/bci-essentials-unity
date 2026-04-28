@@ -11,9 +11,8 @@ namespace BCIEssentials
         public int SelectionCount = 8;
         public float RestTime = 1.0f;
 
-        public AutomatedTrainingConductor(
-            MonoBehaviour executionHost, ITargetIndicator targetIndicator
-        ) : base(executionHost, targetIndicator) { }
+        public AutomatedTrainingConductor(ITargetIndicator targetIndicator)
+        : base(targetIndicator) { }
 
         protected override IEnumerator Run()
         {

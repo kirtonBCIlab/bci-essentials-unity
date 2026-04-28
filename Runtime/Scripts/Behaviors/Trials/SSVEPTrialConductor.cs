@@ -13,8 +13,6 @@ namespace BCIEssentials
         public List<FrequencyStimulusPresenter> Presenters;
         private float[] _markerFrequencies;
 
-        public SSVEPTrialConductor(MonoBehaviour executionHost) : base(executionHost) { }
-
 
         public virtual void RecalculateMarkerFrequencies(int frameRate)
         {

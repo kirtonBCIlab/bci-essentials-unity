@@ -27,11 +27,11 @@ namespace BCIEssentials
         public void ReplaceTrialConductor(FlashingPattern pattern)
         => ReplaceTrialConductor(pattern switch
         {
-            FlashingPattern.Random => new RandomFlashTrialConductor(this),
-            FlashingPattern.ContextAware => new ContextAwareTrialConductor(this),
-            FlashingPattern.RowColumn => new RowColumnFlashTrialConductor(this),
-            FlashingPattern.Checkerboard => new CheckerboardFlashTrialConductor(this),
-            FlashingPattern.ContextAwareGroups => new ContextAwareGroupsTrialConductor(this),
+            FlashingPattern.Random => new RandomFlashTrialConductor(),
+            FlashingPattern.ContextAware => new ContextAwareTrialConductor(),
+            FlashingPattern.RowColumn => new RowColumnFlashTrialConductor(),
+            FlashingPattern.Checkerboard => new CheckerboardFlashTrialConductor(),
+            FlashingPattern.ContextAwareGroups => new ContextAwareGroupsTrialConductor(),
             _ => _trialConductor
         });
 
