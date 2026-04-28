@@ -8,6 +8,7 @@ namespace BCIEssentials.Stimulus.Collections
     public enum SearchMethod { Type, Tag }
     public enum Scope { Scene, Children, ChildrenOfParent }
 
+    [System.Serializable]
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
     {
         [StartFoldoutGroup("Presenter Discovery")]

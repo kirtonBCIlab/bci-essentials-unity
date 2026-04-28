@@ -5,6 +5,7 @@ namespace BCIEssentials
 {
     using LSLFramework;
 
+    [System.Serializable]
     public class SingleRoundTrainingConductor : CoroutineWrapper, IMarkerSource
     {
         public MarkerWriter MarkerWriter { get; set; }

@@ -5,6 +5,7 @@ namespace BCIEssentials
 {
     using Utilities;
 
+    [System.Serializable]
     public class AutomatedTrainingConductor : SingleRoundTrainingConductor
     {
         [Space]

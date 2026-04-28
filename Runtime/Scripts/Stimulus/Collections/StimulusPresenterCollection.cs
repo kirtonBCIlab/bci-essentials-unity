@@ -8,6 +8,7 @@ namespace BCIEssentials.Stimulus.Collections
     using Presenter = Presentation.StimulusPresentationBehaviour;
     using PresenterList = List<Presentation.StimulusPresentationBehaviour>;
 
+    [Serializable]
     public class StimulusPresenterCollection: ICollection<Presenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
