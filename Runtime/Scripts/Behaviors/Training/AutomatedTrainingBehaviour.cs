@@ -11,14 +11,10 @@ namespace BCIEssentials
         public int SelectionCount = 8;
         public float RestTime = 1.0f;
 
-        public AutomatedTrainingConductor(ITargetIndicator targetIndicator)
-        : base(targetIndicator) { }
-
         protected override IEnumerator Run()
         {
-            int[] trainArray = RNRAUtilities.GenerateRNRA_FisherYates(
-                SelectionCount, 0, _targetIndicator.TargetCount - 1
-            );
+            int[] trainArray = RNRAUtilities.GenerateRNRA_FisherYates
+            (SelectionCount, 0, TargetIndicator.TargetCount - 1);
 
             foreach (int targetIndex in trainArray)
             {

@@ -24,15 +24,7 @@ namespace BCIEssentials
         [SerializeField, EndFoldoutGroup] protected IndexedKeyBindSet _selectionBindings;
 
 
-        protected virtual void Reset()
-        {
-            _markerWriter = new();
-            _responseProvider = new();
-            _trainingConductor = new(this) { MarkerWriter = _markerWriter };
-            _responseProvider.SubscribePredictions(OnPrediction);
-            ResetKeyBinds();
-        }
-
+        protected virtual void Reset() => ResetKeyBinds();
         protected virtual void ResetKeyBinds()
         {
             _toggleTrialRunBinding = Key.S;
@@ -49,13 +41,15 @@ namespace BCIEssentials
         }
 
 
-        public void ReplaceTrialConductor(TrialConductor newTrialConductor)
+        protected virtual void Awake()
         {
-            _trialConductor = newTrialConductor;
-            _trialConductor.MarkerWriter = _markerWriter;
-            _trainingConductor.TrialConductor = _trialConductor;
-        }
+            _trainingConductor.MarkerWriter ??= _markerWriter;
+            _trialConductor.MarkerWriter ??= _markerWriter;
+            _responseProvider.SubscribePredictions(OnPrediction);
 
+            _trainingConductor.TrialConductor ??= _trialConductor;
+            _trainingConductor.TargetIndicator ??= this;
+        }
 
         protected virtual void Update() => ProcessKeyBinds();
         protected virtual void ProcessKeyBinds()

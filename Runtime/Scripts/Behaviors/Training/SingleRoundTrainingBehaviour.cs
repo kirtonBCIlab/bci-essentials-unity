@@ -8,6 +8,7 @@ namespace BCIEssentials
     public class SingleRoundTrainingConductor : CoroutineWrapper, IMarkerSource
     {
         public MarkerWriter MarkerWriter { get; set; }
+        public ITargetIndicator TargetIndicator;
         public TrialConductor TrialConductor;
 
         [StartFoldoutGroup("Training Properties")]
@@ -20,22 +21,17 @@ namespace BCIEssentials
         [EndFoldoutGroup]
         public float PostTrialTime = 0.0f;
 
-        protected ITargetIndicator _targetIndicator;
-
-        public SingleRoundTrainingConductor(ITargetIndicator targetIndicator)
-        => _targetIndicator = targetIndicator;
-
 
         protected override IEnumerator Run() => RunRound(TargetIndex);
 
         public virtual IEnumerator RunRound(int targetIndex)
         {
-            _targetIndicator.BeginTargetIndication(targetIndex);
+            TargetIndicator.BeginTargetIndication(targetIndex);
             yield return new WaitForSeconds(TargetIndicationPeriod);
 
             if (!PersistTargetIndication)
             {
-                _targetIndicator.EndTargetIndication();
+                TargetIndicator.EndTargetIndication();
             }
 
             yield return new WaitForSeconds(PreTrialTime);
@@ -45,7 +41,7 @@ namespace BCIEssentials
 
             if (PersistTargetIndication)
             {
-                _targetIndicator.EndTargetIndication();
+                TargetIndicator.EndTargetIndication();
             }
         }
 

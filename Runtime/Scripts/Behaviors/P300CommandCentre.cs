@@ -35,10 +35,13 @@ namespace BCIEssentials
             _ => _trialConductor
         });
 
-        public void ReplaceTrialConductor(P300TrialConductor newTrialConductor)
+        public void ReplaceTrialConductor(TrialConductor newTrialConductor)
         {
-            newTrialConductor.PresenterCollection = _stimulusPresenters;
-            base.ReplaceTrialConductor(newTrialConductor);
+            if (newTrialConductor is P300TrialConductor p300TrialConductor)
+            {
+                p300TrialConductor.PresenterCollection = _stimulusPresenters;
+            }
+            _trialConductor = newTrialConductor;
         }
 
 
