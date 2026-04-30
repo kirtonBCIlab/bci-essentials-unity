@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace BCIEssentials.Behaviours
+namespace BCIEssentials
 {
     using LSLFramework;
     using static Utilities.ComponentSearchMethods;
