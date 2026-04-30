@@ -10,13 +10,20 @@ namespace BCIEssentials.Editor
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            DynamicStimulusPresenterCollection target = GetTarget(property);
+
             if (GUILayout.Button("Locate Presenters"))
             {
-                (property.boxedValue as DynamicStimulusPresenterCollection).RepopulateSerialized(property);
+                target.RepopulateSerialized(property);
                 property.isExpanded = true;
             }
 
             EditorGUILayout.PropertyField(property);
         }
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => 0;
+
+        DynamicStimulusPresenterCollection GetTarget(SerializedProperty property)
+        => property.boxedValue as DynamicStimulusPresenterCollection;
     }
 }
