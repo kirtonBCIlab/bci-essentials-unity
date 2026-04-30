@@ -61,7 +61,7 @@ namespace BCIEssentials
         }
 
 
-        public static IEnumerator RunCheckerboardFlashRoutine<T>
+        public static IEnumerator RunCheckerboardFlashRoutine
         (
             MarkerWriter markerWriter,
             int rows, int columns, int flashesPerOption,

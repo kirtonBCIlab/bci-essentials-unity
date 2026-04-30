@@ -22,7 +22,7 @@ namespace BCIEssentials
 
     public class StimulusPresenterCollectionTargetIndicator : ITargetIndicator
     {
-        public virtual int TargetCount => _target.Count;
+        public virtual int TargetCount => _target.LatestSubset.Count;
 
         private readonly StimulusPresenterCollection _target;
         private int? _lastIndicatedIndex;

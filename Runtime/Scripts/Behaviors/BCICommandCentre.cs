@@ -10,8 +10,9 @@ namespace BCIEssentials
     public abstract class BCICommandCentre : MonoBehaviourUsingExtendedAttributes, ITargetIndicator, IPredictionSink
     {
         public abstract int TargetCount { get; }
+        protected abstract TrialConductor TrialConductor { get; }
 
-        [SerializeField] protected TrialConductor _trialConductor;
+        [StartFoldoutGroup("Behaviour")]
         [SerializeField] protected AutomatedTrainingConductor _trainingConductor;
 
         [StartFoldoutGroup("Communication")]
@@ -44,10 +45,10 @@ namespace BCIEssentials
         protected virtual void Awake()
         {
             _trainingConductor.MarkerWriter ??= _markerWriter;
-            _trialConductor.MarkerWriter ??= _markerWriter;
+            TrialConductor.MarkerWriter ??= _markerWriter;
             _responseProvider.SubscribePredictions(OnPrediction);
 
-            _trainingConductor.TrialConductor ??= _trialConductor;
+            _trainingConductor.TrialConductor ??= TrialConductor;
             _trainingConductor.TargetIndicator ??= this;
         }
 
@@ -60,7 +61,7 @@ namespace BCIEssentials
         }
 
 
-        protected virtual void ToggleTrialRun() => ToggleConductorRun(_trialConductor);
+        protected virtual void ToggleTrialRun() => ToggleConductorRun(TrialConductor);
         protected virtual void ToggleTrainingRun() => ToggleConductorRun(_trainingConductor);
 
         protected void ToggleConductorRun(CoroutineWrapper target)
@@ -75,7 +76,7 @@ namespace BCIEssentials
 
         private IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
-            yield return _trialConductor.AwaitCompletion();
+            yield return TrialConductor.AwaitCompletion();
             OnPrediction(new MockPrediction(selectionIndex, TargetCount));
         }
 
