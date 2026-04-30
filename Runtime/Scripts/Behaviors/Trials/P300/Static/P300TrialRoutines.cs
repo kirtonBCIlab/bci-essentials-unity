@@ -13,7 +13,7 @@ namespace BCIEssentials
 
     public static partial class P300TrialRoutines
     {
-        public static IEnumerator RunSingleFlashTrialRoutine
+        public static IEnumerator RunRandomFlashTrialRoutine
         (
             MarkerWriter markerWriter, int flashesPerOption,
             float onTime, float offTime,

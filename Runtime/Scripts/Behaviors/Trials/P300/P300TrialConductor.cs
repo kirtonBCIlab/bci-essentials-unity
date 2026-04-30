@@ -33,16 +33,16 @@ namespace BCIEssentials
         => pattern switch
         {
             FlashingPattern.Random
-            => StartFlashRoutine(P300TrialRoutines.RunSingleFlashTrialRoutine),
+            => StartFlashRoutine(P300TrialRoutines.RunRandomFlashTrialRoutine),
             FlashingPattern.ContextAware
-            => StartFlashRoutine(P300TrialRoutines.RunContextAwareSingleFlashRoutine),
+            => StartFlashRoutine(P300TrialRoutines.RunContextAwareFlashRoutine),
 
             FlashingPattern.RowColumn
             => StartGridFlashRoutine(P300TrialRoutines.RunRowColumnFlashRoutine),
             FlashingPattern.Checkerboard
             => StartGridFlashRoutine(P300TrialRoutines.RunCheckerboardFlashRoutine),
             FlashingPattern.ContextAwareGroups
-            => StartFlashRoutine(P300TrialRoutines.RunContextAwareMultiFlashRoutine),
+            => StartFlashRoutine(P300TrialRoutines.RunContextAwareGroupsFlashRoutine),
 
             _ => throw new NotImplementedException()
         };
