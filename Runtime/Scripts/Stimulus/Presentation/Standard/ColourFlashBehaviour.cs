@@ -3,73 +3,48 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus
 {
-    public class ColourFlashBehaviour: MonoBehaviourUsingExtendedAttributes
+    [System.Serializable]
+    public class ColourFlashBehaviour
     {
         public bool IsFlashing { get; private set; }
-        [SerializeField]
-        protected Renderer _renderer;
 
+        public Renderer _renderer;
         public Color OnColour = Color.red;
         public Color OffColour = Color.white;
 
-        [StartFoldoutGroup("Target Indication"), Min(0)]
+        [Header("Target Indication"), Min(0)]
         public float TargetIndicationFlashPeriod = 0.2f;
         public int TargetIndicationFlashCount = 3;
 
-        [StartFoldoutGroup("Selection Indication"), Min(0)]
+        [Header("Selection Indication"), Min(0)]
         public float SelectionFlashPeriod = 0.1f;
-        [EndFoldoutGroup]
         public int SelectionFlashCount = 5;
 
-        private Coroutine _targetIndicationRoutine;
-        private Coroutine _selectionIndicationRoutine;
+        private HostedCoroutine _targetIndicationRoutine;
+        private HostedCoroutine _selectionIndicationRoutine;
 
 
-        protected virtual void Awake()
-        {
-            if (_renderer == null && !gameObject.TryGetComponent(out _renderer))
-            {
-                Debug.LogWarning($"No Renderer component found for {gameObject.name}");
-                return;
-            }
-
-            if (_renderer.material == null)
-            {
-                Debug.LogWarning($"No material assigned to renderer component on {gameObject.name}.");
-            }
-
-            SetColour(OffColour);
-        }
+        public virtual void SetUp() => SetColour(OffColour);
 
 
-        public virtual void StartSelectionIndication()
-        => _selectionIndicationRoutine = StartFlashRoutine(
-            SelectionFlashPeriod,
-            SelectionFlashCount
-        );
+        public virtual void StartSelectionIndication(MonoBehaviour executionHost)
+        => _selectionIndicationRoutine = StartFlashRoutine
+        (SelectionFlashPeriod, SelectionFlashCount, executionHost);
         public virtual void StopSelectionIndication()
-        {
-            if (_selectionIndicationRoutine != null)
-            {
-                StopCoroutine(_selectionIndicationRoutine);
-            }
-        }
+        => _selectionIndicationRoutine?.Interrupt();
 
-        public virtual void StartTargetIndication()
-        => _targetIndicationRoutine = StartFlashRoutine(
-            TargetIndicationFlashPeriod,
-            TargetIndicationFlashCount
-        );
+        public virtual void StartTargetIndication(MonoBehaviour executionHost)
+        => _targetIndicationRoutine = StartFlashRoutine
+        (TargetIndicationFlashPeriod, TargetIndicationFlashCount, executionHost);
         public virtual void EndTargetIndication()
-        {
-            if (_targetIndicationRoutine != null)
-            {
-                StopCoroutine(_targetIndicationRoutine);
-            }
-        }
+        => _targetIndicationRoutine?.Interrupt();
 
-        private Coroutine StartFlashRoutine(float period, int count)
-        => StartCoroutine(RunFlashes(period, count));
+        private HostedCoroutine StartFlashRoutine(
+            float period, int count,
+            MonoBehaviour executionHost
+        )
+        => new(executionHost, RunFlashes(period, count));
+
         protected virtual IEnumerator RunFlashes(float period, int count)
         {
             IsFlashing = true;
