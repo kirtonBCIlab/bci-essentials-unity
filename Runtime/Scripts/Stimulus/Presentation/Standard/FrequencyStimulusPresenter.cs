@@ -8,17 +8,12 @@ namespace BCIEssentials.Stimulus
         public float Frequency => CycleEngine.Frequency;
         public DutyCycleEngine CycleEngine;
 
-        protected bool _lastDisplayedCycleState;
-
 
         protected virtual void Update()
         {
-            if (!CycleEngine.IsRunning) return;
-
-            if (CycleEngine.StateFlag != _lastDisplayedCycleState)
+            if (CycleEngine.IsRunning)
             {
                 ToggleDisplayState(CycleEngine.StateFlag);
-                _lastDisplayedCycleState = CycleEngine.StateFlag;
             }
         }
 
