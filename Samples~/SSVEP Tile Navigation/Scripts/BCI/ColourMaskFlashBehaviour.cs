@@ -9,10 +9,10 @@ public class ColourMaskFlashBehaviour : ColourFlashBehaviour
     private Material _material;
 
 
-    protected override void Awake()
+    public override void SetUp()
     {
         Color? inspectorTint = _renderer != null ? _renderer.material.color : null;
-        base.Awake();
+        base.SetUp();
 
         _material = _renderer.material = new(_colourMaskShader);
         SetMaskEnabled(false);
@@ -22,12 +22,10 @@ public class ColourMaskFlashBehaviour : ColourFlashBehaviour
         }
     }
 
-    private void OnDisable() => SetMaskEnabled(false);
-
 
     public override void SetColour(Color colour)
     {
-        if (enabled || IsFlashing) SetMaskEnabled(true);
+        if (IsFlashing) SetMaskEnabled(true);
         SetMaskColour(colour);
     }
 
@@ -50,7 +48,6 @@ public class ColourMaskFlashBehaviour : ColourFlashBehaviour
 
     protected override IEnumerator RunFlashes(float period, int count)
     {
-        enabled = true;
         SetMaskEnabled(true);
         yield return base.RunFlashes(period, count);
         SetMaskEnabled(false);

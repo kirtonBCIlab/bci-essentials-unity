@@ -4,6 +4,8 @@ using UnityEngine.Events;
 public class CustomStimulusPresenter : FrameCycleFrequencyStimulusPresenter
 {
     public UnityEvent OnSelected;
+    private ColourMaskFlashBehaviour CustomFlashBehaviour
+    => (_colourFlashBehaviour is ColourMaskFlashBehaviour m) ? m : null;
 
     public override void Select()
     {
@@ -12,11 +14,7 @@ public class CustomStimulusPresenter : FrameCycleFrequencyStimulusPresenter
     }
 
     protected override void SetUpStimulusDisplay()
-    {
-        _colourFlashBehaviour.enabled = true;
-    }
+    => CustomFlashBehaviour?.SetMaskEnabled(true);
     protected override void CleanUpStimulusDisplay()
-    {
-        _colourFlashBehaviour.enabled = false;
-    }
+    => CustomFlashBehaviour?.SetMaskEnabled(false);
 }
