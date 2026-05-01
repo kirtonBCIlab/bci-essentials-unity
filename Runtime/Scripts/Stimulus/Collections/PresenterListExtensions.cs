@@ -12,16 +12,16 @@ namespace BCIEssentials.Stimulus.Collections
         public static List<ISelectable> WhereSelectable
         (this IEnumerable<ISelectable> caller)
         => caller.Where(p => p.IsSelectable).ToList();
-        public static List<StimulusPresentationBehaviour> WhereSelectable
-        (this IEnumerable<StimulusPresentationBehaviour> caller)
+        public static List<StimulusPresenter> WhereSelectable
+        (this IEnumerable<StimulusPresenter> caller)
         => caller.Where(p => p.IsSelectable).ToList();
 
 
         public static List<IStimulusPresenter> WhereVisibleFromMainCamera
         (this IEnumerable<IStimulusPresenter> caller)
         => caller.WhereVisibleFromCamera(Camera.main);
-        public static List<StimulusPresentationBehaviour> WhereVisibleFromMainCamera
-        (this IEnumerable<StimulusPresentationBehaviour> caller)
+        public static List<StimulusPresenter> WhereVisibleFromMainCamera
+        (this IEnumerable<StimulusPresenter> caller)
         => caller.WhereVisibleFromCamera(Camera.main);
 
 
@@ -34,8 +34,8 @@ namespace BCIEssentials.Stimulus.Collections
             }
         ).ToList();
 
-        public static List<StimulusPresentationBehaviour> WhereVisibleFromCamera
-        (this IEnumerable<StimulusPresentationBehaviour> caller, Camera camera)
+        public static List<StimulusPresenter> WhereVisibleFromCamera
+        (this IEnumerable<StimulusPresenter> caller, Camera camera)
         => caller.Where(p => p switch
             {
                 Component c => c.gameObject.HasRendererVisibleFromCamera(camera),
@@ -49,7 +49,7 @@ namespace BCIEssentials.Stimulus.Collections
         => caller.ToList().ForEach(p => p.StartStimulusDisplay());
 
         public static void StartStimulusDisplay
-        (this IEnumerable<StimulusPresentationBehaviour> caller)
+        (this IEnumerable<StimulusPresenter> caller)
         => caller.ToList().ForEach(p => p.StartStimulusDisplay());
 
         public static void EndStimulusDisplay
@@ -57,7 +57,7 @@ namespace BCIEssentials.Stimulus.Collections
         => caller.ToList().ForEach(p => p.EndStimulusDisplay());
 
         public static void EndStimulusDisplay
-        (this IEnumerable<StimulusPresentationBehaviour> caller)
+        (this IEnumerable<StimulusPresenter> caller)
         => caller.ToList().ForEach(p => p.EndStimulusDisplay());
     }
 }

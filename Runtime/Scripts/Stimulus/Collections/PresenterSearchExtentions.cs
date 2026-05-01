@@ -9,34 +9,34 @@ namespace BCIEssentials.Stimulus.Collections
 
     public static class PresenterSearchExtensions
     {
-        public static List<StimulusPresentationBehaviour> GetSelectablePresentersByType
+        public static List<StimulusPresenter> GetSelectablePresentersByType
         (
             this MonoBehaviour caller,
             Scope scope = Scope.Scene,
             bool includeInactive = false
         )
         {
-            StimulusPresentationBehaviour[] presenters = scope switch
+            StimulusPresenter[] presenters = scope switch
             {
                 Scope.Children
-                    => caller.GetComponentsInChildren<StimulusPresentationBehaviour>(includeInactive)
+                    => caller.GetComponentsInChildren<StimulusPresenter>(includeInactive)
                 ,
                 Scope.ChildrenOfParent
                     => caller.transform.parent switch
                     {
-                        null => GetComponentsInScene<StimulusPresentationBehaviour>()
+                        null => GetComponentsInScene<StimulusPresenter>()
                         ,
-                        Transform parent => parent.GetComponentsInChildren<StimulusPresentationBehaviour>(includeInactive)
+                        Transform parent => parent.GetComponentsInChildren<StimulusPresenter>(includeInactive)
                     }
                 ,
                 _
-                    => GetComponentsInScene<StimulusPresentationBehaviour>()
+                    => GetComponentsInScene<StimulusPresenter>()
             };
             return presenters.WhereSelectable();
         }
 
 
-        public static List<StimulusPresentationBehaviour> GetSelectablePresentersByTag
+        public static List<StimulusPresenter> GetSelectablePresentersByTag
         (
             this MonoBehaviour caller, string tag,
             Scope scope = Scope.Scene
@@ -59,10 +59,10 @@ namespace BCIEssentials.Stimulus.Collections
                     => GameObject.FindGameObjectsWithTag(tag)
             };
 
-            List<StimulusPresentationBehaviour> selectablePresenters = new();
+            List<StimulusPresenter> selectablePresenters = new();
             foreach (GameObject o in taggedObjects)
             {
-                if (o.TryGetComponent(out StimulusPresentationBehaviour presenter) && presenter.IsSelectable)
+                if (o.TryGetComponent(out StimulusPresenter presenter) && presenter.IsSelectable)
                 {
                     selectablePresenters.Add(presenter);
                 }

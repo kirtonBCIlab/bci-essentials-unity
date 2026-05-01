@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Collections
 {
-    using Presenter = Presentation.StimulusPresentationBehaviour;
-    using PresenterList = List<Presentation.StimulusPresentationBehaviour>;
+    using Presenter = Presentation.StimulusPresenter;
+    using PresenterList = List<Presentation.StimulusPresenter>;
 
     [Serializable]
     public class StimulusPresenterCollection: ICollection<Presenter>

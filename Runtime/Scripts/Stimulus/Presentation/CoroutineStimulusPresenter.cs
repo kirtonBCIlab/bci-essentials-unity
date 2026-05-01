@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Presentation
 {
-    public abstract class CoroutineStimulusPresenter : StimulusPresentationBehaviour
+    public abstract class CoroutineStimulusPresenter : StimulusPresenter
     {
 
         private Coroutine _stimulusRoutine;

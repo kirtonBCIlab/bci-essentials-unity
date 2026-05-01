@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus.Presentation.Standard
 {
-    public class ColourToggleStimulusPresenter : StimulusPresentationBehaviour
+    public class ColourToggleStimulusPresenter : StimulusPresenter
     {
         [SerializeField] protected ColourFlashBehaviour _colourFlashBehaviour;
 

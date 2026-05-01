@@ -59,12 +59,12 @@ namespace BCIEssentials.Stimulus.Collections
         }
 #endif
 
-        public override List<StimulusPresentationBehaviour> GetSelectable()
+        public override List<StimulusPresenter> GetSelectable()
         {
             if (RepopulateWhenQueried) Repopulate();
             return base.GetSelectable();
         }
-        public override List<StimulusPresentationBehaviour> GetVisible()
+        public override List<StimulusPresenter> GetVisible()
         {
             if (RepopulateWhenQueried) Repopulate();
             return base.GetVisible();

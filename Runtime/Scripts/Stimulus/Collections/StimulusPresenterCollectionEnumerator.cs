@@ -5,12 +5,12 @@ namespace BCIEssentials.Stimulus.Collections
 {
     using Presentation;
 
-    public class StimulusPresenterCollectionEnumerator : IEnumerator<StimulusPresentationBehaviour>, IEnumerator
+    public class StimulusPresenterCollectionEnumerator : IEnumerator<StimulusPresenter>, IEnumerator
     {
         private readonly StimulusPresenterCollection _source;
         private int _cursorIndex = -1;
 
-        public StimulusPresentationBehaviour Current => _source[_cursorIndex];
+        public StimulusPresenter Current => _source[_cursorIndex];
         object IEnumerator.Current => Current;
 
         public StimulusPresenterCollectionEnumerator(StimulusPresenterCollection collection)
