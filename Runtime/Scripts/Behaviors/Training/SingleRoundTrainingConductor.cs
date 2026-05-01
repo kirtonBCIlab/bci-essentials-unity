@@ -36,7 +36,7 @@ namespace BCIEssentials
             }
 
             yield return new WaitForSeconds(PreTrialTime);
-            TrialConductor.StartTrainingTrial(targetIndex, _executionHost);
+            TrialConductor.StartTrainingTrial(targetIndex, _lastExecutionHost);
             yield return TrialConductor.AwaitCompletion();
             yield return new WaitForSeconds(PostTrialTime);
 

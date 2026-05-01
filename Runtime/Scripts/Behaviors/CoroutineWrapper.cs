@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -5,10 +6,10 @@ namespace BCIEssentials
 {
     public abstract class CoroutineWrapper
     {
-        public bool IsRunning { get; private set; }
-        private Coroutine _routine;
+        public bool IsRunning => _routine?.IsRunning == true;
+        private HostedCoroutine _routine;
 
-        protected MonoBehaviour _executionHost;
+        protected MonoBehaviour _lastExecutionHost;
 
 
         public void Begin(MonoBehaviour executionHost)
@@ -19,8 +20,10 @@ namespace BCIEssentials
                 return;
             }
 
-            _executionHost = executionHost;
-            executionHost.StartCoroutine(RunWrapper());
+            _lastExecutionHost = executionHost;
+            SetUp();
+            _routine = new(executionHost, Run());
+            executionHost.StartCoroutine(RunCompletionCallback(CleanUp));
         }
 
         public void Interrupt()
@@ -31,8 +34,7 @@ namespace BCIEssentials
                 return;
             }
 
-            _executionHost.StopCoroutine(_routine);
-            IsRunning = false;
+            _routine.Interrupt();
         }
 
         protected virtual void SetUp() { }
@@ -45,20 +47,10 @@ namespace BCIEssentials
             while (IsRunning) yield return null;
         }
 
-
-        private IEnumerator RunWrapper()
+        private IEnumerator RunCompletionCallback(Action callback)
         {
-            SetUp();
-            _routine = _executionHost.StartCoroutine(RunWithTrackedStatus());
             yield return AwaitCompletion();
-            CleanUp();
-        }
-
-        private IEnumerator RunWithTrackedStatus()
-        {
-            IsRunning = true;
-            yield return Run();
-            IsRunning = false;
+            callback();
         }
     }
 }
