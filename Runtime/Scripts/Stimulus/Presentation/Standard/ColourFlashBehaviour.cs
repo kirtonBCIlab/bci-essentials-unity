@@ -8,7 +8,7 @@ namespace BCIEssentials.Stimulus
     {
         public bool IsFlashing { get; private set; }
 
-        public Renderer _renderer;
+        public Renderer Renderer;
         public Color OnColour = Color.red;
         public Color OffColour = Color.white;
 
@@ -58,12 +58,17 @@ namespace BCIEssentials.Stimulus
             IsFlashing = false;
         }
 
+        public void DisplayOnColour() => SetRendererColour(OnColour);
+        public void DisplayOffColour() => SetRendererColour(OffColour);
+        public void ToggleDisplayState(bool on)
+        => SetRendererColour(on ? OnColour : OffColour);
+
         public virtual void SetColour(Color colour) => SetRendererColour(colour);
         protected void SetRendererColour(Color colour)
         {
-            if (_renderer && _renderer.material)
+            if (Renderer && Renderer.material)
             {
-                _renderer.material.color = colour;
+                Renderer.material.color = colour;
             }
         }
     }
