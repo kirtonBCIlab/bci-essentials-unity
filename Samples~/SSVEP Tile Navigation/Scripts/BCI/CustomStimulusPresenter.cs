@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class CustomStimulusPresenter : FrequencyStimulusPresenter
 {
     [SerializeField]
-    private ColourMaskFlashBehaviour _customFrequencyDisplay;
+    private ColourMaskFlashDisplay _customFrequencyDisplay;
 
     [Space]
     public UnityEvent OnSelected;
@@ -13,7 +13,7 @@ public class CustomStimulusPresenter : FrequencyStimulusPresenter
 
     protected override void Awake()
     {
-        _customFrequencyDisplay.InitializeRenderer(_colourFlashBehaviour.Renderer);
+        _customFrequencyDisplay.InitializeRenderer(_colourFlashDisplay.Renderer);
         base.Awake();
     }
 

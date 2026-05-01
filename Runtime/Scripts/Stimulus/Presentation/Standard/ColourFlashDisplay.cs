@@ -4,7 +4,7 @@ using UnityEngine;
 namespace BCIEssentials.Stimulus
 {
     [System.Serializable]
-    public class ColourFlashBehaviour
+    public class ColourFlashDisplay
     {
         public bool IsFlashing { get; private set; }
 

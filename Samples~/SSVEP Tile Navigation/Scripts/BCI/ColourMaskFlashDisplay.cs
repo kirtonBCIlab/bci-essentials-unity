@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class ColourMaskFlashBehaviour
+public class ColourMaskFlashDisplay
 {
     public Color OnColour = Color.white;
     public Color OffColour = Color.black;

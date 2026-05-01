@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour:
+  _colourFlashDisplay:
     Renderer: {fileID: 57354922}
     OnColour: {r: 1, g: 0, b: 0, a: 1}
     OffColour: {r: 1, g: 1, b: 1, a: 1}
@@ -356,7 +356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour:
+  _colourFlashDisplay:
     Renderer: {fileID: 131014106}
     OnColour: {r: 1, g: 0, b: 0, a: 1}
     OffColour: {r: 1, g: 1, b: 1, a: 1}
@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour:
+  _colourFlashDisplay:
     Renderer: {fileID: 214308364}
     OnColour: {r: 1, g: 0, b: 0, a: 1}
     OffColour: {r: 1, g: 1, b: 1, a: 1}
@@ -1077,7 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour:
+  _colourFlashDisplay:
     Renderer: {fileID: 1281457872}
     OnColour: {r: 1, g: 0, b: 0, a: 1}
     OffColour: {r: 1, g: 1, b: 1, a: 1}

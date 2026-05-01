@@ -35,7 +35,7 @@ namespace BCIEssentials.Stimulus
         protected virtual void CleanUpStimulusDisplay() { }
 
         protected virtual void ToggleDisplayState(bool value)
-        => _colourFlashBehaviour.ToggleDisplayState(value);
+        => _colourFlashDisplay.ToggleDisplayState(value);
 
 
         [System.Serializable]

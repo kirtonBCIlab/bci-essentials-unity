@@ -4,17 +4,17 @@ namespace BCIEssentials.Stimulus
 {
     public class ColourToggleStimulusPresenter : StimulusPresenter
     {
-        [SerializeField] protected ColourFlashBehaviour _colourFlashBehaviour;
+        [SerializeField] protected ColourFlashDisplay _colourFlashDisplay;
 
-        protected virtual void Awake() => _colourFlashBehaviour.SetUp();
+        protected virtual void Awake() => _colourFlashDisplay.SetUp();
 
 
-        public override void StartStimulusDisplay() => _colourFlashBehaviour.DisplayOnColour();
-        public override void EndStimulusDisplay() => _colourFlashBehaviour.DisplayOffColour();
+        public override void StartStimulusDisplay() => _colourFlashDisplay.DisplayOnColour();
+        public override void EndStimulusDisplay() => _colourFlashDisplay.DisplayOffColour();
 
-        public override void Select() => _colourFlashBehaviour.StartSelectionIndication(this);
+        public override void Select() => _colourFlashDisplay.StartSelectionIndication(this);
 
-        public override void StartTargetIndication() => _colourFlashBehaviour.StartTargetIndication(this);
-        public override void EndTargetIndication() => _colourFlashBehaviour.EndTargetIndication();
+        public override void StartTargetIndication() => _colourFlashDisplay.StartTargetIndication(this);
+        public override void EndTargetIndication() => _colourFlashDisplay.EndTargetIndication();
     }
 }
