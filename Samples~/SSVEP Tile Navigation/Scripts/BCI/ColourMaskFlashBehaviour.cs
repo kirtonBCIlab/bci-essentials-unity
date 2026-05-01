@@ -1,55 +1,35 @@
 using UnityEngine;
-using BCIEssentials.Stimulus;
-using System.Collections;
 
-public class ColourMaskFlashBehaviour : ColourFlashBehaviour
+[System.Serializable]
+public class ColourMaskFlashBehaviour
 {
-    [SerializeField, Space]
-    private Shader _colourMaskShader;
-    private Material _material;
+    public Color OnColour = Color.white;
+    public Color OffColour = Color.black;
 
+    private Material TargetMaterial => _renderer.material;
+    private Renderer _renderer;
 
-    public override void SetUp()
+    public void InitializeRenderer(Renderer target)
     {
-        Color? inspectorTint = _renderer != null ? _renderer.material.color : null;
-        base.SetUp();
-
-        _material = _renderer.material = new(_colourMaskShader);
-        SetMaskEnabled(false);
-        if (inspectorTint.HasValue)
+        _renderer = target;
+        if (!_renderer)
         {
-            _material.SetColor("_Color", inspectorTint.Value);
+            Debug.LogWarning("Missing renderer component reference");
+            return;
         }
+
+        Shader colourMaskShader = Shader.Find("Unlit/Colour Mask");
+        _renderer.material = new(colourMaskShader);
+        SetMaskEnabled(false);
     }
 
 
-    public override void SetColour(Color colour)
-    {
-        if (IsFlashing) SetMaskEnabled(true);
-        SetMaskColour(colour);
-    }
+    public void DisplayOnColour() => SetMaskColour(OnColour);
+    public void DisplayOffColour() => SetMaskColour(OffColour);
 
     public void SetMaskEnabled(bool value)
-    {
-        if (_material)
-        {
-            _material.SetFloat("_MaskEnabled", value ? 1 : 0);
-        }
-    }
+    => TargetMaterial.SetFloat("_MaskEnabled", value ? 1 : 0);
 
     public void SetMaskColour(Color value)
-    {
-        if (_material)
-        {
-            _material.SetColor("_MaskColour", value);
-        }
-    }
-
-
-    protected override IEnumerator RunFlashes(float period, int count)
-    {
-        SetMaskEnabled(true);
-        yield return base.RunFlashes(period, count);
-        SetMaskEnabled(false);
-    }
+    => TargetMaterial.SetColor("_MaskColour", value);
 }

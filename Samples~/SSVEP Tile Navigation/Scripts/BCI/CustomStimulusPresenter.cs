@@ -1,11 +1,22 @@
 using BCIEssentials.Stimulus;
+using UnityEngine;
 using UnityEngine.Events;
 
-public class CustomStimulusPresenter : FrameCycleFrequencyStimulusPresenter
+public class CustomStimulusPresenter : FrequencyStimulusPresenter
 {
+    [SerializeField]
+    private ColourMaskFlashBehaviour _customFrequencyDisplay;
+
+    [Space]
     public UnityEvent OnSelected;
-    private ColourMaskFlashBehaviour CustomFlashBehaviour
-    => (_colourFlashBehaviour is ColourMaskFlashBehaviour m) ? m : null;
+
+
+    protected override void Awake()
+    {
+        _customFrequencyDisplay.InitializeRenderer(_colourFlashBehaviour.Renderer);
+        base.Awake();
+    }
+
 
     public override void Select()
     {
@@ -13,8 +24,14 @@ public class CustomStimulusPresenter : FrameCycleFrequencyStimulusPresenter
         base.Select();
     }
 
+    protected override void ToggleDisplayState(bool value)
+    {
+        if (value) _customFrequencyDisplay.DisplayOnColour();
+        else _customFrequencyDisplay.DisplayOffColour();
+    }
+
     protected override void SetUpStimulusDisplay()
-    => CustomFlashBehaviour?.SetMaskEnabled(true);
+    => _customFrequencyDisplay.SetMaskEnabled(true);
     protected override void CleanUpStimulusDisplay()
-    => CustomFlashBehaviour?.SetMaskEnabled(false);
+    => _customFrequencyDisplay.SetMaskEnabled(false);
 }

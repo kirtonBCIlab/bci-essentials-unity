@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 57354923}
   - component: {fileID: 57354924}
-  - component: {fileID: 57354925}
   - component: {fileID: 57354922}
   m_Layer: 0
   m_Name: SouthEast (-Y)
@@ -210,7 +209,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 471476622}
+  m_Father: {fileID: 584918809}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &57354924
 MonoBehaviour:
@@ -224,9 +223,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour: {fileID: 57354925}
-  FramesOn: 3
-  FramesOff: 4
+  _colourFlashBehaviour:
+    Renderer: {fileID: 57354922}
+    OnColour: {r: 1, g: 0, b: 0, a: 1}
+    OffColour: {r: 1, g: 1, b: 1, a: 1}
+    TargetIndicationFlashPeriod: 0.2
+    TargetIndicationFlashCount: 3
+    SelectionFlashPeriod: 0.1
+    SelectionFlashCount: 5
+  CycleEngine:
+    Frequency: 13
+    DutyCycle: 0.5
+  _customFrequencyDisplay:
+    OnColour: {r: 1, g: 1, b: 1, a: 1}
+    OffColour: {r: 0, g: 0, b: 0, a: 1}
   OnSelected:
     m_PersistentCalls:
       m_Calls:
@@ -242,26 +252,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &57354925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57354920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a7a86ee2e6e1ae41a34dcc6b1ecb509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 57354922}
-  OnColour: {r: 1, g: 1, b: 1, a: 1}
-  OffColour: {r: 0, g: 0, b: 0, a: 0}
-  TargetIndicationFlashPeriod: 0.2
-  TargetIndicationFlashCount: 3
-  SelectionFlashPeriod: 0.1
-  SelectionFlashCount: 5
-  _colourMaskShader: {fileID: 4800000, guid: 1b4e10d8f8adbdc4bbd212a320c67e9d, type: 3}
 --- !u!1 &131014104
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +262,6 @@ GameObject:
   m_Component:
   - component: {fileID: 131014107}
   - component: {fileID: 131014108}
-  - component: {fileID: 131014109}
   - component: {fileID: 131014106}
   m_Layer: 0
   m_Name: NorthWest (+Y)
@@ -353,7 +342,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 471476622}
+  m_Father: {fileID: 584918809}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &131014108
 MonoBehaviour:
@@ -367,9 +356,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour: {fileID: 131014109}
-  FramesOn: 1
-  FramesOff: 2
+  _colourFlashBehaviour:
+    Renderer: {fileID: 131014106}
+    OnColour: {r: 1, g: 0, b: 0, a: 1}
+    OffColour: {r: 1, g: 1, b: 1, a: 1}
+    TargetIndicationFlashPeriod: 0.2
+    TargetIndicationFlashCount: 3
+    SelectionFlashPeriod: 0.1
+    SelectionFlashCount: 5
+  CycleEngine:
+    Frequency: 8
+    DutyCycle: 0.5
+  _customFrequencyDisplay:
+    OnColour: {r: 1, g: 1, b: 1, a: 1}
+    OffColour: {r: 0, g: 0, b: 0, a: 1}
   OnSelected:
     m_PersistentCalls:
       m_Calls:
@@ -385,26 +385,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &131014109
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 131014104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a7a86ee2e6e1ae41a34dcc6b1ecb509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 131014106}
-  OnColour: {r: 1, g: 1, b: 1, a: 1}
-  OffColour: {r: 0, g: 0, b: 0, a: 0}
-  TargetIndicationFlashPeriod: 0.2
-  TargetIndicationFlashCount: 3
-  SelectionFlashPeriod: 0.1
-  SelectionFlashCount: 5
-  _colourMaskShader: {fileID: 4800000, guid: 1b4e10d8f8adbdc4bbd212a320c67e9d, type: 3}
 --- !u!1 &214308362
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,7 +395,6 @@ GameObject:
   m_Component:
   - component: {fileID: 214308365}
   - component: {fileID: 214308366}
-  - component: {fileID: 214308367}
   - component: {fileID: 214308364}
   m_Layer: 0
   m_Name: SouthWest (-X)
@@ -496,7 +475,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 471476622}
+  m_Father: {fileID: 584918809}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &214308366
 MonoBehaviour:
@@ -510,9 +489,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour: {fileID: 214308367}
-  FramesOn: 5
-  FramesOff: 6
+  _colourFlashBehaviour:
+    Renderer: {fileID: 214308364}
+    OnColour: {r: 1, g: 0, b: 0, a: 1}
+    OffColour: {r: 1, g: 1, b: 1, a: 1}
+    TargetIndicationFlashPeriod: 0.2
+    TargetIndicationFlashCount: 3
+    SelectionFlashPeriod: 0.1
+    SelectionFlashCount: 5
+  CycleEngine:
+    Frequency: 17
+    DutyCycle: 0.5
+  _customFrequencyDisplay:
+    OnColour: {r: 1, g: 1, b: 1, a: 1}
+    OffColour: {r: 0, g: 0, b: 0, a: 1}
   OnSelected:
     m_PersistentCalls:
       m_Calls:
@@ -528,132 +518,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &214308367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 214308362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a7a86ee2e6e1ae41a34dcc6b1ecb509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 214308364}
-  OnColour: {r: 1, g: 1, b: 1, a: 1}
-  OffColour: {r: 0, g: 0, b: 0, a: 0}
-  TargetIndicationFlashPeriod: 0.2
-  TargetIndicationFlashCount: 3
-  SelectionFlashPeriod: 0.1
-  SelectionFlashCount: 5
-  _colourMaskShader: {fileID: 4800000, guid: 1b4e10d8f8adbdc4bbd212a320c67e9d, type: 3}
---- !u!1 &471476621
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 471476622}
-  - component: {fileID: 471476623}
-  - component: {fileID: 471476625}
-  - component: {fileID: 471476624}
-  - component: {fileID: 471476626}
-  m_Layer: 0
-  m_Name: Stimulus Presenters
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &471476622
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 471476621}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 131014107}
-  - {fileID: 1281457873}
-  - {fileID: 57354923}
-  - {fileID: 214308365}
-  m_Father: {fileID: 584918809}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &471476623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 471476621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73352abc1832ca346a6948a3ce2ee6c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stimulusPresenters:
-  - {fileID: 131014108}
-  - {fileID: 1281457874}
-  - {fileID: 57354924}
-  - {fileID: 214308366}
---- !u!114 &471476624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 471476621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a282f9ac1c238ce469305817bc2f7e1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Selection.SelectorShortcuts
-  Bindings:
-    Bindings:
-    - BoundKey: 88
-      Index: 0
-    - BoundKey: 90
-      Index: 1
-    - BoundKey: 87
-      Index: 2
-    - BoundKey: 85
-      Index: 3
-  _target: {fileID: 471476625}
-  _trialBehaviour: {fileID: 584918807}
---- !u!114 &471476625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 471476621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b614a82ce0fa3245979d1db3a61c408, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Selection.StimulusPresenterCollectionSelector
-  _target: {fileID: 471476623}
---- !u!114 &471476626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 471476621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 311dfe5af981ee54c87b53d6f58e40ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Training.StimulusPresenterCollectionTargetIndicator
-  _target: {fileID: 471476623}
 --- !u!1 &584918805
 GameObject:
   m_ObjectHideFlags: 0
@@ -663,9 +527,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 584918809}
-  - component: {fileID: 584918811}
-  - component: {fileID: 584918807}
-  - component: {fileID: 584918806}
   - component: {fileID: 584918810}
   m_Layer: 0
   m_Name: BCI
@@ -674,48 +535,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &584918806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584918805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bf249683faf91e4fb308c079bb5a6f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _targetIndicationBehaviour: {fileID: 471476626}
-  _trialBehaviour: {fileID: 584918807}
-  TargetIndex: 0
-  TargetIndicationPeriod: 3
-  PersistTargetIndication: 0
-  PreTrialTime: 0.5
-  PostTrialTime: 0
-  SelectionCount: 8
-  RestTime: 1
---- !u!114 &584918807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584918805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e69272e8bafc5f4eb0a4d2276992341, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TrainingEpochCount: 3
-  EpochLength: 1
-  InterEpochInterval: 0
-  TargetFrameRate: 30
-  Presenters:
-  - {fileID: 131014108}
-  - {fileID: 1281457874}
-  - {fileID: 57354924}
-  - {fileID: 214308366}
 --- !u!4 &584918809
 Transform:
   m_ObjectHideFlags: 0
@@ -729,7 +548,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 471476622}
+  - {fileID: 131014107}
+  - {fileID: 1281457873}
+  - {fileID: 57354923}
+  - {fileID: 214308365}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &584918810
@@ -741,32 +563,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 584918805}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e57ae8077f4c0c47b086a7f0b17d1fa, type: 3}
+  m_Script: {fileID: 11500000, guid: e254b8749c594264698288a6cc37c9d3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.Behaviours.BCIControllerShortcuts
-  ToggleTrialRunBinding:
+  m_EditorClassIdentifier: Bci4Kids.BciEssentials::BCIEssentials.SSVEPCommandCentre
+  _trainingConductor:
+    TargetIndex: 0
+    TargetIndicationPeriod: 3
+    PersistTargetIndication: 0
+    PreTrialTime: 0.5
+    PostTrialTime: 0
+    SelectionCount: 8
+    RestTime: 1
+  _markerWriter:
+    StreamName: UnityMarkerStream
+    StreamType: BCI_Essentials_Markers
+    PrintLogs: 0
+  _responseProvider:
+    StreamType: BCI_Essentials_Predictions
+    LoggingMask: -1
+    PollingPeriod: 0.1
+  _toggleTrialRunBinding:
     BoundKey: 33
-  ToggleTrainingRunBinding:
+  _toggleTrainingRunBinding:
     BoundKey: 34
-  UpdateClassifierBinding:
-    BoundKey: 65
-  _target: {fileID: 584918811}
---- !u!114 &584918811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584918805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 464254de7f56ddb419569333b1ccf1b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ProvisionTriggers: 1
-  ProvisionScope: 0
-  _trialBehaviour: {fileID: 584918807}
-  _trainingBehaviour: {fileID: 584918806}
+  _selectionBindings:
+    Bindings:
+    - BoundKey: 88
+      Index: 0
+    - BoundKey: 90
+      Index: 1
+    - BoundKey: 87
+      Index: 2
+    - BoundKey: 85
+      Index: 3
+  _trialConductor:
+    TrainingEpochCount: 3
+    EpochLength: 1
+    InterEpochInterval: 0
+    Presenters:
+    - {fileID: 131014108}
+    - {fileID: 1281457874}
+    - {fileID: 57354924}
+    - {fileID: 214308366}
+  TargetFrameRate: 30
 --- !u!1 &640805667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1144,7 +983,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1281457873}
   - component: {fileID: 1281457874}
-  - component: {fileID: 1281457875}
   - component: {fileID: 1281457872}
   m_Layer: 0
   m_Name: NorthEast (+X)
@@ -1225,7 +1063,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 471476622}
+  m_Father: {fileID: 584918809}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1281457874
 MonoBehaviour:
@@ -1239,9 +1077,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40cdfb9c00630f42965c4fe71335f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colourFlashBehaviour: {fileID: 1281457875}
-  FramesOn: 2
-  FramesOff: 3
+  _colourFlashBehaviour:
+    Renderer: {fileID: 1281457872}
+    OnColour: {r: 1, g: 0, b: 0, a: 1}
+    OffColour: {r: 1, g: 1, b: 1, a: 1}
+    TargetIndicationFlashPeriod: 0.2
+    TargetIndicationFlashCount: 3
+    SelectionFlashPeriod: 0.1
+    SelectionFlashCount: 5
+  CycleEngine:
+    Frequency: 10
+    DutyCycle: 0.5
+  _customFrequencyDisplay:
+    OnColour: {r: 1, g: 1, b: 1, a: 1}
+    OffColour: {r: 0, g: 0, b: 0, a: 1}
   OnSelected:
     m_PersistentCalls:
       m_Calls:
@@ -1257,26 +1106,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1281457875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1281457870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a7a86ee2e6e1ae41a34dcc6b1ecb509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 1281457872}
-  OnColour: {r: 1, g: 1, b: 1, a: 1}
-  OffColour: {r: 0, g: 0, b: 0, a: 0}
-  TargetIndicationFlashPeriod: 0.2
-  TargetIndicationFlashCount: 3
-  SelectionFlashPeriod: 0.1
-  SelectionFlashCount: 5
-  _colourMaskShader: {fileID: 4800000, guid: 1b4e10d8f8adbdc4bbd212a320c67e9d, type: 3}
 --- !u!1 &1500451808
 GameObject:
   m_ObjectHideFlags: 0
