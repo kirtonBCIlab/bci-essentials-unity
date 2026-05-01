@@ -1,4 +1,4 @@
-using BCIEssentials.Stimulus.Presentation.Standard;
+using BCIEssentials.Stimulus;
 using UnityEngine.Events;
 
 public class CustomStimulusPresenter : FrameCycleFrequencyStimulusPresenter

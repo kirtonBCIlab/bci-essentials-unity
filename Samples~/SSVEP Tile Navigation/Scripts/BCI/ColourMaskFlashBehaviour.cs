@@ -1,5 +1,5 @@
 using UnityEngine;
-using BCIEssentials.Stimulus.Presentation.Standard;
+using BCIEssentials.Stimulus;
 using System.Collections;
 
 public class ColourMaskFlashBehaviour : ColourFlashBehaviour
