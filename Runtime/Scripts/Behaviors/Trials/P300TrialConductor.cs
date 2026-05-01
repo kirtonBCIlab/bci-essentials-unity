@@ -46,6 +46,9 @@ namespace BCIEssentials
             _ => throw new NotImplementedException()
         };
 
+        protected override void CleanUp()
+        => PresenterCollection.EndStimulusDisplay();
+
 
         private IEnumerator StartFlashRoutine
         (
