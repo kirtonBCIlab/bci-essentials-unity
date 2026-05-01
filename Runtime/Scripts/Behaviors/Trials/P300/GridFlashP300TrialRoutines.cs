@@ -5,7 +5,7 @@ namespace BCIEssentials
 {
     using Extensions;
     using LSLFramework;
-    using Stimulus.Presentation;
+    using Stimulus;
     using Utilities;
 
     public static partial class P300TrialRoutines

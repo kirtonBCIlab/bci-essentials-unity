@@ -7,8 +7,7 @@ using UnityEngine;
 namespace BCIEssentials
 {
     using LSLFramework;
-    using Stimulus.Collections;
-    using Stimulus.Presentation;
+    using Stimulus;
 
     [Serializable]
     public class P300TrialConductor : TrialConductor

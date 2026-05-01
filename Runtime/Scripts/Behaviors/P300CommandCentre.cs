@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace BCIEssentials
 {
-    using Stimulus.Collections;
     using LSLFramework;
+    using Stimulus;
 
     public class P300CommandCentre : BCICommandCentre
     {

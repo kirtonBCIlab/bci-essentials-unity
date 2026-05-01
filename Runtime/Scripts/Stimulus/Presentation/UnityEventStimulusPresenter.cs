@@ -1,6 +1,6 @@
 using UnityEngine.Events;
 
-namespace BCIEssentials.Stimulus.Presentation
+namespace BCIEssentials.Stimulus
 {
     public class UnityEventStimulusPresenter : StimulusPresenter
     {

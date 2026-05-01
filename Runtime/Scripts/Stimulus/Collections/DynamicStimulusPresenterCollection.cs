@@ -1,11 +1,9 @@
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
-    using Presentation;
-    using UnityEditor;
-    using UnityEngine;
-
     public enum SearchMethod { Type, Tag }
     public enum Scope { Scene, Children, ChildrenOfParent }
 

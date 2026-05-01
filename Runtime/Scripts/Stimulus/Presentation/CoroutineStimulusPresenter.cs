@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Presentation
+namespace BCIEssentials.Stimulus
 {
     public abstract class CoroutineStimulusPresenter : StimulusPresenter
     {

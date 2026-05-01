@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
     using Extensions;
-    using Stimulus.Presentation;
 
     public static class PresenterListExtensions
     {

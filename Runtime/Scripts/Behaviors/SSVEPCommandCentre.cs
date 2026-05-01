@@ -4,8 +4,7 @@ using UnityEngine;
 namespace BCIEssentials
 {
     using LSLFramework;
-    using Stimulus.Collections;
-    using Stimulus.Presentation.Standard;
+    using Stimulus;
 
     public class SSVEPCommandCentre : BCICommandCentre
     {

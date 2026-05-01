@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
     using Extensions;
-    using Stimulus.Presentation;
     using static Utilities.ComponentSearchMethods;
 
     public static class PresenterSearchExtensions

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Presentation.Standard
+namespace BCIEssentials.Stimulus
 {
     public class ColourToggleStimulusPresenter : StimulusPresenter
     {

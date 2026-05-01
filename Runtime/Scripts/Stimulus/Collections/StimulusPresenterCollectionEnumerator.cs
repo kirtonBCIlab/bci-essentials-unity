@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
-    using Presentation;
-
     public class StimulusPresenterCollectionEnumerator : IEnumerator<StimulusPresenter>, IEnumerator
     {
         private readonly StimulusPresenterCollection _source;

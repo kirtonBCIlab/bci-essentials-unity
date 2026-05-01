@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    using Stimulus.Collections;
+    using Stimulus;
 
     [CustomPropertyDrawer(typeof(DynamicStimulusPresenterCollection))]
     public class DynamicStimulusPresenterCollectionDrawer: PropertyDrawer

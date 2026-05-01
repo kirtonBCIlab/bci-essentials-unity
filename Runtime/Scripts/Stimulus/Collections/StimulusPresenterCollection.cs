@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
-    using Presenter = Presentation.StimulusPresenter;
-    using PresenterList = List<Presentation.StimulusPresenter>;
+    using PresenterList = List<StimulusPresenter>;
 
     [Serializable]
-    public class StimulusPresenterCollection: ICollection<Presenter>
+    public class StimulusPresenterCollection: ICollection<StimulusPresenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
         private PresenterList _latestSubset;
@@ -17,8 +16,8 @@ namespace BCIEssentials.Stimulus.Collections
         [SerializeField] protected PresenterList _stimulusPresenters;
 
 
-        public Presenter this[int index] => GetPresenter(index);
-        protected virtual Presenter GetPresenter(int index)
+        public StimulusPresenter this[int index] => GetPresenter(index);
+        protected virtual StimulusPresenter GetPresenter(int index)
         {
             if (Count == 0)
             {
@@ -31,7 +30,7 @@ namespace BCIEssentials.Stimulus.Collections
                 throw new IndexOutOfRangeException();
             }
 
-            Presenter presenter = _stimulusPresenters[index];
+            StimulusPresenter presenter = _stimulusPresenters[index];
             if (presenter == null)
             {
                 Debug.LogWarning("Stimulus presenter is null and can't be selected");
@@ -53,16 +52,16 @@ namespace BCIEssentials.Stimulus.Collections
         public int Count => _stimulusPresenters.Count;
         public void Clear() => _stimulusPresenters.Clear();
 
-        public void Add(Presenter presenter)
+        public void Add(StimulusPresenter presenter)
         => _stimulusPresenters.Add(presenter);
-        public bool Remove(Presenter presenter)
+        public bool Remove(StimulusPresenter presenter)
         => _stimulusPresenters.Remove(presenter);
-        public bool Contains(Presenter presenter)
+        public bool Contains(StimulusPresenter presenter)
         => _stimulusPresenters.Contains(presenter);
-        public void CopyTo(Presenter[] array, int arrayIndex)
+        public void CopyTo(StimulusPresenter[] array, int arrayIndex)
         => _stimulusPresenters.CopyTo(array, arrayIndex);
 
-        public IEnumerator<Presenter> GetEnumerator()
+        public IEnumerator<StimulusPresenter> GetEnumerator()
         => new StimulusPresenterCollectionEnumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

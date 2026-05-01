@@ -1,4 +1,4 @@
-namespace BCIEssentials.Stimulus.Presentation
+namespace BCIEssentials.Stimulus
 {
     public interface IStimulusPresenter
     {

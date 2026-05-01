@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials
 {
-    using Stimulus.Collections;
-    using Stimulus.Presentation.Standard;
+    using Stimulus;
 
     [System.Serializable]
     public class SSVEPTrialConductor : PersistentTrialConductor
