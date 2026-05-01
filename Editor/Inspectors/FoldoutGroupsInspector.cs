@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
-    [CustomEditor(typeof(MonoBehaviourUsingExtendedAttributes), true)]
-    public class ExtendedAttributeInspector: CustomInspector
+    [CustomEditor(typeof(MonoBehaviourWithFoldoutGroups), true)]
+    public class FoldoutGroupsInspector: CustomInspector
     {
         public override void DrawInspector()
         {

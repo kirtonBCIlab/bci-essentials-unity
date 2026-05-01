@@ -13,7 +13,7 @@ namespace BCIEssentials.Stimulus
         public void Select();
     }
 
-    public abstract class StimulusPresenter : MonoBehaviourUsingExtendedAttributes, IStimulusPresenter, ISelectable, ITargetable
+    public abstract class StimulusPresenter : MonoBehaviourWithFoldoutGroups, IStimulusPresenter, ISelectable, ITargetable
     {
         public virtual bool IsSelectable => enabled;
 

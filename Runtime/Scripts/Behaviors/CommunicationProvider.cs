@@ -7,7 +7,7 @@ namespace BCIEssentials
     using LSLFramework;
     using static Utilities.ComponentSearchMethods;
 
-    public class CommunicationProvider : MonoBehaviourUsingExtendedAttributes
+    public class CommunicationProvider : MonoBehaviourWithFoldoutGroups
     {
         public enum ProvisionOccasion { Manual, Awake, SceneLoad }
         public enum Scope { Scene, Children, SameObject }
