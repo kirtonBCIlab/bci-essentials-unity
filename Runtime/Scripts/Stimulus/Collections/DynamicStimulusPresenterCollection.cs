@@ -20,8 +20,16 @@ namespace BCIEssentials.Stimulus
 
         private readonly MonoBehaviour _defaultSearchAnchor;
 
-        public DynamicStimulusPresenterCollection(MonoBehaviour defaultSearchAnchor)
+        public DynamicStimulusPresenterCollection(
+            MonoBehaviour defaultSearchAnchor,
+            IEnumerable<StimulusPresenter> presenters = null
+        ) : base(presenters)
         => _defaultSearchAnchor = defaultSearchAnchor;
+
+        public static implicit operator DynamicStimulusPresenterCollection
+        (List<StimulusPresenter> presenters) => new(null, presenters);
+        public static implicit operator DynamicStimulusPresenterCollection
+        (StimulusPresenter[] presenters) => new(null, presenters);
 
 
         public void Repopulate() => Repopulate(_defaultSearchAnchor);

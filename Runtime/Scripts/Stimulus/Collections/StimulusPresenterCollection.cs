@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BCIEssentials.Stimulus
@@ -8,12 +9,21 @@ namespace BCIEssentials.Stimulus
     using PresenterList = List<StimulusPresenter>;
 
     [Serializable]
-    public class StimulusPresenterCollection: ICollection<StimulusPresenter>
+    public class StimulusPresenterCollection : ICollection<StimulusPresenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
         private PresenterList _latestSubset;
-        
+
         [SerializeField] protected PresenterList _stimulusPresenters;
+
+
+        public StimulusPresenterCollection(IEnumerable<StimulusPresenter> presenters)
+        { _stimulusPresenters = presenters?.ToList() ?? new(); }
+
+        public static implicit operator StimulusPresenterCollection
+        (PresenterList presenters) => new(presenters);
+        public static implicit operator StimulusPresenterCollection
+        (StimulusPresenter[] presenters) => new(presenters);
 
 
         public StimulusPresenter this[int index] => GetPresenter(index);
