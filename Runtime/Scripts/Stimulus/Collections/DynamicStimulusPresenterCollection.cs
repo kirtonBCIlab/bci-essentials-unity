@@ -18,7 +18,7 @@ namespace BCIEssentials.Stimulus
         public string PresenterTag = "BCI";
         public bool RepopulateWhenQueried;
 
-        private readonly MonoBehaviour _defaultSearchAnchor;
+        protected readonly MonoBehaviour _defaultSearchAnchor;
 
         public DynamicStimulusPresenterCollection(
             MonoBehaviour defaultSearchAnchor,

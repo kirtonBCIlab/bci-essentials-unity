@@ -77,7 +77,7 @@ namespace BCIEssentials.Stimulus
                 }
             }
 
-            private void SleepForSeconds(float seconds)
+            protected void SleepForSeconds(float seconds)
             => Thread.Sleep((int)(seconds * 1000));
         }
     }

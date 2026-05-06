@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using LSL;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using System.Linq;
     using static LSLStreamResolver;
     using static Response;
 
@@ -24,7 +24,7 @@ namespace BCIEssentials.LSLFramework
         public bool TargetStreamExists => TryResolveByType(StreamType, out _);
         public bool IsConnected => (_inlet is not null) && TargetStreamExists;
         public int SamplesAvailable => _inlet?.samples_available() ?? 0;
-        private StreamInlet _inlet;
+        protected StreamInlet _inlet;
         private string[] _sampleBuffer;
 
 
@@ -81,7 +81,7 @@ namespace BCIEssentials.LSLFramework
             return pulledResponses.ToArray();
         }
 
-        private double PullResponse(out Response parsedResponse)
+        protected double PullResponse(out Response parsedResponse)
         {
             double captureTime = _inlet.pull_sample(_sampleBuffer, 0);
             parsedResponse = BuildResponse(_sampleBuffer, captureTime);

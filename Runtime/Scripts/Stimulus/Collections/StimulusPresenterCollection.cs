@@ -12,7 +12,7 @@ namespace BCIEssentials.Stimulus
     public class StimulusPresenterCollection : ICollection<StimulusPresenter>
     {
         public PresenterList LatestSubset => _latestSubset ?? GetSelectable();
-        private PresenterList _latestSubset;
+        protected PresenterList _latestSubset;
 
         [SerializeField] protected PresenterList _stimulusPresenters;
 

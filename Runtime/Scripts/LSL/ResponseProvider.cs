@@ -18,10 +18,10 @@ namespace BCIEssentials.LSLFramework
         [Min(0)]
         public float PollingPeriod = 0.1f;
 
-        private List<IResponseSubscriber> _subscribers = new();
+        protected readonly List<IResponseSubscriber> _subscribers = new();
 
         public bool IsPolling { get; private set; }
-        private Thread _pollingThread;
+        protected Thread _pollingThread;
 
 
         public override void CloseStream()
@@ -84,7 +84,7 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        private void StartPolling()
+        protected void StartPolling()
         {
             StopPolling();
             if (!IsConnected && !IsResolvingStream)
@@ -95,7 +95,7 @@ namespace BCIEssentials.LSLFramework
             _pollingThread.Start();
         }
 
-        private void StopPolling()
+        protected void StopPolling()
         {
             if (IsPolling)
             {

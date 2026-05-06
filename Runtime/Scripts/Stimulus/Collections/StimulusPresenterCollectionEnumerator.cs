@@ -5,8 +5,8 @@ namespace BCIEssentials.Stimulus
 {
     public class StimulusPresenterCollectionEnumerator : IEnumerator<StimulusPresenter>, IEnumerator
     {
-        private readonly StimulusPresenterCollection _source;
-        private int _cursorIndex = -1;
+        protected readonly StimulusPresenterCollection _source;
+        protected int _cursorIndex = -1;
 
         public StimulusPresenter Current => _source[_cursorIndex];
         object IEnumerator.Current => Current;

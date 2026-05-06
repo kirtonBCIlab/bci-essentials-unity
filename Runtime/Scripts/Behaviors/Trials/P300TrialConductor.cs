@@ -50,7 +50,7 @@ namespace BCIEssentials
         => PresenterCollection.EndStimulusDisplay();
 
 
-        private IEnumerator StartFlashRoutine
+        protected IEnumerator StartFlashRoutine
         (
             Func<
                 MarkerWriter, int, float, float,
@@ -63,7 +63,7 @@ namespace BCIEssentials
             GetSelectablePresenters(), TrainingTarget
         );
 
-        private IEnumerator StartGridFlashRoutine
+        protected IEnumerator StartGridFlashRoutine
         (
             Func<
                 MarkerWriter, int, int, int, float, float,

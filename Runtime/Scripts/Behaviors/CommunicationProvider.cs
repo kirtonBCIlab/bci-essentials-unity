@@ -19,7 +19,7 @@ namespace BCIEssentials
         [SerializeField] protected ResponseProvider ResponseProvider;
 
 
-        private void Awake()
+        protected virtual void Awake()
         {
             MarkerWriter.OpenStream();
             if (ProvisionTrigger == ProvisionOccasion.SceneLoad)
@@ -32,7 +32,7 @@ namespace BCIEssentials
             }
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             MarkerWriter.CloseStream();
             ResponseProvider.CloseStream();
@@ -66,13 +66,13 @@ namespace BCIEssentials
         public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
 
 
-        private void ProvideMarkerWriter(IMarkerSource source)
+        protected void ProvideMarkerWriter(IMarkerSource source)
         => source.MarkerWriter = MarkerWriter;
-        private void ProvideResponseSubscription(IPredictionSink sink)
+        protected void ProvideResponseSubscription(IPredictionSink sink)
         => ResponseProvider.SubscribePredictions(sink.OnPrediction);
 
 
-        private void WarnIfProvisionScopeOverlaps()
+        protected void WarnIfProvisionScopeOverlaps()
         {
             CommunicationProvider[] providersInScope = ProvisionScope switch
             {

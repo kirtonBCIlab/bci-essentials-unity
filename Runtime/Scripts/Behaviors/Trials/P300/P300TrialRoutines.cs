@@ -36,7 +36,7 @@ namespace BCIEssentials
         }
 
 
-        private static IEnumerator RunSingleFlash
+        public static IEnumerator RunSingleFlash
         (
             List<IStimulusPresenter> stimulusPresenters,
             int stimulusIndex, MarkerWriter markerWriter,
@@ -55,7 +55,7 @@ namespace BCIEssentials
             yield return new WaitForSeconds(offTime);
         }
 
-        private static IEnumerator RunMultiFlash
+        public static IEnumerator RunMultiFlash
         (
             List<IStimulusPresenter> stimulusPresenters,
             int[] stimulusIndices, MarkerWriter markerWriter,

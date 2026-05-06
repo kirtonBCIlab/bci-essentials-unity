@@ -57,7 +57,7 @@ namespace BCIEssentials
         {
             _toggleTrialRunBinding.CallIfPressedThisFrame(ToggleTrialRun);
             _toggleTrainingRunBinding.CallIfPressedThisFrame(ToggleTrainingRun);
-            _selectionBindings.Process(MakeSelectionAtEndOfRun);
+            _selectionBindings.Process(MakeSelectionAfterTrial);
         }
 
 
@@ -71,10 +71,10 @@ namespace BCIEssentials
         }
 
 
-        private void MakeSelectionAtEndOfRun(int selectionIndex)
+        protected void MakeSelectionAfterTrial(int selectionIndex)
         => StartCoroutine(RunTrialDelayedSelection(selectionIndex));
 
-        private IEnumerator RunTrialDelayedSelection(int selectionIndex)
+        protected IEnumerator RunTrialDelayedSelection(int selectionIndex)
         {
             yield return TrialConductor.AwaitCompletion();
             OnPrediction(new MockPrediction(selectionIndex, TargetCount));

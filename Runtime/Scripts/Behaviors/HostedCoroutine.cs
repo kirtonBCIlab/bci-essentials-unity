@@ -6,8 +6,8 @@ namespace BCIEssentials
     public class HostedCoroutine
     {
         public bool IsRunning { get; private set; }
-        private readonly Coroutine _routine;
-        private readonly MonoBehaviour _executionHost;
+        protected readonly Coroutine _routine;
+        protected readonly MonoBehaviour _executionHost;
 
         public HostedCoroutine(MonoBehaviour host, IEnumerator routineEnumerator)
         {
@@ -31,7 +31,7 @@ namespace BCIEssentials
         }
 
 
-        private IEnumerator RunWithTrackedStatus(IEnumerator target)
+        protected IEnumerator RunWithTrackedStatus(IEnumerator target)
         {
             yield return target;
             IsRunning = false;

@@ -15,7 +15,7 @@ namespace BCIEssentials
         [SerializeField, AppendToFoldoutGroup("Behaviour")]
         protected SSVEPTrialConductor _trialConductor;
         public int TargetFrameRate = 30;
-        private int? _lastIndicatedTarget;
+        protected int? _lastIndicatedTarget;
 
 
         protected virtual void Start()

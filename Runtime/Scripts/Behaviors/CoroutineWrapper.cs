@@ -7,7 +7,7 @@ namespace BCIEssentials
     public abstract class CoroutineWrapper
     {
         public bool IsRunning => _routine?.IsRunning == true;
-        private HostedCoroutine _routine;
+        protected HostedCoroutine _routine;
 
         protected MonoBehaviour _lastExecutionHost;
 
@@ -47,7 +47,7 @@ namespace BCIEssentials
             while (IsRunning) yield return null;
         }
 
-        private IEnumerator RunCompletionCallback(Action callback)
+        protected IEnumerator RunCompletionCallback(Action callback)
         {
             yield return AwaitCompletion();
             callback();

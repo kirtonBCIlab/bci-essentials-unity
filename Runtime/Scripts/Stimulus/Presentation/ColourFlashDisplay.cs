@@ -20,8 +20,8 @@ namespace BCIEssentials.Stimulus
         public float SelectionFlashPeriod = 0.1f;
         public int SelectionFlashCount = 5;
 
-        private HostedCoroutine _targetIndicationRoutine;
-        private HostedCoroutine _selectionIndicationRoutine;
+        protected HostedCoroutine _targetIndicationRoutine;
+        protected HostedCoroutine _selectionIndicationRoutine;
 
 
         public virtual void SetUp() => SetColour(OffColour);
@@ -39,7 +39,7 @@ namespace BCIEssentials.Stimulus
         public virtual void EndTargetIndication()
         => _targetIndicationRoutine?.Interrupt();
 
-        private HostedCoroutine StartFlashRoutine(
+        protected HostedCoroutine StartFlashRoutine(
             float period, int count,
             MonoBehaviour executionHost
         )

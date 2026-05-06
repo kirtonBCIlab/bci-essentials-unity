@@ -6,7 +6,7 @@ namespace BCIEssentials.Stimulus
     public abstract class CoroutineStimulusPresenter : StimulusPresenter
     {
 
-        private Coroutine _stimulusRoutine;
+        protected Coroutine _stimulusRoutine;
 
 
         public override void StartStimulusDisplay()
