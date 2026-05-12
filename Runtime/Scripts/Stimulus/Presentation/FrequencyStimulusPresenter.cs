@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Stimulus
 {
-    public abstract class FrequencyStimulusPresenter : ColourToggleStimulusPresenter
+    public class FrequencyStimulusPresenter : ColourToggleStimulusPresenter
     {
         public float Frequency => CycleEngine.Frequency;
         public DutyCycleEngine CycleEngine;
