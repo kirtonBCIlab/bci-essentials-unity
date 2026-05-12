@@ -72,12 +72,13 @@ Shader "Unlit/Colour Mask"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed a = step(0.5, i.color.a);
+                fixed4 colour = tex2D(_MainTex, i.texcoord);
+                fixed a = step(0.5, colour.a);
 
                 fixed4 mask = _MaskEnabled * _MaskColour * a;
-                fixed4 unmaskedColour = (1 - _MaskEnabled) * i.color;
+                fixed4 unmaskedColour = (1 - _MaskEnabled) * colour;
 
-                return mask + unmaskedColour;
+                return (mask + unmaskedColour) * i.color;
             }
             ENDCG
         }

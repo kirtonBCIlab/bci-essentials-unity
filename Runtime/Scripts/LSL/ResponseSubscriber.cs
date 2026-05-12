@@ -18,7 +18,7 @@ namespace BCIEssentials.LSLFramework
         where TResponse : Response
         {
             public Action<TResponse> responseCallback;
-            private bool _callbackIsStatic;
+            public readonly bool _callbackIsStatic;
 
             public ResponseSubscriber(Action<TResponse> callback)
             {
@@ -26,7 +26,7 @@ namespace BCIEssentials.LSLFramework
                 _callbackIsStatic = callback.Target is null;
             }
 
-            public void Notify<T>(T response)
+            public readonly void Notify<T>(T response)
             {
                 if (response is TResponse typedResponse)
                 {
@@ -35,11 +35,11 @@ namespace BCIEssentials.LSLFramework
                 }
             }
 
-            public bool MatchesCallback<T>(Action<T> callback)
+            public readonly bool MatchesCallback<T>(Action<T> callback)
             => responseCallback.Method == callback.Method
             && responseCallback.Target == callback.Target;
 
-            public bool HasValidCallbackTarget()
+            public readonly bool HasValidCallbackTarget()
             => responseCallback.Target switch
             {
                 UnityEngine.Object o => o != null,

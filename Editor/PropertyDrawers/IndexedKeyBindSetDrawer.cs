@@ -1,12 +1,14 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BCIEssentials.Editor
 {
+    using Unity.Properties;
     using Utilities;
 
     [CustomPropertyDrawer(typeof(IndexedKeyBindSet))]
-    public class IndexedKeyBindSetDrawer: PropertyDrawer
+    public class IndexedKeyBindSetDrawer : PropertyDrawer
     {
         const float ButtonWidth = 20f;
         const float ItemCountLabelWidth = 48f;
@@ -16,28 +18,32 @@ namespace BCIEssentials.Editor
         static readonly float ColumnHeaderSpacing = LineHeight * 1.2f;
 
         static readonly GUIContent AddButtonContent
-        = new (EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
+        = new(EditorGUIUtility.IconContent("d_Toolbar Plus@2x"));
         static readonly GUIContent RemoveButtonContent
-        = new (EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
+        = new(EditorGUIUtility.IconContent("d_Toolbar Minus@2x"));
 
         static readonly GUIStyle FoldoutHeaderStyle
-        = new (EditorStyles.foldoutHeader)
+        = new(EditorStyles.foldoutHeader)
         { clipping = TextClipping.Clip };
 
+        private bool IsExpanded
+        {
+            get => _property.isExpanded;
+            set => _property.isExpanded = value;
+        }
+        private SerializedProperty _property;
 
         private int ItemCount => _arrayProperty.arraySize;
         private SerializedProperty _arrayProperty;
-        private string _prefsKey;
-        private bool _foldout;
 
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            GetTarget(property);
+            ResolveTarget(property);
 
             float height = LineHeight;
 
-            if (_foldout)
+            if (property.isExpanded)
             {
                 height += ColumnHeaderSpacing;
                 height += (LineHeight + ItemSpacing.y) * ItemCount;
@@ -47,32 +53,24 @@ namespace BCIEssentials.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            GetTarget(property);
+            ResolveTarget(property);
 
             position.height = LineHeight;
             DrawHeader(position, label);
 
-            if(!_foldout) return;
+            if (!property.isExpanded) return;
 
             position.y += LineHeight + ColumnHeaderSpacing;
             DrawItems(position);
         }
 
 
-        private void GetTarget(SerializedProperty property)
+        private void ResolveTarget(SerializedProperty property)
         {
+            _property = property;
             _arrayProperty = property.FindPropertyRelative(
                 nameof(IndexedKeyBindSet.Bindings)
             );
-
-            Object targetObject = property.serializedObject.targetObject;
-            _prefsKey = $"{targetObject.name}/{property.propertyPath}";
-        }
-
-        private void SetAndSaveFoldout(bool value)
-        {
-            _foldout = value;
-            EditorPrefs.SetBool(_prefsKey, value);
         }
 
         private Rect GetRightButtonRect(Rect position)
@@ -85,7 +83,6 @@ namespace BCIEssentials.Editor
 
         private void DrawHeader(Rect position, GUIContent label)
         {
-            _foldout = EditorPrefs.GetBool(_prefsKey);
             if (label.text != "Bindings")
             {
                 label.text = label.text.TrimSuffix("Bindings");
@@ -94,37 +91,29 @@ namespace BCIEssentials.Editor
             var foldoutRect = position.Narrowed(
                 ButtonWidth + ItemCountLabelWidth + ItemSpacing.x
             );
-            EditorGUI.BeginChangeCheck();
             if (ItemCount > 0)
             {
-                _foldout = EditorGUI.BeginFoldoutHeaderGroup(
-                    foldoutRect, _foldout, label, FoldoutHeaderStyle
+                IsExpanded = EditorGUI.BeginFoldoutHeaderGroup(
+                    foldoutRect, IsExpanded, label, FoldoutHeaderStyle
                 );
                 EditorGUI.EndFoldoutHeaderGroup();
             }
             else
             {
                 EditorGUI.LabelField(foldoutRect, label);
-                _foldout = false;
-            }
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetAndSaveFoldout(_foldout);
+                IsExpanded = false;
             }
 
             Rect buttonRect = GetRightButtonRect(position);
             if (GUI.Button(buttonRect, AddButtonContent, EditorStyles.iconButton))
             {
                 _arrayProperty.InsertArrayElementAtIndex(ItemCount);
-                SetAndSaveFoldout(true);
+                IsExpanded = true;
             }
 
             DrawItemCountLabel(position);
 
-            if (_foldout)
-            {
-                DrawColumnHeaders(position);
-            }
+            if (IsExpanded) DrawColumnHeaders(position);
         }
 
 
@@ -143,7 +132,7 @@ namespace BCIEssentials.Editor
 
             GUI.Label(position, label, EditorStyles.miniLabel);
         }
-        
+
         private void DrawColumnHeaders(Rect position)
         {
             position.y += ColumnHeaderSpacing;
@@ -180,8 +169,7 @@ namespace BCIEssentials.Editor
             if (itemToDelete.HasValue)
             {
                 _arrayProperty.DeleteArrayElementAtIndex(itemToDelete.Value);
-                if (ItemCount == 0)
-                    SetAndSaveFoldout(false);
+                if (ItemCount == 0) IsExpanded = false;
             }
         }
 
@@ -211,7 +199,7 @@ namespace BCIEssentials.Editor
             SerializedProperty keyCodeProperty
             = GetElementKeyCodeProperty(arrayIndex);
 
-            KeyCode keyCode = (KeyCode)keyCodeProperty.enumValueFlag;
+            Key keyCode = (Key)keyCodeProperty.enumValueFlag;
             Rect keyCodeRect = elementRect
                 .HorizontalSlice(NormalizedIndexFieldSize)
                 .Narrowed(ButtonWidth + ItemSpacing.x);

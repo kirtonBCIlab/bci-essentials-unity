@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 namespace BCIEssentials.LSLFramework
 {
-    public class MarkerWriter: LSLStreamWriter
+    [Serializable]
+    public class MarkerWriter : LSLStreamWriter
     {
         private float? _lastEpochLength;
 
@@ -19,7 +21,7 @@ namespace BCIEssentials.LSLFramework
         public void PushDoneWithRestingStateCollectionMarker()
             => PushStatusMarker<DoneWithRestingStateCollectionMarker>();
         public void PushStatusMarker<T>()
-            where T: IStatusMarker, new()
+            where T : IStatusMarker, new()
             => PushMarker(new T());
 
 

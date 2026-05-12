@@ -1,40 +1,78 @@
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Collections
+namespace BCIEssentials.Stimulus
 {
-    using Presentation;
+    public enum SearchMethod { Type, Tag }
+    public enum Scope { Scene, Children, ChildrenOfParent }
 
+    [System.Serializable]
     public class DynamicStimulusPresenterCollection : StimulusPresenterCollection
     {
-        public enum SearchMethod { Type, Tag }
-        public enum Scope { Scene, Children, ChildrenOfParent }
-
+        [Header("Presenter Discovery")]
         public SearchMethod PopulationMethod;
         public Scope PopulationScope;
 
         [ShowIf(nameof(PopulationMethod), (int)SearchMethod.Tag)]
         public string PresenterTag = "BCI";
+        public bool RepopulateWhenQueried;
+
+        protected readonly MonoBehaviour _defaultSearchAnchor;
+
+        public DynamicStimulusPresenterCollection(
+            MonoBehaviour defaultSearchAnchor,
+            IEnumerable<StimulusPresenter> presenters = null
+        ) : base(presenters)
+        => _defaultSearchAnchor = defaultSearchAnchor;
+
+        public static implicit operator DynamicStimulusPresenterCollection
+        (List<StimulusPresenter> presenters) => new(null, presenters);
+        public static implicit operator DynamicStimulusPresenterCollection
+        (StimulusPresenter[] presenters) => new(null, presenters);
 
 
-        public void Repopulate()
+        public void Repopulate() => Repopulate(_defaultSearchAnchor);
+        public void Repopulate(MonoBehaviour searchAnchor)
         {
             _stimulusPresenters = PopulationMethod switch
             {
-                SearchMethod.Type => this.GetSelectablePresentersByType(PopulationScope),
-                SearchMethod.Tag => this.GetSelectablePresentersByTag(PresenterTag, PopulationScope),
+                SearchMethod.Type => searchAnchor.GetSelectablePresentersByType(PopulationScope),
+                SearchMethod.Tag => searchAnchor.GetSelectablePresentersByTag(PresenterTag, PopulationScope),
                 _ => _stimulusPresenters
             };
         }
 
-
-        public override List<StimulusPresentationBehaviour> GetSelectable()
+#if UNITY_EDITOR
+        public void RepopulateSerialized(SerializedProperty property)
         {
-            if (enabled) Repopulate();
+            SerializedProperty presenterListProperty
+            = property.FindPropertyRelative(nameof(_stimulusPresenters));
+
+            Repopulate(property.serializedObject.targetObject as MonoBehaviour);
+            int presenterCount = _stimulusPresenters.Count;
+
+            presenterListProperty.arraySize = presenterCount;
+            for (int i = 0; i < presenterCount; i++)
+            {
+                SerializedProperty presenterEntryProperty
+                = presenterListProperty.GetArrayElementAtIndex(i);
+
+                presenterEntryProperty.objectReferenceInstanceIDValue = _stimulusPresenters[i].GetInstanceID();
+            }
+
+            Debug.Log($"Found {presenterCount} Stimulus Presenters Matching Search Criteria");
+        }
+#endif
+
+        public override List<StimulusPresenter> GetSelectable()
+        {
+            if (RepopulateWhenQueried) Repopulate();
             return base.GetSelectable();
         }
-        public override List<StimulusPresentationBehaviour> GetVisible()
+        public override List<StimulusPresenter> GetVisible()
         {
-            if (enabled) Repopulate();
+            if (RepopulateWhenQueried) Repopulate();
             return base.GetVisible();
         }
     }

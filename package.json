@@ -1,6 +1,6 @@
 {
   "name": "com.bci4kids.bciessentials",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "displayName": "BCI Essentials",
   "description": "A set of front end components for streamlined development of BCI applications in Unity",
   "unity": "2021.3",
@@ -14,7 +14,8 @@
     "url": "https://bci.games/"
   },
   "dependencies": {
-    "com.unity.shadergraph": "12.1.8",
+    "com.unity.inputsystem": "1.4.0",
+    "com.unity.2d.tilemap": "1.0.0",
     "com.labstreaminglayer.lsl4unity" : "1.16.0"
   },
   "samples": [

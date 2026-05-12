@@ -6,16 +6,16 @@ namespace BCIEssentials.Utilities
     {
         [InspectorReadOnly]
         [SerializeField]
-        private float _currentRefreshRate;
+        protected float _currentRefreshRate;
         public float CurrentRefreshRate => _currentRefreshRate;
         
         [InspectorReadOnly]
         [SerializeField]
-        private float _averageRefreshRate;
+        protected float _averageRefreshRate;
         public float AverageRefreshRate => _averageRefreshRate;
         
-        private float _sumRefreshRate;
-        private int _refreshCounter;
+        protected float _sumRefreshRate;
+        protected int _refreshCounter;
 
         private void Update()
         {

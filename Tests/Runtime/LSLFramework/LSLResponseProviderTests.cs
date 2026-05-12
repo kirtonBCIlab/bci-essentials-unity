@@ -15,15 +15,17 @@ namespace BCIEssentials.Tests.LSLFramework
         public override void SetUp()
         {
             base.SetUp();
-            InStream = AddComponent<ResponseProvider>();
-            InStream.StreamType = OutletType;
-            InStream.PollingPeriod = 0.02f;
+            InStream = new()
+            {
+                StreamType = OutletType,
+                PollingPeriod = 0.02f
+            };
         }
 
         [TearDown]
         public override void TearDown()
         {
-            Destroy(InStream);
+            InStream.CloseStream();
             base.TearDown();
         }
 

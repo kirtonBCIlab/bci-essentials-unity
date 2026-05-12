@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace BCIEssentials.Editor
 {
+    using UnityEngine.InputSystem;
     using Utilities;
 
     [CustomPropertyDrawer(typeof(KeyBind))]
@@ -13,7 +14,7 @@ namespace BCIEssentials.Editor
             SerializedProperty boundKeyProperty
             = property.FindPropertyRelative(nameof(KeyBind.BoundKey));
 
-            KeyCode value = (KeyCode)boundKeyProperty.enumValueFlag;
+            Key value = (Key)boundKeyProperty.enumValueFlag;
 
             string labelText = label.text;
             if (property.TryGetAttribute<InspectorNameAttribute>(out var nameAttribute))

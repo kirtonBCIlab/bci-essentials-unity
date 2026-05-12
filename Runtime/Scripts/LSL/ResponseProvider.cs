@@ -1,24 +1,27 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
+    using static LSLStreamResolver;
+
     /** <summary>
     A convenience class that pulls responses from an LSL
     outlet, providing them through typed callback subscriptions.
     </summary> **/
+    [Serializable]
     public partial class ResponseProvider: LSLStreamReader
     {
         [Min(0)]
         public float PollingPeriod = 0.1f;
 
-        private List<IResponseSubscriber> _subscribers = new();
-        
-        public bool IsPolling => _pollingCoroutine is not null;
-        private Coroutine _pollingCoroutine;
+        protected readonly List<IResponseSubscriber> _subscribers = new();
+
+        public bool IsPolling { get; private set; }
+        protected Thread _pollingThread;
 
 
         public override void CloseStream()
@@ -81,45 +84,52 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        private void StartPolling()
+        protected void StartPolling()
         {
             StopPolling();
             if (!IsConnected && !IsResolvingStream)
                 FindAndOpenStream();
 
-            _pollingCoroutine = StartCoroutine(RunPollForSamples());
+            IsPolling = true;
+            _pollingThread = new(PollForSamples);
+            _pollingThread.Start();
         }
 
-        private void StopPolling()
+        protected void StopPolling()
         {
             if (IsPolling)
             {
-                StopCoroutine(_pollingCoroutine);
-                _pollingCoroutine = null;
+                IsPolling = false;
+                _pollingThread.Join((int)(PollingPeriod * 1000));
+                _pollingThread = null;
             }
         }
 
 
-        protected IEnumerator RunPollForSamples()
+        protected void PollForSamples()
         {
-            while (!IsConnected) yield return null;
-            while (true)
+            while (!IsConnected) SleepForSeconds(PollingPeriod);
+            while (IsPolling)
             {
                 if (IsConnected)
                 {
                     PruneSubscriberList();
                     PullAllResponses();
+                    SleepForSeconds(PollingPeriod);
                 }
-                else yield return RunReconnect();
-                yield return new WaitForSeconds(PollingPeriod);
+                else Reconnect();
             }
         }
 
-        protected IEnumerator RunReconnect()
+        protected void Reconnect()
         {
             Debug.LogWarning("Response Provider Disconnected, attempting to reconnect...");
             FindAndOpenStream();
-            while (!IsConnected) yield return new WaitForSeconds(PollingPeriod);
+            while (!IsConnected)
+            {
+                if (!IsPolling) return;
+                SleepForSeconds(PollingPeriod);
+            }
             Debug.Log("Response Provider Reconnected");
         }
 

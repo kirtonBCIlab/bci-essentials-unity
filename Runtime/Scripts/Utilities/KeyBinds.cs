@@ -1,19 +1,21 @@
 using System;
-using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace BCIEssentials.Utilities
 {
     [Serializable]
     public class KeyBind
     {
-        public KeyCode BoundKey;
-        public KeyBind(KeyCode keyCode) { BoundKey = keyCode; }
-        public static implicit operator KeyCode(KeyBind b) => b.BoundKey;
-        public static implicit operator KeyBind(KeyCode k) => new(k);
+        public Key BoundKey;
+        public KeyBind(Key keyCode) { BoundKey = keyCode; }
+        public static implicit operator Key(KeyBind b) => b.BoundKey;
+        public static implicit operator KeyBind(Key k) => new(k);
 
-        public bool IsPressed => Input.GetKey(BoundKey);
-        public bool WasPressedThisFrame => Input.GetKeyDown(BoundKey);
-        public bool WasReleasedThisFrame => Input.GetKeyUp(BoundKey);
+        public bool IsPressed => Control.isPressed;// Input.GetKey(BoundKey);
+        public bool WasPressedThisFrame => Control.wasPressedThisFrame; //Input.GetKeyDown(BoundKey);
+        public bool WasReleasedThisFrame => Control.wasReleasedThisFrame;// Input.GetKeyUp(BoundKey);
+        protected KeyControl Control => Keyboard.current[BoundKey];
 
         public void CallIfPressedThisFrame(Action method)
         {
@@ -25,7 +27,7 @@ namespace BCIEssentials.Utilities
     public class IndexedKeyBind : KeyBind
     {
         public int Index;
-        public IndexedKeyBind(int index, KeyCode keyCode)
+        public IndexedKeyBind(int index, Key keyCode)
         : base(keyCode) => Index = index;
 
         public void CallIfPressedThisFrame(Action<int> indexedMethod)
@@ -46,13 +48,13 @@ namespace BCIEssentials.Utilities
         }
 
         public IndexedKeyBindSet
-        (params (int, KeyCode)[] tuples)
+        (params (int, Key)[] tuples)
         {
             int count = tuples.Length;
             Bindings = new IndexedKeyBind[count];
             for (int i = 0; i < count; i++)
             {
-                (int index, KeyCode keyCode) = tuples[i];
+                (int index, Key keyCode) = tuples[i];
                 Bindings[i] = new(index, keyCode);
             }
         }
