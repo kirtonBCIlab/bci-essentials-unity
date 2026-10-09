@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,9 @@ namespace BCIEssentials
 
         [SerializeField] protected MarkerWriter MarkerWriter;
         [SerializeField] protected ResponseProvider ResponseProvider;
+
+        private readonly List<IMarkerSource> _servicedSources = new();
+        private readonly List<IPredictionSink> _servicedSinks = new();
 
 
         protected virtual void Awake()
@@ -48,11 +52,11 @@ namespace BCIEssentials
         {
             WarnIfProvisionScopeOverlaps();
 
-            IMarkerSource[] unservicedSources = FindComponentsInScope<IMarkerSource>();
-            IPredictionSink[] unservicedSinks = FindComponentsInScope<IPredictionSink>();
+            IMarkerSource[] sources = FindComponentsInScope<IMarkerSource>();
+            IPredictionSink[] sinks = FindComponentsInScope<IPredictionSink>();
 
-            Array.ForEach(unservicedSources, ProvideMarkerWriter);
-            Array.ForEach(unservicedSinks, ProvideResponseSubscription);
+            Array.ForEach(sources, ProvideMarkerWriter);
+            Array.ForEach(sinks, ProvideResponseSubscription);
         }
 
         T[] FindComponentsInScope<T>()
@@ -67,9 +71,17 @@ namespace BCIEssentials
 
 
         protected void ProvideMarkerWriter(IMarkerSource source)
-        => source.MarkerWriter = MarkerWriter;
+        {
+            if (_servicedSources.Contains(source)) return;
+            source.MarkerWriter = MarkerWriter;
+            _servicedSources.Add(source);
+        }
         protected void ProvideResponseSubscription(IPredictionSink sink)
-        => ResponseProvider.SubscribePredictions(sink.OnPrediction);
+        {
+            if (_servicedSinks.Contains(sink)) return;
+            ResponseProvider.SubscribePredictions(sink.OnPrediction);
+            _servicedSinks.Add(sink);
+        }
 
 
         protected void WarnIfProvisionScopeOverlaps()
