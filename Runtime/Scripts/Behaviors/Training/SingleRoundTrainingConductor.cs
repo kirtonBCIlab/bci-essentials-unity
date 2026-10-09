@@ -22,27 +22,31 @@ namespace BCIEssentials
         [EndFoldoutGroup]
         public float PostTrialTime = 0.0f;
 
+        protected bool _targetIsBeingIndicated;
+
 
         protected override IEnumerator Run() => RunRound(TargetIndex);
 
         public virtual IEnumerator RunRound(int targetIndex)
         {
             TargetIndicator.BeginTargetIndication(targetIndex);
-            yield return new WaitForSeconds(TargetIndicationPeriod);
-
-            if (!PersistTargetIndication)
+            _targetIsBeingIndicated = true;
+            try
             {
-                TargetIndicator.EndTargetIndication();
+                yield return new WaitForSeconds(TargetIndicationPeriod);
+
+                if (!PersistTargetIndication) EndAndFlagTargetIndication();
+
+                yield return new WaitForSeconds(PreTrialTime);
+                TrialConductor.StartTrainingTrial(targetIndex, _lastExecutionHost);
+                yield return TrialConductor.AwaitCompletion();
+                yield return new WaitForSeconds(PostTrialTime);
+
+                if (PersistTargetIndication) EndAndFlagTargetIndication();
             }
-
-            yield return new WaitForSeconds(PreTrialTime);
-            TrialConductor.StartTrainingTrial(targetIndex, _lastExecutionHost);
-            yield return TrialConductor.AwaitCompletion();
-            yield return new WaitForSeconds(PostTrialTime);
-
-            if (PersistTargetIndication)
+            finally
             {
-                TargetIndicator.EndTargetIndication();
+                if (_targetIsBeingIndicated) EndAndFlagTargetIndication();
             }
         }
 
@@ -50,6 +54,13 @@ namespace BCIEssentials
         protected override void CleanUp()
         {
             if (TrialConductor.IsRunning) TrialConductor.Interrupt();
+            if (_targetIsBeingIndicated) EndAndFlagTargetIndication();
+        }
+
+        protected void EndAndFlagTargetIndication()
+        {
+            TargetIndicator.EndTargetIndication();
+            _targetIsBeingIndicated = false;
         }
     }
 }
