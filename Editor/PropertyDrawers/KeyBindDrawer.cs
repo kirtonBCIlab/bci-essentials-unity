@@ -23,7 +23,7 @@ namespace BCIEssentials.Editor
             }
             
             EditorGUI.BeginChangeCheck();
-            value = GUIInputFields.KeyCodeField(position, labelText, value);
+            value = GUIInputFields.KeyField(position, labelText, value);
             if (EditorGUI.EndChangeCheck())
             {
                 boundKeyProperty.enumValueFlag = (int)value;

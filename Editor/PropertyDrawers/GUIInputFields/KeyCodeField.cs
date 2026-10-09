@@ -1,7 +1,6 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 namespace BCIEssentials.Editor
 {
@@ -10,17 +9,17 @@ namespace BCIEssentials.Editor
         const float NormalizedLabelSize = 0.6f;
         const float FieldSpacing = 4f;
 
-        public static Key KeyCodeField(Rect position, string label, Key value)
+        public static Key KeyField(Rect position, string label, Key value)
         {
             (Rect labelPosition, Rect valueFieldPosition)
             = position.SplitHorizontally(NormalizedLabelSize, FieldSpacing);
             label = label.TrimSuffix("Binding");
             EditorGUI.LabelField(labelPosition, label);
 
-            return KeyCodeField(valueFieldPosition, value);
+            return KeyField(valueFieldPosition, value);
         }
 
-        public static Key KeyCodeField(Rect position, Key currentValue)
+        public static Key KeyField(Rect position, Key currentValue)
         {
             int keyboardControlId = GUIUtility.GetControlID(FocusType.Keyboard);
             Event currentEvent = Event.current;
@@ -28,7 +27,7 @@ namespace BCIEssentials.Editor
             switch (currentEvent.GetTypeForControl(keyboardControlId))
             {
                 case EventType.Repaint:
-                    DrawKeyCodeField(
+                    DrawKeyField(
                         position, currentValue,
                         GUIUtility.keyboardControl == keyboardControlId
                     );
@@ -66,7 +65,7 @@ namespace BCIEssentials.Editor
             return currentValue;
         }
 
-        private static void DrawKeyCodeField
+        private static void DrawKeyField
         (
             Rect position, Key displayValue,
             bool isEditing = false

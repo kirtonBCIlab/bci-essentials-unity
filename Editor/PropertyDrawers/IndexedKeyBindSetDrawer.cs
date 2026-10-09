@@ -145,7 +145,7 @@ namespace BCIEssentials.Editor
             Rect keyCodeHeaderRect = position
                 .HorizontalSlice(NormalizedIndexFieldSize)
                 .Narrowed(ButtonWidth + ItemSpacing.x);
-            GUI.Label(keyCodeHeaderRect, "KeyCode");
+            GUI.Label(keyCodeHeaderRect, "Key");
         }
 
 
@@ -155,7 +155,7 @@ namespace BCIEssentials.Editor
             for (int i = 0; i < ItemCount; i++)
             {
                 DrawArrayElementIndexField(i, position);
-                DrawArrayElementKeyCodeField(i, position);
+                DrawArrayElementKeyField(i, position);
 
                 Rect buttonRect = GetRightButtonRect(position);
                 if (GUI.Button(buttonRect, RemoveButtonContent, EditorStyles.iconButton))
@@ -193,11 +193,11 @@ namespace BCIEssentials.Editor
             }
         }
 
-        private void DrawArrayElementKeyCodeField
+        private void DrawArrayElementKeyField
         (int arrayIndex, Rect elementRect)
         {
             SerializedProperty keyCodeProperty
-            = GetElementKeyCodeProperty(arrayIndex);
+            = GetElementKeyProperty(arrayIndex);
 
             Key keyCode = (Key)keyCodeProperty.enumValueFlag;
             Rect keyCodeRect = elementRect
@@ -205,7 +205,7 @@ namespace BCIEssentials.Editor
                 .Narrowed(ButtonWidth + ItemSpacing.x);
 
             EditorGUI.BeginChangeCheck();
-            keyCode = GUIInputFields.KeyCodeField(keyCodeRect, keyCode);
+            keyCode = GUIInputFields.KeyField(keyCodeRect, keyCode);
             if (EditorGUI.EndChangeCheck())
             {
                 keyCodeProperty.enumValueFlag = (int)keyCode;
@@ -217,7 +217,7 @@ namespace BCIEssentials.Editor
         => GetPropertyFromArrayEntry(
             arrayIndex, nameof(IndexedKeyBind.Index)
         );
-        private SerializedProperty GetElementKeyCodeProperty(int arrayIndex)
+        private SerializedProperty GetElementKeyProperty(int arrayIndex)
         => GetPropertyFromArrayEntry(
             arrayIndex, nameof(IndexedKeyBind.BoundKey)
         );
