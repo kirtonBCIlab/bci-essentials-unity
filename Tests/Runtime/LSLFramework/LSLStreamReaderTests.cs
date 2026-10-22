@@ -1,14 +1,14 @@
-using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.TestTools;
+using System.Threading;
 using BCIEssentials.LSLFramework;
 using BCIEssentials.Tests.Utilities.LSLFramework;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace BCIEssentials.Tests.LSLFramework
 {
-    public class LSLStreamReaderTests: LSLOutletTestRunner
+    public class LSLStreamReaderTests : LSLOutletTestRunner
     {
         LSLStreamReader InStream;
 
@@ -22,7 +22,7 @@ namespace BCIEssentials.Tests.LSLFramework
         [TearDown]
         public override void TearDown()
         {
-            Destroy(InStream);
+            InStream.CloseStream();
             base.TearDown();
         }
 
@@ -38,7 +38,6 @@ namespace BCIEssentials.Tests.LSLFramework
         {
             var inStream = BuildAndOpenStreamReader("Invalid Stream Type");
             AssertNotConnected(inStream);
-            Destroy(inStream);
         }
 
         [UnityTest]
@@ -54,7 +53,6 @@ namespace BCIEssentials.Tests.LSLFramework
 
             AssertConnected(inStream);
             outlet.Dispose();
-            Destroy(inStream);
         }
 
         [Test]
@@ -92,15 +90,12 @@ namespace BCIEssentials.Tests.LSLFramework
             Assert.AreEqual(1, prediction.Index);
         }
 
-        
-        private LSLStreamReader BuildAndOpenStreamReader
-        (
-            string streamType
-        )
+
+        private LSLStreamReader BuildAndOpenStreamReader(string streamType)
         {
-            var inStream = AddComponent<LSLStreamReader>();
-            inStream.StreamType = streamType;
+            LSLStreamReader inStream = new() { StreamType = streamType };
             inStream.FindAndOpenStream(0.02f);
+            Thread.Sleep(50);
             return inStream;
         }
 

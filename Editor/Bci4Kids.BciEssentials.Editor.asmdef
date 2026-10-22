@@ -2,7 +2,8 @@
     "name": "Bci4Kids.BciEssentials.Editor",
     "rootNamespace": "BciEssentials.Editor",
     "references": [
-        "Bci4Kids.BciEssentials"
+        "Bci4Kids.BciEssentials",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

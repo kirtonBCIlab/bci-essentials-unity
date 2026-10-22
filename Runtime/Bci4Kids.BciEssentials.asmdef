@@ -2,8 +2,9 @@
     "name": "Bci4Kids.BciEssentials",
     "rootNamespace": "BciEssentials",
     "references": [
-        "GUID:e280ff789d4407a47998ba70fab1034b",
-        "Bci4Kids.BciEssentials.LSLFramework"
+        "LSL.LSL",
+        "Bci4Kids.BciEssentials.LSLFramework",
+        "Unity.InputSystem"
     ],
     "overrideReferences": true,
     "precompiledReferences": [

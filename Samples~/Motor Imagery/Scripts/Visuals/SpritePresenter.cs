@@ -4,7 +4,7 @@ using BCIEssentials.Extensions;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class SpritePresenter : MonoBehaviourUsingExtendedAttributes
+public class SpritePresenter : MonoBehaviourWithFoldoutGroups
 {
     private Coroutine _delayedSpriteChainRoutine;
     private SpriteRenderer Renderer

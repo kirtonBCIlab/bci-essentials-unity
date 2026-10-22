@@ -3,18 +3,12 @@ namespace BCIEssentials
     using LSLFramework;
 
 
-    public interface IHasInstanceID
-    {
-        public int GetInstanceID();
-    }
-
-
-    public interface IMarkerSource : IHasInstanceID
+    public interface IMarkerSource
     {
         public MarkerWriter MarkerWriter { set; }
     }
 
-    public interface IPredictionSink : IHasInstanceID
+    public interface IPredictionSink
     {
         public void OnPrediction(Prediction prediction);
     }

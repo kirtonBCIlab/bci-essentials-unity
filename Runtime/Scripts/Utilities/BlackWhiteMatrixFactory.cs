@@ -12,9 +12,9 @@ namespace BCIEssentials.Utilities
         public int MatrixHeight { get; private set; }
         public int MatrixArea => MatrixWidth * MatrixHeight;
 
-        private System.Random _random = new();
-        private int _sourceGridWidth;
-        private int _sourceGridArea;
+        protected System.Random _random = new();
+        protected readonly int _sourceGridWidth;
+        protected readonly int _sourceGridArea;
 
 
         public BlackWhiteMatrixFactory
@@ -90,7 +90,7 @@ namespace BCIEssentials.Utilities
         }
         
 
-        private bool IndexIsBlack(int index)
+        protected bool IndexIsBlack(int index)
         {
             if (_sourceGridWidth % 2 == 1)
                 return index % 2 == 0;
@@ -100,6 +100,6 @@ namespace BCIEssentials.Utilities
                 return ((index - (rowNumber % 2)) % 2) == 0;
             };
         }
-        private bool IndexIsWhite(int i) => !IndexIsBlack(i);
+        protected bool IndexIsWhite(int i) => !IndexIsBlack(i);
     }
 }

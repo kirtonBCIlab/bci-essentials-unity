@@ -59,7 +59,7 @@ namespace BCIEssentials.Extensions
         }
 
 
-        private static GameObject[] SelectGameObjects
+        public static GameObject[] SelectGameObjects
         (
             this IEnumerable<Transform> caller
         )

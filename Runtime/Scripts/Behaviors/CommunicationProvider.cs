@@ -3,38 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace BCIEssentials.Behaviours
+namespace BCIEssentials
 {
-    using System.Linq;
-    using Extensions;
     using LSLFramework;
     using static Utilities.ComponentSearchMethods;
 
-    public class CommunicationProvider : MonoBehaviourUsingExtendedAttributes
+    public class CommunicationProvider : MonoBehaviourWithFoldoutGroups
     {
-        [Flags]
-        public enum ProvisionOccasion { Manual, Awake, SceneLoad = 3 }
+        public enum ProvisionOccasion { Manual, Awake, SceneLoad }
         public enum Scope { Scene, Children, SameObject }
 
-        public ProvisionOccasion ProvisionTriggers = ProvisionOccasion.Awake;
-        public Scope ProvisionScope = Scope.Scene;
+        public ProvisionOccasion ProvisionTrigger = ProvisionOccasion.Awake;
+        public Scope ProvisionScope = Scope.Children;
 
-        protected MarkerWriter MarkerWriter;
-        protected ResponseProvider ResponseProvider;
+        [SerializeField] protected MarkerWriter MarkerWriter;
+        [SerializeField] protected ResponseProvider ResponseProvider;
 
-        private readonly HashSet<int> _servicedComponentIds = new();
+        private readonly List<IMarkerSource> _servicedSources = new();
+        private readonly List<IPredictionSink> _servicedSinks = new();
 
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            if (ProvisionTriggers.HasFlag(ProvisionOccasion.SceneLoad))
+            MarkerWriter.OpenStream();
+            if (ProvisionTrigger == ProvisionOccasion.SceneLoad)
             {
                 SceneManager.activeSceneChanged += (_, _) => ProvideCommunication();
             }
-            else if (ProvisionTriggers.HasFlag(ProvisionOccasion.Awake))
+            else if (ProvisionTrigger == ProvisionOccasion.Awake)
             {
                 ProvideCommunication();
             }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            MarkerWriter.CloseStream();
+            ResponseProvider.CloseStream();
         }
 
 
@@ -46,46 +51,40 @@ namespace BCIEssentials.Behaviours
         public void ProvideCommunication()
         {
             WarnIfProvisionScopeOverlaps();
-            gameObject.GetOrAddComponent(ref MarkerWriter, true);
-            gameObject.GetOrAddComponent(ref ResponseProvider, true);
 
-            IMarkerSource[] unservicedSources = GetUnservicedComponents<IMarkerSource>();
-            IPredictionSink[] unservicedSinks = GetUnservicedComponents<IPredictionSink>();
+            IMarkerSource[] sources = FindComponentsInScope<IMarkerSource>();
+            IPredictionSink[] sinks = FindComponentsInScope<IPredictionSink>();
 
-            Array.ForEach(unservicedSources, ProvideMarkerWriter);
-            Array.ForEach(unservicedSinks, ProvideResponseSubscription);
+            Array.ForEach(sources, ProvideMarkerWriter);
+            Array.ForEach(sinks, ProvideResponseSubscription);
         }
-        
-        T[] GetUnservicedComponents<T>() where T : IHasInstanceID
+
+        T[] FindComponentsInScope<T>()
+        => ProvisionScope switch
         {
-            T[] found = ProvisionScope switch
-            {
-                Scope.Scene => GetComponentsInScene<T>(),
-                Scope.Children => GetComponentsInChildren<T>(),
-                _ => GetComponents<T>(),
-            };
-
-            return found.Where(
-                c => !_servicedComponentIds.Contains(c.GetInstanceID())
-            ).ToArray();
-        }
+            Scope.Scene => GetComponentsInScene<T>(),
+            Scope.Children => GetComponentsInChildren<T>(),
+            _ => GetComponents<T>(),
+        };
 
         public void UpdateClassifier() => MarkerWriter.PushUpdateClassifierMarker();
 
 
-        private void ProvideMarkerWriter(IMarkerSource source)
+        protected void ProvideMarkerWriter(IMarkerSource source)
         {
+            if (_servicedSources.Contains(source)) return;
             source.MarkerWriter = MarkerWriter;
-            _servicedComponentIds.Append(source.GetInstanceID());
+            _servicedSources.Add(source);
         }
-        private void ProvideResponseSubscription(IPredictionSink sink)
+        protected void ProvideResponseSubscription(IPredictionSink sink)
         {
+            if (_servicedSinks.Contains(sink)) return;
             ResponseProvider.SubscribePredictions(sink.OnPrediction);
-            _servicedComponentIds.Append(sink.GetInstanceID());
+            _servicedSinks.Add(sink);
         }
 
 
-        private void WarnIfProvisionScopeOverlaps()
+        protected void WarnIfProvisionScopeOverlaps()
         {
             CommunicationProvider[] providersInScope = ProvisionScope switch
             {

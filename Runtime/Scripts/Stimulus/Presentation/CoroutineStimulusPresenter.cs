@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BCIEssentials.Stimulus.Presentation
+namespace BCIEssentials.Stimulus
 {
-    public abstract class CoroutineStimulusPresenter : StimulusPresentationBehaviour
+    public abstract class CoroutineStimulusPresenter : StimulusPresenter
     {
 
-        private Coroutine _stimulusRoutine;
+        protected Coroutine _stimulusRoutine;
 
 
         public override void StartStimulusDisplay()

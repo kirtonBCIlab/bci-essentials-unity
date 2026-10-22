@@ -1,8 +1,8 @@
 using UnityEngine.Events;
 
-namespace BCIEssentials.Stimulus.Presentation
+namespace BCIEssentials.Stimulus
 {
-    public class UnityEventStimulusPresenter : StimulusPresentationBehaviour
+    public class UnityEventStimulusPresenter : StimulusPresenter
     {
         public UnityEvent OnStimulusDisplayTrigged;
         public UnityEvent OnStimulusDisplayEnded;

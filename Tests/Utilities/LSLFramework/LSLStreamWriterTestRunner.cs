@@ -4,10 +4,11 @@ using BCIEssentials.LSLFramework;
 using NUnit.Framework;
 
 using static BCIEssentials.LSLFramework.LSLStreamResolver;
+using UnityEditor.Build.Content;
 
 namespace BCIEssentials.Tests.Utilities.LSLFramework
 {
-    public class LSLStreamWriterTestRunner<T>: PlayModeTestRunner where T: LSLStreamWriter
+    public class LSLStreamWriterTestRunner<T>: PlayModeTestRunner where T: LSLStreamWriter, new()
     {
         protected T OutStream;
         private StreamInlet _inlet;
@@ -22,7 +23,7 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
         [TearDown]
         public virtual void TearDown()
         {
-            Destroy(OutStream);
+            OutStream.CloseStream();
             _inlet.Dispose();
         }
 
@@ -41,13 +42,15 @@ namespace BCIEssentials.Tests.Utilities.LSLFramework
 
 
         protected T BuildTestSpecificStreamWriter()
-        => AddComponent<T> (
-            outStream => {
-                outStream.StreamName = $"UnityTestingOutletFor:{CurrentTestName}";
-                outStream.StreamType = "StreamWriterTestMarkers";
-                outStream.OpenStream();
-            }
-        );
+        {
+            T writer = new()
+            {
+                StreamName = $"UnityTestingOutletFor:{CurrentTestName}",
+                StreamType = "StreamWriterTestMarkers"
+            };
+            writer.OpenStream();
+            return writer;
+        }
 
         protected StreamInlet ConnectTestInlet()
         {

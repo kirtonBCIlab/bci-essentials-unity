@@ -5,11 +5,7 @@ using UnityEngine;
 
 namespace BCIEssentials
 {
-    /// <summary>
-    /// Base class for MonoBehaviours using
-    /// [FoldoutGroup] and [ShowIf] attributes
-    /// </summary>
-    public abstract class MonoBehaviourUsingExtendedAttributes: MonoBehaviour {}
+    public abstract class MonoBehaviourWithFoldoutGroups : MonoBehaviour { }
 
     public class InspectorReadOnlyAttribute : PropertyAttribute { }
 
@@ -49,12 +45,11 @@ namespace BCIEssentials
 
     /// <summary>
     /// Triggers conditional inspector rendering on a serialized script field
-    /// if used from a child of <see cref="MonoBehaviourUsingExtendedAttributes"/>
     /// <br/>
     /// Multiple instances can be used to require multiple conditions.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
-    public class ShowIfAttribute : Attribute
+    public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionPropertyPath;
         public int[] ValidValues;
@@ -74,10 +69,18 @@ namespace BCIEssentials
         }
 
 # if UNITY_EDITOR
-        public bool ShouldShow(SerializedObject target)
+        public bool ShouldShow(SerializedProperty referenceProperty)
         {
+            string referencePath = referenceProperty.propertyPath;
+
+            string[] referencePathSegments = referencePath.Split('.');
+            string parentPropertyPath = referencePathSegments.Length > 1
+                ? string.Join('.', referencePathSegments[0..^1]) + '.'
+                : "";
+
+            SerializedObject hostObject = referenceProperty.serializedObject;
             SerializedProperty conditionProperty
-            = target.FindProperty(ConditionPropertyPath);
+            = hostObject.FindProperty(parentPropertyPath + ConditionPropertyPath);
 
             if (conditionProperty == null)
             {
