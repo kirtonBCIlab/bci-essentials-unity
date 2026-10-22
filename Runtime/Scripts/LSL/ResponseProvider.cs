@@ -1,35 +1,46 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
-    using static LSLStreamResolver;
-
     /** <summary>
-    A convenience class that pulls responses from an LSL
-    outlet, providing them through typed callback subscriptions.
+    Convenience class to pull responses from an LSL
+    outlet, providing them through typed callback
+    subscriptions.
+    Process method must be invoked regularly.
     </summary> **/
     [Serializable]
-    public partial class ResponseProvider: LSLStreamReader
+    public partial class ResponseProvider : LSLStreamReader
     {
         [Min(0)]
         public float PollingPeriod = 0.1f;
+        protected float _lastPullTime = 0;
 
         protected readonly List<IResponseSubscriber> _subscribers = new();
 
-        public bool IsPolling { get; private set; }
-        protected Thread _pollingThread;
-
-
-        public override void CloseStream()
+        /** <summary>
+        Pulls responses from internal inlet, distributing
+        them to subscribers. Also handles connection.
+        <br/>
+        Use in Update()
+        </summary> **/
+        public virtual void ProcessResponseProvision()
         {
-            base.CloseStream();
-            StopPolling();
-        }
+            if (Time.time < _lastPullTime + PollingPeriod) return;
 
+            if (IsConnected)
+            {
+                PruneSubscriberList();
+                PullAllResponses();
+                _lastPullTime = Time.time;
+            }
+            else if (!IsResolvingStream)
+            {
+                FindAndOpenStream();
+            }
+        }
 
         public void SubscribePredictions(Action<Prediction> callback)
         => Subscribe(callback);
@@ -52,12 +63,10 @@ namespace BCIEssentials.LSLFramework
         public void Subscribe<T>(Action<T> callback)
         where T: Response
         {
+            if (_subscribers.Count == 0) PrepareForSubscribers();
             _subscribers.Add(new ResponseSubscriber<T>(callback));
-            if (!IsPolling)
-                StartPolling();
         }
 
-        
         public bool UnsubscribePredictions(Action<Prediction> callback)
         => Unsubscribe(callback);
         public bool UnsubscribeAll(Action<Response> callback)
@@ -77,60 +86,8 @@ namespace BCIEssentials.LSLFramework
                 subscriber => subscriber.MatchesCallback(callback)
             );
 
-            if (_subscribers.Count == 0)
-                StopPolling();
-            
+            CheckForSubscriberCleanup();
             return subscribersRemoved == 1;
-        }
-
-
-        protected virtual void StartPolling()
-        {
-            StopPolling();
-            if (!IsConnected && !IsResolvingStream)
-                FindAndOpenStream();
-
-            IsPolling = true;
-            _pollingThread = new(PollForSamples);
-            _pollingThread.Start();
-        }
-
-        protected virtual void StopPolling()
-        {
-            if (IsPolling)
-            {
-                IsPolling = false;
-                _pollingThread.Join((int)(PollingPeriod * 1000));
-                _pollingThread = null;
-            }
-        }
-
-
-        protected void PollForSamples()
-        {
-            while (!IsConnected) SleepForSeconds(PollingPeriod);
-            while (IsPolling)
-            {
-                if (IsConnected)
-                {
-                    PruneSubscriberList();
-                    PullAllResponses();
-                    SleepForSeconds(PollingPeriod);
-                }
-                else Reconnect();
-            }
-        }
-
-        protected void Reconnect()
-        {
-            Debug.LogWarning("Response Provider Disconnected, attempting to reconnect...");
-            FindAndOpenStream();
-            while (!IsConnected)
-            {
-                if (!IsPolling) return;
-                SleepForSeconds(PollingPeriod);
-            }
-            Debug.Log("Response Provider Reconnected");
         }
 
         public override Response[] PullAllResponses(int maxSamples = 50)
@@ -147,9 +104,28 @@ namespace BCIEssentials.LSLFramework
         );
 
         protected int PruneSubscriberList()
-        => _subscribers.RemoveAll
-        (
-            subscriber => !subscriber.HasValidCallbackTarget()
-        );
+        {
+            int subscribersRemoved = _subscribers.RemoveAll
+            (
+                subscriber => !subscriber.HasValidCallbackTarget()
+            );
+            CheckForSubscriberCleanup();
+            return subscribersRemoved;
+        }
+
+        protected virtual void PrepareForSubscribers()
+        {
+            if (!IsConnected && !IsResolvingStream)
+            {
+                FindAndOpenStream();
+            }
+        }
+
+        protected void CheckForSubscriberCleanup()
+        {
+            if (_subscribers.Count > 0) return;
+            CleanUpAfterSubscribers();
+        }
+        protected virtual void CleanUpAfterSubscribers() { }
     }
 }
