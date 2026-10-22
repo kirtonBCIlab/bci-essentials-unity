@@ -5,7 +5,7 @@ namespace BCIEssentials
     using LSLFramework;
     using Stimulus;
 
-    public class P300CommandCentre : BCICommandCentre
+    public class P300Hub : BCIHub
     {
         public override int TargetCount => Presenters.LatestSubset.Count;
         protected override TrialConductor TrialConductor => _trialConductor;

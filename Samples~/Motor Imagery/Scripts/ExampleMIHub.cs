@@ -2,7 +2,7 @@ using BCIEssentials.LSLFramework;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class ExampleMiCommandCentre: MonoBehaviour
+public class ExampleMiHub: MonoBehaviour
 {
     public BlockTrainTrainingConductor TrainingConductor;
     public ClassificationPollingConductor ClassificationPollingConductor;

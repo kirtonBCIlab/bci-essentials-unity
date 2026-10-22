@@ -6,7 +6,7 @@ namespace BCIEssentials
     using LSLFramework;
     using Stimulus;
 
-    public class SSVEPCommandCentre : BCICommandCentre
+    public class SSVEPHub : BCIHub
     {
         public override int TargetCount => Presenters.WhereSelectable().Count;
         protected override TrialConductor TrialConductor => _trialConductor;

@@ -26,7 +26,7 @@ public class GameplayPresentationController : MonoBehaviour
 
     private void Start()
     {
-        _inputProvider = FindAnyObjectByType<ExampleMiCommandCentre>().ClassificationPollingConductor;
+        _inputProvider = FindAnyObjectByType<ExampleMiHub>().ClassificationPollingConductor;
         _inputProvider.ClassificationStarted += Monster.DisplayNewMonster;
         _inputProvider.ClassificationStarted += ChargeBar.Show;
         _inputProvider.ClassificationStarted += () => _chargeLevel = 0;

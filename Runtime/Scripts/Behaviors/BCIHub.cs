@@ -7,7 +7,7 @@ namespace BCIEssentials
     using LSLFramework;
     using Utilities;
 
-    public abstract class BCICommandCentre : MonoBehaviourWithFoldoutGroups, ITargetIndicator
+    public abstract class BCIHub : MonoBehaviourWithFoldoutGroups, ITargetIndicator
     {
         public abstract int TargetCount { get; }
         protected abstract TrialConductor TrialConductor { get; }
