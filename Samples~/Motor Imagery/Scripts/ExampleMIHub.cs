@@ -26,6 +26,7 @@ public class ExampleMiHub: MonoBehaviour
         BlockTrainTrainingConductor.CleanupInvoked -= _onTrainingCompleted.Invoke;
     }
 
+    private void Update() => _responseProvider.ProcessResponseProvision();
 
     public void StartTraining() => TrainingConductor.Begin(this);
     public void StopTraining() => TrainingConductor.Interrupt();

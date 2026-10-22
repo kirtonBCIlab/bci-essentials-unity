@@ -52,7 +52,11 @@ namespace BCIEssentials
             _trainingConductor.TargetIndicator ??= this;
         }
 
-        protected virtual void Update() => ProcessKeyBinds();
+        protected virtual void Update()
+        {
+            ProcessKeyBinds();
+            _responseProvider.ProcessResponseProvision();
+        }
         protected virtual void ProcessKeyBinds()
         {
             _toggleTrialRunBinding.CallIfPressedThisFrame(ToggleTrialRun);
