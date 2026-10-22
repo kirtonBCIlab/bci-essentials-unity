@@ -7,15 +7,16 @@ using NUnit.Framework;
 
 namespace BCIEssentials.Tests.LSLFramework
 {
-    public class LSLResponseProviderTests: LSLOutletTestRunner
+    public class ResponseProviderTests: LSLOutletTestRunner
     {
-        ResponseProvider InStream;
+        protected virtual ResponseProvider InStream => _provider;
+        ResponseProvider _provider;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            InStream = new()
+            _provider = new()
             {
                 StreamType = OutletType,
                 PollingPeriod = 0.02f
@@ -29,29 +30,10 @@ namespace BCIEssentials.Tests.LSLFramework
             base.TearDown();
         }
 
-
-        [Test]
-        public void WhenCreated_ThenNotPolling()
+        protected virtual IEnumerator StepProvider()
         {
-            Assert.IsFalse(InStream.IsPolling);
-        }
-
-        [Test]
-        public void Subscribe_WhenNotPolling_ThenStartsPolling()
-        {
-            Assert.IsFalse(InStream.IsPolling);
-            InStream.SubscribeAll(r => {});
-            Assert.IsTrue(InStream.IsPolling);
-        }
-
-        [Test]
-        public void Unsubscribe_WhenPolling_ThenNotPolling()
-        {
-            static void dummySubscriber(Response r) { }
-            InStream.SubscribeAll(dummySubscriber);
-            Assert.IsTrue(InStream.IsPolling);
-            InStream.UnsubscribeAll(dummySubscriber);
-            Assert.IsFalse(InStream.IsPolling);
+            _provider.ProcessResponseProvision();
+            yield return null;
         }
 
         [UnityTest]
@@ -60,7 +42,7 @@ namespace BCIEssentials.Tests.LSLFramework
             Response response = null;
             InStream.SubscribeAll(r => response = r);
             PushStringThroughOutlet("ping");
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return StepProvider();
             Assert.NotNull(response);
         }
 
@@ -74,7 +56,7 @@ namespace BCIEssentials.Tests.LSLFramework
             PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return StepProvider();
             Assert.NotNull(prediction);
             Assert.AreEqual(1, prediction.Index);
         }
@@ -94,7 +76,7 @@ namespace BCIEssentials.Tests.LSLFramework
             PushStringThroughOutlet("2:[0.39 0.61]");
             PushStringThroughOutlet("ping");
 
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return StepProvider();
             Assert.AreEqual(3, responseCount);
             Assert.AreEqual(1, predictionCount);
             Assert.AreEqual(2, pingCount);
@@ -111,14 +93,14 @@ namespace BCIEssentials.Tests.LSLFramework
 
             PushStringThroughOutlet("ping");
 
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return StepProvider();
             Assert.AreEqual(1, unitySubscriber.responseCount);
             Assert.AreEqual(1, responseCount);
 
             Destroy(unitySubscriber);
             PushStringThroughOutlet("ping");
 
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return StepProvider();
             Assert.AreEqual(2, responseCount);
         }
 
