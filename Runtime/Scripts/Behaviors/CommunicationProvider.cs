@@ -14,7 +14,7 @@ namespace BCIEssentials
         public enum Scope { Scene, Children, SameObject }
 
         public ProvisionOccasion ProvisionTrigger = ProvisionOccasion.Awake;
-        public Scope ProvisionScope = Scope.Scene;
+        public Scope ProvisionScope = Scope.Children;
 
         [SerializeField] protected MarkerWriter MarkerWriter;
         [SerializeField] protected ResponseProvider ResponseProvider;
