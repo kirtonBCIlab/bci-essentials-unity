@@ -84,7 +84,7 @@ namespace BCIEssentials.LSLFramework
         }
 
 
-        protected void StartPolling()
+        protected virtual void StartPolling()
         {
             StopPolling();
             if (!IsConnected && !IsResolvingStream)
@@ -95,7 +95,7 @@ namespace BCIEssentials.LSLFramework
             _pollingThread.Start();
         }
 
-        protected void StopPolling()
+        protected virtual void StopPolling()
         {
             if (IsPolling)
             {
