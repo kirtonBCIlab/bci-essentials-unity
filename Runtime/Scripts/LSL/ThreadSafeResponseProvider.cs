@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace BCIEssentials.LSLFramework
 {
@@ -11,6 +12,8 @@ namespace BCIEssentials.LSLFramework
     [Serializable]
     public class ThreadSafeResponseProvider : ResponseProvider
     {
+        protected float _lastPullTime = 0;
+
         /** <summary>
         Pulls responses from internal inlet, distributing
         them to subscribers. Also handles connection.
@@ -19,10 +22,13 @@ namespace BCIEssentials.LSLFramework
         </summary> **/
         public void ProcessResponseProvision()
         {
+            if (Time.time < _lastPullTime + PollingPeriod) return;
+
             if (IsConnected)
             {
                 PruneSubscriberList();
                 PullAllResponses();
+                _lastPullTime = Time.time;
             }
             else if (!IsResolvingStream)
             {
